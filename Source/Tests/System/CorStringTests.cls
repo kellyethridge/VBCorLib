@@ -179,6 +179,52 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "", vbNullString, StringComparison.Ordinal, True
             Test.Use vbNullString, vbNullString, StringComparison.Ordinal, True
             
+        Case "StartsWith_WithValues_ReturnsExpected"
+            Test.Use "", "", True
+            Test.Use vbNullString, vbNullString, True
+            Test.Use "abc", "abc", True
+            Test.Use "abcdef", "ab", True
+            Test.Use "abcdef", "a", True
+            Test.Use "abcdef", "", True
+            Test.Use "abcdef", vbNullString, True
+            Test.Use "abc", "b", False
+            
+        Case "StartsWith_WithValuesWhenIgnoringCase_ReturnsExpected"
+            Test.Use "", "", True
+            Test.Use vbNullString, vbNullString, True
+            Test.Use "ABC", "abc", True
+            Test.Use "abc", "AbC", True
+            Test.Use "abcdef", "aB", True
+            Test.Use "abcdef", "A", True
+            Test.Use "abcdef", "a", True
+            Test.Use "abcdef", "", True
+            Test.Use "abcdef", vbNullString, True
+            Test.Use "abc", "B", False
+            Test.Use "abc", "b", False
+        
+        Case "EndsWith_WithValues_ReturnsExpected"
+            Test.Use "", "", True
+            Test.Use vbNullString, vbNullString, True
+            Test.Use "abc", "abc", True
+            Test.Use "abcdef", "ef", True
+            Test.Use "abcdef", "f", True
+            Test.Use "abcdef", "", True
+            Test.Use "abcdef", vbNullString, True
+            Test.Use "abc", "b", False
+            
+        Case "EndsWith_WithValuesWhenIgnoringCase_ReturnsExpected"
+            Test.Use "", "", True
+            Test.Use vbNullString, vbNullString, True
+            Test.Use "ABC", "abc", True
+            Test.Use "abc", "AbC", True
+            Test.Use "abcdef", "Ef", True
+            Test.Use "abcdef", "F", True
+            Test.Use "abcdef", "f", True
+            Test.Use "abcdef", "", True
+            Test.Use "abcdef", vbNullString, True
+            Test.Use "abc", "B", False
+            Test.Use "abc", "b", False
+        
     End Select
 End Sub
 
@@ -778,7 +824,37 @@ Public Sub CopyTo_WhenCopyingToNonStartOfArray_CopiesToDestination()
     Assert.That Dest, Iz.EqualTo(NewChars(0, 0, "2", "3"))
 End Sub
 
+Public Sub StartsWith_WithValues_ReturnsExpected(ByVal Source As String, ByVal Value As String, ByVal Expected As Boolean)
+    Dim Actual As Boolean
+    
+    Actual = CorString.StartsWith(Source, Value)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
 
+Public Sub StartsWith_WithValuesWhenIgnoringCase_ReturnsExpected(ByVal Source As String, ByVal Value As String, ByVal Expected As Boolean)
+    Dim Actual As Boolean
+    
+    Actual = CorString.StartsWith(Source, Value, OrdinalIgnoreCase)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub EndsWith_WithValues_ReturnsExpected(ByVal Source As String, ByVal Value As String, ByVal Expected As Boolean)
+    Dim Actual As Boolean
+    
+    Actual = CorString.EndsWith(Source, Value)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub EndsWith_WithValuesWhenIgnoringCase_ReturnsExpected(ByVal Source As String, ByVal Value As String, ByVal Expected As Boolean)
+    Dim Actual As Boolean
+    
+    Actual = CorString.EndsWith(Source, Value, OrdinalIgnoreCase)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
 
 
 Private Property Get WhiteSpaces() As String

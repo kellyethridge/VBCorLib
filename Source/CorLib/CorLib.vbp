@@ -411,7 +411,7 @@ ThreadingModel=1
 DebugStartupOption=0
 
 [TaskList]
-Num=11
+Num=10
 
 [TASK1]
 Description=Add tests for FromBase64Transform.TransformFinalBlock
@@ -437,40 +437,42 @@ Status=0
 Priority=1
 
 [TASK5]
-Description=Add CorString.CopyTo method
-Status=0
-Priority=1
-
-[TASK6]
 Description=Add CorString.EndsWith and CorString.StartsWith
 Status=0
 Priority=1
 
-[TASK7]
+[TASK6]
 Description=Add CorString.Split method
 Status=0
 Priority=1
 
-[TASK8]
+[TASK7]
 Description=Add TimeSpan.Multiply method
 Status=0
 Priority=1
 
-[TASK9]
+[TASK8]
 Description=Add TimeSpan.Divide method
 Status=0
 Priority=1
 
-[TASK10]
+[TASK9]
 Description=Consider adding CorMathF class
 Status=0
 Priority=1
 Comment=This class would have corrisponding methods to CorMath except the arguments and results would be of type Single instead of Double.
 
-[TASK11]
+[TASK10]
 Description=Add CryptDeriveKey method to Rfc2898DeriveBytes class
 Status=0
 Priority=1
+
+[TASK11]
+Description=
+Status=
+Priority=
+AssignedTo=
+Comment=
 
 [TASK12]
 Description=

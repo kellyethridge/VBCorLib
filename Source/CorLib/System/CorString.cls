@@ -474,6 +474,81 @@ Public Function Insert(ByRef s As String, ByVal StartIndex As Long, ByRef Value 
 End Function
 
 ''
+' Determines whether the beginning of a string matches the specified string when compared using the specified comparison option.
+'
+' @param s The string to check.
+' @param Value The string to compare to the substring at the beginning of <i>s</i>.
+' @param ComparisonType One of the enumeration values that determines how <i>s</i> and <i>Value</i> are compared.
+' @return <b>True</b> if the <i>s</i> parameter begins with <i>Value</i>; otherwise <b>False</b>.
+' <h4>Exceptions</h4>
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ArgumentException.html">ArgumentException</a></td><td><i>ComparisonType</i> is not a <a href="CorString.StringComparison.html">StringComparison</a> value.</td>
+'   </tr>
+' </table>
+Public Function StartsWith(ByRef s As String, ByRef Value As String, Optional ByVal ComparisonType As StringComparison = Ordinal) As Boolean
+    Dim SourceLength    As Long
+    Dim ValueLength     As Long
+    Dim SubstringPtr    As Long
+    
+    SourceLength = LenB(s)
+    ValueLength = LenB(Value)
+    
+    If ValueLength <= SourceLength Then
+        Select Case ComparisonType
+            Case StringComparison.Ordinal
+                StartsWith = OrdinalEquals(StrPtr(s), ValueLength, StrPtr(Value), ValueLength)
+            Case StringComparison.OrdinalIgnoreCase
+                StartsWith = OrdinalEqualsIgnoreCase(StrPtr(s), ValueLength, StrPtr(Value), ValueLength)
+            Case Else
+                Error.Argument ArgumentOutOfRange_Enum
+        End Select
+    End If
+End Function
+
+''
+' Determines whether the end of a string matches the specified string when compared using the specified comparison option.
+'
+' @param s The string to check.
+' @param Value The string to compare to the substring at the end of <i>s</i>.
+' @param ComparisonType One of the enumeration values that determines how <i>s</i> and <i>Value</i> are compared.
+' @return <b>True</b> if the <i>Value</i> parameter matches the end of <i>s</i>; otherwise <b>False</b>.
+' <h4>Exceptions</h4>
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ArgumentException.html">ArgumentException</a></td><td><i>ComparisonType</i> is not a <a href="CorString.StringComparison.html">StringComparison</a> value.</td>
+'   </tr>
+' </table>
+Public Function EndsWith(ByRef s As String, ByRef Value As String, Optional ByVal ComparisonType As StringComparison = Ordinal) As Boolean
+    Dim SourceLength    As Long
+    Dim ValueLength     As Long
+    Dim SubstringPtr    As Long
+    
+    SourceLength = LenB(s)
+    ValueLength = LenB(Value)
+    
+    If ValueLength <= SourceLength Then
+        Select Case ComparisonType
+            Case StringComparison.Ordinal
+                EndsWith = OrdinalEquals(StrPtr(s) + SourceLength - ValueLength, ValueLength, StrPtr(Value), ValueLength)
+            Case StringComparison.OrdinalIgnoreCase
+                EndsWith = OrdinalEqualsIgnoreCase(StrPtr(s) + SourceLength - ValueLength, ValueLength, StrPtr(Value), ValueLength)
+            Case Else
+                Error.Argument ArgumentOutOfRange_Enum
+        End Select
+    End If
+End Function
+
+
+''
 ' Determines whether two specified Strings have the same value.
 '
 ' @param a The first string to compare.
@@ -483,9 +558,9 @@ End Function
 Public Function Equals(ByRef a As String, ByRef b As String, Optional ByVal ComparisonType As StringComparison = Ordinal) As Boolean
     Select Case ComparisonType
         Case StringComparison.Ordinal
-            Equals = OrdinalEquals(StrPtr(a), StrPtr(b))
+            Equals = OrdinalEquals(StrPtr(a), LenB(a), StrPtr(b), LenB(b))
         Case StringComparison.OrdinalIgnoreCase
-            Equals = OrdinalEqualsIgnoreCase(StrPtr(a), StrPtr(b))
+            Equals = OrdinalEqualsIgnoreCase(StrPtr(a), LenB(a), StrPtr(b), LenB(b))
         Case Else
             Error.ArgumentOutOfRange "ComparisonType", ArgumentOutOfRange_Enum
     End Select
@@ -495,9 +570,9 @@ End Function
 Friend Function EqualsV(ByRef a As Variant, ByRef b As Variant, Optional ByVal ComparisonType As StringComparison = Ordinal) As Boolean
     Select Case ComparisonType
         Case StringComparison.Ordinal
-            EqualsV = OrdinalEquals(StrPtr(a), StrPtr(b))
+            EqualsV = OrdinalEquals(StrPtr(a), LenB(a), StrPtr(b), LenB(b))
         Case StringComparison.OrdinalIgnoreCase
-            EqualsV = OrdinalEqualsIgnoreCase(StrPtr(a), StrPtr(b))
+            EqualsV = OrdinalEqualsIgnoreCase(StrPtr(a), LenB(a), StrPtr(b), LenB(b))
         Case Else
             Error.ArgumentOutOfRange "ComparisonType", ArgumentOutOfRange_Enum
     End Select
@@ -840,31 +915,26 @@ NonEnumerable:
 End Function
 
 ' Adapted and modified from Chris Lucas XBeat/VBSpeed implementation
-Private Function OrdinalEquals(ByVal Ptr1 As Long, ByVal Ptr2 As Long) As Boolean
-    Dim i       As Long
-    Dim Len1    As Long
-    Dim Len2    As Long
-    Dim Tmp     As Long
-    
-    If Ptr1 <> vbNullPtr Then
-        Len1 = MemLong(Ptr1 - 4)
-    End If
-    If Ptr2 <> vbNullPtr Then
-        Len2 = MemLong(Ptr2 - 4)
-    End If
+Private Function OrdinalEquals(ByVal Ptr1 As Long, ByVal Len1 As Long, ByVal Ptr2 As Long, ByVal Len2 As Long) As Boolean
+    Dim i   As Long
+    Dim Tmp As Long
     
     ' Make an informed decision as to whether we should continue
     If Len1 <> Len2 Then
         Exit Function
     End If
     
-    If Len1 = 0 Then
-        OrdinalEquals = True
-        Exit Function
-    End If
-    
     mComparisonHeader1.pvData = Ptr1
     mComparisonHeader2.pvData = Ptr2
+    
+    Select Case Len1
+        Case 0
+            OrdinalEquals = True
+            Exit Function
+        Case vbSizeOfChar
+            OrdinalEquals = (mComparisonString1(0) And &HFFFF&) = (mComparisonString2(0) And &HFFFF&)
+            Exit Function
+    End Select
     
     Tmp = Len1 \ 4
     ' The first two characters come cheap
@@ -908,22 +978,13 @@ BailOut:
 End Function
 
 ' Adapted and modified from Chris Lucas XBeat/VBSpeed implementation
-Private Function OrdinalEqualsIgnoreCase(ByVal Ptr1 As Long, ByVal Ptr2 As Long) As Boolean
+Private Function OrdinalEqualsIgnoreCase(ByVal Ptr1 As Long, ByVal SLen As Long, ByVal Ptr2 As Long, ByVal SLen2 As Long) As Boolean
     Dim i       As Long
-    Dim SLen    As Long
-    Dim SLen2   As Long
     Dim Tmp1    As Long
     Dim Tmp2    As Long
     Dim Tmp3    As Long
     Dim Tmp4    As Long
     Dim Alt     As Long
-    
-    If Ptr1 <> vbNullPtr Then
-        SLen = MemLong(Ptr1 - 4)
-    End If
-    If Ptr2 <> vbNullPtr Then
-        SLen2 = MemLong(Ptr2 - 4)
-    End If
     
     If SLen <> SLen2 Then
         Exit Function
