@@ -57,6 +57,8 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "\uj"
             
     End Select
+    
+    Debug.Print t("This\tis\r\na\ttest")
 End Sub
 
 Public Sub T_WithValue_ReturnsExpected(ByVal Text As String, ByVal Expected As String)

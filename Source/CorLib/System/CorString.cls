@@ -146,7 +146,6 @@ End Function
 ' @return A formatted string.
 ' @see NumberFormatInfo
 ' @see DateTimeFormatInfo
-'
 Public Function FormatArray(ByRef FormatText As String, ByRef Args() As Variant) As String
     FormatArray = FormatCore(Nothing, FormatText, Args)
 End Function
@@ -154,13 +153,12 @@ End Function
 ''
 ' Formats a string by replacing each argument with the formatted equivalent.
 '
-' @param provider A custom format provider that is used to format the argument instead of the default formatting.
+' @param Provider A custom format provider that is used to format the argument instead of the default formatting.
 ' @param FormatText The string containing formatting information.
-' @param args A list of arguments to use in replacing the formatting information.
+' @param Args A list of arguments to use in replacing the formatting information.
 ' @return A formatted string.
 ' @see NumberFormatInfo
 ' @see DateTimeFormatInfo
-'
 Public Function FormatArrayEx(ByVal Provider As IFormatProvider, ByRef FormatText As String, ByRef Args() As Variant) As String
     FormatArrayEx = FormatCore(Provider, FormatText, Args)
 End Function
@@ -169,10 +167,9 @@ End Function
 ' Creates and array of chars (Integers) from the specified string.
 '
 ' @param s The string to create the chars from.
-' @param startindex The start index in the string to begin converting to a char array. This is zero-based.
-' @param length The number of characters to convert to chars.
+' @param StartIndex The start index in the string to begin converting to a char array. This is zero-based.
+' @param Length The number of characters to convert to chars.
 ' @return An array containing the converted characters from the string.
-'
 Public Function ToCharArray(ByRef s As String, Optional ByRef StartIndex As Variant, Optional ByRef Length As Variant) As Integer()
     Dim Range   As ListRange
     Dim Chars() As Integer
@@ -203,8 +200,7 @@ End Function
 ' @param totalWidth The total length of the final string.
 ' @param paddingChar The character to pad the left of the string with.
 ' @return The padded string.
-' @remarks The paddingChar parameter can accept either a number or chr$ value.
-'
+' @remarks <i>PaddingChar</i> can accept either a number or Chr$ value.
 Public Function PadLeft(ByRef s As String, ByVal TotalWidth As Long, Optional ByRef PaddingChar As Variant = 32) As String
     Dim Length As Long
     Length = Len(s)
@@ -222,8 +218,7 @@ End Function
 ' @param totalWidth The total length of the final string.
 ' @param paddingChar The character to pad the right of the string with.
 ' @return The padded string.
-' @remarks The paddingChar parameter can accept either a number or chr$ value.
-'
+' @remarks <i>PaddingChar</i> can accept either a number or Chr$ value.
 Public Function PadRight(ByRef s As String, ByVal TotalWidth As Long, Optional ByRef PaddingChar As Variant = 32) As String
     Dim Length As Long
     Length = Len(s)
@@ -240,11 +235,9 @@ End Function
 ' @param s The string to be trimmed.
 ' @param trimChars The characters to remove.
 ' @return The trimmed string.
-' @remarks Unlike VB's LTrim function, this can trim multiple character types,
-' not just spaces.
+' @remarks Unlike VB's LTrim function, this can trim multiple character types, not just spaces.
 ' <p>The <i>trimChars</i> can be either a string of the characters or an integer array
 ' of characters that will be trimmed from the beginning.</p>
-'
 Public Function TrimStart(ByRef s As String, Optional ByRef TrimChars As Variant) As String
     TrimStart = TrimCore(s, TrimChars, True, False)
 End Function
@@ -253,13 +246,11 @@ End Function
 ' Trims the end of the string.
 '
 ' @param s The string to be trimmed.
-' @param trimChars The characters to remove.
+' @param TrimChars The characters to remove.
 ' @return The trimmed string.
-' @remarks Unlike VB's RTrim function, this can trim multiple character types,
-' not just spaces.
-' <p>The <i>trimChars</i> can be either a string of the characters or an integer array
+' @remarks Unlike VB's RTrim function, this can trim multiple character types, not just spaces.
+' <p>The <i>TrimChars</i> can be either a string of the characters or an <b>Integer</b> array
 ' of characters that will be trimmed from the end.</p>
-'
 Public Function TrimEnd(ByRef s As String, Optional ByRef TrimChars As Variant) As String
     TrimEnd = TrimCore(s, TrimChars, False, True)
 End Function
@@ -268,13 +259,11 @@ End Function
 ' Trims both the beginning and end of the string.
 '
 ' @param s The string to be trimmed.
-' @param trimChars The characters to remove.
+' @param TrimChars The characters to remove.
 ' @return The trimmed string.
-' @remarks Unlike VB's Trim function, this can trim multiple character types,
-' not just spaces.
-' <p>The <i>trimChars</i> can be either a string of the characters or an integer array
+' @remarks Unlike VB's Trim function, this can trim multiple character types, not just spaces.
+' <p><i>TrimChars</i> can be either a string of the characters or an <i>Integer</i> array
 ' of characters that will be trimmed from both ends.</p>
-'
 Public Function Trim(ByRef s As String, Optional ByRef TrimChars As Variant) As String
     Trim = TrimCore(s, TrimChars, True, True)
 End Function
@@ -285,9 +274,8 @@ End Function
 ' @param Separator A string inserted between each element when joining into a string.
 ' @param Value An array of strings or variants to join together.
 ' @param StartIndex The starting element in <i>Arr</i> to begin joining from.
-' @param Count The number of strings elements to join together.
+' @param Count The number of string elements to join together.
 ' @return A string containing elements joined from the array separated by the delimiter.
-'
 Public Function Join(ByRef Separator As String, ByRef Value As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As String
     Dim Range As ListRange
     
@@ -317,14 +305,12 @@ Public Function Join(ByRef Separator As String, ByRef Value As Variant, Optional
 End Function
 
 ''
-' Removes a substring from the string, returning a new string with the gap filled
-' with the remaining characters.
+' Removes a substring from the string, returning a new string with the gap filled with the remaining characters.
 '
 ' @param s The string to remove characters from.
 ' @param StartIndex The index of the first character to begin removing. This index is zero-based.
 ' @param Count The number of characters to be removed.
 ' @return A new string with the substring removed.
-'
 Public Function Remove(ByRef s As String, ByVal StartIndex As Long, Optional ByRef Count As Variant) As String
     Dim CharCount       As Long
     Dim RemovalCount    As Long
@@ -354,7 +340,6 @@ End Function
 ' @param Count The number of characters in <i>s</i> to search.
 ' @return The index of a character from the set, or -1 if none are found.
 ' @remarks The indexing of <i>s</i> is zero-based.
-'
 Public Function IndexOfAny(ByRef s As String, ByRef OfAny As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As Long
     Dim Range As ListRange
     
@@ -377,8 +362,7 @@ Public Function IndexOfAny(ByRef s As String, ByRef OfAny As Variant, Optional B
 End Function
 
 ''
-' Returns the index of the first character found in the <i>OfAny<i> set of characters
-' searching from the end of the string.
+' Returns the index of the first character found in the <i>OfAny<i> set of characters searching from the end of the string.
 '
 ' @param s The string to be searched.
 ' @param OfAny The set of characters to search for (String or Integer() Array).
@@ -386,7 +370,6 @@ End Function
 ' @param Count The number of characters in <i>s</i> to search.
 ' @return The index of a character from the set, or -1 if none are found.
 ' @remarks The indexing of <i>s</i> is zero-based.
-'
 Public Function LastIndexOfAny(ByRef s As String, ByRef OfAny As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As Long
     Dim Range As ListRange
     
@@ -414,7 +397,6 @@ End Function
 ' @param Value The string to be inserted.
 ' @return A string containing the new string created from the insertion.
 ' @remarks Index is zero-based.
-'
 Public Function Insert(ByRef s As String, ByVal StartIndex As Long, ByRef Value As String) As String
     Dim ValueLength As Long
     Dim SourcePtr As Long
@@ -441,6 +423,13 @@ Public Function Insert(ByRef s As String, ByVal StartIndex As Long, ByRef Value 
     CopyMemory ByVal TargetPtr + StartIndex + ValueLength, ByVal SourcePtr + StartIndex, LenB(Insert) - (StartIndex + ValueLength)
 End Function
 
+''
+' Determines whether two specified Strings have the same value.
+'
+' @param a The first string to compare.
+' @param b The second string to compare.
+' @param ComparisonType One of the enumeration values that specifies the rules for the comparison.
+' @return <b>True</b> if the value of the <i>a</i> parameter is equal to the value of the <i>b</i> parameter; otherwise, <b>False</b>.
 Public Function Equals(ByRef a As String, ByRef b As String, Optional ByVal ComparisonType As StringComparison = Ordinal) As Boolean
     Select Case ComparisonType
         Case StringComparison.Ordinal
@@ -452,6 +441,7 @@ Public Function Equals(ByRef a As String, ByRef b As String, Optional ByVal Comp
     End Select
 End Function
 
+' this is a convenience function for when strings are being passed around in Variants.
 Friend Function EqualsV(ByRef a As Variant, ByRef b As Variant, Optional ByVal ComparisonType As StringComparison = Ordinal) As Boolean
     Select Case ComparisonType
         Case StringComparison.Ordinal

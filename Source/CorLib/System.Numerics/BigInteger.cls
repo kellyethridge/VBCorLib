@@ -132,11 +132,9 @@ End Property
 ''
 ' Returns a byte array representing the number.
 '
-' @return A byte array the same length as Precision that represents the number.
-' @remarks To represent a byte array for a negative value, the highest bit must be
-' set. To ensure this, a pair of bytes with the value of &HFF may be part of the return
-' value.
-'
+' @return A byte array the same length as <a href="BigInteger.Get.Precision.html">Precision</a> that represents the number.
+' @remarks To represent a byte array for a negative value, the highest bit must be set.
+' To ensure this, a pair of bytes with the value of &HFF may be part of the return value.
 Public Function ToByteArray() As Byte()
     Dim Result()    As Byte
     Dim MaxIndex    As Long
@@ -214,11 +212,23 @@ End Function
 ' Compares two <a href="BigInteger.html">BigInteger</a> instance to each other returning their relation.
 '
 ' @param other The right handed value to compare this instance against.
-' @return Returns the relation between this instance and the other number.<br>
-' @remarks If Nothing is passed in, it is treated as zero.<br>
-' If this instance < other then -1 is returned<br>
-' If this instance = other then 0 is returned<br>
-' If this instance > other then 1 is returned.<br>
+' @return Returns the relation between this instance and the other number as shown in the following table.
+' <table style="width: auto">
+'   <tr>
+'       <th>Value</th>
+'       <th>Meaning</th>
+'   </tr>
+'   <tr>
+'        <td>Less than zero</td><td>This instance is less than <i>Other</i>.</td>
+'   </tr>
+'    <tr>
+'        <td>Zero</td><td>This instance equals <i>Other</i>.</td>
+'    </tr>
+'    <tr>
+'        <td>Greater than zero</td><td>This instance is greater than <i>Other</i>.</td>
+'    </tr>
+' </table>
+' @remarks If <b>Nothing</b> is passed in, it is treated as zero.
 Public Function CompareTo(ByVal Other As BigInteger) As Long
     Set Other = ValueOrZero(Other)
     CompareTo = -Other.CompareToNumber(mNumber)
@@ -232,7 +242,7 @@ End Function
 ' Determines if this <a href="BigInteger.html">BigInteger</a> instance is equal to the other value.
 '
 ' @param Value The value to determine if this instance is equal to.
-' @return Returns True if this object and the other value are equal, False otherwise.
+' @return <b>True</b> if this object and the other value are equal, <b>False</b> otherwise.
 ' @remarks The function accepts a <b>String</b>, Number, Byte Array, or <a href="BigInteger.html">BigInteger</a>
 ' object. The <a href="Constructors.BInt.html">BInt</a> function is called to convert the other value to
 ' a <a href="BigInteger.html">BigInteger</a> object before comparison.
@@ -280,7 +290,7 @@ End Function
 ''
 ' Returns the opposite signed value of this <a href="BigInteger.html">BigInteger</a> instance.
 '
-' @return Returns a BigInteger instance containing the opposite signed value.
+' @return Returns a <a href="BigInteger.html">BigInteger</a> instance containing the opposite signed value.
 ' @remarks Negative values are represented as a twos-complement number, unlike
 ' other systems used to represent a negative value. Any negation requires
 ' the twos-complement algorithm to be applied to the number. This keeps in step
@@ -294,7 +304,6 @@ Public Function Negate() As BigInteger
         Negate.InitNegate mNumber
     End If
 End Function
-
 
 ''
 ' Returns the absolute (positive or zero) value of this instance.
@@ -321,7 +330,10 @@ End Function
 ' Dim b As BigInteger
 ' Set b = BInt(100)
 ' Set b = b.Add(BInt(150))
-' Debug.Print b.ToString '' 250
+' Debug.Print b.ToString
+'
+' '' This outputs the following:
+' 250
 ' </pre>
 Public Function Add(ByVal Value As BigInteger) As BigInteger
     Set Value = ValueOrZero(Value)
@@ -351,9 +363,11 @@ End Function
 ' Dim b As BigInteger
 ' Set b = BInt(100)
 ' Set b = b.Subtract(BInt(150))
-' Debug.Print b.ToString '' -50
-' </pre>
+' Debug.Print b.ToString
 '
+' '' This outputs the following:
+' -50
+' </pre>
 Public Function Subtract(ByVal Value As BigInteger) As BigInteger
     Set Value = ValueOrZero(Value)
     
@@ -382,9 +396,11 @@ End Function
 ' Dim b As BigInteger
 ' Set b = BInt(100)
 ' Set b = b.Multiply(BInt(150))
-' Debug.Print b.ToString '' 15000
-' </pre>
+' Debug.Print b.ToString
 '
+' '' This outputs the following:
+' 15000
+' </pre>
 Public Function Multiply(ByVal Value As BigInteger) As BigInteger
     Set Value = ValueOrZero(Value)
     
@@ -419,9 +435,11 @@ End Function
 ' Dim b As BigInteger
 ' Set b = BInt(100)
 ' Set b = b.Divide(BInt(40))
-' Debug.Print b.ToString '' 2
-' </pre>
+' Debug.Print b.ToString
 '
+' '' This outputs the following:
+' 2
+' </pre>
 Public Function Divide(ByVal Divisor As BigInteger) As BigInteger
     Set Divisor = ValueOrZero(Divisor)
     
@@ -458,8 +476,12 @@ End Function
 ' Dim q As BigInteger
 ' Set b = BInt(100)
 ' Set q = b.DivRem(BInt(40), r)
-' Debug.Print q.ToString '' 2
-' Debug.Print r.ToString '' 20
+' Debug.Print q.ToString
+' Debug.Print r.ToString
+'
+' '' This outputs the following:
+' 2
+' 20
 ' </pre>
 Public Function DivRem(ByVal Divisor As BigInteger, ByRef Remainder As BigInteger) As BigInteger
     Set Divisor = ValueOrZero(Divisor)
@@ -497,7 +519,10 @@ End Function
 ' Dim b As BigInteger
 ' Set b = BInt(100)
 ' Set b = b.Modulus(BInt(40))
-' Debug.Print b.ToString '' 20
+' Debug.Print b.ToString
+'
+' '' This outputs the following:
+' 20
 ' </pre>
 Public Function Modulus(ByVal Divisor As BigInteger) As BigInteger
     Set Divisor = ValueOrZero(Divisor)

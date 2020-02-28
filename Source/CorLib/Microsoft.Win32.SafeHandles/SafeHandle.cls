@@ -38,8 +38,7 @@ Attribute VB_Exposed = True
 ''
 ' Represents a wrapper class for operating system handles. This class must be implemented.
 '
-' @remarks This class should be implemented using the <b>Implements</b> keyword for usage
-' within the system.
+' @remarks This class should be implemented using the <b>Implements</b> keyword for usage within the system.
 ' <p>The class also manages the lifetime of a given handle. It should be used within a
 ' custom safe-handle implementation and handle the <b>ReleaseHandle</b> event to peform
 ' clean-up for the specific handle in implementations.</p>

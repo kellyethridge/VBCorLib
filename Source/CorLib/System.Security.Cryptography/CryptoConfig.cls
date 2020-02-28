@@ -49,7 +49,7 @@ Private mDefaultOids    As Hashtable
 ' Creates a cryptography object based on the name.
 '
 ' @param AlgName The name of the cryptography object to be created.
-' @return An instance of the object or Nothing if an empty name is provided.
+' @return An instance of the object or <b>Nothing</i> if an empty name is provided.
 ' @remarks The supported names are:
 ' <pre>
 ' DES
@@ -79,7 +79,6 @@ Private mDefaultOids    As Hashtable
 ' DSA
 ' </pre>
 ' If a custom object is required, then the standard <Server>.<Class> format can be used.
-'
 Public Function CreateFromName(ByRef AlgName As String) As Object
     Dim Result As Object
     
@@ -98,20 +97,50 @@ Public Function CreateFromName(ByRef AlgName As String) As Object
 Catch:
 End Function
 
-Public Sub AddAlgorithm(ByRef TypeName As String, ParamArray AlgNames() As Variant)
-    If Len(TypeName) = 0 Then _
-        Error.Argument Argument_EmptyName, "TypeName"
-    
+''
+' Adds a set of names to algorithm mappings to be used for the current application domain.
+'
+' @param Algorithm The algorithm to map to.
+' @param Names An array of names to map to the algorithm.
+' @remarks The specified mappings take precedence over the built-in mappings.
+' <h4>Exceptions</h4>
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td>
+'           <a href="ArgumentException.html">ArgumentException</a>
+'        </td>
+'        <td>
+'           The <i>Algorithm</i> parameter is empty.<br/>
+'           -or-<br/>
+'           One of the entries in the <i>Names</i> parameter is empty.
+'        </td>
+'   </tr>
+'    <tr>
+'        <td><a href="InvalidCastException.html">InvalidCastException</a></td>
+'        <td>
+'           One of the entries in the <i>Names</i> parameter is not a string.
+'        </td>
+'    </tr>
+' </table>
+Public Sub AddAlgorithm(ByRef Algorithm As String, ParamArray Names() As Variant)
     Dim Name As Variant
-    For Each Name In AlgNames
+    
+    If Len(Algorithm) = 0 Then _
+        Error.Argument Argument_EmptyName, "Algorithm"
+    
+    For Each Name In Names
         If VarType(Name) <> vbString Then _
             Throw New InvalidCastException
         If Len(Name) = 0 Then _
             Error.Argument Cryptography_AddNullOrEmptyName
     Next
     
-    For Each Name In AlgNames
-        mAppAlgos(Name) = TypeName
+    For Each Name In Names
+        mAppAlgos(Name) = Algorithm
     Next
 End Sub
 
@@ -120,7 +149,16 @@ End Sub
 '
 ' @param Str The object identifier as described in the X.690 standard.
 ' @return An encoded version of the object identifier as described in the X.690 standard.
-'
+' <h4>Exceptions</h4>
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="CryptoGraphicException.html">CryptoGraphicException</a></td><td>An error occurred while encoding the OID.</td>
+'   </tr>
+' </table>
 Public Function EncodeOID(ByRef Str As String) As Byte()
     Const X680_OBJECT_IDENTIFIER_TYPE_TAG As Long = 6
     
@@ -129,7 +167,7 @@ Public Function EncodeOID(ByRef Str As String) As Byte()
     Octets = Split(Str, ".")
     
     If UBound(Octets) = 0 Then _
-        Throw Cor.NewCryptographicException("Invalid OID.")
+        Error.Cryptographic Cryptography_InvalidOID
     
     On Error GoTo Catch
     
@@ -150,15 +188,14 @@ Public Function EncodeOID(ByRef Str As String) As Byte()
     Exit Function
     
 Catch:
-    Throw Cor.NewCryptographicException("Invalid OID.")
+    Error.Cryptographic Cryptography_InvalidOID
 End Function
 
 ''
-' Returns an object identifier for a specific name.
+' Returns an object identifier (OID) for a specific name.
 '
 ' @param Name The name of the object to obtain the identifier for.
-' @return The object identifier (OID) for the object.
-'
+' @return The object identifier (OID) for the algorithm.
 Public Function MapNameToOID(ByRef Name As String) As String
     Dim OID As Variant
     
@@ -200,6 +237,7 @@ End Function
 
 Private Function CreateFromAlgTable(ByRef AlgName As String, ByVal Algos As Hashtable) As Object
     Dim Algo As Variant
+    
     Algo = Algos(AlgName)
     
     If Not IsEmpty(Algo) Then

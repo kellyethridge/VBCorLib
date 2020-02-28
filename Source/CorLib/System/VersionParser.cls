@@ -50,6 +50,11 @@ Friend Sub ThrowError()
 End Sub
 
 Friend Function TryParse(ByRef s As String, ByRef Result As Version) As Boolean
+    Dim Major As Long
+    Dim Minor As Long
+    Dim Build As Long
+    Dim Revision As Long
+    
     Set Result = Nothing
     
     Init s
@@ -57,11 +62,6 @@ Friend Function TryParse(ByRef s As String, ByRef Result As Version) As Boolean
     If Not HasValidComponentCount Then
         Exit Function
     End If
-    
-    Dim Major As Long
-    Dim Minor As Long
-    Dim Build As Long
-    Dim Revision As Long
     
     If Not TryParseComponent(MajorComponent, Major) Then
         Exit Function

@@ -2009,11 +2009,12 @@ Public Function NewIniResourceWriter(ByRef FileName As String, ByRef Section As 
 End Function
 
 ''
-' Returns an initialized instance of <a href="Int64Type.Int64.html">Int64</a>.
+' Returns an initialized instance of <a href="Int64Static.Int64.html">Int64</a>.
 '
 ' @param LowPart The least significant 32-bits of the integer value.
 ' @param HighPart The most significant 32-bits of the integer value.
 ' @return An <a href="Int64Static.Int64.html">Int64</a> integer value.
+' @remarks To convert a value to an <a href="Int64Static.Int64.html">Int64</a> use the <a href="PublicFunctions.CInt64.html">CInt64</a> conversion method.
 Public Function NewInt64(ByVal LowPart As Long, ByVal HighPart As Long) As Int64
     NewInt64.HighPart = HighPart
     NewInt64.LowPart = LowPart
@@ -2039,9 +2040,11 @@ End Function
 '    <tr>
 '        <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
 '        <td>
-'           <i>StartIndex</i> or <i>Length</i> is less than zero.<br/>
+'           <i>StartIndex</i> is less than the lower-bound of <i>Value</i>.<br/>
 '           -or-<br/>
-'           The sum of <i>StartIndex</i> and <i>Length</i> is greater than the number of elements in <i>Value</i>.
+'           <i>Length</i> is less than zero.<br/>
+'           -or-<br/>
+'           The sum of <i>StartIndex</i> and <i>Length</i> is greater than the upper-bound of <i>Value</i>.
 '        </td>
 '    </tr>
 ' </table>

@@ -86,7 +86,7 @@ Class=MemoryMappedFile; System.IO.MemoryMappedFiles\MemoryMappedFile.cls
 Class=CultureInfo; System.Globalization\CultureInfo.cls
 Class=CultureTable; System.Globalization\CultureTable.cls
 Class=CultureInfoStatic; System.Globalization\CultureInfoStatic.cls
-Class=DaylightTime; System.Globalization\DayLightTime.cls
+Class=DayLightTime; System.Globalization\DayLightTime.cls
 Class=TimeZone; System\TimeZone.cls
 Class=TimeZoneStatic; System\TimeZoneStatic.cls
 Class=OperatingSystem; System\OperatingSystem.cls
@@ -411,7 +411,7 @@ ThreadingModel=1
 DebugStartupOption=0
 
 [TaskList]
-Num=12
+Num=13
 
 [TASK1]
 Description=Add tests for FromBase64Transform.TransformFinalBlock
@@ -478,11 +478,11 @@ Status=0
 Priority=1
 
 [TASK13]
-Description=
-Status=
-Priority=
+Description=Fix File.OpenFile method
+Status=0
+Priority=1
 AssignedTo=
-Comment=
+Comment=An invalid Access value error occurs when letting the default of -1 be used. It should be zero.
 
 [MS Transaction Server]
 AutoRefresh=1

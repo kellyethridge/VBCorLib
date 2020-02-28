@@ -142,6 +142,7 @@ version 3.0 (BREAKING CHANGES)
 	* Added NewInt64s array constructor.
 	* Added IsDaylightSavingTime to TimeZoneStatic to match .NET.
 	* Removed optional daylightTimes parameter from TimeZone to match .NET.
+	* Added global public function t() used to replace escaped character sequences with literal versions.
 
 version 2.3
 	* Updated ASM code to not trigger DEP protection.

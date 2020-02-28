@@ -81,9 +81,6 @@ Private mComparer   As IComparer
 '
 ' @param value The item to be added to the list.
 ' @return The index at which the item was added.
-' @remarks As items are added, the capacity is increased as necessary. The items
-' are appended to the end of the list and maintain the order they were added,
-' provided no other method is used to change the order, such as <a href="ArrayList.Insert.html">Insert</a> or <a href="ArrayList.Remove.html">Remove</a>.
 ' @include "..\DocIncludes\ArrayList.Add.html"
 Public Function Add(ByRef Value As Variant) As Long
     Add = mCount

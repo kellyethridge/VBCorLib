@@ -44,7 +44,6 @@ Attribute VB_Exposed = True
 ' Set ReadOnlyList = ArrayList.ReadOnly(list)
 ' </pre>
 ' @see ArrayList
-'
 Option Explicit
 
 ''
@@ -52,8 +51,13 @@ Option Explicit
 '
 ' @param List The <a href="ArrayList.html">ArrayList</a> to wrap.
 ' @return The read-only <a href="ArrayList.html">ArrayList</a> wrapper around <i>List</i>.
-' @remarks Passing the object around provides access to the underlying
-' <a href="ArrayList.html">ArrayList</a>, however, the list cannot be changed in size or content.
+' @remarks <p>Passing the object around provides access to the underlying
+' <a href="ArrayList.html">ArrayList</a>, however, the list cannot be changed in size or content.</p>
+' <h4>Example</h4>
+' Call using the following syntax:
+' <pre>
+' Set ReadOnlyList = ArrayList.ReadOnly(OriginalList)
+' </pre>
 Public Function ReadOnly(ByVal List As ArrayList) As ArrayList
     If List Is Nothing Then _
         Error.ArgumentNull "List"
@@ -68,9 +72,14 @@ End Function
 '
 ' @param list The <a href="ArrayList.html">ArrayList</a> to be wrapped.
 ' @return The wrapped <a href="ArrayList.html">ArrayList</a>.
-' @remarks Passing this object around provides access to the underlying
+' @remarks <p>Passing this object around provides access to the underlying
 ' <a href="ArrayList.html">ArrayList</a>, however, prevents the list from changing size. The current
-' values in the list can be modified, but the size of the list cannot change.
+' values in the list can be modified, but the size of the list cannot change.</p>
+' <h4>Example</h4>
+' Call using the following syntax:
+' <pre>
+' Set FixedSizeList = ArrayList.FixedSize(OriginalList)
+' </pre>
 Public Function FixedSize(ByVal List As ArrayList) As ArrayList
     If List Is Nothing Then _
         Error.ArgumentNull "List"
@@ -86,6 +95,12 @@ End Function
 ' @param Value The value to fill the <a href="ArrayList.html">ArrayList</a> with.
 ' @param Count The number of times the value is to be added to the list.
 ' @return An <a href="ArrayList.html">ArrayList</a> with <i>Count</i> elements, all of which are copies of <i>Value</i>.
+' @remarks
+' <h4>Example</h4>
+' The following example creates an <a href="ArrayList.html">ArrayList</a> containing 20 strings with the letter "a".
+' <pre>
+' Set List = ArrayList.Repeat("a", 20)
+' </pre>
 Public Function Repeat(ByRef Value As Variant, ByVal Count As Long) As ArrayList
     If Count < 0 Then _
         Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_NeedNonNegNum
@@ -104,8 +119,13 @@ End Function
 '
 ' @param List The list to be wrapped as an <a href="ArrayList.html">ArrayList</a> instance.
 ' @return An <a href="IList.html">IList</a> object that can be used like an <a href="ArrayList.html">ArrayList</a>.
-' @remarks The adapter gives all <a href="IList.html">IList</a> objects the ability to be used anywhere an
-' <a href="ArrayList.html">ArrayList</a> instance would be used instead.
+' @remarks <p>The adapter gives all <a href="IList.html">IList</a> objects the ability to be used anywhere an
+' <a href="ArrayList.html">ArrayList</a> instance would be used instead.</p>
+' <h4>Example</h4>
+' Call using the following syntax:
+' <pre>
+' Set List = ArrayList.Adapter(OriginalList)
+' </pre>
 Public Function Adapter(ByVal List As IList) As ArrayList
     If List Is Nothing Then _
         Error.ArgumentNull "List"

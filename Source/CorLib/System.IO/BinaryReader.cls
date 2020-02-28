@@ -81,6 +81,8 @@ End Property
 ''
 ' Closes the reader and underlying <a href="Stream.html">Stream</a>.
 '
+' @remarks If the reader was created with the <i>LeaveOpen</i> parameter set to <b>True</b>
+' then the underlying stream will not be closed with this reader.
 Public Sub CloseReader()
     If Not mStream Is Nothing Then
         If Not mLeaveOpen Then

@@ -59,54 +59,48 @@ Private mHasLastBlock       As Boolean
 
 
 ''
-' Returns if the current transfrom can be reused after calling TransformFinalBlock.
+' Gets a value indicating if the current transfrom can be reused.
 '
-' @return Returns True if it can be reused, False otherwise.
-' @remarks This always returns True.
-'
+' @return Always returns <b>True</b>.
 Public Property Get CanReuseTransform() As Boolean
     CanReuseTransform = True
 End Property
 
 ''
-' Returns if this transform can process more than one block per TransformBlock call.
+' Gets a value indicating whether multiple blocks can be transformed.
 '
-' @return This always returns True.
-'
+' @return Always returns <b>True</b>.
 Public Property Get CanTransformMultipleBlocks() As Boolean
     CanTransformMultipleBlocks = True
 End Property
 
 ''
-' Returns the size of one block of data that is to be processed.
+' Gets the size of one block of data that is to be processed.
 '
 ' @return The size of one block of data to be processed.
-' @remarks When calling the TransformBlock method, the InputCount must be zero or a multiple of this value.
-'
+' @remarks When calling the <a href="CryptoAPITransform.TransformBlock.html">TransformBlock</a> method, the <i>InputCount</i> must be zero or a multiple of this value.
 Public Property Get InputBlockSize() As Long
     InputBlockSize = mBlockSize
 End Property
 
 ''
-' Returns the size of the resulting block of data after an input block of data has been processed.
+' Gets the size of the resulting block of data after an input block of data has been processed.
 '
 ' @return The size of the resulting block of data after an input block of data has been processed.
-'
 Public Property Get OutputBlockSize() As Long
     OutputBlockSize = mBlockSize
 End Property
 
 ''
-' This returns the actual handle to a key created by the CryptoAPI service.
+' Gets the actual handle to a key created by the CryptoAPI service.
 '
 ' @return A handle to a CryptoAPI key.
-'
 Public Property Get KeyHandle() As Long
     KeyHandle = mCipherKey
 End Property
 
 ''
-' This will release the key and context of the CryptoAPI provider.
+' Releases the key and context of the CryptoAPI provider.
 '
 Public Sub Clear()
     CryptoAPI.DestroyKey mCipherKey
@@ -114,7 +108,7 @@ Public Sub Clear()
 End Sub
 
 ''
-' Resets the transform so a new set of data can begin to be processed.
+' Resets the transform so a new set of data can be processed.
 '
 Public Sub Reset()
     mHasLastBlock = False
@@ -134,8 +128,7 @@ End Sub
 ' @param OutputBuffer The buffer to place the processed data.
 ' @param OutputOffset The index to begin placing the processed data.
 ' @return The number of bytes that were processed.
-' @remarks The InputCount must be an exact multiple of the InputBlockSize or an exception will be thrown.
-'
+' @remarks The <i>InputCount</i> must be an exact multiple of the <a href="CryptoAPITransform.Get.InputBlockSize.html">InputBlockSize</a> or an exception will be thrown.
 Public Function TransformBlock(ByRef InputBuffer() As Byte, ByVal InputOffset As Long, ByVal InputCount As Long, ByRef OutputBuffer() As Byte, ByVal OutputOffset As Long) As Long
     ' During normal transformations, the number of bytes to be worked on must be
     ' an exact multiple of mBlockSize. There can be no partial blocks.
@@ -144,7 +137,6 @@ Public Function TransformBlock(ByRef InputBuffer() As Byte, ByVal InputOffset As
     
     ValidateArrayRange InputBuffer, InputOffset, InputCount, NameOfInputBuffer, NameOfInputOffset, NameOfInputCount
     ValidateArrayRange OutputBuffer, OutputOffset, InputCount, NameOfOutputBuffer, NameOfOutputOffset, NameOfInputOffset
-    
     
     If mIsEncrypting Then
         TransformBlock = EncryptBlock(InputBuffer, InputOffset, InputCount, OutputBuffer, OutputOffset)
@@ -161,7 +153,6 @@ End Function
 ' @param InputCount The amount of data to be processed.
 ' @return The final block of processed data.
 ' @remarks Once a final block has been processed, the transform is reset to begin transforming new data.
-'
 Public Function TransformFinalBlock(ByRef InputBuffer() As Byte, ByVal InputOffset As Long, ByVal InputCount As Long) As Byte()
     ValidateArrayRange InputBuffer, InputOffset, InputCount, NameOfInputBuffer, NameOfInputOffset, NameOfInputCount
 
@@ -173,13 +164,11 @@ Public Function TransformFinalBlock(ByRef InputBuffer() As Byte, ByVal InputOffs
 End Function
 
 ''
-' Returns a boolean indicating if the value and this object
-' instance are the same instance.
+' Returns a boolean indicating if the value and this object instance are the same instance.
 '
 ' @param value The value to test equality on.
 ' @return Boolean indicating equality.
 ' @see IObject
-'
 Public Function Equals(ByRef Value As Variant) As Boolean
     Equals = MyBase.Equals(Me, Value)
 End Function

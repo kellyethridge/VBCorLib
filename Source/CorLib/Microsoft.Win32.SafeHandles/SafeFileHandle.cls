@@ -34,17 +34,30 @@ Attribute VB_Exposed = True
 '
 ' Module: SafeFileHandle
 '
+
+''
+' Represents a wrapper class for a file handle.
+'
 Option Explicit
+Implements IObject
 Implements SafeHandle
 
 Private WithEvents mBase As SafeHandle
 Attribute mBase.VB_VarHelpID = -1
 
 
+''
+' Gets a value that indicates whether the handle is invalid.
+'
+' @return <b>True</b> if the handle is not valid; otherwise, <b>False</b>.
 Public Property Get IsInvalid() As Boolean
     IsInvalid = mBase.IsInvalid
 End Property
 
+''
+' Returns the value of the handle field.
+'
+' @return A 32-bit integer representing the value of the handle field.
 Public Function DangerousGetHandle() As Long
 Attribute DangerousGetHandle.VB_UserMemId = 0
     DangerousGetHandle = mBase.DangerousGetHandle
@@ -54,9 +67,41 @@ Public Sub CloseHandle()
     mBase.CloseHandle
 End Sub
 
+''
+' Gets a value indicating whether the handle is closed.
+'
+' @return <b>True</b> if the handle is closed; otherwise, <b>False</b>.
 Public Property Get IsClosed() As Boolean
     IsClosed = mBase.IsClosed
 End Property
+
+''
+' Returns a boolean indicating if the value and this object instance are the same instance.
+'
+' @param Value The value to test equality on.
+' @return <b>True</b> if <i>Value</i> and this instance are the same instance; <b>False</b> otherwise.
+' @see IObject
+Public Function Equals(ByRef Value As Variant) As Boolean
+    Equals = MyBase.Equals(Me, Value)
+End Function
+
+''
+' Returns a pseudo-unique number identifying this instance.
+'
+' @return Pseudo-unique number identifying this instance.
+' @see IObject
+Public Function GetHashCode() As Long
+    GetHashCode = MyBase.GetHashCode(Me)
+End Function
+
+''
+' Returns a string representation of this object instance.
+'
+' @return String representing this instance.
+' @see IObject
+Public Function ToString() As String
+    ToString = MyBase.ToString(Me, App)
+End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -94,3 +139,18 @@ Private Property Get SafeHandle_IsInvalid() As Boolean
     SafeHandle_IsInvalid = IsInvalid
 End Property
 
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   IObject
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Function IObject_Equals(Value As Variant) As Boolean
+    IObject_Equals = Equals(Value)
+End Function
+
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = GetHashCode
+End Function
+
+Private Function IObject_ToString() As String
+    IObject_ToString = ToString
+End Function

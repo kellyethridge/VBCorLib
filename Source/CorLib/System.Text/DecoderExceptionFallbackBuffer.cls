@@ -34,11 +34,34 @@ Attribute VB_Exposed = True
 '
 ' Module: DecoderExceptionFallbackBuffer
 '
+
+''
+' Throws <a href="DecoderFallbackException.html">DecoderFallbackException</a> when an encoded input byte sequence cannot be converted to a decoded output character.
+'
 Option Explicit
 Implements IObject
 Implements DecoderFallbackBuffer
 
 
+''
+' Throws <a href="DecoderFallbackException.html">DecoderFallbackException</a> when the input byte sequence cannot be decoded. The nominal return value is not used.
+'
+' @param BytesUnknown An input array of bytes.
+' @param Index The index position of a byte in the input.
+' @return None. No value is returned because the <b>Fallback</b> method always throws an exception.<br/>
+' <h4>Exceptions</h4>
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="DecoderFallbackException.html">DecoderFallbackException</a></td><td>This method always throws an exception that reports the value and index position of the input byte that cannot be decoded.</td>
+'   </tr>
+' </table>
+' @remarks The <a href="Encoding.GetBytes.html">GetBytes</a> and <a href="EncodingStatic.Convert.html">Convert</a> methods call <b>Fallback</b> if they encounter an unknown byte in their input.
+' In response, the <b>Fallback</b> method always throws <a href="DecoderFallbackException.html">DecoderFallbackException</a> and displays the input data.
+' The <b>Fallback</b> method nominally indicates whether an exception is thrown if an input byte sequence cannot be decoded.
 Public Function Fallback(ByRef BytesUnknown() As Byte, ByVal Index As Long) As Boolean
     Dim Message As String
     
@@ -47,26 +70,51 @@ Public Function Fallback(ByRef BytesUnknown() As Byte, ByVal Index As Long) As B
     Throw Cor.NewDecoderFallbackException2(Environment.GetResourceString(Argument_InvalidCodePageBytesIndex, Message, Index), BytesUnknown, Index)
 End Function
 
+''
+' Retrieves the next character in the exception data buffer.
+'
+' @return The return value is always the Unicode character NULL (U+0000).
 Public Function GetNextChar() As Integer
     GetNextChar = 0
 End Function
 
+''
+' Causes the next call to <a href="DecoderExceptionFallbackBuffer.GetNextChar.html">GetNextChar</a> to access the exception data buffer character position that is prior to the current position.
+'
+' @return The return value is always <b>False</b>.
 Public Function MovePrevious() As Boolean
     MovePrevious = False
 End Function
 
+''
+' Gets the number of characters in the current <a href="DecoderExceptionFallbackBuffer.html">DecoderExceptionFallbackBuffer</a> object that remain to be processed.
+'
+' @return The return value is always zero.
 Public Property Get Remaining() As Long
     Remaining = 0
 End Property
 
+''
+' Determines whether the specified object is equal to the current object.
+'
+' @param Value The value to compare with the current object.
+' @return <b>True</b> if the specified value is equal to the current object; otherwise, <b>False</b>.
 Public Function Equals(ByRef Value As Variant) As Boolean
     Equals = MyBase.Equals(Me, Value)
 End Function
 
+''
+' Serves as the default hash function.
+'
+' @return A hash code for the current object.
 Public Function GetHashCode() As Long
     GetHashCode = MyBase.GetHashCode(Me)
 End Function
 
+''
+' Returns a string that represents the current object.
+'
+' @return A string that represents the current object.
 Public Function ToString() As String
     ToString = MyBase.ToString(Me)
 End Function

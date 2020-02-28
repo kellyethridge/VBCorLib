@@ -56,7 +56,7 @@ Private mNotUsedDayLightTimes   As DayLightTime
 ''
 ' Returns the name of the daylight saving period.
 '
-' @return Daylight savings period name.
+' @return Daylight saving period name.
 Public Property Get DaylightName() As String
     DaylightName = mDaylightName
 End Property

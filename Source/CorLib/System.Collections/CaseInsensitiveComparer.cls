@@ -49,12 +49,22 @@ Private mDefault As IComparer
 '
 ' @param a The left-hand-side of the equation.
 ' @param b the right-hand-side of the equation.
-' @return The relationship between the values.<br>
-' Relationship guide:<br>
-' a is equal to b returns 0.<br>
-' a is greater than b returns a positive value (1).<br>
-' a is less than b returns a negative value (-1).
-'
+' @return The relationship between the values as shown in the table.<br>
+' <table style="width: auto">
+'   <tr>
+'       <th>Value</th>
+'       <th>Meaning</th>
+'   </tr>
+'   <tr>
+'        <td>Less than zero</td><td><i>a</i> is less than <i>b</i>, with casing ignored.</td>
+'   </tr>
+'   <tr>
+'        <td>Zero</td><td><i>a</i> equals <i>b</i>, with casing ignored.</td>
+'   </tr>
+'   <tr>
+'        <td>Greater than zero</td><td><i>a</i> is greater than <i>b</i>, with casing ignored.</td>
+'   </tr>
+' </table>
 Public Function Compare(ByRef a As Variant, ByRef b As Variant) As Long
     If VarType(a) = vbString Then
         If VarType(b) = vbString Then
@@ -111,8 +121,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = GetHashCode
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

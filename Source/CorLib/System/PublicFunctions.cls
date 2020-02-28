@@ -42,6 +42,36 @@ Option Explicit
 
 Private mTextOut As New StringBuilder
 
+
+''
+' Replaces escaped character sequences with a literal version.
+'
+' @param Text The string that contains the escaped characters to be replaced.
+' @return A string with escaped character sequence replaced with literal characters.
+' <p>
+' <h4>Supported escaped characters</h4>
+' <ul>
+' <li>\t - Tab</li>
+' <li>\n - Linefeed</li>
+' <li>\r - Carriage Return</li>
+' <li>\a - Bell</li>
+' <li>\b - Back Character</li>
+' <li>\f - Form Feed</li>
+' <li>\v - Vertical Tab</li>
+' <li>\0 - Null Character</li>
+' <li>\uXXXX - Hex asc value</li>
+' <li>\xXXXX - Hex asc value</li>
+' <li>\\ - \</li>
+' </ul>
+' </p>
+' <h4>Example</h4>
+' <pre>
+' Debug.Print t("This\tis\r\na\ttest")
+'
+' ''Outputs:
+'   This    is
+'   a   test
+' </pre>
 Public Function t(ByRef Text As String) As String
     Const vbBellChar        As Integer = 7
     Const vbBackChar        As Integer = 8
@@ -172,36 +202,17 @@ Private Function TryHexToChar(ByVal Ch As Integer, ByRef Result As Long) As Bool
 End Function
 
 ''
-' Converts a Char value greater than 32768 to the corrisponding
-' negative Integer value without overflow.
+' Converts a Char value greater than 32768 to the corrisponding negative Integer value without overflow.
 '
-' @param Value The Long Ascii value to be converted.
+' @param Value The Long ASCII value to be converted.
 ' @return Integer version of the Long value.
 ' @remarks The Value can only range from -32767 to 65535, otherwise
-' an <b>ArgumentOutOfRangeException</b> will be thrown.
-'
+' an <a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a> will be thrown.
 Public Function LongToChar(ByVal Value As Long) As Integer
     If Value < -32767 Or Value > 65535 Then _
         Throw Cor.NewArgumentOutOfRangeException("Value", "Value must be between -32767 and 65535 inclusively.")
-    If Value > 32767 Then Value = Value - 65536
-    LongToChar = Value
-End Function
-
-''
-' Returns character value from a string at the specified index.
-'
-' @param s The string to return the character from.
-' @param Index The position of the character in the string.
-' @return An integer representing the character.
-' @remarks The index is zero based.
-'
-Public Function CharAt(ByRef s As String, ByVal Index As Long) As Integer
-    If Index < 0 Then _
-        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_NeedNonNegNum
-    If Index >= Len(s) Then _
-        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_Index
     
-    CharAt = MemWord(StrPtr(s) + Index * 2)
+    LongToChar = AsWord(Value)
 End Function
 
 ''
@@ -215,6 +226,22 @@ Public Function CharToLong(ByVal Value As Integer) As Long
 End Function
 
 ''
+' Returns character value from a string at the specified index.
+'
+' @param s The string to return the character from.
+' @param Index The position of the character in the string.
+' @return An integer representing the character.
+' @remarks The index is zero based.
+Public Function CharAt(ByRef s As String, ByVal Index As Long) As Integer
+    If Index < 0 Then _
+        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_NeedNonNegNum
+    If Index >= Len(s) Then _
+        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_Index
+    
+    CharAt = MemWord(StrPtr(s) + Index * 2)
+End Function
+
+''
 ' Provides a way to move a variant datatype to another variant without
 ' the knowledge if Set needs to be used for objects.
 '
@@ -225,7 +252,6 @@ End Function
 ' overhead when a variant value needs to be transfered to another variant.
 ' <p>Any value in the destination variant will be released correctly
 ' before the source variants is moved into it.</p>
-'
 Public Sub MoveVariant(ByRef Destination As Variant, ByRef Source As Variant)
     Helper.MoveVariant Destination, Source
 End Sub
@@ -239,7 +265,6 @@ End Sub
 ' @remarks This works identical to the Win32 VariantCopyInd API function.
 ' <p>Any value in the destination variant will be released correctly
 ' before the source variants is copied into it.</p>
-'
 Public Sub CopyVariant(ByRef Destination As Variant, ByRef Source As Variant)
     VariantCopyInd Destination, Source
 End Sub
@@ -249,7 +274,6 @@ End Sub
 '
 ' @param Obj The object get the controlling interface of.
 ' @return The controlling IUnknown interface.
-'
 Public Function CUnk(ByVal Obj As IUnknown) As IUnknown
     Set CUnk = Obj
 End Function
@@ -259,30 +283,27 @@ End Function
 '
 ' @param Obj The instance to convert.
 ' @return Returns the instance as type Object.
-'
 Public Function CObj(ByVal Obj As Object) As Object
     Set CObj = Obj
 End Function
 
 ''
-' Returns the collection version for a collection that implements IVersionableCollection.
+' Returns the collection version for a collection that implements <a href="IVersionable.html">IVersionable</a>.
 '
 ' @param Obj The collection to retrieve the version from.
 ' @return The collection version.
 ' @remark The collection must maintain its own versioning.
 ' <p>This method does not throw an exception for unsupported values.</p>
-'
 Public Function GetCollectionVersion(ByVal Obj As Object) As Long
     GetCollectionVersion = Enumeration.GetCollectionVersion(Obj)
 End Function
 
 ''
-' Converts a value to a CorDateTimeObject.
+' Converts a value to a CorDateTime object.
 '
 ' @param Value The value to be converted to a<a href="CorDateTime.html">CorDateTime</a> object.
 ' @return The converted value.
 ' @remark This is a short-cut version of <a href="Convert.ToDateTime.html">Convert.ToDateTime</a>.
-'
 Public Function CDateTime(ByRef Value As Variant) As CorDateTime
     Set CDateTime = Convert.ToDateTime(Value)
 End Function
