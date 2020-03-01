@@ -62,6 +62,16 @@ Public Enum StringComparison
     OrdinalIgnoreCase = 5
 End Enum
 
+''
+' Specifies whether <a href="CorString.Split.html">CorString.Split</a> method include or omit empty substrings from the return value.
+'
+' @param None The return value includes array elements that contain an empty string.
+' @param RemoveEmptyEntries The return value does not include array elements that contain an empty string.
+Public Enum StringSplitOptions
+    None
+    RemoveEmptyEntries
+End Enum
+
 Private mComparisonString1()    As Long
 Private mComparisonString2()    As Long
 Private mComparisonHeader1      As SafeArray1d
@@ -495,8 +505,8 @@ Public Function StartsWith(ByRef s As String, ByRef Value As String, Optional By
     Dim ValueLength     As Long
     Dim SubstringPtr    As Long
     
-    SourceLength = LenB(s)
-    ValueLength = LenB(Value)
+    SourceLength = Len(s)
+    ValueLength = Len(Value)
     
     If ValueLength <= SourceLength Then
         Select Case ComparisonType
@@ -532,21 +542,301 @@ Public Function EndsWith(ByRef s As String, ByRef Value As String, Optional ByVa
     Dim ValueLength     As Long
     Dim SubstringPtr    As Long
     
-    SourceLength = LenB(s)
-    ValueLength = LenB(Value)
+    SourceLength = Len(s)
+    ValueLength = Len(Value)
     
     If ValueLength <= SourceLength Then
         Select Case ComparisonType
             Case StringComparison.Ordinal
-                EndsWith = OrdinalEquals(StrPtr(s) + SourceLength - ValueLength, ValueLength, StrPtr(Value), ValueLength)
+                EndsWith = OrdinalEquals(StrPtr(s) + (SourceLength - ValueLength) * vbSizeOfChar, ValueLength, StrPtr(Value), ValueLength)
             Case StringComparison.OrdinalIgnoreCase
-                EndsWith = OrdinalEqualsIgnoreCase(StrPtr(s) + SourceLength - ValueLength, ValueLength, StrPtr(Value), ValueLength)
+                EndsWith = OrdinalEqualsIgnoreCase(StrPtr(s) + (SourceLength - ValueLength) * vbSizeOfChar, ValueLength, StrPtr(Value), ValueLength)
             Case Else
                 Error.Argument ArgumentOutOfRange_Enum
         End Select
     End If
 End Function
 
+''
+' Splits a string into a maximum number of substrings based on the strings or characters in an array. You can specify whether the substrings include empty array elements.
+'
+' @param s The string to split.
+' @param Separator A String or Integer array that delimits the substrings in the <i>s</i> parameter, an empty array that contains no delimiters, or null.
+' @param Count The maximum number of substrings to return.
+' @param Options <a href="CorString.StringSplitOptions.html">StringSplitOptions.RemoveEmptyEntries</a> to omit empty array elements from the array returned; or <a href="CorString.StringSplitOptions.html">StringSplitOptions.None</a> to include empty array elements in the array returned.
+' @return An array whose elements contain the substrings in this string that are delimited by one or more strings in <i>Separator</i>. For more information, see the Remarks section.
+' <h4>Exceptions</h4>
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td><td><i>Count</i> is negative.</td>
+'   </tr>
+'    <tr>
+'        <td><a href="ArgumentException.html">ArgumentException</a></td><td><i>Options</i> is not one of the <a href="CorString.StringSplitOptions.html">StringSplitOptions</a> values.</td>
+'    </tr>
+' </table>
+' @remarks <p>Delimiter strings are not included in the elements of the returned array.</p>
+' <p>If the <i>s</i> parameter does not contain any of the strings or characters in <i>Separator</i>, or the <i>Count</i> parameter is 1, the returned array consists of a single element
+' that contains the <i>s</i> parameter. If the <i>Separator</i> parameter is <b>null</b> or contains no elements, white-space characters are assumed to be the delimiters.
+' White-space characters are defined by the Unicode standard and return <b>True</b> if they are passed to the <a href="Char.IsWhiteSpace.html">Char.IsWhiteSpace</a> method.</p>
+' <p>If the <i>Count</i> parameter is zero, or the <i>Options</i> parameter is <a href="CorString.StringSplitOptions.html">RemoveEmptyEntries</a> and the length of the <i>s</i> parameter is zero, an empty array is returned.</p>
+Public Function Split(ByRef s As String, ByRef Separator As Variant, Optional ByVal Count As Long = &H7FFFFFFF, Optional ByVal Options As StringSplitOptions = StringSplitOptions.None) As String()
+    If Count < 0 Then _
+        Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_NeedNonNegNum
+    
+    If Count = 0 Or (Len(s) = 0 And Options = StringSplitOptions.RemoveEmptyEntries) Then
+        Split = Cor.NewStrings()
+    Else
+        Dim SeparatorIndexes()  As Long
+        Dim SeparatorLengths()  As Long
+        Dim MatchCount          As Long
+    
+        If CorArray.IsNull(Separator) Then
+            MatchCount = FindWhitespaceSeparatorIndexes(s, SeparatorIndexes, SeparatorLengths)
+        ElseIf CorArray.Length(Separator) = 0 Then
+            MatchCount = FindWhitespaceSeparatorIndexes(s, SeparatorIndexes, SeparatorLengths)
+        Else
+            MatchCount = FindSeparatorIndexes(s, Separator, SeparatorIndexes, SeparatorLengths)
+        End If
+        
+        If MatchCount > 0 Then
+            Select Case Options
+                Case StringSplitOptions.None
+                    Split = SplitWithEmpties(s, MatchCount, SeparatorIndexes, SeparatorLengths, Count)
+                Case StringSplitOptions.RemoveEmptyEntries
+                    Split = SplitWithoutEmpties(s, MatchCount, SeparatorIndexes, SeparatorLengths, Count)
+                Case Else
+                    Error.Argument ArgumentOutOfRange_Enum
+            End Select
+        Else
+            Split = Cor.NewStrings(s)
+        End If
+    End If
+End Function
+
+Private Function FindSeparatorIndexes(ByRef s As String, ByRef Separator As Variant, ByRef SeparatorIndexes() As Long, ByRef SeparatorLengths() As Long) As Long
+    Dim StringSeparator()   As String
+    Dim CharSeparator()     As Integer
+    
+    On Error GoTo Catch
+    
+    Select Case VarType(Separator)
+        Case vbStringArray
+            SAPtr(StringSeparator) = SAPtrV(Separator)
+            FindSeparatorIndexes = FindStringSeparatorIndexes(s, StringSeparator, SeparatorIndexes, SeparatorLengths)
+        Case vbIntegerArray
+            SAPtr(CharSeparator) = SAPtrV(Separator)
+            FindSeparatorIndexes = FindCharSeparatorIndexes(s, CharSeparator, SeparatorIndexes, SeparatorLengths)
+        Case Else
+            Error.Argument Argument_CharArrayRequired, "Separator"
+    End Select
+
+    GoSub Finally
+    Exit Function
+    
+Catch:
+    GoSub Finally
+    ThrowOrErr Err
+Finally:
+    SAPtr(StringSeparator) = vbNullPtr
+    SAPtr(CharSeparator) = vbNullPtr
+    Return
+End Function
+
+Private Function FindStringSeparatorIndexes(ByRef s As String, ByRef Separator() As String, ByRef SeparatorIndexes() As Long, ByRef SeparatorLengths() As Long) As Long
+    Dim SPtr            As Long
+    Dim CharIndex       As Long
+    Dim SLength         As Long
+    Dim SeparatorPtr    As Long
+    Dim SeparatorLength As Long
+    Dim SeparatorUB     As Long
+    Dim SeparatorLB     As Long
+    Dim MatchCount      As Long
+    
+    SeparatorUB = UBound(Separator)
+    SeparatorLB = LBound(Separator)
+    SPtr = StrPtr(s)
+    SLength = Len(s)
+    ReDim SeparatorIndexes(0 To SLength \ 2 + 1)
+    ReDim SeparatorLengths(0 To SLength \ 2 + 1)
+    
+    Do While CharIndex < SLength
+        Dim i As Long
+        
+        For i = SeparatorLB To SeparatorUB
+            SeparatorPtr = StrPtr(Separator(i))
+            SeparatorLength = Len(Separator(i))
+            
+            If SeparatorLength > SLength - CharIndex Then
+                Exit For
+            End If
+            
+            If OrdinalEquals(SPtr + CharIndex * vbSizeOfChar, SeparatorLength, SeparatorPtr, SeparatorLength) Then
+                SeparatorIndexes(MatchCount) = CharIndex
+                SeparatorLengths(MatchCount) = SeparatorLength
+                MatchCount = MatchCount + 1
+                CharIndex = CharIndex + SeparatorLength - 1
+                Exit For
+            End If
+        Next
+        
+        CharIndex = CharIndex + 1
+    Loop
+    
+    FindStringSeparatorIndexes = MatchCount
+End Function
+
+Private Function FindCharSeparatorIndexes(ByRef s As String, ByRef Separator() As Integer, ByRef SeparatorIndexes() As Long, ByRef SeparatorLengths() As Long) As Long
+    Dim Chars()     As Integer
+    Dim CharIndex   As Long
+    Dim SLength     As Long
+    Dim MatchCount  As Long
+    Dim SeparatorUB As Long
+    Dim SeparatorLB As Long
+    
+    SeparatorUB = UBound(Separator)
+    SeparatorLB = LBound(Separator)
+    SLength = Len(s)
+    ReDim SeparatorIndexes(0 To SLength \ 2 + 1)
+    ReDim SeparatorLengths(0 To SLength \ 2 + 1)
+    Chars = AllocChars(s)
+    
+    On Error GoTo Catch
+    
+    Do While CharIndex < SLength
+        Dim i As Long
+        
+        For i = SeparatorLB To SeparatorUB
+            If Chars(CharIndex) = Separator(i) Then
+                SeparatorIndexes(MatchCount) = CharIndex
+                SeparatorLengths(MatchCount) = 1
+                MatchCount = MatchCount + 1
+                Exit For
+            End If
+        Next
+        
+        CharIndex = CharIndex + 1
+    Loop
+    
+    GoSub Finally
+    FindCharSeparatorIndexes = MatchCount
+    Exit Function
+    
+Catch:
+    GoSub Finally
+    ThrowOrErr Err
+Finally:
+    FreeChars Chars
+    Return
+End Function
+
+Private Function FindWhitespaceSeparatorIndexes(ByRef s As String, ByRef SeparatorIndexes() As Long, ByRef SeparatorLengths() As Long) As Long
+    Dim Chars()     As Integer
+    Dim CharIndex   As Long
+    Dim SLength     As Long
+    Dim MatchCount  As Long
+    
+    SLength = Len(s)
+    ReDim SeparatorIndexes(0 To SLength \ 2 + 1)
+    ReDim SeparatorLengths(0 To SLength \ 2 + 1)
+    Chars = AllocChars(s)
+    
+    On Error GoTo Catch
+    
+    Do While CharIndex < SLength
+        If Char.IsWhiteSpace(Chars(CharIndex)) Then
+            SeparatorIndexes(MatchCount) = CharIndex
+            SeparatorLengths(MatchCount) = 1
+            MatchCount = MatchCount + 1
+        End If
+        
+        CharIndex = CharIndex + 1
+    Loop
+    
+    GoSub Finally
+    FindWhitespaceSeparatorIndexes = MatchCount
+    Exit Function
+    
+Catch:
+    GoSub Finally
+    ThrowOrErr Err
+Finally:
+    FreeChars Chars
+    Return
+End Function
+
+Private Function SplitWithEmpties(ByRef s As String, ByVal MatchCount As Long, ByRef SeparatorIndexes() As Long, ByRef SeparatorLengths() As Long, ByVal Count As Long) As String()
+    Dim Result()            As String
+    Dim MaxSubstrings       As Long
+    Dim SubstringStartIndex As Long
+    
+    MaxSubstrings = IIf(MatchCount + 1 < Count, MatchCount, Count - 1)
+    ReDim Result(0 To MaxSubstrings)
+    
+    Dim i As Long
+    For i = 0 To MaxSubstrings - 1
+        Result(i) = Mid$(s, SubstringStartIndex + 1, SeparatorIndexes(i) - SubstringStartIndex)
+        SubstringStartIndex = SeparatorIndexes(i) + SeparatorLengths(i)
+    Next
+    
+    If SubstringStartIndex < Len(s) Then
+        Result(MaxSubstrings) = Mid$(s, SubstringStartIndex + 1, Len(s) - SubstringStartIndex)
+    End If
+
+    SplitWithEmpties = Result
+End Function
+
+Private Function SplitWithoutEmpties(ByRef s As String, ByVal MatchCount As Long, ByRef SeparatorIndexes() As Long, ByRef SeparatorLengths() As Long, ByVal Count As Long) As String()
+    Dim MaxSubstrings       As Long
+    
+    MaxSubstrings = CountSubstrings(s, MatchCount, SeparatorIndexes, SeparatorLengths)
+    MaxSubstrings = IIf(MaxSubstrings < Count, MaxSubstrings, Count)
+    SplitWithoutEmpties = CreateSubstrings(s, MaxSubstrings, SeparatorIndexes, SeparatorLengths)
+End Function
+
+Private Function CountSubstrings(ByRef s As String, ByVal MatchCount As Long, ByRef SeparatorIndexes() As Long, ByRef SeparatorLengths() As Long) As Long
+    Dim SubstringStartIndex As Long
+    
+    Dim i As Long
+    For i = 0 To MatchCount - 1
+        If SeparatorIndexes(i) - SubstringStartIndex > 0 Then
+            CountSubstrings = CountSubstrings + 1
+        End If
+        
+        SubstringStartIndex = SeparatorIndexes(i) + SeparatorLengths(i)
+    Next
+    
+    If SubstringStartIndex < Len(s) And (Len(s) - SubstringStartIndex) > 0 Then
+        CountSubstrings = CountSubstrings + 1
+    End If
+End Function
+
+Private Function CreateSubstrings(ByRef s As String, ByVal MaxSubstrings As Long, ByRef SeparatorIndexes() As Long, ByRef SeparatorLengths() As Long) As String()
+    Dim Result() As String
+    Dim SubstringStartIndex As Long
+    Dim ResultIndex         As Long
+    
+    ReDim Result(0 To MaxSubstrings - 1)
+    
+    Dim i As Long
+    For i = 0 To MaxSubstrings - 1
+        If SeparatorIndexes(i) - SubstringStartIndex > 0 Then
+            Result(ResultIndex) = Mid$(s, SubstringStartIndex + 1, SeparatorIndexes(i) - SubstringStartIndex)
+            ResultIndex = ResultIndex + 1
+        End If
+        
+        SubstringStartIndex = SeparatorIndexes(i) + SeparatorLengths(i)
+    Next
+    
+    If SubstringStartIndex < Len(s) And (Len(s) - SubstringStartIndex) > 0 Then
+        Result(MaxSubstrings - 1) = Mid$(s, SubstringStartIndex + 1, Len(s) - SubstringStartIndex)
+    End If
+
+    CreateSubstrings = Result
+End Function
 
 ''
 ' Determines whether two specified Strings have the same value.
@@ -558,9 +848,9 @@ End Function
 Public Function Equals(ByRef a As String, ByRef b As String, Optional ByVal ComparisonType As StringComparison = Ordinal) As Boolean
     Select Case ComparisonType
         Case StringComparison.Ordinal
-            Equals = OrdinalEquals(StrPtr(a), LenB(a), StrPtr(b), LenB(b))
+            Equals = OrdinalEquals(StrPtr(a), Len(a), StrPtr(b), Len(b))
         Case StringComparison.OrdinalIgnoreCase
-            Equals = OrdinalEqualsIgnoreCase(StrPtr(a), LenB(a), StrPtr(b), LenB(b))
+            Equals = OrdinalEqualsIgnoreCase(StrPtr(a), Len(a), StrPtr(b), Len(b))
         Case Else
             Error.ArgumentOutOfRange "ComparisonType", ArgumentOutOfRange_Enum
     End Select
@@ -570,9 +860,9 @@ End Function
 Friend Function EqualsV(ByRef a As Variant, ByRef b As Variant, Optional ByVal ComparisonType As StringComparison = Ordinal) As Boolean
     Select Case ComparisonType
         Case StringComparison.Ordinal
-            EqualsV = OrdinalEquals(StrPtr(a), LenB(a), StrPtr(b), LenB(b))
+            EqualsV = OrdinalEquals(StrPtr(a), Len(a), StrPtr(b), Len(b))
         Case StringComparison.OrdinalIgnoreCase
-            EqualsV = OrdinalEqualsIgnoreCase(StrPtr(a), LenB(a), StrPtr(b), LenB(b))
+            EqualsV = OrdinalEqualsIgnoreCase(StrPtr(a), Len(a), StrPtr(b), Len(b))
         Case Else
             Error.ArgumentOutOfRange "ComparisonType", ArgumentOutOfRange_Enum
     End Select
@@ -931,11 +1221,13 @@ Private Function OrdinalEquals(ByVal Ptr1 As Long, ByVal Len1 As Long, ByVal Ptr
         Case 0
             OrdinalEquals = True
             Exit Function
-        Case vbSizeOfChar
+        Case 1
             OrdinalEquals = (mComparisonString1(0) And &HFFFF&) = (mComparisonString2(0) And &HFFFF&)
             Exit Function
     End Select
     
+    Len1 = Len1 * vbSizeOfChar
+    Len2 = Len2 * vbSizeOfChar
     Tmp = Len1 \ 4
     ' The first two characters come cheap
     If mComparisonString1(i) <> mComparisonString2(i) Then GoTo BailOut Else i = i + 1
@@ -995,6 +1287,8 @@ Private Function OrdinalEqualsIgnoreCase(ByVal Ptr1 As Long, ByVal SLen As Long,
         Exit Function
     End If
     
+    SLen = SLen * 2
+    SLen2 = SLen2 * 2
     mComparisonHeader1.pvData = Ptr1
     mComparisonHeader2.pvData = Ptr2
 

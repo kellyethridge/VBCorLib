@@ -50,3 +50,5 @@ End Property
 Public Property Get NullChars() As Integer()
 End Property
 
+Public Property Get NullStrings() As String()
+End Property

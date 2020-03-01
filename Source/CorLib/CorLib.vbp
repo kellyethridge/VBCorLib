@@ -411,7 +411,7 @@ ThreadingModel=1
 DebugStartupOption=0
 
 [TaskList]
-Num=10
+Num=3
 
 [TASK1]
 Description=Add tests for FromBase64Transform.TransformFinalBlock
@@ -426,46 +426,58 @@ Priority=1
 Comment=Investigate implementation.
 
 [TASK3]
-Description=PasswordDeriveBytes class
-Status=0
-Priority=1
-Comment=Investigate implementation.
-
-[TASK4]
-Description=Add CorString.Concat method
-Status=0
-Priority=1
-
-[TASK5]
-Description=Add CorString.EndsWith and CorString.StartsWith
-Status=0
-Priority=1
-
-[TASK6]
-Description=Add CorString.Split method
-Status=0
-Priority=1
-
-[TASK7]
-Description=Add TimeSpan.Multiply method
-Status=0
-Priority=1
-
-[TASK8]
-Description=Add TimeSpan.Divide method
-Status=0
-Priority=1
-
-[TASK9]
-Description=Consider adding CorMathF class
-Status=0
-Priority=1
-Comment=This class would have corrisponding methods to CorMath except the arguments and results would be of type Single instead of Double.
-
-[TASK10]
 Description=Add CryptDeriveKey method to Rfc2898DeriveBytes class
 Status=0
 Priority=1
+
+[TASK4]
+Description=
+Status=
+Priority=
+AssignedTo=
+Comment=
+
+[TASK5]
+Description=
+Status=
+Priority=
+AssignedTo=
+Comment=
+
+[TASK6]
+Description=
+Status=
+Priority=
+AssignedTo=
+Comment=
+
+[TASK7]
+Description=
+Status=
+Priority=
+AssignedTo=
+Comment=
+
+[TASK8]
+Description=
+Status=
+Priority=
+AssignedTo=
+Comment=
+
+[TASK9]
+Description=
+Status=
+Priority=
+AssignedTo=
+Comment=
+
+[TASK10]
+Description=
+Status=
+Priority=
+AssignedTo=
+Comment=
 
 [TASK11]
 Description=

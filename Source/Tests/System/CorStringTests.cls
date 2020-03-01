@@ -100,7 +100,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use 9, "123456789"
             Test.Use 10, "1234567890"
             
-        Case "Join_WihtLongsSubset_ReturnsJoined"
+        Case "Join_WithLongsSubset_ReturnsJoined"
             Test.Use 0, 10, "1,2,3,4,5,6,7,8,9,0"
             Test.Use 1, 9, "2,3,4,5,6,7,8,9,0"
             Test.Use 0, 9, "1,2,3,4,5,6,7,8,9"
@@ -225,6 +225,66 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "abc", "B", False
             Test.Use "abc", "b", False
         
+        Case "Split_WithStringSeparators_ReturnsExpected"
+            Test.Use "abc", NewStrings("b"), NewStrings("a", "c")
+            Test.Use "abc", NewStrings("a"), NewStrings("", "bc")
+            Test.Use "abc", NewStrings("c"), NewStrings("ab", "")
+            Test.Use "abc", NewStrings("ab"), NewStrings("", "c")
+            Test.Use "abc", NewStrings("bc"), NewStrings("a", "")
+            Test.Use "abc", NewStrings("abc"), NewStrings("", "")
+            Test.Use "abc", NewStrings("d"), NewStrings("abc")
+            Test.Use "abc", NewStrings("a", "c"), NewStrings("", "b", "")
+            Test.Use "abc", NewStrings("abcd"), NewStrings("abc")
+            Test.Use "abcabc", NewStrings("b"), NewStrings("a", "ca", "c")
+            Test.Use "abccda", NewStrings("c"), NewStrings("ab", "", "da")
+            Test.Use "abccda", NewStrings("c", "d"), NewStrings("ab", "", "", "a")
+            Test.Use "abcd", NewStrings(), NewStrings("abcd")
+            Test.Use "abcd", NullStrings, NewStrings("abcd")
+            Test.Use "abcd", NewStrings("ce"), NewStrings("abcd")
+            Test.Use "abcd", NewStrings("de"), NewStrings("abcd")
+            Test.Use "", NewStrings("b"), NewStrings("")
+            Test.Use "", NewStrings(""), NewStrings("")
+            Test.Use "", NewStrings(), NewStrings("")
+            Test.Use vbNullString, NewStrings("b"), NewStrings("")
+            Test.Use vbNullString, NewStrings(""), NewStrings("")
+            Test.Use "a b c", NewStrings(), NewStrings("a", "b", "c")
+            Test.Use "a b c", NullStrings, NewStrings("a", "b", "c")
+            
+        Case "Split_WithRemoveEmptyEntries_ReturnsFilledStringsOnly"
+            Test.Use "abbc", NewStrings("b"), NewStrings("a", "c")
+            Test.Use "abbc", NewStrings("a"), NewStrings("bbc")
+            Test.Use "abbc", NewStrings("c"), NewStrings("abb")
+            Test.Use "abbc", NewStrings("d"), NewStrings("abbc")
+            Test.Use "abcd", NewStrings(), NewStrings("abcd")
+            Test.Use "abcd", NullStrings, NewStrings("abcd")
+            Test.Use "abcd", NewStrings("ce"), NewStrings("abcd")
+            Test.Use "abcd", NewStrings("de"), NewStrings("abcd")
+            Test.Use "", NewStrings("b"), NewStrings()
+            Test.Use "", NewStrings(""), NewStrings()
+            
+        Case "Split_WithCount_ReturnsLimitedNumberOfSubstrings"
+            Test.Use "abc", NewStrings("b"), 2, NewStrings("a", "c")
+            Test.Use "abc", NewStrings("b"), 3, NewStrings("a", "c")
+            Test.Use "abc", NewStrings("b"), 1, NewStrings("abc")
+            Test.Use "abc", NewStrings("b"), 0, NewStrings()
+            Test.Use "", NewStrings("b"), 1, NewStrings("")
+            Test.Use "", NewStrings("b"), 0, NewStrings()
+            Test.Use "", NewStrings(""), 5, NewStrings("")
+            
+        Case "Split_WithCharSeparators_ReturnsExpected"
+            Test.Use "abc", NewChars("b"), NewStrings("a", "c")
+            Test.Use "abc", NewChars("a"), NewStrings("", "bc")
+            Test.Use "abc", NewChars("c"), NewStrings("ab", "")
+            Test.Use "abc", NewChars("d"), NewStrings("abc")
+            Test.Use "abc", NewChars("a", "c"), NewStrings("", "b", "")
+            Test.Use "abcabc", NewChars("b"), NewStrings("a", "ca", "c")
+            Test.Use "abccda", NewChars("c"), NewStrings("ab", "", "da")
+            Test.Use "abccda", NewChars("c", "d"), NewStrings("ab", "", "", "a")
+            Test.Use "abcd", NewChars(), NewStrings("abcd")
+            Test.Use "abcd", NullChars, NewStrings("abcd")
+            Test.Use "", NewChars("b"), NewStrings("")
+            Test.Use vbNullString, NewChars("b"), NewStrings("")
+            
     End Select
 End Sub
 
@@ -514,7 +574,7 @@ Public Sub Join_WithLongArray_ReturnsJoined()
     Assert.That Actual, Iz.EqualTo("1,2,3,4")
 End Sub
 
-Public Sub Join_WihtLongsSubset_ReturnsJoined(ByVal StartIndex As Long, ByVal Count As Long, ByVal Expected As String)
+Public Sub Join_WithLongsSubset_ReturnsJoined(ByVal StartIndex As Long, ByVal Count As Long, ByVal Expected As String)
     Dim Longs() As Long
     Longs = NewLongs(1, 2, 3, 4, 5, 6, 7, 8, 9, 0)
     
@@ -852,6 +912,38 @@ Public Sub EndsWith_WithValuesWhenIgnoringCase_ReturnsExpected(ByVal Source As S
     Dim Actual As Boolean
     
     Actual = CorString.EndsWith(Source, Value, OrdinalIgnoreCase)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub Split_WithStringSeparators_ReturnsExpected(ByVal StringToSplit As String, ByRef Separators() As String, ByRef Expected() As String)
+    Dim Actual() As String
+    
+    Actual = CorString.Split(StringToSplit, Separators)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub Split_WithCount_ReturnsLimitedNumberOfSubstrings(ByVal StringToSplit As String, ByRef Separators() As String, ByVal Count As Long, ByRef Expected() As String)
+    Dim Actual() As String
+    
+    Actual = CorString.Split(StringToSplit, Separators, Count)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub Split_WithRemoveEmptyEntries_ReturnsFilledStringsOnly(ByVal StringToSplit As String, ByRef Separators() As String, ByRef Expected() As String)
+    Dim Actual() As String
+    
+    Actual = CorString.Split(StringToSplit, Separators, , StringSplitOptions.RemoveEmptyEntries)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub Split_WithCharSeparators_ReturnsExpected(ByVal StringToSplit As String, ByRef Separators() As Integer, ByRef Expected() As String)
+    Dim Actual() As String
+    
+    Actual = CorString.Split(StringToSplit, Separators)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
