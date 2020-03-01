@@ -594,9 +594,7 @@ Public Function Split(ByRef s As String, ByRef Separator As Variant, Optional By
         Dim SeparatorLengths()  As Long
         Dim MatchCount          As Long
     
-        If CorArray.IsNull(Separator) Then
-            MatchCount = FindWhitespaceSeparatorIndexes(s, SeparatorIndexes, SeparatorLengths)
-        ElseIf CorArray.Length(Separator) = 0 Then
+        If CorArray.IsNullOrEmpty(Separator) Then
             MatchCount = FindWhitespaceSeparatorIndexes(s, SeparatorIndexes, SeparatorLengths)
         Else
             MatchCount = FindSeparatorIndexes(s, Separator, SeparatorIndexes, SeparatorLengths)
@@ -790,7 +788,7 @@ Private Function SplitWithEmpties(ByRef s As String, ByVal MatchCount As Long, B
 End Function
 
 Private Function SplitWithoutEmpties(ByRef s As String, ByVal MatchCount As Long, ByRef SeparatorIndexes() As Long, ByRef SeparatorLengths() As Long, ByVal Count As Long) As String()
-    Dim MaxSubstrings       As Long
+    Dim MaxSubstrings As Long
     
     MaxSubstrings = CountSubstrings(s, MatchCount, SeparatorIndexes, SeparatorLengths)
     MaxSubstrings = IIf(MaxSubstrings < Count, MaxSubstrings, Count)
@@ -815,7 +813,7 @@ Private Function CountSubstrings(ByRef s As String, ByVal MatchCount As Long, By
 End Function
 
 Private Function CreateSubstrings(ByRef s As String, ByVal MaxSubstrings As Long, ByRef SeparatorIndexes() As Long, ByRef SeparatorLengths() As Long) As String()
-    Dim Result() As String
+    Dim Result()            As String
     Dim SubstringStartIndex As Long
     Dim ResultIndex         As Long
     

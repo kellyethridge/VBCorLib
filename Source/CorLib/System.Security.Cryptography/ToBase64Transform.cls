@@ -73,10 +73,10 @@ End Property
 '
 ' @return The number of bytes operated on at a time.
 ' @remarks This always returns 3.
-' <p>When calling the TransformBlock method, the InputCount must be zero or a multiple of this value.</p>
-' <p><b>ToBase64Transform</b> works on 24bits at a time using standard Base 64 conversion methods. The
-' resulting output is 32bits of transformed data.
-'
+' <p>When calling the <a href="ToBase64Transform.TransformBlock.html">TransformBlock</a> method,
+' the <i>InputCount</i> must be zero or a multiple of this value.</p>
+' <p><b>ToBase64Transform</b> works on 24 bits at a time using standard Base 64 conversion methods. The
+' resulting output is 32 bits of transformed data.
 Public Property Get InputBlockSize() As Long
     InputBlockSize = 3
 End Property
@@ -86,8 +86,8 @@ End Property
 '
 ' @return The number of bytes that will result from a transformation.
 ' @remarks This always returns 4.
-' <p><b>ToBase64Transform</b> works on 24bits at a time using standard Base 64 conversion methods. The
-' resulting output is 32bits of transformed data.
+' <p><b>ToBase64Transform</b> works on 24 bits at a time using standard Base 64 conversion methods. The
+' resulting output is 32 bits of transformed data.
 '
 Public Property Get OutputBlockSize() As Long
     OutputBlockSize = 4
@@ -108,7 +108,7 @@ End Sub
 ' @param InputOffset The starting position in the InputBuffer to begin transforming data.
 ' @param InputCount The number of bytes to be transformed.
 ' @param OutputBuffer A byte array that received the transformed data.
-' @param OutputOffset The starting position in the OutputBuffer to begin placing transformed data.
+' @param OutputOffset The starting position in the <i>OutputBuffer</i> to begin placing transformed data.
 ' @return The number of bytes added to the OutputBuffer after the transformation.
 ' @remarks <b>ToBase64Transform</b> only operated on 3 bytes at a time, generating 4 bytes of output.
 ' If more than 3 bytes is needed to be transformed, then this method needs to be called multiple times.

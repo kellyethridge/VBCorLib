@@ -133,7 +133,7 @@ Public Sub AddAlgorithm_WithEmptyTypeName_ThrowsArgumentException()
     
     CryptoConfig.AddAlgorithm "", "abc"
     
-    AssertArgumentException Err, "TypeName"
+    AssertArgumentException Err, "Algorithm"
 End Sub
 
 Public Sub AddAlgorithm_WithNonStringAlgName_ThrowsInvalidCastException()

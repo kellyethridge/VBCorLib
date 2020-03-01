@@ -45,14 +45,13 @@ Option Explicit
 
 
 ''
-' Returns the block size, in bits, used by the cryptographic operation.
+' Gets the block size, in bits, used by the cryptographic operation.
 '
 ' @Return The block size in bits.
 ' @remarks A block size is the basic unit size of data that can be encrypted or decrypted in a single operation. Data that is
 ' larger than a block size are processed by splitting the data into multiple blocks the same size as the block size then
 ' operating of the multiple blocks.
-' <p>A list of legal block sizes can be obtained through the <b>LegalBlockSizes</b> property.</p>
-'
+' <p>A list of legal block sizes can be obtained through the <a href="TripleDES.Get.LegalBlockSizes.html">LegalBlockSizes</a> property.</p>
 Public Property Get BlockSize() As Long: End Property
 
 
@@ -63,18 +62,16 @@ Public Property Get BlockSize() As Long: End Property
 ' @remarks A block size is the basic unit size of data that can be encrypted or decrypted in a single operation. Data that is
 ' larger than a block size are processed by splitting the data into multiple blocks the same size as the block size then
 ' operating of the multiple blocks.
-' <p>An invalid block size will cause a <b>CryptographicException</b>.
-' <p>A list of legal block sizes can be obtained through the <b>LegalBlockSizes</b> property.</p>
-'
+' <p>An invalid block size will cause a <a href="CryptographicException.html">CryptographicException</a>.
+' <p>A list of legal block sizes can be obtained through the <a href="TripleDES.Get.LegalBlockSizes.html">LegalBlockSizes</a> property.</p>
 Public Property Let BlockSize(ByVal Value As Long): End Property
 
 ''
-' Returns the feedback size, in bits, used by the cryptographic operation.
+' Gets the feedback size, in bits, used by the cryptographic operation.
 '
 ' @return Returns the feedback size in bits.
 ' @remarks The feedback size determines the amount of data that is fed back to successive encryption or decryption operations.
 ' The feedback size cannot be greater than the block size.
-'
 Public Property Get FeedbackSize() As Long: End Property
 
 ''
@@ -83,18 +80,16 @@ Public Property Get FeedbackSize() As Long: End Property
 ' @param Value The feedback size in bits.
 ' @remarks The feedback size determines the amount of data that is fed back to successive encryption or decryption operations.
 ' The feedback size cannot be greater than the block size.
-'
 Public Property Let FeedbackSize(ByVal Value As Long): End Property
 
 ''
-' Returns the Initialization Vector used by the cryptographic operation.
+' Gets the Initialization Vector used by the cryptographic operation.
 '
 ' @return Returns an array of bytes representing an Initialization Vector.
 ' @remarks If several blocks of same plain text are encrypted, the ciphered data could all be the same as well. Using an
 ' Initialization Vector can prevent same plain text blocks to reproduce the same ciphered blocks.
-' <p>This can be generated using the <b>GenerateIV</b> method, or a new one will be generated if one hasn't been set when
+' <p>This can be generated using the <a href="TripleDES.GenerateIV.html">GenerateIV</a> method, or a new one will be generated if one hasn't been set when
 ' this property is accessed.</p>
-'
 Public Property Get IV() As Byte(): End Property
 
 ''
@@ -103,10 +98,9 @@ Public Property Get IV() As Byte(): End Property
 ' @param Value The new Initialization Vector.
 ' @remarks If several blocks of same plain text are encrypted, the ciphered data could all be the same aswell. Using an
 ' Initialization Vector can prevent same plain text blocks to reproduce the same ciphered blocks.
-' <p>This can be generated using the <b>GenerateIV</b> method, or a new one will be generated if one hasn't been set when
+' <p>This can be generated using the <a href="TripleDES.GenerateIV.html">GenerateIV</a> method, or a new one will be generated if one hasn't been set when
 ' this property is accessed.</p>
 ' <p>This must be set to an array the same size as the block size.</p>
-'
 Public Property Let IV(ByRef Value() As Byte): End Property
 
 ''
@@ -114,9 +108,8 @@ Public Property Let IV(ByRef Value() As Byte): End Property
 '
 ' @return Returns the secret key.
 ' @remarks Valid key sizes are determined by the individual algorithms. A list of valid sizes can be obtained
-' through the <b>LegalKeySizes</b> property.
+' through the <a href="TripleDES.Get.LegalKeySizes.html">LegalKeySizes</a> property.
 ' <p>If a key has not been set, then a new key will be generated automatically.</p>
-'
 Public Property Get Key() As Byte(): End Property
 
 ''
@@ -124,8 +117,7 @@ Public Property Get Key() As Byte(): End Property
 '
 ' @param Value The new secret key to be used.
 ' @remarks Valid key sizes are determined by the individual algorithms. A list of valid sizes can be obtained
-' through the <b>LegalKeySizes</b> property.
-'
+' through the <a href="TripleDES.Get.LegalKeySizes.html">LegalKeySizes</a> property.
 Public Property Let Key(ByRef Value() As Byte): End Property
 
 ''
@@ -133,7 +125,6 @@ Public Property Let Key(ByRef Value() As Byte): End Property
 '
 ' @return The size of the key in bits.
 ' @remarks The size of keys are measured in bits. Common key sizes are 64, 128, 192, and 256 bit lengths.
-'
 Public Property Get KeySize() As Long: End Property
 
 ''
@@ -141,31 +132,27 @@ Public Property Get KeySize() As Long: End Property
 '
 ' @param Value The size of the key in bits.
 ' @remarks The size of keys are measured in bits. Common key sizes are 64, 128, 192, and 256 bit lengths.
-' <p>This will cause the <b>Key</b> property to reset and regenerate when needed.</p>
-'
+' <p>This will cause the <a href="TripleDES.Get.Key.html">Key</a> property to reset and regenerate when needed.</p>
 Public Property Let KeySize(ByVal Value As Long): End Property
 
 ''
-' Returns a list of legal block sizes.
+' Gets a list of legal block sizes.
 '
 ' @return A list of legal block sizes the cryptographic operation supports.
-'
 Public Property Get LegalBlockSizes() As KeySizes(): End Property
 
 ''
-' Returns a list of legal key sizes.
+' Gets a list of legal key sizes.
 '
 ' @return A list of legal key sizes the cryptographic operation supports.
-'
 Public Property Get LegalKeySizes() As KeySizes(): End Property
 
 ''
-' Returns the mode the current algoritm is set to.
+' Gets the mode the current algoritm is set to.
 '
-' @return Returns a <b>CipherMode</b> value.
+' @return Returns a <a href="SymmetricAlgorithm.CipherMode.html">CipherMode</a> value.
 ' @remarks The algoritm can operate in several modes. The modes determine how the data
 ' is processed from one block to the next.
-'
 Public Property Get Mode() As CipherMode: End Property
 
 ''
@@ -174,11 +161,10 @@ Public Property Get Mode() As CipherMode: End Property
 ' @param Value The new mode for the algorithm.
 ' @remarks The algoritm can operate in several modes. The modes determine how the data
 ' is processed from one block to the next.
-'
 Public Property Let Mode(ByVal Value As CipherMode): End Property
 
 ''
-' Returns the padding to be used by the algorithm.
+' Gets the padding to be used by the algorithm.
 '
 ' @return A current padding being used.
 ' @remarks Padding is added to the end of plain text data to make the data length
@@ -192,7 +178,6 @@ Public Property Get Padding() As PaddingMode: End Property
 ' @param Value The new padding value to be used.
 ' @remarks Padding is added to the end of plain text data to make the data length
 ' an even multiple of the block size.
-'
 Public Property Let Padding(ByVal Value As PaddingMode): End Property
 
 ''
@@ -205,7 +190,7 @@ Public Sub Clear(): End Sub
 '
 ' @param RgbKey The secret key to be used to decrypt the ciphered text back into plain text.
 ' @param RgbIV The Initialization Vector to begin the feedback with.
-' @return A new <b>ICryptoTransform</b> used to decrypt ciphered text.
+' @return A new <a href="ICryptoTransform.html">ICryptoTransform</a> used to decrypt ciphered text.
 ' @remarks Though both parameters are optional, if only one parameter is supplied, an exception will be thrown.
 '
 Public Function CreateDecryptor(Optional ByRef RgbKey As Variant, Optional ByRef RgbIV As Variant) As ICryptoTransform: End Function
@@ -215,7 +200,7 @@ Public Function CreateDecryptor(Optional ByRef RgbKey As Variant, Optional ByRef
 '
 ' @param RgbKey The secret key to be used to encrypt the plain text into ciphered text.
 ' @param RgbIV The Initialization Vector to begin the feedback with.
-' @return A new <b>ICryptoTransform</b> used to encrypt plain text.
+' @return A new <a href="ICryptoTransform.html">ICryptoTransform</a> used to encrypt plain text.
 ' @remarks Though both parameters are optional, if only one parameter is supplied, an exception will be thrown.
 '
 Public Function CreateEncryptor(Optional ByRef RgbKey As Variant, Optional ByRef RgbIV As Variant) As ICryptoTransform: End Function

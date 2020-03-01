@@ -167,7 +167,7 @@ Public Sub WriteChar(ByRef Value As Variant)
         Case vbString
             If Len(Value) = 0 Then _
                 Error.Argument Argument_StringZeroLength
-                
+            
             mSingleChar(0) = AscW(CStr(Value))
         Case vbLong, vbInteger, vbByte
             mSingleChar(0) = AsWord(CLng(Value))
@@ -222,6 +222,7 @@ Friend Sub Init(ByVal Output As Stream, ByVal Encoding As Encoding)
         Error.Argument Argument_StreamNotWritable
     
     Set mOutStream = Output
+    
     If Encoding Is Nothing Then
         Set mEncoding = Cor.NewUTF8Encoding(False, True)
     Else
@@ -235,12 +236,14 @@ End Sub
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub WriteStringLength(ByVal Length As Long)
     Dim LengthRemaining As Long
+    
     LengthRemaining = Length
     
     Do While LengthRemaining > &H80
         WriteByte (LengthRemaining And &H7F) Or &H80
         LengthRemaining = (LengthRemaining And &HFFFFFF80) \ &H80
     Loop
+    
     WriteByte LengthRemaining
 End Sub
 

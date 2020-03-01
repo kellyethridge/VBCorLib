@@ -36,7 +36,7 @@ Attribute VB_Exposed = True
 '
 
 ''
-' Provides cryptographic services using the TripleDES cryptographic service provider.
+' Provides cryptographic services using the <a href="TripleDES.html">TripleDES</a> cryptographic service provider.
 '
 ' @see TripleDESStatic
 ' @include "..\DocIncludes\TripleDESCryptoServiceProvider.html"
@@ -58,7 +58,7 @@ Attribute mBase.VB_VarHelpID = -1
 
 
 ''
-' Returns the block size, in bits, used by this algorithm.
+' Gets the block size, in bits, used by this algorithm.
 '
 ' @return The block size in bits.
 ' @remarks This will always return 64 bits (8 bytes).
@@ -78,7 +78,7 @@ Public Property Let BlockSize(ByVal Value As Long)
 End Property
 
 ''
-' Returns a list of legal block sizes.
+' Gets a list of legal block sizes.
 '
 ' @return A list of legal block sizes.
 ' @remarks Only one block size is legal, 64 bits.
@@ -88,7 +88,7 @@ Public Property Get LegalBlockSizes() As KeySizes()
 End Property
 
 ''
-' Returns the Feedback Size in bits.
+' Gets the Feedback Size in bits.
 '
 ' @return The Feedback size in bits.
 ' @remarks Always returns 64 bits.
@@ -108,7 +108,7 @@ Public Property Let FeedbackSize(ByVal Value As Long)
 End Property
 
 ''
-' Returns the key size in bits.
+' Gets the key size in bits.
 '
 ' @Return The key size in bits.
 '
@@ -127,7 +127,7 @@ Public Property Let KeySize(ByVal Value As Long)
 End Property
 
 ''
-' Returns a list of valid key sizes supported by this algorithm.
+' Gets a list of valid key sizes supported by this algorithm.
 '
 ' @return A list of valid key sizes.
 '
@@ -136,7 +136,7 @@ Public Property Get LegalKeySizes() As KeySizes()
 End Property
 
 ''
-' Returns the Cipher mode this algorithm will use.
+' Gets the Cipher mode this algorithm will use.
 '
 ' @return The Cipher mode.
 ' @see CipherMode
@@ -156,7 +156,7 @@ Public Property Let Mode(ByVal Value As CipherMode)
 End Property
 
 ''
-' Returns the padding mode being used.
+' Gets the padding mode being used.
 '
 ' @return The current padding mode.
 ' @see PaddingMode
@@ -176,7 +176,7 @@ Public Property Let Padding(ByVal Value As PaddingMode)
 End Property
 
 ''
-' Returns the current secret key.
+' Gets the current secret key.
 '
 ' @return The secret key.
 ' @remarks If no key has been set, then a new random key will be generated.
@@ -203,42 +203,40 @@ Public Sub GenerateKey()
 End Sub
 
 ''
-' Returns the Initialization Vector.
+' Gets the initialization vector.
 '
-' @return The Initialization Vector.
+' @return A byte-array representing the initialization vector.
 ' @remarks If several blocks of same plain text are encrypted, the ciphered data could all be the same as well. Using an
 ' Initialization Vector can prevent same plain text blocks to reproduce the same ciphered blocks.
-' <p>This can be generated using the <b>GenerateIV</b> method, or a new one will be generated if one hasn't been set when
-' this property is accessed.</p>
-' <p>If no IV has been set, then a new random IV will be generated.</p>
-'
+' <p>This can be generated using the <a href="TripleDESCryptoServiceProvider.GenerateIV.html">GenerateIV</a> method,
+' or a new one will be generated if one hasn't been set when this property is accessed.</p>
+' <p>If <b>IV</b> has not been set, then a new random <b>IV</b> will be generated.</p>
 Public Property Get IV() As Byte()
     IV = mBase.GetIV
 End Property
 
 ''
-' Sets the Initialization Vector to be used.
+' Sets the initialization vector to be used.
 '
-' @param Value The new IV to use.
+' @param Value An 8-byte array representing the initialization vector.
 ' @remarks If several blocks of same plain text are encrypted, the ciphered data could all be the same as well. Using an
-' Initialization Vector can prevent same plain text blocks to reproduce the same ciphered blocks.
-' <p>This can be generated using the <b>GenerateIV</b> method, or a new one will be generated if one hasn't been set when
-' this property is accessed.</p>
-' <p>The array must be 8 bytes in length.</p>
-'
+' initialization vector can prevent same plain text blocks to reproduce the same ciphered blocks.
+' <p>This can be generated using the <a href="TripleDESCryptoServiceProvider.GenerateIV.html">GenerateIV</a> method,
+' or a new one will be generated if one hasn't been set when this property is accessed.</p>
+' <p>The <i>Value</i> parameter must be 8 bytes in length.</p>
 Public Property Let IV(ByRef Value() As Byte)
     mBase.SetIV Value
 End Property
 
 ''
-' Generates a random IV array to use.
+' Generates a random initialization vector array to use.
 '
 Public Sub GenerateIV()
     mBase.GenerateIV
 End Sub
 
 ''
-' Clears the Key and IV arrays.
+' Clears the <a href="TripleDESCryptoServiceProvider.Get.Key.html">Key</a> and <a href="TripleDESCryptoServiceProvider.Get.IV.html">IV</a> arrays.
 '
 Public Sub Clear()
     mBase.Clear
@@ -248,9 +246,8 @@ End Sub
 ' Tests if a specific bit length is valid for a key.
 '
 ' @param BitLength The number of bits to test for.
-' @return Return True if the number of bits is supported, False otherwise.
-' @remarks Only 128bit and 192bit are supported.
-'
+' @return <b>True</b> if the number of bits is supported, <b>False</b> otherwise.
+' @remarks Only 128-bit and 192-bit are supported.
 Public Function ValidKeySize(ByVal BitLength As Long) As Boolean
     ValidKeySize = mBase.ValidKeySize(BitLength)
 End Function
@@ -259,11 +256,11 @@ End Function
 ' Returns a new cipher used to encrypt data.
 '
 ' @param RgbKey A supplied byte array used as the secret key.
-' @param RgbIV A supplied byte array used for the Initialization Vector (IV).
-' @return An ICryptoTransform object used to encrypt data.
-' @remarks Both parameters must be either supplied or missing. A single parameter will throw an exception.
-' <p>If no parameters are supplied then the key and IV will be retrieved through the Key and IV properties.</p>
-'
+' @param RgbIV A supplied byte array used for the initialization vector (IV).
+' @return An <a href="ICryptoTransform.html">ICryptoTransform</a> object used to encrypt data.
+' @remarks The <i>RgbKey</i> and <i>RgbIV</i> parameters must be either supplied or missing. A single parameter will throw an exception.
+' <p>If no parameters are supplied then the key and IV will be retrieved through the <a href="TripleDESCryptoServiceProvider.Get.Key.html">Key</a>
+' and <a href="TripleDESCryptoServiceProvider.Get.IV.html">IV</a> properties.</p>
 Public Function CreateEncryptor(Optional ByRef RgbKey As Variant, Optional ByRef RgbIV As Variant) As ICryptoTransform
     Set CreateEncryptor = CreateCipher(RgbKey, RgbIV, True)
 End Function
@@ -273,10 +270,10 @@ End Function
 '
 ' @param RgbKey A supplied byte array used as the secret key.
 ' @param RgbIV A supplied byte array used for the Initialization Vector (IV).
-' @return An ICryptoTransform object used to dencrypt data.
-' @remarks Both parameters must be either supplied or missing. A single parameter will throw an exception.
-' <p>If no parameters are supplied then the key and IV will be retrieved through the Key and IV properties.</p>
-'
+' @return An <a href="ICryptoTransform.html">ICryptoTransform</a> object used to dencrypt data.
+' @remarks The <i>RgbKey</i> and <i>RgbIV</i> parameters must be either supplied or missing. A single parameter will throw an exception.
+' <p>If no parameters are supplied then the key and IV will be retrieved through the <a href="TripleDESCryptoServiceProvider.Get.Key.html">Key</a>
+' and <a href="TripleDESCryptoServiceProvider.Get.IV.html">IV</a> properties.</p>
 Public Function CreateDecryptor(Optional ByRef RgbKey As Variant, Optional ByRef RgbIV As Variant) As ICryptoTransform
     Set CreateDecryptor = CreateCipher(RgbKey, RgbIV, False)
 End Function

@@ -403,6 +403,7 @@ Public Enum ParameterName
     NameOfRgb = 2038
     NameOfKeyBlob = 2039
     NameOfArrayIndex = 2040
+    NameOfDestination = 2041
 End Enum
 
 Private Declare Function DeleteObject Lib "gdi32.dll" (ByVal hObject As Long) As Long

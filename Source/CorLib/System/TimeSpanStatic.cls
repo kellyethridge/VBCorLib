@@ -36,7 +36,7 @@ Attribute VB_Exposed = True
 '
 
 ''
-'   Provides severs static functions to help in creating TimeSpan objects.
+' Provides severs static functions to help in creating <a href="TimeSpan.html">TimeSpan</a> objects.
 '
 ' @see TimeSpan
 '
@@ -54,13 +54,13 @@ Private Type OperandMilliseconds
 End Type
 
 ''
-' Returns a <a href="TimeSpan.html">TimeSpan</a> with a value of zero.
+' Gets a <a href="TimeSpan.html">TimeSpan</a> with a value of zero.
 Public Property Get Zero() As TimeSpan
     Set Zero = mZero
 End Property
 
 ''
-' Returns a <a href="TimeSpan.html">TimeSpan</a> with a maximum value.
+' Gets a <a href="TimeSpan.html">TimeSpan</a> with a maximum value.
 '
 ' @remarks The value of this field is equivalent to the maximum <b>Currency</b> milliseconds.
 ' The string representation of this value is positive 10675199.02:48:05.4775807, or slightly more than 10,675,199 days.
@@ -69,7 +69,7 @@ Public Property Get MaxValue() As TimeSpan
 End Property
 
 ''
-' Returns a <a href="TimeSpan.html">TimeSpan</a> with a minimum value.
+' Gets a <a href="TimeSpan.html">TimeSpan</a> with a minimum value.
 '
 ' @remarks The value of this field is equivalent to the minimum <b>Currency</b> milliseconds.
 ' The string representation of this value is negative 10675199.02:48:05.4775808, or slightly more than negative 10,675,199 days.

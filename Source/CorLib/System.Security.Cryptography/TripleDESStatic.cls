@@ -49,8 +49,8 @@ Private Const PartSize As Long = 8
 ''
 ' Returns a TripleDES algorithm implementation based on the name.
 '
-' @param AlgName The name of the TripleDES implementation.
-' @return The TripleDES algorithm.
+' @param AlgName The name of the <a href="TripleDES.html">TripleDES</a> implementation.
+' @return The specified <a href="TripleDES.html">TripleDES</a> algorithm.
 ' @remarks The name is specified by the Server.Class name. The CreateObject
 ' method is used to instantiate the object.
 ' <p>If the name is "3DES", "TripleDES" or missing then the default implementation is returned.
