@@ -36,7 +36,7 @@ Attribute VB_Exposed = True
 '
 
 ''
-' Provides a means to convert value datatypes to and from arrays of bytes.
+' Provides a means to convert value data-types to and from arrays of bytes.
 '
 ' @remarks The <b>BitConverter</b> class cannot be instantiated. The methods
 ' are available through the class name itself.
@@ -245,7 +245,7 @@ End Function
 '
 ' @param Value The array of bytes to create a double from.
 ' @param StartIndex The starting byte in the array to create a double from.
-' @return Double datatype representation of the 8 bytes used in the array.
+' @return Double data-type representation of the 8 bytes used in the array.
 '
 Public Function ToDouble(ByRef Value() As Byte, ByVal StartIndex As Long) As Double
     ValidateArrayArguments Value, StartIndex, vbSizeOfDouble
@@ -258,8 +258,9 @@ End Function
 ' @param Value The array of bytes to create a date from.
 ' @param StartIndex The starting byte in the array to create a date from.
 ' @return Date datatype representation of the 8 bytes used in the array.
-' @remarks Even though a Date is represented using a Double, it may still
-' raise an error due to the 8 bytes used represent an invalid date range.
+' @remarks The date data-type is stored as a 64-bit signed integer. Visual Basic's
+' Date data-type cannot represent the entire range storable in 64-bits. If the value
+' is outside a legal Date value an <a href="OverflowException.html">OverflowException</a> will be thrown.
 '
 Public Function ToDate(ByRef Value() As Byte, ByVal StartIndex As Long) As Date
     Dim Milliseconds As Currency
@@ -273,7 +274,7 @@ End Function
 '
 ' @param Value The array of bytes used to create an integer from.
 ' @param StartIndex The starting byte in the array to create an integer from.
-' @return Integer datatype representation of the 2 bytes used in the array.
+' @return Integer data-type representation of the 2 bytes used in the array.
 '
 Public Function ToInt16(ByRef Value() As Byte, ByVal StartIndex As Long) As Integer
     ValidateArrayArguments Value, StartIndex, vbSizeOfInteger
@@ -285,7 +286,7 @@ End Function
 '
 ' @param Value The array of bytes used to create a Long from.
 ' @param StartIndex The starting byte in the array to create a Long from.
-' @return Long datatype representation of the 4 bytes used in the array.
+' @return Long data-type representation of the 4 bytes used in the array.
 Public Function ToInt32(ByRef Value() As Byte, ByVal StartIndex As Long) As Long
     ValidateArrayArguments Value, StartIndex, vbSizeOfLong
     ToInt32 = AsLong(Value(StartIndex))
@@ -308,7 +309,7 @@ End Function
 '
 ' @param Value The array of bytes used to create a Single from.
 ' @param StartIndex The starting byte in the array to create a Single from.
-' @return Single datatype representation of the 4 bytes used in the array.
+' @return Single data-type representation of the 4 bytes used in the array.
 '
 Public Function ToSingle(ByRef Value() As Byte, ByVal StartIndex As Long) As Single
     ValidateArrayArguments Value, StartIndex, vbSizeOfSingle
@@ -320,7 +321,7 @@ End Function
 '
 ' @param Value The array of bytes used to create a Currency from.
 ' @param StartIndex The starting byte in the array to create a Currency from.
-' @return Currency datatype representation of the 8 bytes used in the array.
+' @return Currency data-type representation of the 8 bytes used in the array.
 '
 Public Function ToCurrency(ByRef Value() As Byte, ByVal StartIndex As Long) As Currency
     ValidateArrayArguments Value, StartIndex, vbSizeOfCurrency
@@ -333,7 +334,7 @@ End Function
 ' @param Value The array of bytes used to create a Decimal value. Must be atleast 16 bytes in length.
 ' @param StartIndex The starting index within the array to be converting to a Decimal value.
 ' @return The converted Decimal value.
-' @remarks <p>The Decimal datatype is created from 16 bytes with the same
+' @remarks <p>The Decimal data-type is created from 16 bytes with the same
 ' layout as used in .NET. The layout is different than that of VB.<br><br>
 ' VB Decimal layout<br>
 ' bytes 0-1: Variant datatype information<br>

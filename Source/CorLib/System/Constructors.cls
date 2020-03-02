@@ -1811,6 +1811,7 @@ End Function
 '
 ' @param PreexistingHandle An <b>Long</b> pointer that represents the pre-existing handle to use.
 ' @param OwnsHandle <b>True</b> to reliably release the handle during the finalization phase; <b>False</b> to prevent reliable release (not recommended).
+' @param ZeroIsInvalid <b>True</b> if a handle of the value zero is considered an invalid handle; <b>False</b> otherwise.
 ' @return A new instance of the <a href="SafeHandle.html">SafeHandle</a> class.
 ' @remarks The <a href="SafeHandle.html">SafeHandle</a> class is used as base class through composition for managing specific handles.
 Public Function NewSafeHandle(ByVal PreexistingHandle As Long, ByVal OwnsHandle As Boolean, Optional ByVal ZeroIsInvalid = False) As SafeHandle

@@ -39,7 +39,7 @@ Attribute VB_Exposed = True
 ' Provides creation methods from various types of arrays.
 '
 ' @remarks This class cannot be directly instantiated. In order to
-' use the methods in the class, use the <b>BitArray.*</b> syntax.
+' use the methods in the class, use the <b>BitArray.<i>MethodName</i></b> syntax.
 ' <pre>
 ' Set Bits = BitArray.FromLongs(LongArray)
 ' </pre>
@@ -48,11 +48,11 @@ Attribute VB_Exposed = True
 Option Explicit
 
 ''
-' Returns a BitArray object created from an array of Longs. Each bit
+' Returns a <a href="BitArray.html">BitArray</a> object created from an array of Longs. Each bit
 ' in each long represents an associated bit in the bit array.
 '
 ' @param values An array of Long datatypes.
-' @return A BitArray initialized to the number of bits an their
+' @return A <a href="BitArray.html">BitArray</a> initialized to the number of bits an their
 ' state in the values array.
 '
 Public Function FromLongs(ByRef Values() As Long) As BitArray
@@ -61,11 +61,11 @@ Public Function FromLongs(ByRef Values() As Long) As BitArray
 End Function
 
 ''
-' Returns a BitArray object created from an array of Bytes. Each bit
+' Returns a <a href="BitArray.html">BitArray</a> object created from an array of Bytes. Each bit
 ' in each byte represents an associated bit in the bit array.
 '
 ' @param values An array of Byte datatypes.
-' @return A BitArray initialized to the number of bits and their
+' @return A <a href="BitArray.html">BitArray</a> initialized to the number of bits and their
 ' state in the values array.
 '
 Public Function FromBytes(ByRef Values() As Byte) As BitArray
@@ -74,11 +74,11 @@ Public Function FromBytes(ByRef Values() As Byte) As BitArray
 End Function
 
 ''
-' Returns a BitArray object created from an array of Booleans. Each boolean
+' Returns a <a href="BitArray.html">BitArray</a> object created from an array of Booleans. Each boolean
 ' represents a single bit in the bit array.
 '
 ' @param values An array of Boolean datatypes.
-' @return A BitArray initialized to the number of bits as there are
+' @return A <a href="BitArray.html">BitArray</a> initialized to the number of bits as there are
 ' boolean elements in the array. Each bit is set to the corrisponding
 ' boolean value in the array.
 '

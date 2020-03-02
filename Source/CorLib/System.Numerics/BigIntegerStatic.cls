@@ -95,8 +95,8 @@ End Property
 ''
 ' Compares two <a href="BigInteger.html">BigInteger</a> instances to each other returning their relation.
 '
-' @param x The left handed value to be compared to.
-' @param y The right handed value to be compared to.
+' @param Left The left handed value to be compared to.
+' @param Right The right handed value to be compared to.
 ' @return Returns the relation between to the two numbers.<br>
 ' @remarks If <b>Nothing</b> is passed in, it is treated as zero.<br>
 ' <table style="width: auto">
