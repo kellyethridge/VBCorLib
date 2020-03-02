@@ -543,7 +543,46 @@ End Sub
 ' @param SourceArray The array from which to copy the elements.
 ' @param DestinationArray The array in which to place the elements.
 ' @param Length The number of elements to copy.
-'
+' <h4>Exceptions</h4>
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ArgumentNullException.html">ArgumentNullException</a></td>
+'        <td>
+'           <i>SourceArray</i> is <b>null</b>.<br/>
+'           -or-<br/>
+'           <i>DestinationArray</i> is <b>null</b>.
+'        </td>
+'   </tr>
+'    <tr>
+'        <td><a href="RankException.html">RankException</a></td><td><i>SourceArray</i> and <i>DestinationArray</i> have different ranks.</td>
+'    </tr>
+'    <tr>
+'        <td><a href="ArrayTypeMismatchException.html">ArrayTypeMismatchException</a></td><td><i>SourceArray</i> and <i>DestinationArray</i> are incompatible types.</td>
+'    </tr>
+'    <tr>
+'        <td><a href="InvalidCastException.html">InvalidCastException</a></td><td>At least one element in <i>SourceArray</i> cannot be cast to the type of <i>DestinationArray</i>.</td>
+'    </tr>
+'    <tr>
+'        <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td><td><i>Length</i> is less than zero.</td>
+'    </tr>
+'    <tr>
+'        <td><a href="ArgumentException.html">ArgumentException</a></td>
+'        <td>
+'           <i>Length</i> is greater than the number of elements from <i>SourceIndex</i> to the end of <i>SourceArray</i>.<br/>
+'           -or-<br/>
+'           <i>Length</i> is greater than the number of elements from <i>DestinationIndex</i> to the end of <i>DestinationArray</i>.
+'        </td>
+'    </tr>
+' </table>
+' @remarks The <i>SourceArray</i> and <i>DestinationArray</i> parameters must have the same number of dimensions.
+' In addition, <i>DestinationArray</i> must already have been dimensioned and must have a sufficient number of elements to accommodate the copied data.
+' <p>When copying between multidimensional arrays, the array behaves like a long one-dimensional array, where the rows (or columns) are conceptually
+' laid end to end. For example, if an array has three rows (or columns) with four elements each, copying six elements from the beginning of the array
+' would copy all four elements of the first row (or column) and the first two elements of the second row (or column).</p>
 Public Sub Copy(ByRef SourceArray As Variant, ByRef DestinationArray As Variant, ByVal Length As Long)
     If IsNull(SourceArray) Then _
         Error.ArgumentNull "SourceArray", ArgumentNull_Array
@@ -561,21 +600,71 @@ End Sub
 ' @param Destinationarray The array in which to place the elements.
 ' @param Destinationindex The starting element in the destination array to place elements.
 ' @param Length The number of elements to copy.
-'
+' <h4>Exceptions</h4>
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ArgumentNullException.html">ArgumentNullException</a></td>
+'        <td>
+'           <i>SourceArray</i> is <b>null</b>.<br/>
+'           -or-<br/>
+'           <i>DestinationArray</i> is <b>null</b>.
+'        </td>
+'   </tr>
+'    <tr>
+'        <td><a href="RankException.html">RankException</a></td><td><i>SourceArray</i> and <i>DestinationArray</i> have different ranks.</td>
+'    </tr>
+'    <tr>
+'        <td><a href="ArrayTypeMismatchException.html">ArrayTypeMismatchException</a></td><td><i>SourceArray</i> and <i>DestinationArray</i> are incompatible types.</td>
+'    </tr>
+'    <tr>
+'        <td><a href="InvalidCastException.html">InvalidCastException</a></td><td>At least one element in <i>SourceArray</i> cannot be cast to the type of <i>DestinationArray</i>.</td>
+'    </tr>
+'    <tr>
+'        <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+'        <td>
+'           <i>SourceIndex</i> is less than the lower-bound of the first dimension of <i>SourceArray</i>.<br/>
+'           -or-<br/>
+'           <i>DestinationIndex</i> is less than the lower-bound of the first dimension of <i>DestinationArray</i>.<br/>
+'           -or-<br/>
+'           <i>Length</i> is less than zero.
+'        </td>
+'    </tr>
+'    <tr>
+'        <td><a href="ArgumentException.html">ArgumentException</a></td>
+'        <td>
+'           <i>Length</i> is greater than the number of elements from <i>SourceIndex</i> to the end of <i>SourceArray</i>.<br/>
+'           -or-<br/>
+'           <i>Length</i> is greater than the number of elements from <i>DestinationIndex</i> to the end of <i>DestinationArray</i>.
+'        </td>
+'    </tr>
+' </table>
+' @remarks The <i>SourceArray</i> and <i>DestinationArray</i> parameters must have the same number of dimensions.
+' In addition, <i>DestinationArray</i> must already have been dimensioned and must have a sufficient number of elements to accommodate the copied data.
+' <p>When copying between multidimensional arrays, the array behaves like a long one-dimensional array, where the rows (or columns) are conceptually
+' laid end to end. For example, if an array has three rows (or columns) with four elements each, copying six elements from the beginning of the array
+' would copy all four elements of the first row (or column) and the first two elements of the second row (or column).</p>
 Public Sub CopyEx(ByRef SourceArray As Variant, ByVal SourceIndex As Long, ByRef DestinationArray As Variant, ByVal DestinationIndex As Long, ByVal Length As Long)
-    Dim pSourceSafeArray As Long
+    Dim pSourceSafeArray        As Long
+    Dim pDestinationSafeArray   As Long
+    Dim SourceLength            As Long
+    Dim DestinationLength       As Long
+    Dim SourceArrayType         As VbVarType
+    Dim DestinationArrayType    As VbVarType
+    Dim Assigner                As Long
+
     pSourceSafeArray = SAPtrV(SourceArray)
+    pDestinationSafeArray = SAPtrV(DestinationArray)
+    
     If pSourceSafeArray = vbNullPtr Then _
         Error.ArgumentNull "SourceArray", ArgumentNull_Array
-    
-    Dim pDestinationSafeArray As Long
-    pDestinationSafeArray = SAPtrV(DestinationArray)
     If pDestinationSafeArray = vbNullPtr Then _
         Error.ArgumentNull "DestinationArray", ArgumentNull_Array
     
-    Dim SourceLength As Long
     SourceLength = LengthCore(pSourceSafeArray)
-    Dim DestinationLength As Long
     DestinationLength = LengthCore(pDestinationSafeArray)
     
     If Length < 0 Then _
@@ -588,11 +677,10 @@ Public Sub CopyEx(ByRef SourceArray As Variant, ByVal SourceIndex As Long, ByRef
         Error.ArgumentOutOfRange "SourceIndex", ArgumentOutOfRange_ArrayLB
     If DestinationIndex < LBound(DestinationArray) Then _
         Error.ArgumentOutOfRange "DestinationIndex", ArgumentOutOfRange_ArrayLB
-    
-    Dim SourceArrayType As VbVarType
+    If SafeArrayGetDim(pSourceSafeArray) <> SafeArrayGetDim(pDestinationSafeArray) Then _
+        Error.Rank Rank_MustMatch
+        
     SourceArrayType = VarType(SourceArray) And &HFF    ' knock off the vbArray bit.
-    
-    Dim DestinationArrayType As VbVarType
     DestinationArrayType = VarType(DestinationArray) And &HFF   ' knock off the vbArray bit.
     
     If SourceArrayType = DestinationArrayType Then
@@ -623,8 +711,8 @@ Public Sub CopyEx(ByRef SourceArray As Variant, ByVal SourceIndex As Long, ByRef
                 CopyValueTypes pSourceSafeArray, SourceIndex, pDestinationSafeArray, DestinationIndex, Length
         End Select
     Else
-        Dim Assigner As Long
         Assigner = GetAssigningFunction(SourceArrayType, DestinationArrayType)
+        
         If Assigner = vbNullPtr Then _
             Throw Cor.NewArrayTypeMismatchException(Environment.GetResourceString(ArrayTypeMismatch_Incompatible))
         
@@ -644,7 +732,26 @@ End Sub
 ' If one length is defined as zero, then all other defined lengths must be zero.
 ' This does not mean that lengths 2 and 3 need to be set to zero if only an empty
 ' one-dimensional array is being created.
-'
+' <h4>Exceptions</h4>
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ArgumentException.html">ArgumentException</a></td><td><i>ElementType</i> is not a valid type.</td>
+'   </tr>
+'    <tr>
+'        <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+'        <td>
+'           <i>Length1</i> is less than zero.<br/>
+'           -or-<br/>
+'           <i>Length2</i> is less than zero.<br/>
+'           -or-<br/>
+'           <i>Length3</i> is less than zero.
+'        </td>
+'    </tr>
+' </table>
 Public Function CreateInstance(ByVal ElementType As VbVarType, Optional ByVal Length1 As Long = 0, Optional ByRef Length2 As Variant, Optional ByRef Length3 As Variant) As Variant
     Dim Bounds(2)   As SafeArrayBound
     Dim Rank        As Long
@@ -723,14 +830,7 @@ End Function
 Public Function Rank(ByRef Arr As Variant) As Long
     Dim Ptr As Long
     
-    If Not IsArray(Arr) Then _
-        Error.Argument Argument_ArrayRequired
-        
-    Ptr = SAPtrV(Arr)
-    
-    If Ptr = vbNullPtr Then _
-        Error.ArgumentNull "Arr", ArgumentNull_Array
-    
+    Ptr = GetValidSAPtr(Arr)
     Rank = SafeArrayGetDim(Ptr)
 End Function
 
@@ -782,7 +882,20 @@ End Function
 '
 ' @param arr The array to test for initialization.
 ' @return Returns <b>True</b> if the array is uninitialized, <b>False</b> otherwise.
+' <h4>Exceptions</h4>
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ArgumentException.html">ArgumentException</a></td><td><i>Arr</i> is not an array.</td>
+'   </tr>
+' </table>
 Public Function IsNull(ByRef Arr As Variant) As Boolean
+    If Not IsArray(Arr) Then _
+        Error.Argument Argument_ArrayRequired, "Arr"
+    
     IsNull = SAPtrV(Arr) = vbNullPtr
 End Function
 
@@ -791,10 +904,27 @@ End Function
 '
 ' @param Arr The array to inspectd.
 ' @return Returns <b>True</b> if the array is unitialized or has zero elements, <b>False</b> otherwise.
+' <h4>Exceptions</h4>
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ArgumentException.html">ArgumentException</a></td><td><i>Arr</i> is not an array.</td>
+'   </tr>
+' </table>
 Public Function IsNullOrEmpty(ByRef Arr As Variant) As Boolean
-    If IsNull(Arr) Then
+    Dim Ptr As Long
+    
+    If Not IsArray(Arr) Then _
+        Error.Argument Argument_ArrayRequired, "Arr"
+    
+    Ptr = SAPtrV(Arr)
+    
+    If Ptr = vbNullPtr Then
         IsNullOrEmpty = True
-    ElseIf Length(Arr) = 0 Then
+    ElseIf LengthCore(Ptr) = 0 Then
         IsNullOrEmpty = True
     End If
 End Function
@@ -1283,12 +1413,19 @@ Private Sub CopyWithCast(ByVal SrcSAPtr As Long, ByVal SourceIndex As Long, ByVa
     Dst = MemLong(DstSAPtr + PVDATA_OFFSET) + (DestinationIndex - SafeArrayGetLBound(DstSAPtr, 1)) * DstSize
     Set Assigner = NewDelegate(pfn)
     
+    On Error GoTo Catch
+    
     Do While Length > 0
         Assigner.Invoke ByVal Dst, ByVal Src
         Src = Src + SrcSize
         Dst = Dst + DstSize
         Length = Length - 1
     Loop
+    
+    Exit Sub
+    
+Catch:
+    Throw Cor.NewInvalidCastException(Environment.GetResourceString(InvalidCast_DownCastArrayElement))
 End Sub
 
 ' Copies objects and checks for compatible interfaces during the copy.
@@ -1319,7 +1456,7 @@ Private Sub CopyObjectTypesCast(ByVal SrcSAPtr As Long, ByVal SourceIndex As Lon
             If SrcObj.QueryInterface(ByVal DstGuidPtr, pObj) = E_NOINTERFACE Then
                 ObjectPtr(SrcObj) = vbNullPtr
                 ObjectPtr(DstObj) = vbNullPtr
-                Throw Cor.NewArrayTypeMismatchException(Environment.GetResourceString(ArrayTypeMismatch_Incompatible))
+                Throw Cor.NewInvalidCastException(Environment.GetResourceString(InvalidCast_DownCastArrayElement))
             End If
         End If
         

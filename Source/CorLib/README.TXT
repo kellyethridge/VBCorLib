@@ -148,6 +148,7 @@ version 3.0 (BREAKING CHANGES)
 	* Added CorString.StartsWith method.
 	* Added CorString.EndsWith method.
 	* Added CorString.Split method.
+	* Changed CorArray.CopyEx to enforce matching ranks between source and destination arrays.
 
 version 2.3
 	* Updated ASM code to not trigger DEP protection.

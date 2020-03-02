@@ -745,7 +745,7 @@ Private Function FindWhitespaceSeparatorIndexes(ByRef s As String, ByRef Separat
     On Error GoTo Catch
     
     Do While CharIndex < SLength
-        If Char.IsWhiteSpace(Chars(CharIndex)) Then
+        If IsWhiteSpace(Chars(CharIndex)) Then
             SeparatorIndexes(MatchCount) = CharIndex
             SeparatorLengths(MatchCount) = 1
             MatchCount = MatchCount + 1

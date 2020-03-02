@@ -278,6 +278,7 @@ Public Enum ResourceStringKey
     IndexOutOfRange_ArrayBounds = 301
     
     InvalidCast_FromTo = 1400
+    InvalidCast_DownCastArrayElement = 1401
     
     InvalidOperation_EmptyStack = 1100
     InvalidOperation_EnumNotStarted = 1101

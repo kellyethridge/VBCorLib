@@ -81,12 +81,17 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
         Case "Copy_WithIncompatibleTypes_ThrowsArrayTypeMismatchException"
             Test.Use NewLongs(0), NewIntegers(0)
             Test.Use NewDoubles(0), NewLongs(0)
-            
+        
+        Case "Copy_WithUncastableElements_ThrowsInvalidCastException"
             Dim SrcInt32(0) As Int32
             Dim DstInt32F(0) As Int32Formattable
             Set SrcInt32(0) = New Int32
             Set DstInt32F(0) = New Int32Formattable
             Test.Use SrcInt32, DstInt32F
+            
+            Test.Use Array(256), NewBytes(0)
+            Test.Use Array("a"), NewLongs(0)
+            Test.Use Array(New Int32), NewLongs(0)
     End Select
 End Sub
 
@@ -102,6 +107,14 @@ Public Sub Copy_WithIncompatibleTypes_ThrowsArrayTypeMismatchException(ByRef Sou
     CorArray.Copy Source, Destination, 1
     
     AssertArrayTypeMismatchException Err
+End Sub
+
+Public Sub Copy_WithUncastableElements_ThrowsInvalidCastException(ByRef Source As Variant, ByRef Destination As Variant)
+    On Error Resume Next
+    
+    CorArray.Copy Source, Destination, 1
+    
+    AssertInvalidCastException Err
 End Sub
 
 Public Sub CopyEx_WithValues_CopiesWithConversion(ByRef Source As Variant, ByRef Destination As Variant, ByRef Expected As Variant)
@@ -386,4 +399,13 @@ Public Sub Copy_WithVariantsToObjects_ConvertsElements()
     Assert.That Target, Iz.EqualTo(Source)
 End Sub
 
+Public Sub CopyEx_WithDifferingRanks_ThrowsRankException()
+    Dim Src(2) As Long
+    Dim Dst(0, 0) As Long
+    
+    On Error Resume Next
+    CorArray.CopyEx Src, 0, Dst, 0, 1
+    
+    AssertRankException Err
+End Sub
 
