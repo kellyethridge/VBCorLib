@@ -38,8 +38,7 @@ Attribute VB_Exposed = True
 ''
 ' Provides static methods used to retrieve existing encodings and convert between encodings.
 '
-' @remarks This class cannot be directly instantiated. To access the methods, use the
-' variable name directly.
+' @remarks This class cannot be directly instantiated. To access the methods, use the variable name directly.
 ' <pre>
 ' Dim en As Encoding
 ' Set en = Encoding.UTF8
@@ -73,11 +72,11 @@ Public Property Get Default() As Encoding
 End Property
 
 ''
-' Returns a UnicodeEncoding object that encodes using BigEndian byte ordering.
+' Gets an encoding for the UTF-16 format that uses the big endian byte order.
 '
-' @return A single instance of UnicodeEncoding with BigEndian encoding.
-' @remarks This encoding is declared as Cor.NewUnicodeEncoding(True, True).
-'
+' @return An encoding object for the UTF-16 format that uses the big endian byte order.
+' @remarks This encoding is constructed using <a href="Constructors.NewUnicodeEncoding.html">Cor.NewUnicodeEncoding(True, True)</a>
+' and may not be appropriate for your application.
 Public Property Get BigEndianUnicode() As UnicodeEncoding
     If mBigEndianUnicode Is Nothing Then
         Set mBigEndianUnicode = Cor.NewUnicodeEncoding(True, True)
@@ -87,11 +86,11 @@ Public Property Get BigEndianUnicode() As UnicodeEncoding
 End Property
 
 ''
-' Returns a UnicodeEncoding object that encodes using LittleEndian byte ordering.
+' Gets an encoding for the UTF-16 format using the little endian byte order.
 '
-' @return A single instance of UnicodeEncoding with LittleEndian encoding.
-' @remarks This encoding is declared as Cor.NewUnicodeEncoding(False, True).
-'
+' @return An encoding for the UTF-16 format using the little endian byte order.
+' @remarks This encoding is constructed using <a href="Constructors.NewUnicodeEncoding.html">Cor.NewUnicodeEncoding(False, True)</a>
+' and may not be appropriate for your application.
 Public Property Get Unicode() As UnicodeEncoding
     If mUnicode Is Nothing Then
         Set mUnicode = Cor.NewUnicodeEncoding(False, True)
@@ -101,11 +100,10 @@ Public Property Get Unicode() As UnicodeEncoding
 End Property
 
 ''
-' Returns a shared ASCIIEncoding object.
+' Gets an encoding for the ASCII (7-bit) character set.
 '
-' @return A single instance of an ASCIIEncoding.
+' @return An encoding for the ASCII (7-bit) character set.
 ' @remarks This encoding is declared as New ASCIIEncoding.
-'
 Public Property Get ASCII() As ASCIIEncoding
     If mASCII Is Nothing Then
         Set mASCII = New ASCIIEncoding
@@ -115,11 +113,10 @@ Public Property Get ASCII() As ASCIIEncoding
 End Property
 
 ''
-' Returns a shared UTF7Encoding object.
+' Gets an encoding for the UTF-7 format.
 '
-' @return A single instance of a UTF7Encoding object
+' @return An encoding for the UTF-7 format.
 ' @remarks This encoding is declared as New UTF7Encoding.
-'
 Public Property Get UTF7() As UTF7Encoding
     If mUTF7 Is Nothing Then
         Set mUTF7 = New UTF7Encoding
@@ -129,11 +126,11 @@ Public Property Get UTF7() As UTF7Encoding
 End Property
 
 ''
-' Returns a shared UTF8Encoding object.
+' Gets an encoding for the UTF-8 format.
 '
-' @return A single instance of UTF8Encoding object.
-' @remarks This encoding is declared as Cor.NewUTF8Encoding(True)
-'
+' @return An encoding for the UTF-8 format.
+' @remarks This encoding is constructed using <a href="Constructors.NewUTF8Encoding.html">Cor.NewUTF8Encoding(True)</a>
+' and may not be appropriate for your application.
 Public Property Get UTF8() As UTF8Encoding
     If mUTF8 Is Nothing Then
         Set mUTF8 = Cor.NewUTF8Encoding(True)

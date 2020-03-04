@@ -325,7 +325,7 @@ Private Sub AddSystemText()
         .Add New UnicodeEncodingTests
         .Add New UnicodeDecoderTests
         .Add New UnicodeEncoderTests
-        .Add New EncodingInfoTests
+        .Add New EncodingTests
         .Add New SBCSCodePageEncodingTests
         .Add New DBCSCodePageEncodingTests
         .Add New DBCSCodePageDecoderTests

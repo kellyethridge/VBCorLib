@@ -40,7 +40,7 @@ Implements IObject
 Implements Exception
 Implements SystemException
 
-Private Const BaseProperty      As String = "Base"
+Private Const BaseProperty As String = "Base"
 
 Private mBase As CorLib.ExceptionBase
 
