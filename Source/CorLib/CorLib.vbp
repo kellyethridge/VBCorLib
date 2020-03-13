@@ -334,7 +334,7 @@ Class=DecoderFallbackBuffer; System.Text\DecoderFallbackBuffer.cls
 Class=DecoderFallback; System.Text\DecoderFallback.cls
 Class=DecoderReplacementFallback; System.Text\DecoderReplacementFallback.cls
 Class=DecoderReplacementFallbackBuffer; System.Text\DecoderReplacementFallbackBuffer.cls
-Class=DecoderFallbackStatic; ..\Tests\System.Text\DecoderFallbackStatic.cls
+Class=DecoderFallbackStatic; System.Text\DecoderFallbackStatic.cls
 Class=DecoderExceptionFallback; System.Text\DecoderExceptionFallback.cls
 Class=DecoderExceptionFallbackBuffer; System.Text\DecoderExceptionFallbackBuffer.cls
 Class=DecoderFallbackException; System.Text\DecoderFallbackException.cls
@@ -369,7 +369,10 @@ Module=Int64Callbacks; System\Int64Callbacks.bas
 Class=Int64Parser; System\Int64Parser.cls
 Class=EncoderReplacementFallback; System.Text\EncoderReplacementFallback.cls
 Class=NumberFormatter; System.Globalization\NumberFormatter.cls
+Class=UTF32Encoding; System.Text\UTF32Encoding.cls
+Class=UTF32Encoder; System.Text\UTF32Encoder.cls
 ResFile32="CorLib.RES"
+Class=UTF32Decoder; System.Text\UTF32Decoder.cls
 Startup="Sub Main"
 HelpFile=""
 Title="CorLib"
@@ -411,7 +414,7 @@ ThreadingModel=1
 DebugStartupOption=0
 
 [TaskList]
-Num=3
+Num=5
 
 [TASK1]
 Description=Add tests for FromBase64Transform.TransformFinalBlock
@@ -431,18 +434,18 @@ Status=0
 Priority=1
 
 [TASK4]
-Description=
-Status=
-Priority=
+Description=Move preamble write in StreamWriter
+Status=0
+Priority=1
 AssignedTo=
-Comment=
+Comment=The preamble is being written in the Init method. This should be written when writing the first value to the underlying stream.
 
 [TASK5]
-Description=
-Status=
-Priority=
+Description=Update StreamReader BOM detection
+Status=0
+Priority=1
 AssignedTo=
-Comment=
+Comment=Add detection for UTF-32 BOM in StreamReader.
 
 [TASK6]
 Description=

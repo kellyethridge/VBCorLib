@@ -376,7 +376,7 @@ Private Sub WriteCore(ByRef Value As String)
         
         ' Copy the characters to the buffer
         CopyMemory mCharBuffer(mPosition), ByVal CharPtr, CharsToCopy * 2
-        
+
         ' Calculate the remaining characters to write.
         CharCount = CharCount - CharsToCopy
         CharPtr = CharPtr + CharsToCopy * 2

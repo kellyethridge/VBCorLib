@@ -65,9 +65,13 @@ Public Property Get FallbackBuffer() As EncoderFallbackBuffer: End Property
 ' @param Chars The set of characters that would be used to produce the encoded bytes.
 ' @param Index The first character in the array to begin the encoding count.
 ' @param Count The number of characters to be included in the encoding count.
-' @param Flush Indicates if the Encoder should maintain state between calls.
-' @return The number of bytes that would be produced if the character set was encoded.
-' @remarks Setting Flush as false allows multiple bytes that are needed to
+' @param Flush <b>True</b> to simulate clearing the internal state of the encoder after the calculation; otherwise, <b>False</b>.
+' @return The number of bytes produced by encoding the specified characters and any characters in the internal buffer.
+' @remarks <p>This method does not affect the state of the encoder.</p>
+' <p>To calculate the exact array size that <a href="Encoder.GetBytes.html">GetBytes</a> requires to store the resulting bytes, the application should use <b>GetByteCount</b>.</p>
+' <p>If <a href="Encoder.GetBytes.html">GetBytes</a> is called with <i>Flush</i> set to <b>False</b>, the encoder stores trailing characters at the end of the data block in an
+' internal buffer and uses them in the next encoding operation. The application should call <b>GetByteCount</b> on a block of data immediately
+' before calling <a href="Encoder.GetBytes.html">GetBytes</a> on the same block, so that any trailing characters from the previous block are included in the calculation.</p>
 Public Function GetByteCount(ByRef Chars() As Integer, ByVal Index As Long, ByVal Count As Long, ByVal Flush As Boolean) As Long: End Function
 
 ''

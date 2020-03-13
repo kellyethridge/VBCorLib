@@ -40,17 +40,18 @@ Implements EncoderFallbackBuffer
 
 
 Public Function Fallback(ByVal UnknownCharOrHighSurrogate As Long, Optional ByRef UnknownLowSurrogate As Variant, Optional ByVal Index As Long) As Boolean
+    Dim UTF32 As Long
+    
     If Not IsMissing(UnknownLowSurrogate) Then
         If Not Char.IsHighSurrogate(UnknownCharOrHighSurrogate) Then _
             Throw Cor.NewArgumentOutOfRangeException("UnknownCharOrHighSurrogate", Environment.GetResourceString(ArgumentOutOfRange_Range, &HD800, &HDBFF))
         If Not Char.IsLowSurrogate(UnknownLowSurrogate) Then _
             Throw Cor.NewArgumentOutOfRangeException("UnknownLowSurrogate", Environment.GetResourceString(ArgumentOutOfRange_Range, &HDC00, &HDFFF))
         
-        Dim Utf32 As Long
-        Utf32 = Char.ConvertToUtf32(UnknownCharOrHighSurrogate, UnknownLowSurrogate)
+        UTF32 = Char.ConvertToUtf32(UnknownCharOrHighSurrogate, UnknownLowSurrogate)
         
         Throw Cor.NewEncoderFallbackException3( _
-            Environment.GetResourceString(Argument_InvalidCodePageConversionIndex, Utf32, Index), _
+            Environment.GetResourceString(Argument_InvalidCodePageConversionIndex, UTF32, Index), _
             UnknownCharOrHighSurrogate, UnknownLowSurrogate, Index)
     End If
     

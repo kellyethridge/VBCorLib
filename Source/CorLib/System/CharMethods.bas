@@ -30,14 +30,14 @@ Attribute VB_Name = "CharMethods"
 '
 Option Explicit
 
-Private Const UnicodePlane1Start As Long = &H10000
-
+Public Const UnicodePlane1Start As Long = &H10000
 Public Const SurrogateStart     As Long = &HD800&
 Public Const SurrogateEnd       As Long = &HDFFF&
 Public Const HighSurrogateStart As Long = &HD800&
 Public Const HighSurrogateEnd   As Long = &HDBFF&
 Public Const LowSurrogateStart  As Long = &HDC00&
 Public Const LowSurrogateEnd    As Long = &HDFFF&
+Public Const vbSizeOfUTF32Char  As Long = 4
 
 
 Public Function Compare(ByVal a As Long, ByVal b As Long) As Long

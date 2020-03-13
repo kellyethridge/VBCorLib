@@ -628,6 +628,18 @@ Public Function NewUnicodeEncoding(ByVal BigEndian As Boolean, ByVal ByteOrderMa
 End Function
 
 ''
+' Initializes a new instance of the <a href="UTF32Encoding.html">UTF32Encoding</a> class. Parameters specify whether to use the big endian byte order, whether to provide a Unicode byte order mark, and whether to throw an exception when an invalid encoding is detected.
+'
+' @param BigEndian <b>True</b> to use the big endian byte order (most significant byte first), or <b>False</b> to use the little endian byte order (least significant byte first).
+' @param ByteOrderMark <b>True</b> to specify that a Unicode byte order mark is provided; otherwise, <b>False</b>.
+' @param ThrowOnInvalidBytes <b>True</b> to specify that an exception should be thrown when an invalid encoding is detected; otherwise, <b>False</b>.
+' @return An initialized <a href="UTF32Encoding.html">UTF32Encoding</a> object.
+Public Function NewUTF32Encoding(ByVal BigEndian As Boolean, ByVal ByteOrderMark As Boolean, Optional ByVal ThrowOnInvalidBytes As Boolean) As UTF32Encoding
+    Set NewUTF32Encoding = New UTF32Encoding
+    NewUTF32Encoding.Init BigEndian, ByteOrderMark, ThrowOnInvalidBytes
+End Function
+
+''
 ' Returns a new <a href="StringWriter.html">StringWriter</a> object.
 '
 ' @param sb A supplied <a href="StringBuilder.html">StringBuilder</a> object that is written to. This allows the <a href="StringWriter.html">StringWriter</a> to start with an already created string.
@@ -647,7 +659,7 @@ End Function
 ' @remarks By default the parameter <i>s</i> is referenced internally. This requires the original holder of the
 ' string variable to remain valid until <a href="StringReader.html">StringReader</a> has been disposed. If the
 ' original string cannot be maintained, then passing <b>True</b> for <i>CopyString</i> will cause <a href="StringReader.html">StringReader</a>
-' to make a copy of the source string to prevent and string deallocation issues.
+' to make a copy of the source string to prevent any string deallocation issues.
 Public Function NewStringReader(ByRef s As String, Optional ByVal CopyString As Boolean) As StringReader
     Set NewStringReader = New StringReader
     NewStringReader.Init s, CopyString

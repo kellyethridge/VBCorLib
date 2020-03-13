@@ -40,10 +40,10 @@ Attribute VB_Exposed = True
 '
 ' @remarks The <b>StreamReader</b> object cannot be created directly. In order to
 ' create a new <b>StreamReader</b>, use the <b>Cor.NewStreamReader</b> method.
-' <p>Unlike the FileStream and MemoryStream classes, the StreamReader
-' reads bytes that are of a particular encoding to be decoded. Instead of reading
-' bytes, the StreamReader returns characters or strings of the decoded bytes.</p>
-' <p>The default encoding is UTF8Encoding.</p>
+' <p>Unlike the <a href="FileStream.html">FileStream</a> and <a href="MemoryStream.html">MemoryStream</a> classes,
+' the <b>StreamReader</b> reads bytes that are of a particular encoding to be decoded. Instead of reading
+' bytes, the <b>StreamReader</b> returns characters or strings of the decoded bytes.</p>
+' <p>The default encoding is <a href="UTF8Encoding.html">UTF8Encoding</a>.</p>
 '
 ' @see Constructors
 ' @see StreamWriter

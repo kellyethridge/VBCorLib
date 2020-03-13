@@ -330,6 +330,9 @@ Private Sub AddSystemText()
         .Add New DBCSCodePageEncodingTests
         .Add New DBCSCodePageDecoderTests
         .Add New StringBuilderTests
+        .Add New UTF32EncodingTests
+        .Add New UTF32EncoderTests
+        .Add New UTF32DecoderTests
         
         AddTest .This
     End With

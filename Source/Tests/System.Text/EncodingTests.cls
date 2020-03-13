@@ -31,12 +31,14 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use 65001, Encoding.UTF8
             Test.Use 20127, Encoding.ASCII
             Test.Use 0, Encoding.Default
+            Test.Use 12000, Encoding.UTF32
             
         Case "GetEncoding_WithEncodingName_ReturnsCommonEncoding"
             Test.Use "unicode", Encoding.Unicode
             Test.Use "utf-8", Encoding.UTF8
             Test.Use "us-ascii", Encoding.ASCII
             Test.Use "utf-7", Encoding.UTF7
+            Test.Use "utf-32", Encoding.UTF32
             
     End Select
 End Sub
@@ -73,4 +75,22 @@ Public Sub GetEncoding_WithEncodingName_ReturnsCommonEncoding(ByVal Name As Stri
     Set Actual = Encoding.GetEncoding(Name)
     
     Assert.That Actual, Iz.SameAs(Expected)
+End Sub
+
+Public Sub UTF32_WhenCalled_ReturnsUTF32EncodingInLittleEndian()
+    Dim Actual As Encoding
+    
+    Set Actual = Encoding.UTF32
+    
+    Assert.That TypeOf Actual Is UTF32Encoding, Iz.True
+    Assert.That Actual.CodePage, Iz.EqualTo(12000)
+End Sub
+
+Public Sub GetEncoding_WithUTF32BigEndianName_ReturnsUTF32EncodingInBigEndian()
+    Dim Actual As Encoding
+    
+    Set Actual = Encoding.GetEncoding("utf-32be")
+    
+    Assert.That TypeOf Actual Is UTF32Encoding, Iz.True
+    Assert.That Actual.CodePage, Iz.EqualTo(12001)
 End Sub
