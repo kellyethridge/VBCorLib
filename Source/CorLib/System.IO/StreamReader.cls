@@ -141,7 +141,7 @@ Public Function Peek() As Long
     VerifyIsOpen
     
     If HaveChars Then
-        AsWord(Peek) = mCharBuffer(mCharIndex)
+        Peek = mCharBuffer(mCharIndex) And &HFFFF&
     Else
         Peek = -1
     End If
@@ -459,15 +459,34 @@ Private Sub DetermineEncoding()
         
     Select Case FirstTwoBytes
         Case UnicodeLittleEndianBOM
-            SetEncodingFromBOM Cor.NewUnicodeEncoding(False, False), UnicodeEncodingBOMLength
+            If mByteLength >= 4 Then
+                If mByteBuffer(2) = 0 And mByteBuffer(3) = 0 Then
+                    SetEncodingFromBOM Encoding.UTF32, 4
+                Else
+                    SetEncodingFromBOM Encoding.Unicode, UnicodeEncodingBOMLength
+                End If
+            Else
+                SetEncodingFromBOM Encoding.Unicode, UnicodeEncodingBOMLength
+            End If
 
         Case UnicodeBigEndianBOM
-            SetEncodingFromBOM Cor.NewUnicodeEncoding(True, False), UnicodeEncodingBOMLength
+            SetEncodingFromBOM Encoding.BigEndianUnicode, UnicodeEncodingBOMLength
 
         Case UTF8PartialBOM
             If mByteLength >= 3 Then
                 If mByteBuffer(2) = UTF8RemainingBOM Then
-                    SetEncodingFromBOM Cor.NewUTF8Encoding(False, False), UTF8EncodingBOMLength
+                    SetEncodingFromBOM Encoding.UTF8, UTF8EncodingBOMLength
+                Else
+                    mDetermineEncoding = False
+                End If
+            End If
+        
+        Case 0
+            If mByteLength >= 4 Then
+                If mByteBuffer(2) = &HFE And mByteBuffer(3) = &HFF Then
+                    SetEncodingFromBOM Cor.NewUTF32Encoding(True, True), 4
+                Else
+                    mDetermineEncoding = False
                 End If
             End If
             
