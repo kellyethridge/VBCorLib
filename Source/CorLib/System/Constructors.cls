@@ -695,13 +695,14 @@ End Function
 ' @param Append Indicates if a file is to be appended to or overwritten.
 ' @param Encoding The encoding to be used when writing to the stream.
 ' @param BufferSize The minimum size of the internal buffer used to cache writes.
+' @param LeaveOpen <b>True</b> to leave the stream open after the <a href="StreamWriter.html">StreamWriter</a> object is disposed; otherwise, <b>False</b>.
 ' @return A new <a href="StreamWriter.html">StreamWriter</a> ready to write to an underlying stream in the specified <a href="Encoding.html">Encoding</a>.
 ' @remarks <p>If a file name is passed in, then a <a href="FileStream.html">FileStream</a> is created internally using either
 ' <a href="FileStream.FileMode.html">FileMode.Create</a> or <a href="FileStream.FileMode.html">FileMode.Append</a> depending on <i>Append</i>.</p>
 ' <p>If <i>Encoding</i> is not supplied, then an encoding of <a href="Constructors.NewUTF8Encoding.html">NewUTF8Encoding(False, True)</a> is used.</p>
-Public Function NewStreamWriter(ByRef Source As Variant, Optional ByVal Append As Boolean = False, Optional ByVal Encoding As Encoding, Optional ByVal BufferSize As Long = 4096) As StreamWriter
+Public Function NewStreamWriter(ByRef Source As Variant, Optional ByVal Append As Boolean = False, Optional ByVal Encoding As Encoding, Optional ByVal BufferSize As Long = 4096, Optional ByVal LeaveOpen As Boolean) As StreamWriter
     Set NewStreamWriter = New StreamWriter
-    NewStreamWriter.Init Source, Append, Encoding, BufferSize
+    NewStreamWriter.Init Source, Append, Encoding, BufferSize, LeaveOpen
 End Function
 
 ''

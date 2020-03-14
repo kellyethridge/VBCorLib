@@ -96,7 +96,7 @@ Public Sub WriteChars_WithNullChars_ThrowsArgumentNullException()
         .WriteChars NullChars
     End With
     
-    AssertArgumentNullException Err, "Chars"
+    AssertArgumentNullException Err, "Buffer"
 End Sub
 
 Public Sub WriteChars_WithChars_WritesToStream()
@@ -241,11 +241,74 @@ Public Sub WriteCharsLine_WhenCalled_WritesCharsAndNewLine()
     Assert.That Actual, Iz.EqualTo(NewBytes(48, 49, 13, 10))
 End Sub
 
+Public Sub Flush_WithDefaultEncoding_DoesNotWritePreamble()
+    Dim Store As New MemoryStream
+    Dim Writer As StreamWriter
+    
+    Set Writer = Cor.NewStreamWriter(Store)
+    
+    Writer.WriteValue 1
+    Writer.Flush
+    
+    Assert.That Store.ToArray, Iz.EqualTo(NewBytes(49))
+End Sub
 
+Public Sub Flush_WithBOMEncoding_WritesPreamble()
+    Dim Store As New MemoryStream
+    Dim Writer As StreamWriter
+    
+    Set Writer = Cor.NewStreamWriter(Store, Encoding:=Encoding.UTF8)
+    
+    Writer.WriteValue 1
+    Writer.Flush
+    
+    Assert.That Store.ToArray, Iz.EqualTo(NewBytes(&HEF, &HBB, &HBF, 49))
+End Sub
 
+Public Sub NewStreamWriter_WhenCalled_DoesNotWritePreamble()
+    Dim Store As New MemoryStream
+    Dim Writer As StreamWriter
+    
+    Set Writer = Cor.NewStreamWriter(Store, Encoding:=Encoding.UTF8)
 
+    Assert.That Store.Position, Iz.EqualTo(0)
+End Sub
 
+Public Sub Flush_WhenNotAtBeginningOfStream_DoesNotWritePreamble()
+    Dim Store As New MemoryStream
+    Dim Writer As StreamWriter
+    
+    Store.WriteByte 49
+    Set Writer = Cor.NewStreamWriter(Store, Encoding:=Encoding.UTF8)
+    
+    Writer.WriteValue 2
+    Writer.Flush
+    
+    Assert.That Store.ToArray, Iz.EqualTo(NewBytes(49, 50))
+End Sub
 
+Public Sub CloseWriter_WhenUsingLeaveOpen_LeavesUnderlyingStreamOpen()
+    Dim Store As New MemoryStream
+    Dim Writer As StreamWriter
+    
+    Set Writer = Cor.NewStreamWriter(Store, LeaveOpen:=True)
+    
+    Writer.CloseWriter
+    
+    Assert.That Store.CanWrite, Iz.True
+End Sub
+
+Public Sub AutoFlush_WhenSetToTrue_ImmediatelyFlushes()
+    Dim Store As New MemoryStream
+    Dim Writer As StreamWriter
+    
+    Set Writer = Cor.NewStreamWriter(Store)
+    
+    Writer.WriteValue 1
+    Writer.AutoFlush = True
+    
+    Assert.That Store.ToArray, Iz.EqualTo(NewBytes(49))
+End Sub
 
 
 

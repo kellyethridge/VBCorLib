@@ -151,6 +151,9 @@ version 3.0 (BREAKING CHANGES)
 	* Changed CorArray.CopyEx to enforce matching ranks between source and destination arrays.
 	* Added UTF32Encoding class.
 	* Added UTF32Encoding BOM detection in StreamReader class.
+	* Fixed StreamWriter to write Preamble to any stream type as long as we are at the beginning of the stream.
+	* Fixed StreamWriter AutoFlush. When setting to true it should cause the writer to immediately flush.
+	* Added LeaveOpen constructor option to StreamWriter to match .NET.
 
 version 2.3
 	* Updated ASM code to not trigger DEP protection.

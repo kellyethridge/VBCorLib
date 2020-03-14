@@ -44,6 +44,7 @@ Attribute VB_Exposed = True
 Option Explicit
 
 Private mNullStream As New NullStream
+Private mUTF8NoBOMAndThrows As UTF8Encoding
 
 ''
 ' Returns a Stream object with no backing store.
@@ -52,6 +53,14 @@ Private mNullStream As New NullStream
 '
 Public Property Get NullStream() As Stream
     Set NullStream = mNullStream
+End Property
+
+Friend Property Get UTF8NoBOMAndThrows() As UTF8Encoding
+    If mUTF8NoBOMAndThrows Is Nothing Then
+        Set mUTF8NoBOMAndThrows = Cor.NewUTF8Encoding(False, True)
+    End If
+    
+    Set UTF8NoBOMAndThrows = mUTF8NoBOMAndThrows
 End Property
 
 Friend Sub CopyTo(ByVal Source As Stream, ByVal Destination As Stream, ByVal BufferSize As Long)

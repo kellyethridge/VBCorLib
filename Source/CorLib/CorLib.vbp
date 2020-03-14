@@ -371,8 +371,8 @@ Class=EncoderReplacementFallback; System.Text\EncoderReplacementFallback.cls
 Class=NumberFormatter; System.Globalization\NumberFormatter.cls
 Class=UTF32Encoding; System.Text\UTF32Encoding.cls
 Class=UTF32Encoder; System.Text\UTF32Encoder.cls
-ResFile32="CorLib.RES"
 Class=UTF32Decoder; System.Text\UTF32Decoder.cls
+ResFile32="CorLib.RES"
 Startup="Sub Main"
 HelpFile=""
 Title="CorLib"
@@ -414,7 +414,7 @@ ThreadingModel=1
 DebugStartupOption=0
 
 [TaskList]
-Num=5
+Num=3
 
 [TASK1]
 Description=Add tests for FromBase64Transform.TransformFinalBlock
@@ -434,18 +434,18 @@ Status=0
 Priority=1
 
 [TASK4]
-Description=Move preamble write in StreamWriter
-Status=0
-Priority=1
+Description=
+Status=
+Priority=
+Comment=
 AssignedTo=
-Comment=The preamble is being written in the Init method. This should be written when writing the first value to the underlying stream.
 
 [TASK5]
-Description=Update StreamReader BOM detection
-Status=0
-Priority=1
+Description=
+Status=
+Priority=
 AssignedTo=
-Comment=Add detection for UTF-32 BOM in StreamReader.
+Comment=
 
 [TASK6]
 Description=
