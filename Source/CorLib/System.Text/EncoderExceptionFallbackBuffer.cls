@@ -34,11 +34,38 @@ Attribute VB_Exposed = True
 '
 ' Module: EncoderExceptionFallbackBuffer
 '
+
+''
+' Throws <a href="EncoderFallbackException.html">EncoderFallbackException</a> when an input character cannot be converted to an encoded output byte sequence.
+'
 Option Explicit
 Implements IObject
 Implements EncoderFallbackBuffer
 
 
+''
+' Throws an exception because the input character cannot be encoded. Parameters specify the value and index position of the surrogate pair in the input, and the nominal return value is not used.
+'
+' @param UnknownCharOrHighSurrogate The high surrogate of the input pair.
+' @param UnknownLowSurrogate The low surrogate of the input pair.
+' @param Index The index position of the surrogate pair in the input buffer.
+' @return None. No value is returned because the <b>Fallback</b> method always throws an exception.
+' <h4>Exceptions</h4>
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="EncoderFallbackException.html">EncoderFallbackException</a></td><td>The character represented by <i>UnknownCharOrHighSurrogate</i> and <i>UnknownLowSurrogate</i> cannot be encoded.</td>
+'   </tr>
+'    <tr>
+'        <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+'        <td>
+'           Either <i>UnknownCharOrHighSurrogate</i> or <i>UnknownLowSurrogate</i> is invalid.
+'        </td>
+'    </tr>
+' </table>
 Public Function Fallback(ByVal UnknownCharOrHighSurrogate As Long, Optional ByRef UnknownLowSurrogate As Variant, Optional ByVal Index As Long) As Boolean
     Dim UTF32 As Long
     
@@ -60,22 +87,36 @@ Public Function Fallback(ByVal UnknownCharOrHighSurrogate As Long, Optional ByRe
         UnknownCharOrHighSurrogate, Index)
 End Function
 
+''
+' Retrieves the next character in the exception fallback buffer.
+'
+' @return The return value is always the Unicode character, NULL (U+0000).
 Public Function GetNextChar() As Integer
     GetNextChar = 0
 End Function
 
+''
+' Causes the next call to the <a href="EncoderExceptionFallbackBuffer.GetNextChar.html">GetNextChar</a> method
+' to access the exception data buffer character position that is prior to the current position.
+'
+' @return The return value is always <b>False</b>.
 Public Function MovePrevious() As Boolean
     MovePrevious = False
 End Function
 
+''
+' Gets the number of characters in the current <a href="EncoderExceptionFallbackBuffer.html">EncoderExceptionFallbackBuffer</a> object that remain to be processed.
+'
+' @return The return value is always zero.
 Public Property Get Remaining() As Long
     Remaining = 0
 End Property
 
+''
+' Initializes all data and state information pertaining to this fallback buffer.
 Public Sub Reset()
     ' do nothing
 End Sub
-
 
 ''
 ' Determines whether the specified value passed in is equal to the current object.

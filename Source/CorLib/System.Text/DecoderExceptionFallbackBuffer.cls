@@ -144,8 +144,16 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   DecoderFallbackBuffer
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Function DecoderFallbackBuffer_Equals(Value As Variant) As Boolean
+    DecoderFallbackBuffer_Equals = Equals(Value)
+End Function
+
 Private Function DecoderFallbackBuffer_Fallback(BytesUnknown() As Byte, ByVal Index As Long) As Boolean
     DecoderFallbackBuffer_Fallback = Fallback(BytesUnknown, Index)
+End Function
+
+Private Function DecoderFallbackBuffer_GetHashCode() As Long
+    DecoderFallbackBuffer_GetHashCode = GetHashCode
 End Function
 
 Private Function DecoderFallbackBuffer_GetNextChar() As Integer
@@ -163,6 +171,10 @@ End Property
 Private Sub DecoderFallbackBuffer_Reset()
     Reset
 End Sub
+
+Private Function DecoderFallbackBuffer_ToString() As String
+    DecoderFallbackBuffer_ToString = ToString
+End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
