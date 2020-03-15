@@ -34,11 +34,21 @@ Attribute VB_Exposed = True
 '
 ' Module: Thread
 '
+
+''
+' Creates and controls a thread, sets its priority, and gets its status.
+'
 Option Explicit
 
 Private mCurrentCulture As CultureInfo
 
 
+''
+' Gets the culture for the current thread.
+'
+' @return An object that represents the culture for the current thread.
+' @remarks The CultureInfo object that is returned by this property, together with its associated objects,
+' determine the default format for dates, times, numbers, and currency values.
 Public Property Get CurrentCulture() As CultureInfo
     If mCurrentCulture Is Nothing Then
         Set mCurrentCulture = Cor.NewCultureInfo(GetSystemDefaultLCID)
@@ -48,6 +58,22 @@ Public Property Get CurrentCulture() As CultureInfo
     Set CurrentCulture = mCurrentCulture
 End Property
 
+''
+' Sets the culture for the current thread.
+'
+' @param Value An object that represents the culture for the current thread.
+' @remarks The CultureInfo object that is returned by this property, together with its associated objects,
+' determine the default format for dates, times, numbers, and currency values.
+' <h4>Exceptions</h4>
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ArgumentNullException.html">ArgumentNullException</a></td><td>The property is set to <b>Nothing</b>.</td>
+'   </tr>
+' </table>
 Public Property Set CurrentCulture(ByVal Value As CultureInfo)
     If Value Is Nothing Then _
         Error.ArgumentNull "Value"
