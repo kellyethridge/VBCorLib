@@ -62,6 +62,7 @@ Option Explicit
 ' @param InvariantCultureIgnoreCase Compare strings using culture-sensitive sort rules, the invariant culture, and ignoring the case of the strings being compared.
 ' @param Ordinal Specifies a case-sensitive string comparison.
 ' @param OrdinalIgnoreCase Specifies a case-insensitive string comparison.
+' @param BinaryCompare Uses the Visual Basic <b>StrComp</b> function with <b>vbBinaryCompare</b> option.
 ' @param TextCompare Uses the Visual Basic <b>StrComp</b> function with <b>vbTextCompare</b> option.
 Public Enum StringComparison
     CurrentCulture = 0
@@ -70,7 +71,8 @@ Public Enum StringComparison
     InvariantCultureIgnoreCase = 3
     Ordinal = 4
     OrdinalIgnoreCase = 5
-    TextCompare = &H10000000
+    BinaryCompare = 6
+    TextCompare = 7
 End Enum
 
 ''

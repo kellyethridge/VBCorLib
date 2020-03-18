@@ -34,37 +34,49 @@ Attribute VB_Name = "StringMethods"
 Option Explicit
 
 Public Function Equals(ByRef a As String, ByRef b As String, ByVal ComparisonType As StringComparison) As Boolean
-    If ComparisonType = StringComparison.TextCompare Then
-        Equals = StrComp(a, b, vbTextCompare)
-    Else
-        Equals = CompareHelper(StrPtr(a), Len(a), StrPtr(b), Len(b), ComparisonType) = 0
-    End If
+    Select Case ComparisonType
+        Case StringComparison.BinaryCompare
+            Equals = StrComp(a, b, vbBinaryCompare) = 0
+        Case StringComparison.TextCompare
+            Equals = StrComp(a, b, vbTextCompare) = 0
+        Case Else
+            Equals = CompareHelper(StrPtr(a), Len(a), StrPtr(b), Len(b), ComparisonType) = 0
+    End Select
 End Function
 
 ' there are places where strings will be held in variants and we don't want to
 ' have to convert them to a string variable causing additional string allocations.
 Public Function EqualsV(ByRef a As Variant, ByRef b As Variant, ByVal ComparisonType As StringComparison) As Boolean
-    If ComparisonType = StringComparison.TextCompare Then
-        EqualsV = StrComp(a, b, vbTextCompare)
-    Else
-        EqualsV = CompareHelper(StrPtr(a), Len(a), StrPtr(b), Len(b), ComparisonType) = 0
-    End If
+    Select Case ComparisonType
+        Case StringComparison.BinaryCompare
+            EqualsV = StrComp(a, b, vbBinaryCompare) = 0
+        Case StringComparison.TextCompare
+            EqualsV = StrComp(a, b, vbTextCompare) = 0
+        Case Else
+            EqualsV = CompareHelper(StrPtr(a), Len(a), StrPtr(b), Len(b), ComparisonType) = 0
+    End Select
 End Function
 
 Public Function Compare(ByRef StrA As String, ByRef StrB As String, ByVal ComparisonType As StringComparison) As Long
-    If ComparisonType = StringComparison.TextCompare Then
-        Compare = StrComp(StrA, StrB, vbTextCompare)
-    Else
-        Compare = CompareHelper(StrPtr(StrA), Len(StrA), StrPtr(StrB), Len(StrB), ComparisonType)
-    End If
+    Select Case ComparisonType
+        Case StringComparison.BinaryCompare
+            Compare = StrComp(StrA, StrB, vbBinaryCompare)
+        Case StringComparison.TextCompare
+            Compare = StrComp(StrA, StrB, vbTextCompare)
+        Case Else
+            Compare = CompareHelper(StrPtr(StrA), Len(StrA), StrPtr(StrB), Len(StrB), ComparisonType)
+    End Select
 End Function
 
 Public Function CompareV(ByRef StrA As Variant, ByRef StrB As Variant, ByVal ComparisonType As StringComparison) As Long
-    If ComparisonType = StringComparison.TextCompare Then
-        CompareV = StrComp(StrA, StrB, vbTextCompare)
-    Else
-        CompareV = CompareHelper(StrPtr(StrA), Len(StrA), StrPtr(StrB), Len(StrB), ComparisonType)
-    End If
+    Select Case ComparisonType
+        Case StringComparison.BinaryCompare
+            CompareV = StrComp(StrA, StrB, vbBinaryCompare)
+        Case StringComparison.TextCompare
+            CompareV = StrComp(StrA, StrB, vbTextCompare)
+        Case Else
+            CompareV = CompareHelper(StrPtr(StrA), Len(StrA), StrPtr(StrB), Len(StrB), ComparisonType)
+    End Select
 End Function
 
 Public Function CompareEx(ByRef StrA As String, ByVal IndexA As Long, ByRef StrB As String, ByVal IndexB As Long, ByVal Length As Long, ByVal ComparisonType As StringComparison) As Long
@@ -73,7 +85,8 @@ Public Function CompareEx(ByRef StrA As String, ByVal IndexA As Long, ByRef StrB
     Dim LengthA As Long
     Dim LengthB As Long
     
-    If ComparisonType = StringComparison.TextCompare Then _
+    If ComparisonType = StringComparison.TextCompare Or _
+        ComparisonType = StringComparison.BinaryCompare Then _
         Error.NotSupported NotSupported_StringComparison
 
     ValidateAndGetLengths StrA, IndexA, StrB, IndexB, Length, LengthA, LengthB
@@ -118,6 +131,10 @@ End Function
 
 Public Function CompareCultural(ByRef StrA As String, ByRef StrB As String, ByRef Culture As CultureInfo, ByVal Options As CompareOptions) As Long
     CompareCultural = CompareCulturalHelper(StrPtr(StrA), Len(StrA), StrPtr(StrB), Len(StrB), Culture, Options)
+End Function
+
+Public Function CompareCulturalV(ByRef StrA As Variant, ByRef StrB As Variant, ByRef Culture As CultureInfo, ByVal Options As CompareOptions) As Long
+    CompareCulturalV = CompareCulturalHelper(StrPtr(StrA), Len(StrA), StrPtr(StrB), Len(StrB), Culture, Options)
 End Function
 
 Public Function CompareCulturalEx(ByRef StrA As String, ByVal IndexA As Long, ByRef StrB As String, ByVal IndexB As Long, ByVal Length As Long, ByRef Culture As CultureInfo, ByVal Options As CompareOptions) As Long

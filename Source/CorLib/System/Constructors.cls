@@ -2129,5 +2129,13 @@ Friend Function NewSafeFindHandle(ByVal PreexistingHandle As Long, ByVal OwnsHan
     NewSafeFindHandle.Init PreexistingHandle, OwnsHandle
 End Function
 
+Friend Function NewNonculturalStringComparer(ByVal ComparisonType As StringComparison) As NonculturalStringComparer
+    Set NewNonculturalStringComparer = New NonculturalStringComparer
+    NewNonculturalStringComparer.Init ComparisonType
+End Function
 
+Friend Function NewCultureAwareStringComparer(ByVal Culture As CultureInfo, ByVal IgnoreCase As Boolean) As CultureAwareStringComparer
+    Set NewCultureAwareStringComparer = New CultureAwareStringComparer
+    NewCultureAwareStringComparer.Init Culture, IgnoreCase
+End Function
 

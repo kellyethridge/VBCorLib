@@ -6,13 +6,13 @@ BEGIN
   DataSourceBehavior  = 0  'vbNone
   MTSTransactionMode  = 0  'NotAnMTSObject
 END
-Attribute VB_Name = "OrdinalStringComparer"
+Attribute VB_Name = "NonculturalStringComparer"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 'The MIT License (MIT)
-'Copyright (c) 2015 Kelly Ethridge
+'Copyright (c) 2020 Kelly Ethridge
 '
 'Permission is hereby granted, free of charge, to any person obtaining a copy
 'of this software and associated documentation files (the "Software"), to deal
@@ -32,7 +32,7 @@ Attribute VB_Exposed = False
 'DEALINGS IN THE SOFTWARE.
 '
 '
-' Module: OrdinalStringComparer
+' Module: NonculturalStringComparer
 '
 Option Explicit
 Implements IObject
@@ -40,21 +40,14 @@ Implements StringComparer
 Implements IComparer
 Implements IEqualityComparer
 
-Private mCompareMethod      As VbCompareMethod
-Private mStringComparison   As StringComparison
+Private mComparisonType As StringComparison
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByVal IgnoreCase As Boolean)
-    If IgnoreCase Then
-        mCompareMethod = vbTextCompare
-        mStringComparison = StringComparison.OrdinalIgnoreCase
-    Else
-        mCompareMethod = vbBinaryCompare
-        mStringComparison = StringComparison.Ordinal
-    End If
+Friend Sub Init(ByVal ComparisonType As StringComparison)
+    mComparisonType = ComparisonType
 End Sub
 
 
@@ -64,7 +57,7 @@ End Sub
 Private Function StringComparer_Compare(x As Variant, y As Variant) As Long
     If VarType(x) = vbString Then
         If VarType(y) = vbString Then
-            StringComparer_Compare = StrComp(x, y, mCompareMethod)
+            StringComparer_Compare = StringMethods.CompareV(x, y, mComparisonType)
             Exit Function
         End If
     End If
@@ -75,7 +68,7 @@ End Function
 Private Function StringComparer_Equals(x As Variant, y As Variant) As Boolean
     If VarType(x) = vbString Then
         If VarType(y) = vbString Then
-            StringComparer_Equals = StringMethods.EqualsV(x, y, mStringComparison)
+            StringComparer_Equals = StringMethods.EqualsV(x, y, mComparisonType)
             Exit Function
         End If
     End If
@@ -85,7 +78,8 @@ End Function
 
 Private Function StringComparer_GetHashCode(Obj As Variant) As Long
     If VarType(Obj) = vbString Then
-        If mStringComparison = StringComparison.OrdinalIgnoreCase Then
+        If mComparisonType = StringComparison.OrdinalIgnoreCase Or _
+           mComparisonType = StringComparison.TextCompare Then
             StringComparer_GetHashCode = Object.GetHashCode(UCase$(Obj))
             Exit Function
         End If
