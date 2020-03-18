@@ -162,3 +162,16 @@ Public Sub Compare_WithInvariantCulture_ReturnsExpected()
     Assert.That StringComparer.InvariantCulture.Compare("a", "a"), Iz.EqualTo(0)
     Assert.That StringComparer.InvariantCulture.Compare("a", "A"), Iz.EqualTo(-1)
 End Sub
+
+Public Sub Equals_WithInvariantCultureIgnoreCase_ReturnsExpected()
+    Assert.That StringComparer.InvariantCultureIgnoreCase.Equals("a", "A"), Iz.True
+End Sub
+
+Public Sub Equals_WithCurrentCulture_ReturnsExpected()
+    Assert.That StringComparer.CurrentCulture.Equals("a", "a"), Iz.True
+End Sub
+
+Public Sub Equals_WithCurrentCultureIgnoreCase_ReturnsExpected()
+    Assert.That StringComparer.CurrentCultureIgnoreCase.Equals("a", "A"), Iz.True
+End Sub
+

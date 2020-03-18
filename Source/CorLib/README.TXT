@@ -43,7 +43,8 @@ version 3.0 (BREAKING CHANGES)
 	* Added Char static class.
 	* Fixed CorDateTime.ToLocalTime and CorDateTime.ToUniversalTime. Were not setting corret DateTimeKind.
 	* Removed 'Format' parameter from Convert.ToString to align with .NET.
-	* Added StringComparer class with Ordinal and OrdinalIgnoreCase implementations.
+	* Added StringComparer interface.
+	* Added corrisponding .NET and Visual Basic StrComp StringComparer implementations.
 	* Removed IHashCodeProvider. *BREAKING*
 	* Added IEqualityComparer.
 	* Updated Hashtable to use IEqualityComparer instead of IHashCodeProvider/IComparer combination. *BREAKING*

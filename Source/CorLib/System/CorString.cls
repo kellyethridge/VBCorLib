@@ -123,10 +123,6 @@ Public Enum StringSplitOptions
     RemoveEmptyEntries
 End Enum
 
-Private mComparisonString1()    As Long
-Private mComparisonString2()    As Long
-Private mComparisonHeader1      As SafeArray1d
-Private mComparisonHeader2      As SafeArray1d
 Private mCharCheckerDelegate    As Delegate
 Private mCharChecker            As Func_T_Boolean
 
@@ -1112,13 +1108,10 @@ End Function
 '   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_Initialize()
-    InitComparisonStrings
     Set mCharChecker = InitDelegate(mCharCheckerDelegate)
 End Sub
 
 Private Sub Class_Terminate()
-    ReleaseComparisonStrings
-    
     ' Normally we could let light-weight delegate object release
     ' on their own, but, this class will be kept alive for the
     ' duration of the application, so when the delegation object
@@ -1147,27 +1140,6 @@ Private Function MakeStringRange(ByRef s As String, ByRef StartIndex As Variant,
         MakeStringRange.Count = CLngOrDefault(Count, MakeStringRange.Index + 1)
     End If
 End Function
-
-Private Sub InitComparisonStrings()
-    With mComparisonHeader1
-        .cbElements = vbSizeOfChar * 2
-        .cDims = 1
-        .cElements = &H7FFFFFFF
-    End With
-    With mComparisonHeader2
-        .cbElements = vbSizeOfChar * 2
-        .cDims = 1
-        .cElements = &H7FFFFFFF
-    End With
-    
-    SAPtr(mComparisonString1) = VarPtr(mComparisonHeader1)
-    SAPtr(mComparisonString2) = VarPtr(mComparisonHeader2)
-End Sub
-
-Private Sub ReleaseComparisonStrings()
-    SAPtr(mComparisonString1) = vbNullPtr
-    SAPtr(mComparisonString2) = vbNullPtr
-End Sub
 
 Private Function FormatCore(ByRef Provider As IFormatProvider, ByRef Format As String, ByRef Args() As Variant) As String
     If SAPtr(Args) = vbNullPtr Then _
