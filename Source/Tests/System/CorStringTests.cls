@@ -178,6 +178,22 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use vbNullString, "", StringComparison.Ordinal, True
             Test.Use "", vbNullString, StringComparison.Ordinal, True
             Test.Use vbNullString, vbNullString, StringComparison.Ordinal, True
+            Test.Use vbNullString, "a", StringComparison.Ordinal, False
+            Test.Use "a", vbNullString, StringComparison.Ordinal, False
+            Test.Use vbNullString, "a", StringComparison.OrdinalIgnoreCase, False
+            Test.Use "a", vbNullString, StringComparison.OrdinalIgnoreCase, False
+            Test.Use "a" & ChrW$(&H30A), ChrW$(&HE5), StringComparison.OrdinalIgnoreCase, False
+            Test.Use "a" & ChrW$(&H30A), ChrW$(&HE5), StringComparison.CurrentCulture, True
+            Test.Use ChrW$(&HDF), ChrW$(&H1E9E), StringComparison.OrdinalIgnoreCase, False
+            Test.Use "a", "a", StringComparison.InvariantCulture, True
+            Test.Use "A", "a", StringComparison.InvariantCulture, False
+            Test.Use "a", "a", StringComparison.InvariantCultureIgnoreCase, True
+            Test.Use "A", "a", StringComparison.InvariantCultureIgnoreCase, True
+            
+            ' This will work when compiled. Both StrComp and CompareString behave differently when run in the IDE VS compiled.
+            ' In the IDE both report ChrW$(&h1E9E) < ChrW$(&hDF)
+            ' Compiled both report ChrW$(&h1E9E) = ChrW$(&hDF) <- this should be the correct result always.
+            ' Test.Use ChrW$(&HDF), ChrW$(&H1E9E), StringComparison.CurrentCultureIgnoreCase, True
             
         Case "StartsWith_WithValues_ReturnsExpected"
             Test.Use "", "", True
@@ -285,7 +301,79 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "", NewChars("b"), NewStrings("")
             Test.Use vbNullString, NewChars("b"), NewStrings("")
             
+        Case "Compare_WithValues_ReturnsExpected"
+            Test.Use "abc", "abc", StringComparison.Ordinal, 0
+            Test.Use "aBc", "abc", StringComparison.Ordinal, -1
+            Test.Use "abc", "aBc", StringComparison.Ordinal, 1
+            Test.Use "aBc", "abc", StringComparison.OrdinalIgnoreCase, 0
+            Test.Use "abc", "aBc", StringComparison.OrdinalIgnoreCase, 0
+            Test.Use "", vbNullString, StringComparison.Ordinal, 0
+            
+        Case "CompareEx_WhenCalled_ComparesSubstrings"
+            Test.Use 0, 0, 5, StringComparison.Ordinal, 0
+            Test.Use 0, 5, 5, StringComparison.Ordinal, 1
+            Test.Use 0, 5, 5, StringComparison.OrdinalIgnoreCase, 0
+            Test.Use 5, 5, 10, StringComparison.Ordinal, 1
+            Test.Use 5, 5, 9, StringComparison.Ordinal, 1
+            Test.Use 5, 5, 9, StringComparison.OrdinalIgnoreCase, 0
+            
+        Case "CompareCultural_WithValues_ReturnsExpected"
+            Test.Use "brother", "Brother", CompareOptions.OrdinalOption, 1
+            Test.Use "brother", "Brother", CompareOptions.None, -1
+            Test.Use "Brother", "brother", CompareOptions.OrdinalOption, -1
+            Test.Use "Brother", "brother", CompareOptions.None, 1
+            Test.Use "brother", "Brother", CompareOptions.OrdinalIgnoreCaseOption, 0
+            Test.Use "brother", "Brother", CompareOptions.IgnoreCase, 0
+            
+        Case "CompareCulturalEx_WithValues_ReturnsExpected"
+            Test.Use 0, 0, 5, CompareOptions.OrdinalOption, 0
+            Test.Use 0, 5, 5, CompareOptions.OrdinalOption, 1
+            Test.Use 0, 5, 5, CompareOptions.OrdinalIgnoreCaseOption, 0
+            Test.Use 5, 5, 10, CompareOptions.OrdinalOption, 1
+            Test.Use 5, 5, 9, CompareOptions.OrdinalOption, 1
+            Test.Use 5, 5, 9, CompareOptions.OrdinalIgnoreCaseOption, 0
+            
     End Select
+End Sub
+
+Public Sub Compare_WithValues_ReturnsExpected(ByVal s1 As String, ByVal s2 As String, ByVal ComparisonType As StringComparison, ByVal Expected As Long)
+    Dim Actual As Long
+    
+    Actual = CorString.Compare(s1, s2, ComparisonType)
+    
+    Assert.That Sgn(Actual), Iz.EqualTo(Expected)
+End Sub
+
+Public Sub CompareEx_WhenCalled_ComparesSubstrings(ByVal IndexA As Long, ByVal IndexB As Long, ByVal Length As Long, ByVal ComparisonType As StringComparison, ByVal Expected As Long)
+    Dim Actual As Long
+    
+    Actual = CorString.CompareEx("abcdeABCDEabcde", IndexA, "abcdeABCDEabcD", IndexB, Length, ComparisonType)
+    
+    Assert.That Sgn(Actual), Iz.EqualTo(Expected)
+End Sub
+
+Public Sub CompareEx_WithNullStrings_ReturnsZero()
+    Dim Actual As Long
+    
+    Actual = CorString.CompareEx(vbNullString, 0, vbNullString, 0, 0)
+    
+    Assert.That Sgn(Actual), Iz.EqualTo(0)
+End Sub
+
+Public Sub CompareCultural_WithValues_ReturnsExpected(ByVal s1 As String, ByVal s2 As String, ByVal Options As CompareOptions, ByVal Expected As Long)
+    Dim Actual As Long
+    
+    Actual = CorString.CompareCultural(s1, s2, Cor.NewCultureInfo("en-US"), Options)
+    
+    Assert.That Sgn(Actual), Iz.EqualTo(Expected)
+End Sub
+
+Public Sub CompareCulturalEx_WithValues_ReturnsExpected(ByVal IndexA As Long, ByVal IndexB As Long, ByVal Length As Long, ByVal Options As CompareOptions, ByVal Expected As Long)
+    Dim Actual As Long
+    
+    Actual = CorString.CompareCulturalEx("abcdeABCDEabcde", IndexA, "abcdeABCDEabcD", IndexB, Length, NewCultureInfo("en-US"), Options)
+    
+    Assert.That Sgn(Actual), Iz.EqualTo(Expected)
 End Sub
 
 Public Sub IsNullOrWhitespace_WithValues_ReturnsExpected(ByVal s As String, ByVal Expected As Boolean)
@@ -895,7 +983,7 @@ End Sub
 Public Sub StartsWith_WithValuesWhenIgnoringCase_ReturnsExpected(ByVal Source As String, ByVal Value As String, ByVal Expected As Boolean)
     Dim Actual As Boolean
     
-    Actual = CorString.StartsWith(Source, Value, OrdinalIgnoreCase)
+    Actual = CorString.StartsWith(Source, Value, StringComparison.OrdinalIgnoreCase)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
@@ -911,7 +999,7 @@ End Sub
 Public Sub EndsWith_WithValuesWhenIgnoringCase_ReturnsExpected(ByVal Source As String, ByVal Value As String, ByVal Expected As Boolean)
     Dim Actual As Boolean
     
-    Actual = CorString.EndsWith(Source, Value, OrdinalIgnoreCase)
+    Actual = CorString.EndsWith(Source, Value, StringComparison.OrdinalIgnoreCase)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub

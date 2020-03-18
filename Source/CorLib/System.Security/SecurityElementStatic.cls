@@ -267,7 +267,7 @@ Private Sub EndElement(ByRef Name As String)
         mIndex = mIndex + 1
     Loop
     
-    If Not CorString.Equals(Name, mXml.ToString(StartIndex, mIndex - StartIndex), OrdinalIgnoreCase) Then _
+    If Not CorString.Equals(Name, mXml.ToString(StartIndex, mIndex - StartIndex), StringComparison.OrdinalIgnoreCase) Then _
         Throw New XmlSyntaxException
     
     ConsumeWhiteSpace

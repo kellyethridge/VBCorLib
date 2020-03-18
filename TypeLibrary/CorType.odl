@@ -503,7 +503,6 @@ library CorType {
         const long INVALID_FILE_ATTRIBUTES    = -1;
         const long INVALID_SET_FILE_POINTER   = -1;
         const long INVALID_FILE_SIZE          = -1;
-        const long ERROR_BROKEN_PIPE          = 109;
 
         const long GENERIC_READ               = 0x80000000;
         const long GENERIC_WRITE              = 0x40000000;
@@ -529,18 +528,6 @@ library CorType {
 		const long FILE_MAP_EXECUTE  		  = 0x32;
 		const long FILE_MAP_WRITE			  = 0x2;
         const long NULL_HANDLE                = 0;
-
-        const long NO_ERROR                   = 0x0;
-        const long ERROR_PATH_NOT_FOUND       = 0x3;
-        const long ERROR_ACCESS_DENIED        = 0x5;
-        const long ERROR_FILE_NOT_FOUND       = 0x2;
-        const long ERROR_INVALID_DRIVE        = 0xF;
-        const long ERROR_SHARING_VIOLATION    = 0x20;
-        const long ERROR_FILE_EXISTS          = 0x50;
-        const long ERROR_INVALID_PARAMETER    = 0x57;
-        const long ERROR_INSUFFICIENT_BUFFER  = 0x7A;
-        const long ERROR_ALREADY_EXISTS       = 0xB7;
-        const long ERROR_FILENAME_EXCED_RANGE = 0xCE;
 
         const long LOCALE_USER_DEFAULT            = 0x400;
 
@@ -948,7 +935,37 @@ library CorType {
         const long COR_E_UNAUTHORIZEDACCESS   = 0x46;
         const long CORSEC_E_CRYPTO            = 0x80131430;
         const long CORSEC_E_XMLSYNTAX         = 0x80131418;
+    }
 
+    [dllname("SystemErrorCodes")]
+    module SystemErrorCodes {
+        const long NO_ERROR                   = 0x0;
+        const long ERROR_SUCCESS              = 0x0;
+        const long ERROR_FILE_NOT_FOUND       = 0x2;
+        const long ERROR_PATH_NOT_FOUND       = 0x3;
+        const long ERROR_ACCESS_DENIED        = 0x5;
+        const long ERROR_INVALID_HANDLE       = 0x6;
+        const long ERROR_INVALID_DRIVE        = 0xF;
+        const long ERROR_SHARING_VIOLATION    = 0x20;
+        const long ERROR_FILE_EXISTS          = 0x50;
+        const long ERROR_INVALID_PARAMETER    = 0x57;
+        const long ERROR_BROKEN_PIPE          = 0x6D;
+        const long ERROR_CALL_NOT_IMPLEMENTED = 0x78;
+        const long ERROR_INSUFFICIENT_BUFFER  = 0x7A;
+        const long ERROR_ALREADY_EXISTS       = 0xB7;
+        const long ERROR_FILENAME_EXCED_RANGE = 0xCE;
+        const long ERROR_MORE_DATA            = 0xEA;
+        const long ERROR_NO_MORE_ITEMS        = 0x103;
+        const long ERROR_INVALID_FLAGS		  = 0x3EC;
+        const long ERROR_CANTOPEN             = 0x3F3;
+        const long ERROR_CANTREAD             = 0x3F4;
+        const long ERROR_CANTWRITE            = 0x3F5;
+        const long ERROR_REGISTRY_RECOVERED   = 0x3F6;
+        const long ERROR_REGISTRY_CORRUPT     = 0x3F7;
+        const long ERROR_REGISTRY_IO_FAILED   = 0x3F8;
+        const long ERROR_NOT_REGISTRY_FILE    = 0x3F9;
+        const long ERROR_KEY_DELETED          = 0x3FA;
+    	const long ERROR_NO_UNICODE_TRANSLATION = 0x459;
     }
 
     [dllname("kernel32.dll"), helpstring("Access to API functions within the Kernel32.dll system file.")]
@@ -956,8 +973,19 @@ library CorType {
     	const long MB_PRECOMPOSED		= 0x1;
     	const long WC_NO_BEST_FIT_CHARS	= 0x400;
     	const long MB_ERR_INVALID_CHARS = 0x8;
-    	const long ERROR_NO_UNICODE_TRANSLATION = 0x459;
-    	
+
+    	// ripped from mscorlib reference source.    	
+        const long NORM_IGNORECASE            = 0x00000001;       // Ignores case.  (use LINGUISTIC_IGNORECASE instead)
+        const long NORM_IGNOREKANATYPE        = 0x00010000;       // Does not differentiate between Hiragana and Katakana characters. Corresponding Hiragana and Katakana will compare as equal.
+        const long NORM_IGNORENONSPACE        = 0x00000002;       // Ignores nonspacing. This flag also removes Japanese accent characters.  (use LINGUISTIC_IGNOREDIACRITIC instead)
+        const long NORM_IGNORESYMBOLS         = 0x00000004;       // Ignores symbols.
+        const long NORM_IGNOREWIDTH           = 0x00020000;       // Does not differentiate between a single-byte character and the same character as a double-byte character.
+        const long SORT_STRINGSORT            = 0x00001000;       // Treats punctuation the same as symbols.
+
+        const long CSTR_LESS_THAN		= 0x1;
+        const long CSTR_EQUAL			= 0x2;
+        const long CSTR_GREATER_THAN	= 0x3;
+
         [entry("CloseHandle"), usesgetlasterror] long CloseHandle([in] long hObject);
         [entry("CopyFileW"), usesgetlasterror] long CopyFileW([in] LPWSTR Source, [in] LPWSTR Destination, [in] BOOL FailIfExists);
         [entry("RtlMoveMemory")] void CopyMemory([in] void * Destination,[in] void * Source, [in] long Length);
@@ -1051,6 +1079,8 @@ library CorType {
     	[entry("GlobalLock")] long GlobalLock([in] long hMem);
     	[entry("GlobalUnlock")] long GlobalUnlock([in] long hMem);
     	[entry("VirtualQuery")] DWORD VirtualQuery([in] LPCVOID lpAddress, [in] MEMORY_BASIC_INFORMATION* lpBuffer, [in] DWORD dwLength);
+    	[entry("CompareStringW"), usesgetlasterror] long CompareString([in] long LCID, [in] long dwCmpFlags, [in] long lpString1, [in] long cchCount1, [in] long lpString2, [in] long cchCount2);
+    	[entry("CompareStringOrdinal"), usesgetlasterror] long CompareStringOrdinal([in] long lpString1, [in] long cchCount1, [in] long lpString2, [in] long cchCount2, [in] BOOL bIgnoreCase);
     }
 
     [dllname("oleaut32.dll"), helpstring("Access to API functions within the Oleaut32.dll system file.")]
@@ -1142,21 +1172,6 @@ library CorType {
         const long REG_MULTI_SZ               = 7;
         const long REG_EXPAND_SZ              = 2;
         const long REG_QWORD                  = 11;
-
-        const long ERROR_SUCCESS              = 0;
-        const long ERROR_INVALID_HANDLE       = 6;
-        const long ERROR_INVALID_PARAMETER    = 87;
-        const long ERROR_CALL_NOT_IMPLEMENTED = 120;
-        const long ERROR_MORE_DATA            = 234;
-        const long ERROR_NO_MORE_ITEMS        = 259;
-        const long ERROR_CANTOPEN             = 1011;
-        const long ERROR_CANTREAD             = 1012;
-        const long ERROR_CANTWRITE            = 1013;
-        const long ERROR_REGISTRY_RECOVERED   = 1014;
-        const long ERROR_REGISTRY_CORRUPT     = 1015;
-        const long ERROR_REGISTRY_IO_FAILED   = 1016;
-        const long ERROR_NOT_REGISTRY_FILE    = 1017;
-        const long ERROR_KEY_DELETED          = 1018;
 
         const long HKEY_CLASSES_ROOT      = 0x80000000;
         const long HKEY_CURRENT_CONFIG    = 0x80000005;

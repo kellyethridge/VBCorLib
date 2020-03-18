@@ -229,6 +229,7 @@ Public Enum ResourceStringKey
     ArgumentOutOfRange_PositionLessThanCapacityRequired = 751
     ArgumentOutOfRange_StreamLength = 752
     ArgumentOutOfRange_NegativeCount = 753
+    ArgumentOutOfRange_OffsetLength = 754
     
     IOException_Exception = 400 '?
     IO_AlreadyExists_Name = 401 '?
@@ -305,6 +306,7 @@ Public Enum ResourceStringKey
     NotSupported_Reading = 1007
     NotSupported_Writing = 1008
     NotSupported_MMViewStreamsFixedLength = 1009
+    NotSupported_StringComparison = 1010
     
     ObjectDisposed_StreamClosed = 1200
     ObjectDisposed_FileNotOpen = 1201

@@ -50,10 +50,10 @@ Private mStringComparison   As StringComparison
 Friend Sub Init(ByVal IgnoreCase As Boolean)
     If IgnoreCase Then
         mCompareMethod = vbTextCompare
-        mStringComparison = OrdinalIgnoreCase
+        mStringComparison = StringComparison.OrdinalIgnoreCase
     Else
         mCompareMethod = vbBinaryCompare
-        mStringComparison = Ordinal
+        mStringComparison = StringComparison.Ordinal
     End If
 End Sub
 
@@ -75,7 +75,7 @@ End Function
 Private Function StringComparer_Equals(x As Variant, y As Variant) As Boolean
     If VarType(x) = vbString Then
         If VarType(y) = vbString Then
-            StringComparer_Equals = CorString.EqualsV(x, y, mStringComparison)
+            StringComparer_Equals = StringMethods.EqualsV(x, y, mStringComparison)
             Exit Function
         End If
     End If
@@ -85,7 +85,7 @@ End Function
 
 Private Function StringComparer_GetHashCode(Obj As Variant) As Long
     If VarType(Obj) = vbString Then
-        If mStringComparison = OrdinalIgnoreCase Then
+        If mStringComparison = StringComparison.OrdinalIgnoreCase Then
             StringComparer_GetHashCode = Object.GetHashCode(UCase$(Obj))
             Exit Function
         End If

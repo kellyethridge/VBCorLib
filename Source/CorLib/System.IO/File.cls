@@ -99,7 +99,7 @@ Public Sub Copy(ByRef SourceFileName As String, ByRef DestFileName As String, Op
     SourceFullName = Path.GetFullPath(SourceFileName)
     DestFullName = Path.GetFullPath(DestFileName)
     
-    If CorString.Equals(SourceFullName, DestFullName, OrdinalIgnoreCase) Then
+    If CorString.Equals(SourceFullName, DestFullName, StringComparison.OrdinalIgnoreCase) Then
         Exit Sub
     End If
     

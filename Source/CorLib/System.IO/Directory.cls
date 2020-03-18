@@ -411,7 +411,7 @@ Public Sub Move(ByRef SourceDirName As String, ByRef DestDirName As String)
     FullSourceDirName = Path.GetFullPath(SourceDirName)
     FullDestDirName = Path.GetFullPath(DestDirName)
     
-    If CorString.Equals(FullSourceDirName, FullDestDirName, OrdinalIgnoreCase) Then _
+    If CorString.Equals(FullSourceDirName, FullDestDirName, StringComparison.OrdinalIgnoreCase) Then _
         Error.IO IO_SourceDestMustBeDifferent
     If Path.GetPathRoot(FullSourceDirName) <> Path.GetPathRoot(FullDestDirName) Then _
         Error.IO IO_SourceDestMustHaveSameRoot

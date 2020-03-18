@@ -696,7 +696,7 @@ End Function
 ' @return The formatting provider, or Nothing is none is available.
 '
 Public Function GetFormat(ByRef FormatType As String) As Object
-    If CorString.Equals(FormatType, vbDateTimeFormatInfo, OrdinalIgnoreCase) Then
+    If CorString.Equals(FormatType, vbDateTimeFormatInfo, StringComparison.OrdinalIgnoreCase) Then
         Set GetFormat = Me
     End If
 End Function

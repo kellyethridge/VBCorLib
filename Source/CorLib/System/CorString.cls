@@ -53,14 +53,63 @@ Option Explicit
 '
     
 ''
-' String comparisons
+' Specifies the culture, case, and sort rules to be used with certain implementations of the
+' <a href="CorString.Compare.html">CorString.Compare</a> and <a href="CorString.Equals.html">CorString.Equals</a> methods.
 '
+' @param CurrentCulture Compare strings using culture-sensitive sort rules and the current culture.
+' @param CurrentCultureIgnoreCase Compare strings using culture-sensitive sort rules, the current culture, and ignoring the case of the strings being compared.
+' @param InvariantCulture Compare strings using culture-sensitive sort rules and the invariant culture.
+' @param InvariantCultureIgnoreCase Compare strings using culture-sensitive sort rules, the invariant culture, and ignoring the case of the strings being compared.
 ' @param Ordinal Specifies a case-sensitive string comparison.
 ' @param OrdinalIgnoreCase Specifies a case-insensitive string comparison.
+' @param TextCompare Uses the Visual Basic <b>StrComp</b> function with <b>vbTextCompare</b> option.
 Public Enum StringComparison
+    CurrentCulture = 0
+    CurrentCultureIgnoreCase = 1
+    InvariantCulture = 2
+    InvariantCultureIgnoreCase = 3
     Ordinal = 4
     OrdinalIgnoreCase = 5
+    TextCompare = &H10000000
 End Enum
+
+''
+' Defines the string comparison options to use with certain implementations of the
+' <a href="CorString.Compare.html">CorString.Compare</a> and <a href="CorString.Equals.html">CorString.Equals</a> methods.
+' <p>This enumeration allows a bitwise combination of its member values.</p>
+'
+' @param None Indicates the default option settings for string comparisons.
+' @param IgnoreCase Indicates that the string comparison must ignore case.
+' @param IgnoreNonSpace Indicates that the string comparison must ignore nonspacing combining characters, such as diacritics.
+' The <a href="https://home.unicode.org/">Online Unicode Standard</a> defines combining characters as characters that are
+' combined with base characters to produce a new character. Nonspacing combining characters do not occupy a spacing position by themselves when rendered.
+' @param IgnoreSymbols Indicates that the string comparison must ignore symbols, such as white-space characters, punctuation, currency symbols, the percent sign, mathematical symbols, the ampersand, and so on.
+' @param IgnoreKanaType Indicates that the string comparison must ignore the Kana type. Kana type refers to Japanese hiragana and katakana characters,
+' which represent phonetic sounds in the Japanese language. Hiragana is used for native Japanese expressions and words, while katakana is used for
+' words borrowed from other languages, such as "computer" or "Internet". A phonetic sound can be expressed in both hiragana and katakana. If this value
+' is selected, the hiragana character for one sound is considered equal to the katakana character for the same sound.
+' @param IgnoreWidth Indicates that the string comparison must ignore the character width. For example, Japanese katakana
+' characters can be written as full-width or half-width. If this value is selected, the katakana characters written as full-width
+' are considered equal to the same characters written as half-width
+' @param OrdinalIgnoreCaseOption String comparison must ignore case, then perform an ordinal comparison. This technique is
+' equivalent to converting the string to uppercase using the invariant culture and then performing an ordinal comparison on the result.
+' @param StringSort Indicates that the string comparison must use the string sort algorithm. In a string sort, the hyphen and the apostrophe, as well as other nonalphanumeric symbols, come before alphanumeric characters.
+' @param OrdinalOption Indicates that the string comparison must use successive Unicode UTF-16 encoded values of the string
+' (code unit by code unit comparison), leading to a fast comparison but one that is culture-insensitive. A string starting with a
+' code unit \uXXXX comes before a string starting with \uYYYY, if \uXXXX is less than \uYYYY.
+' <p>This value cannot be combined with other CompareOptions values and must be used alone.</p>
+Public Enum CompareOptions
+    None = 0
+    IgnoreCase = &H1
+    IgnoreNonSpace = &H2
+    IgnoreSymbols = &H4
+    IgnoreKanaType = &H8
+    IgnoreWidth = &H10
+    OrdinalIgnoreCaseOption = &H10000000
+    StringSort = &H20000000
+    OrdinalOption = &H40000000
+End Enum
+
 
 ''
 ' Specifies whether <a href="CorString.Split.html">CorString.Split</a> method include or omit empty substrings from the return value.
@@ -500,23 +549,9 @@ End Function
 '        <td><a href="ArgumentException.html">ArgumentException</a></td><td><i>ComparisonType</i> is not a <a href="CorString.StringComparison.html">StringComparison</a> value.</td>
 '   </tr>
 ' </table>
-Public Function StartsWith(ByRef s As String, ByRef Value As String, Optional ByVal ComparisonType As StringComparison = Ordinal) As Boolean
-    Dim SourceLength    As Long
-    Dim ValueLength     As Long
-    Dim SubstringPtr    As Long
-    
-    SourceLength = Len(s)
-    ValueLength = Len(Value)
-    
-    If ValueLength <= SourceLength Then
-        Select Case ComparisonType
-            Case StringComparison.Ordinal
-                StartsWith = OrdinalEquals(StrPtr(s), ValueLength, StrPtr(Value), ValueLength)
-            Case StringComparison.OrdinalIgnoreCase
-                StartsWith = OrdinalEqualsIgnoreCase(StrPtr(s), ValueLength, StrPtr(Value), ValueLength)
-            Case Else
-                Error.Argument ArgumentOutOfRange_Enum
-        End Select
+Public Function StartsWith(ByRef s As String, ByRef Value As String, Optional ByVal ComparisonType As StringComparison = StringComparison.Ordinal) As Boolean
+    If Len(Value) <= Len(s) Then
+        StartsWith = StringMethods.CompareEx(s, 0, Value, 0, Len(Value), ComparisonType) = 0
     End If
 End Function
 
@@ -537,23 +572,12 @@ End Function
 '        <td><a href="ArgumentException.html">ArgumentException</a></td><td><i>ComparisonType</i> is not a <a href="CorString.StringComparison.html">StringComparison</a> value.</td>
 '   </tr>
 ' </table>
-Public Function EndsWith(ByRef s As String, ByRef Value As String, Optional ByVal ComparisonType As StringComparison = Ordinal) As Boolean
-    Dim SourceLength    As Long
-    Dim ValueLength     As Long
-    Dim SubstringPtr    As Long
+Public Function EndsWith(ByRef s As String, ByRef Value As String, Optional ByVal ComparisonType As StringComparison = StringComparison.Ordinal) As Boolean
+    Dim StartIndex As Long
     
-    SourceLength = Len(s)
-    ValueLength = Len(Value)
-    
-    If ValueLength <= SourceLength Then
-        Select Case ComparisonType
-            Case StringComparison.Ordinal
-                EndsWith = OrdinalEquals(StrPtr(s) + (SourceLength - ValueLength) * vbSizeOfChar, ValueLength, StrPtr(Value), ValueLength)
-            Case StringComparison.OrdinalIgnoreCase
-                EndsWith = OrdinalEqualsIgnoreCase(StrPtr(s) + (SourceLength - ValueLength) * vbSizeOfChar, ValueLength, StrPtr(Value), ValueLength)
-            Case Else
-                Error.Argument ArgumentOutOfRange_Enum
-        End Select
+    If Len(Value) <= Len(s) Then
+        StartIndex = Len(s) - Len(Value)
+        EndsWith = StringMethods.CompareEx(s, StartIndex, Value, 0, Len(Value), ComparisonType) = 0
     End If
 End Function
 
@@ -645,18 +669,16 @@ Finally:
 End Function
 
 Private Function FindStringSeparatorIndexes(ByRef s As String, ByRef Separator() As String, ByRef SeparatorIndexes() As Long, ByRef SeparatorLengths() As Long) As Long
-    Dim SPtr            As Long
     Dim CharIndex       As Long
     Dim SLength         As Long
-    Dim SeparatorPtr    As Long
-    Dim SeparatorLength As Long
     Dim SeparatorUB     As Long
     Dim SeparatorLB     As Long
     Dim MatchCount      As Long
+    Dim Sep             As String
+    Dim SepLength       As Long
     
     SeparatorUB = UBound(Separator)
     SeparatorLB = LBound(Separator)
-    SPtr = StrPtr(s)
     SLength = Len(s)
     ReDim SeparatorIndexes(0 To SLength \ 2 + 1)
     ReDim SeparatorLengths(0 To SLength \ 2 + 1)
@@ -665,18 +687,18 @@ Private Function FindStringSeparatorIndexes(ByRef s As String, ByRef Separator()
         Dim i As Long
         
         For i = SeparatorLB To SeparatorUB
-            SeparatorPtr = StrPtr(Separator(i))
-            SeparatorLength = Len(Separator(i))
+            Sep = Separator(i)
+            SepLength = Len(Sep)
             
-            If SeparatorLength > SLength - CharIndex Then
+            If SepLength > SLength - CharIndex Then
                 Exit For
             End If
             
-            If OrdinalEquals(SPtr + CharIndex * vbSizeOfChar, SeparatorLength, SeparatorPtr, SeparatorLength) Then
+            If StringMethods.CompareEx(s, CharIndex, Sep, 0, SepLength, StringComparison.Ordinal) = 0 Then
                 SeparatorIndexes(MatchCount) = CharIndex
-                SeparatorLengths(MatchCount) = SeparatorLength
+                SeparatorLengths(MatchCount) = SepLength
                 MatchCount = MatchCount + 1
-                CharIndex = CharIndex + SeparatorLength - 1
+                CharIndex = CharIndex + SepLength - 1
                 Exit For
             End If
         Next
@@ -843,27 +865,222 @@ End Function
 ' @param b The second string to compare.
 ' @param ComparisonType One of the enumeration values that specifies the rules for the comparison.
 ' @return <b>True</b> if the value of the <i>a</i> parameter is equal to the value of the <i>b</i> parameter; otherwise, <b>False</b>.
-Public Function Equals(ByRef a As String, ByRef b As String, Optional ByVal ComparisonType As StringComparison = Ordinal) As Boolean
-    Select Case ComparisonType
-        Case StringComparison.Ordinal
-            Equals = OrdinalEquals(StrPtr(a), Len(a), StrPtr(b), Len(b))
-        Case StringComparison.OrdinalIgnoreCase
-            Equals = OrdinalEqualsIgnoreCase(StrPtr(a), Len(a), StrPtr(b), Len(b))
-        Case Else
-            Error.ArgumentOutOfRange "ComparisonType", ArgumentOutOfRange_Enum
-    End Select
+Public Function Equals(ByRef a As String, ByRef b As String, Optional ByVal ComparisonType As StringComparison = StringComparison.Ordinal) As Boolean
+    Equals = StringMethods.Equals(a, b, ComparisonType)
 End Function
 
-' this is a convenience function for when strings are being passed around in Variants.
-Friend Function EqualsV(ByRef a As Variant, ByRef b As Variant, Optional ByVal ComparisonType As StringComparison = Ordinal) As Boolean
-    Select Case ComparisonType
-        Case StringComparison.Ordinal
-            EqualsV = OrdinalEquals(StrPtr(a), Len(a), StrPtr(b), Len(b))
-        Case StringComparison.OrdinalIgnoreCase
-            EqualsV = OrdinalEqualsIgnoreCase(StrPtr(a), Len(a), StrPtr(b), Len(b))
-        Case Else
-            Error.ArgumentOutOfRange "ComparisonType", ArgumentOutOfRange_Enum
-    End Select
+''
+' Compares two specified String objects using the specified rules, and returns an integer that indicates their relative position in the sort order.
+'
+' @param StrA The first string to compare.
+' @param StrB The second string to compare.
+' @param ComparisonType One of the enumeration values that specifies the rules to use in the comparison.
+' @return A 32-bit signed integer that indicates the lexical relationship between the two comparands.
+' <h4>Exceptions</h4>
+' <table style="width: auto">
+'   <tr>
+'       <th>Value</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td>Less than zero</td><td><i>StrA</i> is less than <i>StrB</>.</td>
+'   </tr>
+'    <tr>
+'        <td>Zero</td><td><i>StrA</i> equals <i>StrB</i>.</td>
+'    </tr>
+'    <tr>
+'        <td>Greater than zero</td><td><i>StrA</i> is greater than <i>StrB</i>.</td>
+'    </tr>
+' </table>
+Public Function Compare(ByRef StrA As String, ByRef StrB As String, Optional ByVal ComparisonType As StringComparison = StringComparison.Ordinal) As Long
+    Compare = StringMethods.Compare(StrA, StrB, ComparisonType)
+End Function
+
+''
+' Compares substrings of two specified String objects using the specified rules, and returns an integer that indicates their relative position in the sort order.
+'
+' @param StrA The first string to use in the comparison.
+' @param IndexA The position of the substring within <i>StrA</i>.
+' @param StrB The second string to use in the comparison.
+' @param IndexB The position of the substring within <i>StrB</i>.
+' @param Length The maximum number of characters in the substrings to compare.
+' @param ComparisonType One of the enumeration values that specifies the rules to use in the comparison.
+' @return A 32-bit signed integer that indicates the lexical relationship between <i>StrA</i> and <i>StrB</i>, as shown in the following table
+' <table style="width: auto">
+'   <tr>
+'       <th>Value</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td>Less than zero</td><td>The substring in the <i>StrA</i> parameter is less than the substring in the <i>StrB</i> parameter.</td>
+'   </tr>
+'    <tr>
+'        <td>Zero</td><td>The substrings are equal, or the <i>Length</i> parameter is zero.</td>
+'    </tr>
+'    <tr>
+'        <td>Greater than zero</td><td>The substring in <i>StrA</i> is greater than the substring in <i>StrB</i>.</td>
+'    </tr>
+' </table>
+' @remarks The substrings to compare start in <i>StrA</i> at <i>IndexA</i> and in <i>StrB</i> at <i>IndexB</i>. Both <i>IndexA</i> and <i>IndexB</i> are zero-based;
+' that is, the first character in <i>StrA</i> and <i>StrB</i> is at position zero, not position one.
+' <h4>Exceptions</h4>
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+'        <td>
+'           <i>IndexA</i> is greater than <i>StrA</i> length.<br/>
+'           -or-<br/>
+'           <i>IndexB</i> is greater than <i>StrB</i> length.<br/>
+'           -or-<br/>
+'           <i>IndexA</i>, <i>IndexB</i>, or <i>Length</i> is negative.<br/>
+'           -or-<br/>
+'           Either <i>StrA</i> or <i>StrB</i> is empty, and <i>Length</i> is greater than zero.
+'        </td>
+'   </tr>
+'    <tr>
+'        <td><a href="ArgumentException.html">ArgumentException</a></td><td><i>ComparisonType</i> is not a <a href="CorString.StringComparison.html">StringComparison</a> value.</td>
+'    </tr>
+'    <tr>
+'        <td><a href="NotSupportedException.html">NotSupportedException</a></td><td><a href="CorString.StringComparison.html">StringComparison</a> is not supported.</td>
+'    </tr>
+' </table>
+Public Function CompareEx(ByRef StrA As String, ByVal IndexA As Long, ByRef StrB As String, ByVal IndexB As Long, ByVal Length As Long, Optional ByVal ComparisonType As StringComparison = StringComparison.Ordinal) As Long
+    CompareEx = StringMethods.CompareEx(StrA, IndexA, StrB, IndexB, Length, ComparisonType)
+End Function
+
+''
+' Compares two specified String objects using the specified comparison options and culture-specific information to influence the comparison, and returns an integer that indicates the relationship of the two strings to each other in the sort order.
+'
+' @param StrA The first string to compare.
+' @param StrB The second string to compare.
+' @param Culture The culture that supplies culture-specific comparison information.
+' @param Options Options to use when performing the comparison (such as ignoring case or symbols).
+' @return A 32-bit signed integer that indicates the lexical relationship between strA and strB, as shown in the following table
+' <table style="width: auto">
+'   <tr>
+'       <th>Value</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td>Less than zero</td><td><i>StrA</i> is less than <i>StrB</>.</td>
+'   </tr>
+'    <tr>
+'        <td>Zero</td><td><i>StrA</i> equals <i>StrB</i>.</td>
+'    </tr>
+'    <tr>
+'        <td>Greater than zero</td><td><i>StrA</i> is greater than <i>StrB</i>.</td>
+'    </tr>
+' </table>
+Public Function CompareCultural(ByRef StrA As String, ByRef StrB As String, ByVal Culture As CultureInfo, ByVal Options As CompareOptions) As Long
+    CompareCultural = StringMethods.CompareCultural(StrA, StrB, Culture, Options)
+End Function
+
+''
+' Compares substrings of two specified String objects using the specified comparison options and culture-specific information to influence the comparison, and returns an integer that indicates the relationship of the two substrings to each other in the sort order.
+'
+' @param StrA The first string to use in the comparison.
+' @param IndexA The position of the substring within <i>StrA</i>.
+' @param StrB The second string to use in the comparison.
+' @param IndexB The position of the substring within <i>StrB</i>.
+' @param Length The maximum number of characters in the substrings to compare.
+' @param Culture The culture that supplies culture-specific comparison information.
+' @param Options Options to use when performing the comparison (such as ignoring case or symbols).
+' @return A 32-bit signed integer that indicates the lexical relationship between <i>StrA</i> and <i>StrB</i>, as shown in the following table
+' <table style="width: auto">
+'   <tr>
+'       <th>Value</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td>Less than zero</td><td><i>StrA</i> is less than <i>StrB</>.</td>
+'   </tr>
+'    <tr>
+'        <td>Zero</td><td><i>StrA</i> equals <i>StrB</i>.</td>
+'    </tr>
+'    <tr>
+'        <td>Greater than zero</td><td><i>StrA</i> is greater than <i>StrB</i>.</td>
+'    </tr>
+' </table>
+Public Function CompareCulturalEx(ByRef StrA As String, ByVal IndexA As Long, ByRef StrB As String, ByVal IndexB As Long, ByVal Length, ByVal Culture As CultureInfo, ByVal Options As CompareOptions) As Long
+    CompareCulturalEx = StringMethods.CompareCulturalEx(StrA, IndexA, StrB, IndexB, Length, Culture, Options)
+End Function
+
+''
+' Compares two specified String objects by evaluating the numeric values of the corresponding Char objects in each string.
+'
+' @param StrA The first string to compare.
+' @param StrB The second string to compare.
+' @return A 32-bit signed integer that indicates the lexical relationship between strA and strB, as shown in the following table
+' <table style="width: auto">
+'   <tr>
+'       <th>Value</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td>Less than zero</td><td><i>StrA</i> is less than <i>StrB</>.</td>
+'   </tr>
+'    <tr>
+'        <td>Zero</td><td><i>StrA</i> equals <i>StrB</i>.</td>
+'    </tr>
+'    <tr>
+'        <td>Greater than zero</td><td><i>StrA</i> is greater than <i>StrB</i>.</td>
+'    </tr>
+' </table>
+Public Function CompareOrdinal(ByRef StrA As String, ByRef StrB As String) As Long
+    CompareOrdinal = StringMethods.Compare(StrA, StrB, StringComparison.Ordinal)
+End Function
+
+''
+' Compares substrings of two specified String objects by evaluating the numeric values of the corresponding Char objects in each substring.
+'
+' @param StrA The first string to use in the comparison.
+' @param IndexA The position of the substring within <i>StrA</i>.
+' @param StrB The second string to use in the comparison.
+' @param IndexB The position of the substring within <i>StrB</i>.
+' @param Length The maximum number of characters in the substrings to compare.
+' @return A 32-bit signed integer that indicates the lexical relationship between <i>StrA</i> and <i>StrB</i>, as shown in the following table
+' <table style="width: auto">
+'   <tr>
+'       <th>Value</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td>Less than zero</td><td>The substring in the <i>StrA</i> parameter is less than the substring in the <i>StrB</i> parameter.</td>
+'   </tr>
+'    <tr>
+'        <td>Zero</td><td>The substrings are equal, or the <i>Length</i> parameter is zero.</td>
+'    </tr>
+'    <tr>
+'        <td>Greater than zero</td><td>The substring in <i>StrA</i> is greater than the substring in <i>StrB</i>.</td>
+'    </tr>
+' </table>
+' @remarks The <i>IndexA</i>, <i>IndexB</i>, and <i>Length</i> parameters must be nonnegative.
+' <p>The number of characters compared is the lesser of the length of <i>StrA</i> less <i>IndexA</i>, the length of <i>StrB</i> less <i>IndexB</i>, and <i>Length</i>.</p>
+' <h4>Exceptions</h4>
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+'        <td>
+'           <i>IndexA</i> is greater than <i>StrA</i> length.<br/>
+'           -or-<br/>
+'           <i>IndexB</i> is greater than <i>StrB</i> length.<br/>
+'           -or-<br/>
+'           <i>IndexA</i>, <i>IndexB</i>, or <i>Length</i> is negative.<br/>
+'           -or-<br/>
+'           Either <i>StrA</i> or <i>StrB</i> is empty, and <i>Length</i> is greater than zero.
+'        </td>
+'   </tr>
+' </table>
+Public Function CompareOrdinalEx(ByRef StrA As String, ByVal IndexA As Long, ByRef StrB As String, ByVal IndexB As Long, ByVal Length) As Long
+    CompareOrdinalEx = StringMethods.CompareEx(StrA, IndexA, StrB, IndexB, Length, StringComparison.OrdinalIgnoreCase)
 End Function
 
 Friend Function LastChar(ByRef s As String) As Integer
@@ -1200,211 +1417,6 @@ Private Function JoinCollection(ByRef Separator As String, ByVal Value As Object
 NonEnumerable:
     StringBuilderCache.Release ResultBuilder
     Error.Argument Argument_NotEnumerable, "Value"
-End Function
-
-' Adapted and modified from Chris Lucas XBeat/VBSpeed implementation
-Private Function OrdinalEquals(ByVal Ptr1 As Long, ByVal Len1 As Long, ByVal Ptr2 As Long, ByVal Len2 As Long) As Boolean
-    Dim i   As Long
-    Dim Tmp As Long
-    
-    ' Make an informed decision as to whether we should continue
-    If Len1 <> Len2 Then
-        Exit Function
-    End If
-    
-    mComparisonHeader1.pvData = Ptr1
-    mComparisonHeader2.pvData = Ptr2
-    
-    Select Case Len1
-        Case 0
-            OrdinalEquals = True
-            Exit Function
-        Case 1
-            OrdinalEquals = (mComparisonString1(0) And &HFFFF&) = (mComparisonString2(0) And &HFFFF&)
-            Exit Function
-    End Select
-    
-    Len1 = Len1 * vbSizeOfChar
-    Len2 = Len2 * vbSizeOfChar
-    Tmp = Len1 \ 4
-    ' The first two characters come cheap
-    If mComparisonString1(i) <> mComparisonString2(i) Then GoTo BailOut Else i = i + 1
-   
-DoLoop:
-        If mComparisonString1(i) <> mComparisonString2(i) Then GoTo NotEqual Else i = i + 1
-        If mComparisonString1(i) <> mComparisonString2(i) Then GoTo NotEqual Else i = i + 1
-        If mComparisonString1(i) <> mComparisonString2(i) Then GoTo NotEqual Else i = i + 1
-        If mComparisonString1(i) <> mComparisonString2(i) Then GoTo NotEqual Else i = i + 1
-        If mComparisonString1(i) <> mComparisonString2(i) Then GoTo NotEqual Else i = i + 1
-        If mComparisonString1(i) <> mComparisonString2(i) Then GoTo NotEqual Else i = i + 1
-        If mComparisonString1(i) <> mComparisonString2(i) Then GoTo NotEqual Else i = i + 1
-        If mComparisonString1(i) <> mComparisonString2(i) Then GoTo NotEqual Else i = i + 1
-        If mComparisonString1(i) <> mComparisonString2(i) Then GoTo NotEqual Else i = i + 1
-        If mComparisonString1(i) <> mComparisonString2(i) Then GoTo NotEqual Else i = i + 1
-        If mComparisonString1(i) <> mComparisonString2(i) Then GoTo NotEqual Else i = i + 1
-        If mComparisonString1(i) <> mComparisonString2(i) Then GoTo NotEqual Else i = i + 1
-        If mComparisonString1(i) <> mComparisonString2(i) Then GoTo NotEqual Else i = i + 1
-        If mComparisonString1(i) <> mComparisonString2(i) Then GoTo NotEqual Else i = i + 1
-        If mComparisonString1(i) <> mComparisonString2(i) Then GoTo NotEqual Else i = i + 1
-        If mComparisonString1(i) <> mComparisonString2(i) Then GoTo NotEqual Else i = i + 1
-        If mComparisonString1(i) <> mComparisonString2(i) Then GoTo NotEqual Else i = i + 1
-        If mComparisonString1(i) <> mComparisonString2(i) Then GoTo NotEqual Else i = i + 1
-        If mComparisonString1(i) <> mComparisonString2(i) Then GoTo NotEqual Else i = i + 1
-        If mComparisonString1(i) <> mComparisonString2(i) Then GoTo NotEqual Else i = i + 1
-        If i <= Tmp Then GoTo DoLoop
-    
-NotEqual:
-    ' some characters don't match, but we need to check to
-    ' see if it happened after the end of the string, a
-    ' nasty side-effect of cascading ifs
-    If Tmp * 4 = Len1 Then
-        If i >= Tmp Then OrdinalEquals = True
-    Else
-        If i > Tmp Then OrdinalEquals = True
-    End If
-    
-BailOut:
-    ' Lengths don't match, let's do absolutely nothing
-End Function
-
-' Adapted and modified from Chris Lucas XBeat/VBSpeed implementation
-Private Function OrdinalEqualsIgnoreCase(ByVal Ptr1 As Long, ByVal SLen As Long, ByVal Ptr2 As Long, ByVal SLen2 As Long) As Boolean
-    Dim i       As Long
-    Dim Tmp1    As Long
-    Dim Tmp2    As Long
-    Dim Tmp3    As Long
-    Dim Tmp4    As Long
-    Dim Alt     As Long
-    
-    If SLen <> SLen2 Then
-        Exit Function
-    End If
-    
-    If SLen = 0 Then
-        OrdinalEqualsIgnoreCase = True
-        Exit Function
-    End If
-    
-    SLen = SLen * 2
-    SLen2 = SLen2 * 2
-    mComparisonHeader1.pvData = Ptr1
-    mComparisonHeader2.pvData = Ptr2
-
-    For i = 0 To SLen \ 4 - 1
-        Tmp1 = mComparisonString1(i)
-        Tmp2 = (Tmp1 And &HFFFF&)
-        Tmp3 = mComparisonString2(i)
-        Tmp4 = (Tmp3 And &HFFFF&)
-                
-        Select Case Tmp2
-            Case 97& To 122&: Alt = Tmp2 - 32
-            Case 65& To 90&: Alt = Tmp2 + 32
-            Case 49&: Alt = 185
-            Case 50&: Alt = 178
-            Case 51&: Alt = 179
-            Case 138&: Alt = 154
-            Case 140&: Alt = 156
-            Case 142&: Alt = 158
-            Case 154&: Alt = 138
-            Case 156&: Alt = 140
-            Case 158&: Alt = 142
-            Case 159&: Alt = 255
-            Case 178&: Alt = 50
-            Case 179&: Alt = 51
-            Case 185&: Alt = 49
-            Case 192& To 214&: Alt = Tmp2 + 32
-            Case 216& To 222&: Alt = Tmp2 + 32
-            Case 224& To 246&: Alt = Tmp2 - 32
-            Case 248& To 254&: Alt = Tmp2 - 32
-            Case 255&: Alt = 376
-            Case 338&: Alt = 339
-            Case 339&: Alt = 338
-            Case 352&: Alt = 353
-            Case 353&: Alt = 352
-            Case 376&: Alt = 255
-            Case 381&: Alt = 382
-            Case 382&: Alt = 381
-        End Select
-                
-        If Alt <> Tmp4 Then
-            If Tmp2 <> Tmp4 Then Exit Function
-        End If
-        Tmp2 = (Tmp1 And &HFFFF0000)
-        Tmp4 = (Tmp3 And &HFFFF0000)
-        Select Case Tmp2
-            Case &H610000 To &H7A0000: Alt = Tmp2 - &H200000
-            Case &H410000 To &H5A0000: Alt = Tmp2 + &H200000
-            Case &H310000: Alt = &HB90000
-            Case &H320000: Alt = &HB20000
-            Case &H330000: Alt = &HB30000
-            Case &H8A0000: Alt = &H9A0000
-            Case &H8C0000: Alt = &H9C0000
-            Case &H8E0000: Alt = &H9E0000
-            Case &H9B0000: Alt = &H8A0000
-            Case &H9C0000: Alt = &H8C0000
-            Case &H9E0000: Alt = &H8E0000
-            Case &H9F0000: Alt = &HFF0000
-            Case &HB20000: Alt = &H320000
-            Case &HB30000: Alt = &H970000
-            Case &HB90000: Alt = &H310000
-            Case &HC00000 To &HD60000: Alt = Tmp2 + &H200000
-            Case &HD80000 To &HDE0000: Alt = Tmp2 + &H200000
-            Case &HE00000 To &HF60000: Alt = Tmp2 - &H200000
-            Case &HF80000 To &HFE0000: Alt = Tmp2 - &H200000
-            Case &HFF0000: Alt = &H1780000
-            Case &H1520000: Alt = &H1530000
-            Case &H1530000: Alt = &H1520000
-            Case &H1600000: Alt = &H1610000
-            Case &H1610000: Alt = &H1600000
-            Case &H1780000: Alt = &HFF0000
-            Case &H17D0000: Alt = &H17E0000
-            Case &H17E0000: Alt = &H17D0000
-        End Select
-        If Alt <> Tmp4 Then
-            If Tmp2 <> Tmp4 Then Exit Function
-        End If
-    Next i
-    
-    If (SLen \ 2 And 1) Then
-        Tmp2 = (mComparisonString1(i) And &HFFFF&)
-        Tmp4 = (mComparisonString2(i) And &HFFFF&)
-        
-        Select Case Tmp2
-            Case 97& To 122&: Alt = Tmp2 - 32
-            Case 65& To 90&: Alt = Tmp2 + 32
-            Case 49&: Alt = 185
-            Case 50&: Alt = 178
-            Case 51&: Alt = 179
-            Case 138&: Alt = 154
-            Case 140&: Alt = 156
-            Case 142&: Alt = 158
-            Case 154&: Alt = 138
-            Case 156&: Alt = 140
-            Case 158&: Alt = 142
-            Case 159&: Alt = 255
-            Case 178&: Alt = 50
-            Case 179&: Alt = 51
-            Case 185&: Alt = 49
-            Case 192& To 214&: Alt = Tmp2 + 32
-            Case 216& To 222&: Alt = Tmp2 + 32
-            Case 224& To 246&: Alt = Tmp2 - 32
-            Case 248& To 254&: Alt = Tmp2 - 32
-            Case 255&: Alt = 376
-            Case 338&: Alt = 339
-            Case 339&: Alt = 338
-            Case 352&: Alt = 353
-            Case 353&: Alt = 352
-            Case 376&: Alt = 255
-            Case 381&: Alt = 382
-            Case 382&: Alt = 381
-        End Select
-        
-        If Tmp2 <> Tmp4 Then
-            If Alt <> Tmp4 Then Exit Function
-        End If
-    End If
-
-    OrdinalEqualsIgnoreCase = True
 End Function
 
 Private Function CheckChars(ByRef s As String, ByVal SuccessfulState As Boolean, ByVal Predicate As Long) As Boolean

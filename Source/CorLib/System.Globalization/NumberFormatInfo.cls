@@ -892,7 +892,7 @@ End Property
 ' @return The requested format provider, or Nothing if no format provider was found.
 '
 Public Function GetFormat(ByRef FormatType As String) As Object
-    If CorString.Equals(FormatType, vbNumberFormatInfo, OrdinalIgnoreCase) Then
+    If CorString.Equals(FormatType, vbNumberFormatInfo, StringComparison.OrdinalIgnoreCase) Then
         Set GetFormat = Me
     End If
 End Function

@@ -373,6 +373,7 @@ Class=UTF32Encoding; System.Text\UTF32Encoding.cls
 Class=UTF32Encoder; System.Text\UTF32Encoder.cls
 Class=UTF32Decoder; System.Text\UTF32Decoder.cls
 ResFile32="CorLib.RES"
+Module=StringMethods; System\StringMethods.bas
 Startup="Sub Main"
 HelpFile=""
 Title="CorLib"
