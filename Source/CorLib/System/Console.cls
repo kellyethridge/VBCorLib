@@ -287,7 +287,8 @@ Public Property Get Out() As TextWriter
     Dim Writer As StreamWriter
     
     If mOutput Is Nothing Then
-        Set Writer = Cor.NewStreamWriter(OpenStandardOutput, Encoding:=Encoding.GetEncoding(GetConsoleOutputCP))
+        Set Writer = Cor.NewStreamWriter(OpenStandardOutput, Encoding:=OutputEncoding)
+        Writer.HaveWrittenPreamble
         Writer.AutoFlush = True
         Set mOutput = Writer
     End If
@@ -304,7 +305,7 @@ End Property
 '
 Public Property Get In_() As TextReader
     If mInput Is Nothing Then
-        Set mInput = Cor.NewStreamReader(OpenStandardInput, Encoding.GetEncoding(GetConsoleCP), False)
+        Set mInput = Cor.NewStreamReader(OpenStandardInput, InputEncoding, False)
     End If
     
     Set In_ = mInput

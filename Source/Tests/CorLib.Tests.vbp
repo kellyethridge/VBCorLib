@@ -1,5 +1,5 @@
 Type=Exe
-Reference=*\A..\CorLib\CorLib.vbp
+Reference=*\G{E67787FD-71D6-4C37-837D-0300A1E31B5A}#1.0#0#..\..\Binaries\Compiled\VBCorLib3.dll#VB.EXT: CorLib 3.0
 Reference=*\G{00020430-0000-0000-C000-000000000046}#2.0#0#..\..\..\..\..\..\..\Windows\SysWOW64\stdole2.tlb#OLE Automation
 Reference=*\G{1F852AFD-5C0A-46D0-8AA1-4319E8EF72C0}#3.0#0#..\..\TypeLibrary\CorType.tlb#VB.EXT: VBCorLib 3.0 Type Library
 Reference=*\G{3E4F7CEC-C640-49F1-80D9-8DD42421CB1B}#5.0#0#..\..\..\..\..\..\..\WINDOWS\SysWow64\SimplyVBUnitType.tlb#SimplyVBUnit 5.0 Type Library
@@ -230,8 +230,8 @@ Class=ConstructorsTests; System\ConstructorsTests.cls
 Class=EncodingTests; System.Text\EncodingTests.cls
 Class=UTF32EncodingTests; System.Text\UTF32EncodingTests.cls
 Class=UTF32EncoderTests; System.Text\UTF32EncoderTests.cls
-ResFile32="..\CorLib\CorLib.RES"
 Class=UTF32DecoderTests; System.Text\UTF32DecoderTests.cls
+ResFile32="..\CorLib\CorLib.RES"
 IconForm="frmSimplyVBUnitRunner"
 Startup="frmSimplyVBUnitRunner"
 HelpFile=""

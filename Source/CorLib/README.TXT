@@ -157,6 +157,7 @@ version 3.0 (BREAKING CHANGES)
 	* Added LeaveOpen constructor option to StreamWriter to match .NET.
 	* Added CorString.Equals method.
 	* Added CorString.Compare(Ex), CorString.CompareCultural(Ex), and CorString.CompareOrdinal(Ex) methods.
+	* Fixed Console.Out and Console._In not initialzing with Console.OutputEncoding and Console.InputEncoding respectively.
 	
 version 2.3
 	* Updated ASM code to not trigger DEP protection.

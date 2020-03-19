@@ -492,74 +492,74 @@ Public Sub Equals_WithValues_ReturnsExpected(ByRef Left As Int64, ByRef Right As
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub Compare_WithValues_ReturnsExpected(ByRef a As Int64, ByRef b As Int64, ByVal Expected As Long)
+Public Sub Compare_WithValues_ReturnsExpected(ByRef A As Int64, ByRef b As Int64, ByVal Expected As Long)
     Dim Actual As Long
     
-    Actual = Int64.Compare(a, b)
+    Actual = Int64.Compare(A, b)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub Sign_WithValues_ReturnsExpected(ByRef a As Int64, ByVal Expected As Long)
+Public Sub Sign_WithValues_ReturnsExpected(ByRef A As Int64, ByVal Expected As Long)
     Dim Actual As Long
     
-    Actual = Int64.Sign(a)
+    Actual = Int64.Sign(A)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub Negate_WithValues_ReturnsExpected(ByRef a As Int64, ByRef Expected As Int64)
+Public Sub Negate_WithValues_ReturnsExpected(ByRef A As Int64, ByRef Expected As Int64)
     Dim Actual As Int64
     
-    Actual = Int64.Negate(a)
+    Actual = Int64.Negate(A)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub Absolute_WithValues_ReturnsExpected(ByRef a As Int64, ByRef Expected As Int64)
+Public Sub Absolute_WithValues_ReturnsExpected(ByRef A As Int64, ByRef Expected As Int64)
     Dim Actual As Int64
     
-    Actual = Int64.Absolute(a)
+    Actual = Int64.Absolute(A)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub Add_WithValues_ReturnsExpected(ByRef a As Int64, ByRef b As Int64, ByRef Expected As Int64)
+Public Sub Add_WithValues_ReturnsExpected(ByRef A As Int64, ByRef b As Int64, ByRef Expected As Int64)
     Dim Actual As Int64
     
-    Actual = Int64.Add(a, b)
+    Actual = Int64.Add(A, b)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub Subract_WithValues_ReturnsExpected(ByRef a As Int64, ByRef b As Int64, ByRef Expected As Int64)
+Public Sub Subract_WithValues_ReturnsExpected(ByRef A As Int64, ByRef b As Int64, ByRef Expected As Int64)
     Dim Actual As Int64
     
-    Actual = Int64.Subtract(a, b)
+    Actual = Int64.Subtract(A, b)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub Multiply_WithValues_ReturnsExpected(ByRef a As Int64, ByRef b As Int64, ByRef Expected As Int64)
+Public Sub Multiply_WithValues_ReturnsExpected(ByRef A As Int64, ByRef b As Int64, ByRef Expected As Int64)
     Dim Actual As Int64
     
-    Actual = Int64.Multiply(a, b)
+    Actual = Int64.Multiply(A, b)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub Divide_WithValues_ReturnsExpected(ByRef a As Int64, ByRef b As Int64, ByRef Expected As Int64)
+Public Sub Divide_WithValues_ReturnsExpected(ByRef A As Int64, ByRef b As Int64, ByRef Expected As Int64)
     Dim Actual As Int64
     
-    Actual = Int64.Divide(a, b)
+    Actual = Int64.Divide(A, b)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub DivRem_WithValues_ReturnsExpected(ByRef a As Int64, ByRef b As Int64, ByRef Expected As Int64)
+Public Sub DivRem_WithValues_ReturnsExpected(ByRef A As Int64, ByRef b As Int64, ByRef Expected As Int64)
     Dim Actual As Int64
     
-    Int64.DivRem a, b, Actual
+    Int64.DivRem A, b, Actual
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
@@ -749,18 +749,18 @@ Public Sub Parse_WithMoreThanMaxValue_ThrowsOverflowException(ByVal s As String)
     AssertOverflowException Err
 End Sub
 
-Public Sub Max_WithValues_ReturnsExpected(ByRef a As Int64, ByRef b As Int64, ByRef Expected As Int64)
+Public Sub Max_WithValues_ReturnsExpected(ByRef A As Int64, ByRef b As Int64, ByRef Expected As Int64)
     Dim Actual As Int64
     
-    Actual = Int64.Max(a, b)
+    Actual = Int64.Max(A, b)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub Min_WithValues_ReturnsExpected(ByRef a As Int64, ByRef b As Int64, ByRef Expected As Int64)
+Public Sub Min_WithValues_ReturnsExpected(ByRef A As Int64, ByRef b As Int64, ByRef Expected As Int64)
     Dim Actual As Int64
     
-    Actual = Int64.Min(a, b)
+    Actual = Int64.Min(A, b)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub

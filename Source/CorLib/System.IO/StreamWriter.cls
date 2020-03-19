@@ -279,6 +279,12 @@ Public Function GetHashCode() As Long
     GetHashCode = MyBase.GetHashCode(Me)
 End Function
 
+' this is to allow Console to force the prevention
+' of writting a preamble since it makes no sense.
+Friend Sub HaveWrittenPreamble()
+    mPreambleWritten = True
+End Sub
+
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Constructors
@@ -307,8 +313,10 @@ Friend Sub Init(ByRef Source As Variant, ByVal Append As Boolean, ByVal Encoding
             Error.Argument Argument_InvalidStreamSource, "Source"
     End Select
     
-    If mStream.CanSeek And mStream.Position > 0 Then
-        mPreambleWritten = True
+    If mStream.CanSeek Then
+        If mStream.Position > 0 Then
+            HaveWrittenPreamble
+        End If
     End If
     
     Set mEncoding = IfObject(Encoding, Stream.UTF8NoBOMAndThrows)

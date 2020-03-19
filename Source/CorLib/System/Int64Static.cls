@@ -219,7 +219,8 @@ Public Function ToDecimal(ByRef Value As Int64) As Variant
     Dim Ptr As Long
     
     Ptr = VarPtr(ToDecimal)
-        
+    MemLong(Ptr + 4) = 0 ' we need to clear the highest 32 bits because they aren't cleared when compiled.
+    
     If IsNegative(Value) Then
         MemLong(Ptr) = NegativeDecimalType
         AssignQWord Negate(Value), ByVal Ptr + VARIANTDATA_OFFSET

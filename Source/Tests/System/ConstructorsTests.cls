@@ -25,7 +25,7 @@ Public Sub NewDecimals_WithInt64_ReturnsDecimalArray()
     Dim Actual() As Variant
     
     Actual = NewDecimals(CInt64(1))
-    
+
     Assert.That Actual, Iz.EqualTo(Array(CDec(1))).Strict
 End Sub
 
