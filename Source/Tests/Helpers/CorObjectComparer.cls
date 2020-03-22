@@ -15,10 +15,21 @@ Option Explicit
 Implements SimplyVBUnitType.IEqualityComparer
 Implements SimplyVBUnitType.IComparer
 
-Private Function IComparer_Compare(X As Variant, Y As Variant) As Long
-    IComparer_Compare = Comparer.Default.Compare(X, Y)
+Private mComparer As CorLib.IComparer
+
+
+Private Sub Class_Initialize()
+    Set mComparer = Comparer.Default
+End Sub
+
+Private Function IComparer_Compare(x As Variant, y As Variant) As Long
+    IComparer_Compare = mComparer.Compare(x, y)
 End Function
 
-Private Function IEqualityComparer_Equals(X As Variant, Y As Variant) As Boolean
-    IEqualityComparer_Equals = Object.Equals(X, Y)
+Private Function IEqualityComparer_Equals(x As Variant, y As Variant) As Boolean
+    IEqualityComparer_Equals = Object.Equals(x, y)
 End Function
+
+Friend Sub Init(ByVal Comparer As CorLib.IComparer)
+    Set mComparer = Comparer
+End Sub

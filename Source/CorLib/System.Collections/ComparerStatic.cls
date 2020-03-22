@@ -38,26 +38,42 @@ Attribute VB_Exposed = True
 ''
 ' Provides static functions to access the default comparer.
 '
-' @remarks To access the default comparer through the ComparerStatic
-' class, use the Comparer namespace.
+' @remarks To access the default comparer through the ComparerStatic class use the Comparer namespace.
 ' <pre>
 ' Set Comparer = Comparer.Default
 ' </pre>
 ' This will return the default system comparer.<br>
 '
 ' @see Comparer
+' @see Constructors
 '
 Option Explicit
 
-Private mDefault As New Comparer
+Private mDefault            As Comparer
+Private mDefaultInvariant   As Comparer
 
 
 ''
-' Returns the single instance of the default comparer.
+' Gets an instance of <a href="Comparer.html">Comparer</a> that is associated with the <a href="Thread.Get.CurrentCulture.html">Thread.CurrentCulture</a> of the current thread and that is always available.
 '
-' @return The default comparer.
-'
-Public Function Default() As Comparer
+' @return An instance of <a href="Comparer.html">Comparer</a> that is associated with <a href="CultureInfo.Get.InvariantCulture.html">CultureInfo.InvariantCulture</a>.
+Public Property Get Default() As Comparer
     Set Default = mDefault
-End Function
+End Property
 
+''
+' Represents an instance of <a href="Comparer.html">Comparer</a> that is associated with <a href="CultureInfoStatic.Get.InvariantCulture.html">CultureInfo.InvariantCulture</a>.
+'
+' @return An instance of <a href="Comparer.html">Comparer</a> that is associated with <a href="CultureInfoStatic.Get.InvariantCulture.html">CultureInfo.InvariantCulture</a>.
+Public Property Get DefaultInvariant() As Comparer
+    Set DefaultInvariant = mDefaultInvariant
+End Property
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Constructors
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Sub Class_Initialize()
+    Set mDefault = Cor.NewComparer(CultureInfo.CurrentCulture)
+    Set mDefaultInvariant = Cor.NewComparer(CultureInfo.InvariantCulture)
+End Sub

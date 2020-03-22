@@ -1,7 +1,7 @@
 VERSION 1.0 CLASS
 BEGIN
   MultiUse = -1  'True
-  Persistable = 1  'Persistable
+  Persistable = 0  'NotPersistable
   DataBindingBehavior = 0  'vbNone
   DataSourceBehavior  = 0  'vbNone
   MTSTransactionMode  = 0  'NotAnMTSObject
@@ -42,6 +42,7 @@ Option Explicit
 Implements IObject
 Implements IComparer
 
+Private mCulture As CultureInfo
 Private mDefault As IComparer
 
 ''
@@ -68,7 +69,7 @@ Private mDefault As IComparer
 Public Function Compare(ByRef a As Variant, ByRef b As Variant) As Long
     If VarType(a) = vbString Then
         If VarType(b) = vbString Then
-            Compare = StrComp(a, b, vbTextCompare)
+            Compare = StringMethods.CompareCulturalV(a, b, mCulture, CompareOptions.IgnoreCase)
             Exit Function
         End If
     End If
@@ -109,8 +110,16 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Friend Sub Init(ByVal Culture As CultureInfo)
+    If Culture Is Nothing Then _
+        Error.ArgumentNull "Culture"
+    
+    Set mCulture = Culture
+End Sub
+
 Private Sub Class_Initialize()
     Set mDefault = Comparer.Default
+    Set mCulture = CultureInfo.CurrentCulture
 End Sub
 
 

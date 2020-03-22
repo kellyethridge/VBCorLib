@@ -51,6 +51,8 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use Col, Col, False
             Test.Use Int64.MinValue, Int64.Zero, True
             Test.Use Int64.MaxValue, Int64.Zero, False
+            Test.Use Nothing, New Int32, True
+            Test.Use New Int32, Nothing, False
             
         Case "GreaterThan_WithValues_ReturnsExpected"
             Test.Use 1, 2, False
@@ -75,6 +77,8 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use Col, Col, False
             Test.Use Int64.MinValue, Int64.Zero, False
             Test.Use Int64.MaxValue, Int64.Zero, True
+            Test.Use New Int32, Nothing, True
+            Test.Use Nothing, New Int32, False
             
         Case "Equal_WithValues_ReturnsExpected"
             Test.Use 1, 2, False
@@ -101,6 +105,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use Int64.MinValue, Int64.Zero, False
             Test.Use Int64.MaxValue, Int64.Zero, False
             Test.Use Int64.MaxValue, Int64.MaxValue, True
+            Test.Use Nothing, Nothing, True
             
         Case "Compare_WithDifferentDataTypes_ThrowsArgumentException"
             Test.Use CLng(1), CInt(1)
@@ -142,6 +147,16 @@ Public Sub Compare_WithDifferentDataTypes_ThrowsArgumentException(ByRef x As Var
     
     mComparer.Compare x, y
 
+    AssertArgumentException Err
+End Sub
+
+Public Sub Compare_WithNonIComparableObjects_ThrowsArgumentException()
+    Dim x As New MockObject
+    Dim y As New MockObject
+    
+    On Error Resume Next
+    Comparer.Default.Compare x, y
+    
     AssertArgumentException Err
 End Sub
 

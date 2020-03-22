@@ -47,7 +47,41 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use NewDates(#5/1/2001#, #4/1/2001#, #6/1/2001#, #3/1/2001#), AddressOf CompareDates
             Test.Use NewVariants(7, 8, 9, 6, 5, 4, 1, 3, 2), AddressOf CompareVariants
             
+        Case "Sort_WithStringsAndComparer_SortsExpected"
+            Test.Use Nothing, NewStrings("a", "a", "A", "A", "à", "à", "À", "À", "B", "B", "c", "c", "d", "d", "ê", "ê", "Ê", "Ê", "Ø", "Ø")
+            Test.Use CorLib.Comparer.Default, NewStrings("a", "a", "A", "A", "à", "à", "À", "À", "B", "B", "c", "c", "d", "d", "ê", "ê", "Ê", "Ê", "Ø", "Ø")
+            Test.Use CorLib.Comparer.DefaultInvariant, NewStrings("a", "a", "A", "A", "à", "à", "À", "À", "B", "B", "c", "c", "d", "d", "ê", "ê", "Ê", "Ê", "Ø", "Ø")
+            Test.Use StringComparer.Ordinal, NewStrings("A", "A", "B", "B", "a", "a", "c", "c", "d", "d", "À", "À", "Ê", "Ê", "Ø", "Ø", "à", "à", "ê", "ê")
+            Test.Use StringComparer.BinaryCompare, NewStrings("A", "A", "B", "B", "a", "a", "c", "c", "d", "d", "À", "À", "Ê", "Ê", "Ø", "Ø", "à", "à", "ê", "ê")
+            Test.Use StringComparer.InvariantCulture, NewStrings("a", "a", "A", "A", "à", "à", "À", "À", "B", "B", "c", "c", "d", "d", "ê", "ê", "Ê", "Ê", "Ø", "Ø")
+
+        Case "SortWithStringsAndComparerIgnoreCase_SortsExpected"
+            Test.Use StringComparer.OrdinalIgnoreCase
+            Test.Use StringComparer.InvariantCultureIgnoreCase
+            Test.Use StringComparer.TextCompare
+            Test.Use New AscendingComparer
+            
     End Select
+End Sub
+
+Public Sub Sort_WithStringsAndComparer_SortsExpected(ByVal Comparer As CorLib.IComparer, ByRef Expected() As String)
+    Dim Value() As String
+    
+    Value = NewStrings("Ø", "à", "c", "d", "ê", "a", "B", "A", "Ê", "À", "Ø", "à", "c", "d", "ê", "a", "B", "A", "Ê", "À")
+    
+    CorArray.Sort Value, Comparer
+    
+    Assert.That Value, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub SortWithStringsAndComparerIgnoreCase_SortsExpected(ByVal Comparer As CorLib.IComparer)
+    Dim Value() As String
+    
+    Value = NewStrings("Ø", "à", "c", "d", "ê", "a", "B", "A", "Ê", "À", "Ø", "à", "c", "d", "ê", "a", "B", "A", "Ê", "À")
+    
+    CorArray.Sort Value, Comparer
+    
+    Assert.That Value, Iz.Ordered.IgnoreCase.Using(NewCorObjectComparer(Comparer))
 End Sub
 
 Public Sub Sort_WithPrimitives_SortsAscending(ByRef Arr As Variant)
@@ -86,11 +120,20 @@ End Sub
 
 Public Sub Sort_WithComparer_SortsValues()
     Dim Arr() As Long
-    Arr = NewLongs(7, 8, 9, 6, 5, 4, 1, 3, 2)
+    Arr = NewLongs(7, 8, 9, 6, 5, 4, 1, 3, 2, 7, 8, 9, 6, 5, 4, 1, 3, 2, 7, 8, 9, 6, 5, 4, 1, 3, 2, 7, 8, 9, 6, 5, 4, 1, 3, 2, 7, 8, 9, 6, 5, 4, 1, 3, 2)
     
     CorArray.Sort Arr, New DescendingComparer
     
     Assert.That Arr, Iz.Ordered.Descending
+End Sub
+
+Public Sub Sort_WithOrdinalComparer_SortsStrings()
+    Dim Arr() As String
+    Arr = NewStrings("a", "b", "B", "A")
+    
+    CorArray.Sort Arr, StringComparer.Ordinal
+    
+    Assert.That Arr, Iz.Ordered
 End Sub
 
 Public Sub Sort_WithComparableObjects_SortsObjects()
@@ -218,7 +261,7 @@ Public Sub SortEx_WithComparer_SortsSubArray()
     Assert.That a, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub SortKey_WithNullKeysArray_Throws()
+Public Sub SortKey_WithNullKeysArray_ThrowsArgumentNullException()
     Dim Keys() As Long
     Dim Items(0) As Long
     
@@ -228,7 +271,7 @@ Public Sub SortKey_WithNullKeysArray_Throws()
     AssertArgumentNullException Err, "Keys"
 End Sub
 
-Public Sub SortKey_WithNullItemsArray_Throws()
+Public Sub SortKey_WithNullItemsArray_ThrowsArgumentNullException()
     Dim Keys(0) As Long
     Dim Items() As Long
     
@@ -238,7 +281,7 @@ Public Sub SortKey_WithNullItemsArray_Throws()
     AssertArgumentNullException Err, "Items"
 End Sub
 
-Public Sub SortKey_WithMultiDimensionKeys_Throws()
+Public Sub SortKey_WithMultiDimensionKeys_ThrowsRankException()
     Dim Keys(0, 0) As Long
     Dim Items(0) As Long
     
@@ -248,7 +291,7 @@ Public Sub SortKey_WithMultiDimensionKeys_Throws()
     AssertRankException Err
 End Sub
 
-Public Sub SortKey_WithMultiDimensionItems_Throws()
+Public Sub SortKey_WithMultiDimensionItems_ThrowsRankException()
     Dim Keys(0) As Long
     Dim Items(0, 0) As Long
     
@@ -258,7 +301,7 @@ Public Sub SortKey_WithMultiDimensionItems_Throws()
     AssertRankException Err
 End Sub
 
-Public Sub SortKey_WithInvalidItems_Throws()
+Public Sub SortKey_WithInvalidItems_ThrowsArgumentException()
     Dim Keys(0) As Long
     Dim InvalidItems As Long
     
@@ -268,7 +311,7 @@ Public Sub SortKey_WithInvalidItems_Throws()
     AssertArgumentException Err, "Items"
 End Sub
 
-Public Sub SortKeyEx_WithNullKeys_Throws()
+Public Sub SortKeyEx_WithNullKeys_ThrowsArgumentNullException()
     Dim Keys() As Long
     Dim Items(0) As Long
     
@@ -276,6 +319,38 @@ Public Sub SortKeyEx_WithNullKeys_Throws()
     CorArray.SortKeyEx Keys, Items, 0, 1
     
     AssertArgumentNullException Err, "Keys"
+End Sub
+
+Public Sub Sort_WithCustomTypeAndNothingComparer_ThrowsArgumentNullException()
+    Dim Keys(10) As LargeUdt
+    
+    On Error Resume Next
+    CorArray.Sort Keys, Nothing
+    
+    AssertArgumentNullException Err, "Comparer"
+End Sub
+
+Public Sub Sort_WithObjectsAndNothing_SortsAscending()
+    Dim Keys(10) As Int32
+    Dim i As Long
+    
+    For i = 0 To 10 Step 2
+        Set Keys(i) = NewInt32(i)
+    Next
+    
+    CorArray.Sort Keys
+    
+    Assert.That Keys(0), Iz.Nothing
+    Assert.That Keys(1), Iz.Nothing
+    Assert.That Keys(2), Iz.Nothing
+    Assert.That Keys(3), Iz.Nothing
+    Assert.That Keys(4), Iz.Nothing
+    Assert.That Keys(5).Value, Iz.EqualTo(0)
+    Assert.That Keys(6).Value, Iz.EqualTo(2)
+    Assert.That Keys(7).Value, Iz.EqualTo(4)
+    Assert.That Keys(8).Value, Iz.EqualTo(6)
+    Assert.That Keys(9).Value, Iz.EqualTo(8)
+    Assert.That Keys(10).Value, Iz.EqualTo(10)
 End Sub
 
 Public Sub SortKey_WhenCalled_SortsKeys()

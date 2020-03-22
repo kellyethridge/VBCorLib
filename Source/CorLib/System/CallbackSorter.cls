@@ -45,7 +45,6 @@ Attribute VB_Exposed = False
 '
 Option Explicit
 
-Private mComparerDel    As Delegate
 Private mComparer       As Func_T_T_Long
 Private mHasSortItems   As Boolean
 Private mSortItems      As SortItems
@@ -63,86 +62,101 @@ Private mElemSize       As Long
 Private mPivotBuffer    As Long
 
 
-Friend Sub Sort(ByVal pSAKeys As Long, ByVal pSAItems As Long, ByVal Left As Long, ByVal Right As Long, ByVal AddressOfCallback As Long)
-    Set mComparer = InitDelegate(mComparerDel, AddressOfCallback)
+Friend Sub Sort(ByRef Keys As Variant, ByRef Items As Variant, ByVal Left As Long, ByVal Right As Long)
+    Dim KeysPtr As Long
     
-    On Error GoTo Catch
+    InitSortItems Items
+    KeysPtr = SAPtrV(Keys)
     
-    If pSAItems <> vbNullPtr Then
-        InitSortItems pSAItems
-    Else
-        mHasSortItems = False
-    End If
-    
-    Select Case SafeArrayGetElemsize(pSAKeys)
-        Case 1
-            SAPtr(mInt8) = pSAKeys
-            SortInt8 Left, Right
-        Case 2
-            SAPtr(mInt16) = pSAKeys
-            SortInt16 Left, Right
-        Case 4
-            SAPtr(mInt32) = pSAKeys
-            SortInt32 Left, Right
-        Case 8
-            SAPtr(mInt64) = pSAKeys
-            SortInt64 Left, Right
-        Case 16
-            SAPtr(mInt128) = pSAKeys
-            SortInt128 Left, Right
-        Case Else
-            With mKeyItems
-                CopyMemory .SA, ByVal pSAKeys, vbSizeOfSafeArray1d
-                mElemSize = .SA.cbElements
-                mPVData = .SA.pvData
-                mPivotBuffer = CoTaskMemAlloc(mElemSize)
-                .Buffer = CoTaskMemAlloc(mElemSize)
-                SortAny Left, Right
-            End With
+    Select Case SafeArrayGetElemsize(KeysPtr)
+        Case 1: Sort8Bits KeysPtr, Left, Right
+        Case 2: Sort16Bits KeysPtr, Left, Right
+        Case 4: Sort32Bits KeysPtr, Left, Right
+        Case 8: Sort64Bits KeysPtr, Left, Right
+        Case 16: Sort128Bits KeysPtr, Left, Right
+        Case Else: SortAnyBits KeysPtr, Left, Right
     End Select
-    
-    GoSub Finally
-    Exit Sub
-    
-Catch:
-    GoSub Finally
-    ThrowOrErr Err
-Finally:
+End Sub
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Constructors
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Friend Sub Init(ByVal Callback As Long)
+    Set mComparer = NewDelegate(Callback)
+End Sub
+
+Private Sub Class_Terminate()
     SAPtr(mInt8) = vbNullPtr
     SAPtr(mInt16) = vbNullPtr
     SAPtr(mInt32) = vbNullPtr
     SAPtr(mInt64) = vbNullPtr
     SAPtr(mInt128) = vbNullPtr
     
-    If mSortItems.Buffer Then
-        CoTaskMemFree mSortItems.Buffer
-        mSortItems.Buffer = vbNullPtr
-    End If
-    
-    If mPivotBuffer Then
-        CoTaskMemFree mPivotBuffer
-        mPivotBuffer = vbNullPtr
-    End If
-    
-    If mKeyItems.Buffer Then
-        CoTaskMemFree mKeyItems.Buffer
-        mKeyItems.Buffer = vbNullPtr
-    End If
-    
-    Set mComparer = Nothing
-    Return
+    CoTaskMemFree mSortItems.Buffer
+    CoTaskMemFree mKeyItems.Buffer
+    CoTaskMemFree mPivotBuffer
 End Sub
 
-Private Sub InitSortItems(ByVal pSA As Long)
-    CopyMemory mSortItems.SA, ByVal pSA, vbSizeOfSafeArray1d
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Helpers
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Sub InitSortItems(ByRef Items As Variant)
+    Dim pSA As Long
     
-    Select Case mSortItems.SA.cbElements
-        Case 1, 2, 4, 8, 16
-        Case Else
-            mSortItems.Buffer = CoTaskMemAlloc(mSortItems.SA.cbElements)
-    End Select
+    If Not IsMissing(Items) Then
+        pSA = SAPtrV(Items)
+        CopyMemory mSortItems.SA, ByVal pSA, vbSizeOfSafeArray1d
+        
+        Select Case mSortItems.SA.cbElements
+            Case 1, 2, 4, 8, 16
+            Case Else
+                mSortItems.Buffer = CoTaskMemAlloc(mSortItems.SA.cbElements)
+                
+                If mSortItems.Buffer = vbNullPtr Then _
+                    Throw New OutOfMemoryException
+        End Select
+        
+        mHasSortItems = True
+    End If
+End Sub
+
+Private Sub Sort8Bits(ByVal KeysPtr As Long, ByVal Left As Long, ByVal Right As Long)
+    SAPtr(mInt8) = KeysPtr
+    SortInt8 Left, Right
+End Sub
+
+Private Sub Sort16Bits(ByVal KeysPtr As Long, ByVal Left As Long, ByVal Right As Long)
+    SAPtr(mInt16) = KeysPtr
+    SortInt16 Left, Right
+End Sub
+
+Private Sub Sort32Bits(ByVal KeysPtr As Long, ByVal Left As Long, ByVal Right As Long)
+    SAPtr(mInt32) = KeysPtr
+    SortInt32 Left, Right
+End Sub
+
+Private Sub Sort64Bits(ByVal KeysPtr As Long, ByVal Left As Long, ByVal Right As Long)
+    SAPtr(mInt64) = KeysPtr
+    SortInt64 Left, Right
+End Sub
+
+Private Sub Sort128Bits(ByVal KeysPtr As Long, ByVal Left As Long, ByVal Right As Long)
+    SAPtr(mInt128) = KeysPtr
+    SortInt128 Left, Right
+End Sub
+
+Private Sub SortAnyBits(ByVal KeysPtr As Long, ByVal Left As Long, ByVal Right As Long)
+    With mKeyItems
+        CopyMemory .SA, ByVal KeysPtr, vbSizeOfSafeArray1d
+        mElemSize = .SA.cbElements
+        mPVData = .SA.PVData
+        mPivotBuffer = CoTaskMemAlloc(mElemSize)
+        .Buffer = CoTaskMemAlloc(mElemSize)
+    End With
     
-    mHasSortItems = True
+    SortAny Left, Right
 End Sub
 
 Private Sub SortInt8(ByVal Left As Long, ByVal Right As Long)
@@ -308,3 +322,4 @@ Private Sub SortAny(ByVal Left As Long, ByVal Right As Long)
         End If
     Loop
 End Sub
+

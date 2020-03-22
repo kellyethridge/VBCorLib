@@ -74,10 +74,10 @@ Public Function IsInt64(ByRef Value As Variant) As Boolean
     End If
 End Function
 
-Public Function IsInt64Array(ByVal pSA As Long) As Boolean
+Public Function IsInt64Array(ByRef Value As Variant) As Boolean
     Dim Info As IRecordInfo
     
-    Set Info = SafeArrayGetRecordInfo(pSA)
+    Set Info = SafeArrayGetRecordInfo(SAPtrV(Value))
     IsInt64Array = IsEqualGUID(Info.GetGuid, Statics.Int64.Int64Guid)
 End Function
 

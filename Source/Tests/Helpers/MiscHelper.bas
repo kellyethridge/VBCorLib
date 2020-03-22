@@ -20,6 +20,11 @@ Public Function NewInt32(ByVal Value As Long) As Int32
     NewInt32.Init Value
 End Function
 
+Public Function NewCorObjectComparer(ByVal Comparer As CorLib.IComparer) As CorObjectComparer
+    Set NewCorObjectComparer = New CorObjectComparer
+    NewCorObjectComparer.Init Comparer
+End Function
+
 Public Function GenerateString(ByVal Size As Long) As String
     Dim Ran As New Random
     Dim sb As New StringBuilder

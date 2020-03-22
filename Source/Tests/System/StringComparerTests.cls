@@ -35,7 +35,14 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use(1, 1).Expect Iz.EqualTo(0)
             Test.Use(1, 0).Expect Iz.GreaterThan(0)
             Test.Use(0, 1).Expect Iz.LessThan(0)
-        
+            Test.Use("", "a").Expect Iz.EqualTo(-1)
+            Test.Use("a", "").Expect Iz.EqualTo(1)
+            Test.Use("", "").Expect Iz.EqualTo(0)
+            Test.Use(vbNullString, vbNullString).Expect Iz.EqualTo(0)
+            Test.Use(vbNullString, "").Expect Iz.EqualTo(0)
+            Test.Use(vbNullString, "a").Expect Iz.LessThan(0)
+            Test.Use("a", vbNullString).Expect Iz.EqualTo(1)
+            
         Case "Compare_WithOrdinalIgnoreCaseComparer_ReturnsExpected"
             Test.Use("a", "a").Expect Iz.EqualTo(0)
             Test.Use("a", "b").Expect Iz.LessThan(0)
@@ -47,6 +54,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use(1, 1).Expect Iz.EqualTo(0)
             Test.Use(1, 0).Expect Iz.GreaterThan(0)
             Test.Use(0, 1).Expect Iz.LessThan(0)
+            
             
         Case "Equals_WithOrdinalComparer_ReturnsExpected"
             Test.Use "a", "a", True

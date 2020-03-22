@@ -158,6 +158,12 @@ version 3.0 (BREAKING CHANGES)
 	* Added CorString.Equals method.
 	* Added CorString.Compare(Ex), CorString.CompareCultural(Ex), and CorString.CompareOrdinal(Ex) methods.
 	* Fixed Console.Out and Console._In not initialzing with Console.OutputEncoding and Console.InputEncoding respectively.
+	* Added Comparer.DefaultInvariant.
+	* Added CaseInsensitiveComparer.DefaultInvariant.
+	* Fixed Comparer.Default; should use culture-sensitive comparison.
+	* Fixed CaseInsensitiveCompare.Default; should use culture-sensistive comparison.
+	* Fixed CorArray.Sort; when sorting strings, should be culture aware. * may produce different results from previous. *
+	* Improved CorArray.Sort when sorting strings.
 	
 version 2.3
 	* Updated ASM code to not trigger DEP protection.

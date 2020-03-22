@@ -62,8 +62,6 @@ Private Type ArrayInfo
     ElementSize As Long
 End Type
 
-Private CallbackSorter As New CallbackSorter
-
 
 ''
 ' Uses a callback method to check if an element in an array exists.
@@ -531,7 +529,7 @@ Public Sub Clear(ByRef Arr As Variant, ByVal Index As Long, ByVal Length As Long
     
     With SubArray.SA
         .fFeatures = .fFeatures Or FADF_FIXEDSIZE Or FADF_STATIC Or FADF_AUTO
-        .pvData = .pvData + (Index - LBound(Arr)) * .cbElements
+        .PVData = .PVData + (Index - LBound(Arr)) * .cbElements
         .cElements = Length
     End With
     SafeArrayDestroyData VarPtr(SubArray.SA)
@@ -1066,7 +1064,7 @@ Public Sub Sort(ByRef Arr As Variant, Optional ByRef Comparer As Variant)
     If IsNull(Arr) Then _
         Error.ArgumentNull "Arr", ArgumentNull_Array
     
-    SortKeyEx Arr, Empty, LBound(Arr), Len1D(Arr), Comparer
+    SortKeyEx Arr, Missing, LBound(Arr), Len1D(Arr), Comparer
 End Sub
 
 ''
@@ -1096,7 +1094,7 @@ Public Sub SortEx(ByRef Arr As Variant, ByVal Index As Long, ByVal Length As Lon
     If IsNull(Arr) Then _
         Error.ArgumentNull "Arr", ArgumentNull_Array
     
-    SortKeyEx Arr, Empty, Index, Length, Comparer
+    SortKeyEx Arr, Missing, Index, Length, Comparer
 End Sub
 
 ''
@@ -1153,54 +1151,71 @@ End Sub
 ' any specific sub-type within the variants of the array.</p>
 '
 Public Sub SortKeyEx(ByRef Keys As Variant, ByRef Items As Variant, ByVal Index As Long, ByVal Length As Long, Optional ByRef Comparer As Variant)
-    Dim KeysPtr  As Long
-    Dim ItemsPtr As Long
-        
+    Dim KeysPtr     As Long
+    Dim ItemsPtr    As Long
+    Dim Left        As Long
+    Dim Right       As Long
+    
     ValidateArrayRange Keys, Index, Length, Parameter_Keys, CountName:=NameOfLength
     KeysPtr = SAPtrV(Keys)
+    Left = Index
+    Right = Index + Length - 1
     
-    If Not IsEmpty(Items) Then
+    If Not IsMissing(Items) Then
         ValidateArray Items, Parameter_Items
         
         ' Items array must match the Keys array in size and bounds.
         If (LBound(Keys) <> LBound(Items)) Or _
            (UBound(Keys) <> UBound(Items)) Then _
             Error.Argument Argument_MatchingBounds
-        
-        ItemsPtr = SAPtrV(Items)
-        SetSortItems ItemsPtr
+                
+        ' If a callback address was passed in for the Comparer then
+        ' a callback sort routine will be used and it will
+        ' allocate its own sort-item swap buffer.
+        If Not IsInteger(Comparer) Then
+            ItemsPtr = SAPtrV(Items)
+            SetSortItems ItemsPtr
+        End If
     End If
     
     On Error GoTo Catch
     Select Case VarType(Comparer)
         ' use an IComparer object to sort with.
         Case vbObject
-            SetSortKeys KeysPtr
-            
-            If Comparer Is Nothing Then
-                Set SortComparer = CorLib.Comparer.Default
-            Else
-                Set SortComparer = Comparer
+            ' use specialized sorting for different types of string comparisons.
+            If (VarType(Keys) And &HFF) = vbString Then
+                SortStringsWithComparer Keys, Left, Right, Comparer
+                GoSub Finally
+                Exit Sub
+            ElseIf Comparer Is Nothing Or Comparer Is Statics.Comparer.Default Then
+                ' try specialized sorting using default comparisons.
+                If TrySZSort(Keys, Left, Right) Then
+                    GoSub Finally
+                    Exit Sub
+                End If
             End If
             
-            QuickSortGeneral Keys, Index, Index + Length - 1
+            If Comparer Is Nothing Then _
+                Error.ArgumentNull "Comparer"
+            If Not TypeOf Comparer Is IComparer Then _
+                Throw Cor.NewInvalidCastException(Environment.GetResourceString(InvalidCast_IComparer))
+            
+            SetSortKeys KeysPtr
+            QuickSortGeneral Keys, Left, Right, CUnk(Comparer)
             
         ' Use a callback method to sort with.
         ' This allows a user to supply a highspeed comparison
         ' routine to compare two elements of the array.
         Case vbLong
-            CallbackSorter.Sort KeysPtr, ItemsPtr, Index, Index + Length - 1, Comparer
+            Dim Sorter As CallbackSorter
+            Set Sorter = Cor.NewCallbackSorter(Comparer)
+            Sorter.Sort Keys, Items, Left, Right
             
-        ' try optimized routines first, then fallback to the default IComparer object.
-        Case vbError
-            If Not TrySZSort(KeysPtr, Index, Index + Length - 1) Then
-                ' If we get here, then no optimized routine existed,
-                ' so we'll set our comparer to the default and loop
-                ' around again, letting this case statement fall
-                ' into the QuickSortGeneral routine.
+        ' No compare given so try optimized routines first, then fallback to general sort.
+        Case vbMissing
+            If Not TrySZSort(Keys, Left, Right) Then
                 SetSortKeys KeysPtr
-                Set SortComparer = CorLib.Comparer.Default
-                QuickSortGeneral Keys, Index, Index + Length - 1
+                QuickSortGeneral Keys, Left, Right, Statics.Comparer.Default
             End If
         Case Else
             Error.Argument Argument_InvalidComparer, "Comparer"
@@ -1211,7 +1226,7 @@ Public Sub SortKeyEx(ByRef Keys As Variant, ByRef Items As Variant, ByVal Index 
     
 Catch:
     GoSub Finally
-    Throw
+    ThrowOrErr Err
 Finally:
     ClearSortKeys
     ClearSortItems
@@ -1368,13 +1383,13 @@ Private Sub CopyReferenceTypes(ByVal srcpSA As Long, ByVal SourceIndex As Long, 
             Dim ClearSA As GuidSafeArray1d
             ClearSA = srcSA
             With ClearSA.SA
-                .pvData = .pvData + (SourceIndex + Length) * .cbElements
+                .PVData = .PVData + (SourceIndex + Length) * .cbElements
                 .cElements = DestinationIndex - SourceIndex
             End With
             SafeArrayDestroyData VarPtr(ClearSA.SA)
             
             With srcSA.SA
-                CopyMemory ByVal .pvData + (DestinationIndex - .lLbound) * .cbElements, ByVal .pvData + (SourceIndex - .lLbound) * .cbElements, Length * .cbElements
+                CopyMemory ByVal .PVData + (DestinationIndex - .lLbound) * .cbElements, ByVal .PVData + (SourceIndex - .lLbound) * .cbElements, Length * .cbElements
     
                 ' If we have moved reference type values, then we need to
                 ' fill in the uncovered portion of the original values
@@ -1383,7 +1398,7 @@ Private Sub CopyReferenceTypes(ByVal srcpSA As Long, ByVal SourceIndex As Long, 
                 ' moved the references without making copies to objects or strings.
                 ' Once the uncovered portion is set up, we can copy backwards using
                 ' the standard reference copy method without stepping on ourselves.
-                ZeroMemory ByVal .pvData + (SourceIndex - .lLbound) * .cbElements, (DestinationIndex - SourceIndex) * .cbElements
+                ZeroMemory ByVal .PVData + (SourceIndex - .lLbound) * .cbElements, (DestinationIndex - SourceIndex) * .cbElements
             End With
             
             Length = DestinationIndex - SourceIndex
@@ -1561,7 +1576,7 @@ End Function
 
 Private Sub SetCopyArrayDescriptor(ByRef desc As SafeArray1d, ByVal Index As Long, ByVal Length As Long)
     With desc
-        .pvData = .pvData + (Index - .lLbound) * .cbElements
+        .PVData = .PVData + (Index - .lLbound) * .cbElements
         .cElements = Length
     End With
 End Sub

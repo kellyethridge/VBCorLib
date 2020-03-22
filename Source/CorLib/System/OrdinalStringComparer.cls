@@ -6,7 +6,7 @@ BEGIN
   DataSourceBehavior  = 0  'vbNone
   MTSTransactionMode  = 0  'NotAnMTSObject
 END
-Attribute VB_Name = "NonculturalStringComparer"
+Attribute VB_Name = "OrdinalStringComparer"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
@@ -32,7 +32,7 @@ Attribute VB_Exposed = False
 'DEALINGS IN THE SOFTWARE.
 '
 '
-' Module: NonculturalStringComparer
+' Module: OrdinalStringComparer
 '
 Option Explicit
 Implements IObject
@@ -40,14 +40,16 @@ Implements StringComparer
 Implements IComparer
 Implements IEqualityComparer
 
-Private mComparisonType As StringComparison
+Private mIgnoreCase As BOOL
+Private mDefault    As Comparer
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByVal ComparisonType As StringComparison)
-    mComparisonType = ComparisonType
+Friend Sub Init(ByVal IgnoreCase As Boolean)
+    mIgnoreCase = IIfLong(IgnoreCase, BOOL.BOOL_TRUE, BOOL.BOOL_FALSE)
+    Set mDefault = Comparer.Default
 End Sub
 
 
@@ -57,18 +59,18 @@ End Sub
 Private Function StringComparer_Compare(x As Variant, y As Variant) As Long
     If VarType(x) = vbString Then
         If VarType(y) = vbString Then
-            StringComparer_Compare = StringMethods.CompareV(x, y, mComparisonType)
+            StringComparer_Compare = CompareStringOrdinal(StrPtr(x), Len(x), StrPtr(y), Len(y), mIgnoreCase) - CSTR_EQUAL
             Exit Function
         End If
     End If
     
-    StringComparer_Compare = Comparer.Default.Compare(x, y)
+    StringComparer_Compare = mDefault.Compare(x, y)
 End Function
 
 Private Function StringComparer_Equals(x As Variant, y As Variant) As Boolean
     If VarType(x) = vbString Then
         If VarType(y) = vbString Then
-            StringComparer_Equals = StringMethods.EqualsV(x, y, mComparisonType)
+            StringComparer_Equals = CompareStringOrdinal(StrPtr(x), Len(x), StrPtr(y), Len(y), mIgnoreCase) = CSTR_EQUAL
             Exit Function
         End If
     End If
@@ -78,8 +80,7 @@ End Function
 
 Private Function StringComparer_GetHashCode(Obj As Variant) As Long
     If VarType(Obj) = vbString Then
-        If mComparisonType = StringComparison.OrdinalIgnoreCase Or _
-           mComparisonType = StringComparison.TextCompare Then
+        If mIgnoreCase = BOOL_TRUE Then
             StringComparer_GetHashCode = Object.GetHashCode(UCase$(Obj))
             Exit Function
         End If

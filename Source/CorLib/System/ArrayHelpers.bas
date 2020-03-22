@@ -33,11 +33,19 @@ Public Type SortItems
     Buffer  As Long
 End Type
 
+Private Type StringSortContext
+    Keys()          As String
+    KeyPtrs()       As Long
+    LCID            As Long
+    ComparisonType  As Long
+    Comparer        As IComparer
+End Type
+
 Private mSortItems      As SortItems
 Private mHasSortItems   As Boolean
 Private mSortKeys       As SortItems
-Public SortComparer     As IComparer
 
+Public SortComparer     As IComparer
 
 Public Function ReverseByteCopy(ByRef Bytes() As Byte) As Byte()
     Dim ub As Long
@@ -132,14 +140,14 @@ End Function
 
 Private Function SZBinarySearch(ByVal ArrayPtr As Long, ByVal pValue As Long, ByVal Index As Long, ByVal Count As Long, ByVal ComparerAddress As Long) As Long
     Dim ElemSize    As Long
-    Dim pvData      As Long
+    Dim PVData      As Long
     Dim pLowElem    As Long
     Dim pHighElem   As Long
     Dim ComparerDel As Delegate
     Dim Comparer    As Func_T_T_Long
     
     ElemSize = SafeArrayGetElemsize(ArrayPtr)
-    pvData = MemLong(ArrayPtr + PVDATA_OFFSET)
+    PVData = MemLong(ArrayPtr + PVDATA_OFFSET)
     pLowElem = Index - SafeArrayGetLBound(ArrayPtr, 1)
     pHighElem = pLowElem + Count - 1
     Set Comparer = InitDelegate(ComparerDel, ComparerAddress)
@@ -147,7 +155,7 @@ Private Function SZBinarySearch(ByVal ArrayPtr As Long, ByVal pValue As Long, By
     Dim pMiddleElem As Long
     Do While pLowElem <= pHighElem
         pMiddleElem = (pLowElem + pHighElem) \ 2
-        Select Case Comparer.Invoke(ByVal pvData + pMiddleElem * ElemSize, ByVal pValue)
+        Select Case Comparer.Invoke(ByVal PVData + pMiddleElem * ElemSize, ByVal pValue)
             Case 0
                 SZBinarySearch = pMiddleElem + SafeArrayGetLBound(ArrayPtr, 1)
                 Exit Function
@@ -162,18 +170,18 @@ Private Function SZBinarySearch(ByVal ArrayPtr As Long, ByVal pValue As Long, By
 End Function
 
 Private Function SZIndexOf(ByVal ArrayPtr As Long, ByVal pValue As Long, ByVal Index As Long, ByVal Count As Long, ByVal ComparerAddress As Long) As Long
-    Dim pvData      As Long
+    Dim PVData      As Long
     Dim ElemSize    As Long
     Dim Comparer    As Func_T_T_Boolean
     
     Set Comparer = NewDelegate(ComparerAddress)
     ElemSize = SafeArrayGetElemsize(ArrayPtr)
-    pvData = MemLong(ArrayPtr + PVDATA_OFFSET)
+    PVData = MemLong(ArrayPtr + PVDATA_OFFSET)
     Index = Index - SafeArrayGetLBound(ArrayPtr, 1)
     
     Dim i As Long
     For i = Index To Index + Count - 1
-        If Comparer.Invoke(ByVal pvData + i * ElemSize, ByVal pValue) Then
+        If Comparer.Invoke(ByVal PVData + i * ElemSize, ByVal pValue) Then
             SZIndexOf = i + SafeArrayGetLBound(ArrayPtr, 1)
             Exit Function
         End If
@@ -183,18 +191,18 @@ Private Function SZIndexOf(ByVal ArrayPtr As Long, ByVal pValue As Long, ByVal I
 End Function
 
 Private Function SZLastIndexOf(ByVal ArrayPtr As Long, ByVal pValue As Long, ByVal Index As Long, ByVal Count As Long, ByVal ComparerAddress As Long) As Long
-    Dim pvData      As Long
+    Dim PVData      As Long
     Dim ElemSize    As Long
     Dim Comparer    As Func_T_T_Boolean
     
     Set Comparer = NewDelegate(ComparerAddress)
     ElemSize = SafeArrayGetElemsize(ArrayPtr)
-    pvData = MemLong(ArrayPtr + PVDATA_OFFSET)
+    PVData = MemLong(ArrayPtr + PVDATA_OFFSET)
     Index = Index - SafeArrayGetLBound(ArrayPtr, 1)
     
     Dim i As Long
     For i = Index To Index - Count + 1 Step -1
-        If Comparer.Invoke(ByVal pvData + i * ElemSize, ByVal pValue) Then
+        If Comparer.Invoke(ByVal PVData + i * ElemSize, ByVal pValue) Then
             SZLastIndexOf = i + SafeArrayGetLBound(ArrayPtr, 1)
             Exit Function
         End If
@@ -328,12 +336,18 @@ End Function
 '   Optimized sort routines. There could have been one
 '   all-purpose sort routine, but it would be too slow.
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Public Function TrySZSort(ByVal pSA As Long, ByVal Left As Long, ByVal Right As Long) As Boolean
+Public Function TrySZSort(ByRef Keys As Variant, ByVal Left As Long, ByVal Right As Long) As Boolean
+    Dim Sorter As Action_T_T_T
     Dim pfn As Long
     
-    Select Case SafeArrayGetVartype(pSA) And &HFF
+    On Error GoTo Catch
+    
+    Select Case VarType(Keys) And &HFF
         Case vbLong:                    pfn = FuncAddr(AddressOf QuickSortLong)
-        Case vbString:                  pfn = FuncAddr(AddressOf QuickSortString)
+        Case vbString
+            SortStringsWithComparer Keys, Left, Right, Nothing
+            TrySZSort = True
+            Exit Function
         Case vbDouble, vbDate:          pfn = FuncAddr(AddressOf QuickSortDouble)
         Case vbObject, vbDataObject:    pfn = FuncAddr(AddressOf QuickSortObject)
         Case vbVariant:                 pfn = FuncAddr(AddressOf QuickSortVariant)
@@ -343,7 +357,7 @@ Public Function TrySZSort(ByVal pSA As Long, ByVal Left As Long, ByVal Right As 
         Case vbCurrency:                pfn = FuncAddr(AddressOf QuickSortCurrency)
         Case vbBoolean:                 pfn = FuncAddr(AddressOf QuickSortBoolean)
         Case vbUserDefinedType
-            If IsInt64Array(pSA) Then
+            If IsInt64Array(Keys) Then
                 ' we can sort Int64 as Currency because they are both a signed 64-bit number.
                 pfn = FuncAddr(AddressOf QuickSortCurrency)
             Else
@@ -353,12 +367,71 @@ Public Function TrySZSort(ByVal pSA As Long, ByVal Left As Long, ByVal Right As 
             Exit Function
     End Select
     
-    Dim Sorter As Action_T_T_T
     Set Sorter = NewDelegate(pfn)
-    Sorter.Invoke pSA, ByVal Left, ByVal Right
+    Sorter.Invoke SAPtrV(Keys), ByVal Left, ByVal Right
 
     TrySZSort = True
+    Exit Function
+    
+Catch:
+    If Err.Number = 13 Then _
+        Error.InvalidOperation InvalidOperation_Comparer_Arg
+    
+    Throw Err
 End Function
+
+Public Sub SortStringsWithComparer(ByRef Keys As Variant, ByVal Left As Long, ByVal Right As Long, ByVal Comparer As IComparer)
+    If Comparer Is Nothing Then
+        SortStrings Keys, Left, Right, AddressOf QuickSortCompareString, Statics.Comparer.Default.LCID, CompareOptions.None
+    ElseIf Comparer Is Statics.Comparer.Default Then
+        SortStrings Keys, Left, Right, AddressOf QuickSortCompareString, Statics.Comparer.Default.LCID, CompareOptions.None
+    ElseIf Comparer Is Statics.Comparer.DefaultInvariant Then
+        SortStrings Keys, Left, Right, AddressOf QuickSortCompareString, Statics.Comparer.DefaultInvariant.LCID, CompareOptions.None
+    ElseIf Comparer Is StringComparer.BinaryCompare Then
+        SortStrings Keys, Left, Right, AddressOf QuickSortStrComp, 0, vbBinaryCompare
+    ElseIf Comparer Is StringComparer.TextCompare Then
+        SortStrings Keys, Left, Right, AddressOf QuickSortStrComp, 0, vbTextCompare
+    ElseIf Comparer Is StringComparer.Ordinal Then
+        SortStrings Keys, Left, Right, AddressOf QuickSortCompareStringOrdinal, 0, BOOL.BOOL_FALSE
+    ElseIf Comparer Is StringComparer.OrdinalIgnoreCase Then
+        SortStrings Keys, Left, Right, AddressOf QuickSortCompareStringOrdinal, 0, BOOL.BOOL_TRUE
+    ElseIf Comparer Is StringComparer.InvariantCulture Then
+        SortStrings Keys, Left, Right, AddressOf QuickSortCompareString, CultureInfo.InvariantCulture.LCID, CompareOptions.None
+    ElseIf Comparer Is StringComparer.InvariantCultureIgnoreCase Then
+        SortStrings Keys, Left, Right, AddressOf QuickSortCompareString, CultureInfo.InvariantCulture.LCID, CompareOptions.IgnoreCase
+    Else
+        SortStrings Keys, Left, Right, AddressOf QuickSortStringComparer, 0, 0, Comparer
+    End If
+End Sub
+
+Private Sub SortStrings(ByRef Keys As Variant, ByVal Left As Long, ByVal Right As Long, ByVal pfn As Long, ByVal LCID As Long, ByVal ComparisonType As Long, Optional ByVal Comparer As IComparer)
+    Dim Sorter  As Action_T_T_T
+    Dim Context As StringSortContext
+    Dim pSA     As Long
+    
+    Set Sorter = NewDelegate(pfn)
+    
+    Context.LCID = LCID
+    Context.ComparisonType = ComparisonType
+    Set Context.Comparer = Comparer
+    
+    pSA = SAPtrV(Keys)
+    SAPtr(Context.Keys) = pSA
+    SAPtr(Context.KeyPtrs) = pSA
+    
+    On Error GoTo Catch
+    Sorter.Invoke Context, ByVal Left, ByVal Right
+    GoSub Finally
+    Exit Sub
+    
+Catch:
+    GoSub Finally
+    ThrowOrErr Err
+Finally:
+    SAPtr(Context.KeyPtrs) = vbNullPtr
+    SAPtr(Context.Keys) = vbNullPtr
+    Return
+End Sub
 
 Public Sub SetSortKeys(ByVal pSA As Long)
     CopyMemory mSortKeys.SA, ByVal pSA, vbSizeOfSafeArray1d
@@ -396,16 +469,16 @@ End Sub
 Public Sub SwapSortItems(ByRef Items As SortItems, ByVal i As Long, ByVal j As Long)
     With Items.SA
         Select Case .cbElements
-            Case 1:     Helper.Swap1 ByVal .pvData + i, ByVal .pvData + j
-            Case 2:     Helper.Swap2 ByVal .pvData + i * 2, ByVal .pvData + j * 2
-            Case 4:     Helper.Swap4 ByVal .pvData + i * 4, ByVal .pvData + j * 4
-            Case 8:     Helper.Swap8 ByVal .pvData + i * 8, ByVal .pvData + j * 8
-            Case 16:    Helper.Swap16 ByVal .pvData + i * 16, ByVal .pvData + j * 16
+            Case 1:     Helper.Swap1 ByVal .PVData + i, ByVal .PVData + j
+            Case 2:     Helper.Swap2 ByVal .PVData + i * 2, ByVal .PVData + j * 2
+            Case 4:     Helper.Swap4 ByVal .PVData + i * 4, ByVal .PVData + j * 4
+            Case 8:     Helper.Swap8 ByVal .PVData + i * 8, ByVal .PVData + j * 8
+            Case 16:    Helper.Swap16 ByVal .PVData + i * 16, ByVal .PVData + j * 16
             Case Else
                 ' primarily for UDTs
-                CopyMemory ByVal Items.Buffer, ByVal .pvData + i * .cbElements, .cbElements
-                CopyMemory ByVal .pvData + i * .cbElements, ByVal .pvData + j * .cbElements, .cbElements
-                CopyMemory ByVal .pvData + j * .cbElements, ByVal Items.Buffer, .cbElements
+                CopyMemory ByVal Items.Buffer, ByVal .PVData + i * .cbElements, .cbElements
+                CopyMemory ByVal .PVData + i * .cbElements, ByVal .PVData + j * .cbElements, .cbElements
+                CopyMemory ByVal .PVData + j * .cbElements, ByVal Items.Buffer, .cbElements
         End Select
     End With
 End Sub
@@ -431,25 +504,289 @@ Private Sub QuickSortLong(ByRef Keys() As Long, ByVal Left As Long, ByVal Right 
     Loop
 End Sub
 
-Private Sub QuickSortString(ByRef Keys() As String, ByVal Left As Long, ByVal Right As Long)
-    Dim i As Long, j As Long, x As String
+Private Sub QuickSortCompareStringOrdinal(ByRef Context As StringSortContext, ByVal Left As Long, ByVal Right As Long)
+    Dim i As Long, j As Long, t As Long, m As Long
+    Dim PtrX As Long
+    Dim LenX As Long
+        
+    If Right - Left < 15 Then
+        InsertionSortCompareStringOrdinal Context, Left, Right
+        Exit Sub
+    End If
+    
     Do While Left < Right
-        i = Left: j = Right: x = StringRef(Keys((i + j) \ 2))
+        i = Left: j = Right: m = (i + j) \ 2
+        PtrX = Context.KeyPtrs(m)
+        LenX = Len(Context.Keys(m))
+        
         Do
-            Do While Keys(i) < x: i = i + 1: Loop
-            Do While Keys(j) > x: j = j - 1: Loop
+            Do While CompareStringOrdinal(Context.KeyPtrs(i), Len(Context.Keys(i)), PtrX, LenX, Context.ComparisonType) = CSTR_LESS_THAN
+                i = i + 1
+            Loop
+            
+            Do While CompareStringOrdinal(Context.KeyPtrs(j), Len(Context.Keys(j)), PtrX, LenX, Context.ComparisonType) = CSTR_GREATER_THAN
+                j = j - 1
+            Loop
+            
             If i > j Then Exit Do
-            If i < j Then Helper.Swap4 Keys(i), Keys(j): If mHasSortItems Then SwapSortItems mSortItems, i, j
+            
+            If i < j Then
+                t = Context.KeyPtrs(i)
+                Context.KeyPtrs(i) = Context.KeyPtrs(j)
+                Context.KeyPtrs(j) = t
+                
+                If mHasSortItems Then SwapSortItems mSortItems, i, j
+            End If
+            
             i = i + 1: j = j - 1
         Loop While i <= j
+        
         If j - Left <= Right - i Then
-            If Left < j Then QuickSortString Keys, Left, j
+            If Left < j Then QuickSortCompareStringOrdinal Context, Left, j
             Left = i
         Else
-            If i < Right Then QuickSortString Keys, i, Right
+            If i < Right Then QuickSortCompareStringOrdinal Context, i, Right
             Right = j
         End If
-        StringPtr(x) = 0
+    Loop
+End Sub
+
+Private Sub InsertionSortCompareStringOrdinal(ByRef Context As StringSortContext, ByVal Left As Long, ByVal Right As Long)
+    Dim i As Long
+    Dim j As Long
+    Dim PtrX As Long
+    Dim LenX As Long
+    
+    i = Left
+    
+    Do While i <= Right
+        PtrX = Context.KeyPtrs(i)
+        LenX = Len(Context.Keys(i))
+        j = i - 1
+        
+        Do While j >= Left
+            If CompareStringOrdinal(Context.KeyPtrs(j), Len(Context.Keys(j)), PtrX, LenX, Context.ComparisonType) <> CSTR_GREATER_THAN Then
+                Exit Do
+            End If
+            
+            Context.KeyPtrs(j + 1) = Context.KeyPtrs(j)
+            j = j - 1
+        Loop
+        
+        Context.KeyPtrs(j + 1) = PtrX
+        i = i + 1
+    Loop
+End Sub
+
+Private Sub QuickSortCompareString(ByRef Context As StringSortContext, ByVal Left As Long, ByVal Right As Long)
+    Dim i As Long, j As Long, t As Long, m As Long
+    Dim PtrX As Long
+    Dim LenX As Long
+        
+    If Right - Left < 15 Then
+        InsertionSortCompareString Context, Left, Right
+        Exit Sub
+    End If
+    
+    Do While Left < Right
+        i = Left: j = Right: m = (i + j) \ 2
+        PtrX = Context.KeyPtrs(m)
+        LenX = Len(Context.Keys(m))
+        
+        Do
+            Do While CompareString(Context.LCID, Context.ComparisonType, Context.KeyPtrs(i), Len(Context.Keys(i)), PtrX, LenX) = CSTR_LESS_THAN
+                i = i + 1
+            Loop
+            
+            Do While CompareString(Context.LCID, Context.ComparisonType, Context.KeyPtrs(j), Len(Context.Keys(j)), PtrX, LenX) = CSTR_GREATER_THAN
+                j = j - 1
+            Loop
+            
+            If i > j Then Exit Do
+            
+            If i < j Then
+                t = Context.KeyPtrs(i)
+                Context.KeyPtrs(i) = Context.KeyPtrs(j)
+                Context.KeyPtrs(j) = t
+                
+                If mHasSortItems Then SwapSortItems mSortItems, i, j
+            End If
+            
+            i = i + 1: j = j - 1
+        Loop While i <= j
+        
+        If j - Left <= Right - i Then
+            If Left < j Then QuickSortCompareString Context, Left, j
+            Left = i
+        Else
+            If i < Right Then QuickSortCompareString Context, i, Right
+            Right = j
+        End If
+    Loop
+End Sub
+
+Private Sub InsertionSortCompareString(ByRef Context As StringSortContext, ByVal Left As Long, ByVal Right As Long)
+    Dim i As Long
+    Dim j As Long
+    Dim PtrX As Long
+    Dim LenX As Long
+    
+    i = Left
+    
+    Do While i <= Right
+        PtrX = Context.KeyPtrs(i)
+        LenX = Len(Context.Keys(i))
+        j = i - 1
+        
+        Do While j >= Left
+            If CompareString(Context.LCID, Context.ComparisonType, Context.KeyPtrs(j), Len(Context.Keys(j)), PtrX, LenX) <> CSTR_GREATER_THAN Then
+                Exit Do
+            End If
+            
+            Context.KeyPtrs(j + 1) = Context.KeyPtrs(j)
+            j = j - 1
+        Loop
+        
+        Context.KeyPtrs(j + 1) = PtrX
+        i = i + 1
+    Loop
+End Sub
+
+Private Sub QuickSortStrComp(ByRef Context As StringSortContext, ByVal Left As Long, ByVal Right As Long)
+    Dim i As Long, j As Long, t As Long, x As String
+    
+    If Right - Left < 15 Then
+        InsertionSortStrComp Context, Left, Right
+        Exit Sub
+    End If
+    
+    Do While Left < Right
+        i = Left: j = Right
+        StringPtr(x) = Context.KeyPtrs((i + j) \ 2)
+        
+        Do
+            Do While StrComp(Context.Keys(i), x, Context.ComparisonType) < 0: i = i + 1: Loop
+            Do While StrComp(Context.Keys(j), x, Context.ComparisonType) > 0: j = j - 1: Loop
+            
+            If i > j Then Exit Do
+            
+            If i < j Then
+                t = Context.KeyPtrs(i)
+                Context.KeyPtrs(i) = Context.KeyPtrs(j)
+                Context.KeyPtrs(j) = t
+                
+                If mHasSortItems Then SwapSortItems mSortItems, i, j
+            End If
+            
+            i = i + 1: j = j - 1
+        Loop While i <= j
+        
+        If j - Left <= Right - i Then
+            If Left < j Then QuickSortStrComp Context, Left, j
+            Left = i
+        Else
+            If i < Right Then QuickSortStrComp Context, i, Right
+            Right = j
+        End If
+        
+        StringPtr(x) = vbNullPtr
+    Loop
+End Sub
+
+Private Sub InsertionSortStrComp(ByRef Context As StringSortContext, ByVal Left As Long, ByVal Right As Long)
+    Dim i As Long
+    Dim j As Long
+    Dim x As String
+    Dim PtrX As Long
+    
+    i = Left
+    
+    Do While i <= Right
+        PtrX = Context.KeyPtrs(i)
+        StringPtr(x) = PtrX
+        j = i - 1
+        
+        Do While j >= Left
+            If StrComp(Context.Keys(j), x, Context.ComparisonType) <= 0 Then
+                Exit Do
+            End If
+            
+            Context.KeyPtrs(j + 1) = Context.KeyPtrs(j)
+            j = j - 1
+        Loop
+        
+        Context.KeyPtrs(j + 1) = PtrX
+        StringPtr(x) = vbNullPtr
+        i = i + 1
+    Loop
+End Sub
+
+Private Sub QuickSortStringComparer(ByRef Context As StringSortContext, ByVal Left As Long, ByVal Right As Long)
+    Dim i As Long, j As Long, t As Long, x As String
+    
+    If Right - Left < 15 Then
+        InsertionSortStrComp Context, Left, Right
+        Exit Sub
+    End If
+    
+    Do While Left < Right
+        i = Left: j = Right
+        StringPtr(x) = Context.KeyPtrs((i + j) \ 2)
+        
+        Do
+            Do While Context.Comparer.Compare(Context.Keys(i), x) < 0: i = i + 1: Loop
+            Do While Context.Comparer.Compare(Context.Keys(j), x) > 0: j = j - 1: Loop
+            
+            If i > j Then Exit Do
+            
+            If i < j Then
+                t = Context.KeyPtrs(i)
+                Context.KeyPtrs(i) = Context.KeyPtrs(j)
+                Context.KeyPtrs(j) = t
+                
+                If mHasSortItems Then SwapSortItems mSortItems, i, j
+            End If
+            
+            i = i + 1: j = j - 1
+        Loop While i <= j
+        
+        If j - Left <= Right - i Then
+            If Left < j Then QuickSortStrComp Context, Left, j
+            Left = i
+        Else
+            If i < Right Then QuickSortStrComp Context, i, Right
+            Right = j
+        End If
+        
+        StringPtr(x) = vbNullPtr
+    Loop
+End Sub
+
+Private Sub InsertionSortStringComparer(ByRef Context As StringSortContext, ByVal Left As Long, ByVal Right As Long)
+    Dim i As Long
+    Dim j As Long
+    Dim x As String
+    Dim PtrX As Long
+    
+    i = Left
+    
+    Do While i <= Right
+        PtrX = Context.KeyPtrs(i)
+        StringPtr(x) = PtrX
+        j = i - 1
+        
+        Do While j >= Left
+            If Context.Comparer.Compare(Context.Keys(j), x) <= 0 Then
+                Exit Do
+            End If
+            
+            Context.KeyPtrs(j + 1) = Context.KeyPtrs(j)
+            j = j - 1
+        Loop
+        
+        Context.KeyPtrs(j + 1) = PtrX
+        StringPtr(x) = vbNullPtr
+        i = i + 1
     Loop
 End Sub
 
@@ -458,8 +795,36 @@ Private Sub QuickSortObject(ByRef Keys() As Object, ByVal Left As Long, ByVal Ri
     Do While Left < Right
         i = Left: j = Right: Set x = Keys((i + j) \ 2)
         Do
-            Set Key = Keys(i): Do While Key.CompareTo(x) < 0: i = i + 1: Set Key = Keys(i): Loop
-            Set Key = Keys(j): Do While Key.CompareTo(x) > 0: j = j - 1: Set Key = Keys(j): Loop
+'            Set Key = Keys(i)
+'            Do
+'                If Not Key Is Nothing Then
+'                    If Key.CompareTo(x) >= 0 Then
+'                        Exit Do
+'                    End If
+'                ElseIf x Is Nothing Then
+'                    Exit Do
+'                End If
+'
+'                i = i + 1
+'                Set Key = Keys(i)
+'            Loop
+'
+'            Set Key = Keys(j)
+'            Do
+'                If Not Key Is Nothing Then
+'                    If Key.CompareTo(x) <= 0 Then
+'                        Exit Do
+'                    End If
+'                ElseIf x Is Nothing Then
+'                    Exit Do
+'                End If
+'
+'                j = j - 1
+'                Set Key = Keys(j)
+'            Loop
+            Do While Comparer.Default.Compare(Keys(i), x) < 0: i = i + 1: Loop
+            Do While Comparer.Default.Compare(Keys(j), x) > 0: j = j - 1: Loop
+            
             If i > j Then Exit Do
             If i < j Then Helper.Swap4 Keys(i), Keys(j): If mHasSortItems Then SwapSortItems mSortItems, i, j
             i = i + 1: j = j - 1
@@ -621,22 +986,22 @@ Private Sub QuickSortVariant(ByRef Keys() As Variant, ByVal Left As Long, ByVal 
     Loop
 End Sub
 
-Public Sub QuickSortGeneral(ByRef Keys As Variant, ByVal Left As Long, ByVal Right As Long)
+Public Sub QuickSortGeneral(ByRef Keys As Variant, ByVal Left As Long, ByVal Right As Long, ByRef Comparer As IComparer)
     Dim i As Long, j As Long, x As Variant
     Do While Left < Right
         i = Left: j = Right: VariantCopyInd x, Keys((i + j) \ 2)
         Do
-            Do While SortComparer.Compare(Keys(i), x) < 0: i = i + 1: Loop
-            Do While SortComparer.Compare(Keys(j), x) > 0: j = j - 1: Loop
+            Do While Comparer.Compare(Keys(i), x) < 0: i = i + 1: Loop
+            Do While Comparer.Compare(Keys(j), x) > 0: j = j - 1: Loop
             If i > j Then Exit Do
             If i < j Then SwapSortItems mSortKeys, i, j: If mHasSortItems Then SwapSortItems mSortItems, i, j
             i = i + 1: j = j - 1
         Loop While i <= j
         If j - Left <= Right - i Then
-            If Left < j Then QuickSortGeneral Keys, Left, j
+            If Left < j Then QuickSortGeneral Keys, Left, j, Comparer
             Left = i
         Else
-            If i < Right Then QuickSortGeneral Keys, i, Right
+            If i < Right Then QuickSortGeneral Keys, i, Right, Comparer
             Right = j
         End If
     Loop

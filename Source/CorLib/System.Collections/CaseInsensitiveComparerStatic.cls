@@ -34,16 +34,32 @@ Attribute VB_Exposed = True
 '
 ' Module: CaseInsensitiveComparerStatic
 '
-Option Explicit
-
-Private mDefault As New CaseInsensitiveComparer
 
 ''
-' Gets an instance of CaseInsensitiveComparer that is always available.
+' Provides access to default culture-sensitive <a href="CaseInsensitiveComparer.html">CaseInsensitiveComparer</a> objects.
 '
-' @returns Returns the single static instance of CaseInsensitiveComparer.
+' @remarks This class cannot be instantiated. To access the defined properties use the class name.
+' <code>Set c = CaseInsensitiveComparer.Default</code>
+Option Explicit
+
+Private mDefaultInvariant As CaseInsensitiveComparer
+
+''
+' Gets an instance of <a href="CaseInsensitiveComparer.html">CaseInsensitiveComparer</a> that is associated with the <a href="Thread.Get.CurrentCulture.html">Thread.CurrentCulture</a> of the current thread and that is always available.
 '
+' @returns An instance of <a href="CaseInsensitiveComparer.html">CaseInsensitiveComparer</a> that is associated with <a href="CultureInfo.Get.InvariantCulture.html">CultureInfo.InvariantCulture</a>.
 Public Property Get Default() As CaseInsensitiveComparer
-    Set Default = mDefault
+    Set Default = Cor.NewCaseInsensitiveComparer(CultureInfo.CurrentCulture)
 End Property
 
+''
+' Gets an instance of <a href="CaseInsensitiveComparer.html">CaseInsensitiveComparer</a> that is associated with <a href="CultureInfo.Get.InvariantCulture.html">CultureInfo.InvariantCulture</a> and that is always available.
+'
+' @return An instance of <a href="CaseInsensitiveComparer.html">CaseInsensitiveComparer</a> that is associated with <a href="CultureInfo.Get.InvariantCulture.html">CultureInfo.InvariantCulture</a>.
+Public Property Get DefaultInvariant() As CaseInsensitiveComparer
+    If mDefaultInvariant Is Nothing Then
+        Set mDefaultInvariant = Cor.NewCaseInsensitiveComparer(CultureInfo.InvariantCulture)
+    End If
+    
+    Set DefaultInvariant = mDefaultInvariant
+End Property

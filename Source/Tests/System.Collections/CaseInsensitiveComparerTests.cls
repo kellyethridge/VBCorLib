@@ -61,7 +61,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
 End Sub
 
 Public Sub Setup()
-    Set mComparer = CaseInsensitiveComparer.Default
+    Set mComparer = CaseInsensitiveComparer.DefaultInvariant
 End Sub
 
 Public Sub LessThan_WithValues_ReturnsExpected(ByRef x As Variant, ByRef y As Variant, ByVal Expected As Boolean)

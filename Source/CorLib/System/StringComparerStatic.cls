@@ -42,10 +42,10 @@ Attribute VB_Exposed = True
 '
 Option Explicit
 
-Private mOrdinal            As NonculturalStringComparer
-Private mOrdinalIgnoreCase  As NonculturalStringComparer
-Private mBinaryCompare      As NonculturalStringComparer
-Private mTextCompare        As NonculturalStringComparer
+Private mOrdinal            As OrdinalStringComparer
+Private mOrdinalIgnoreCase  As OrdinalStringComparer
+Private mBinaryCompare      As LegacyStringComparer
+Private mTextCompare        As LegacyStringComparer
 Private mInvariantCulture   As CultureAwareStringComparer
 Private mInvariantCultureIgnoreCase As CultureAwareStringComparer
 
@@ -63,7 +63,7 @@ Private mInvariantCultureIgnoreCase As CultureAwareStringComparer
 ' <p>The instance of the <a href="StringComparer.html">StringComparer</a> object returned is a private class and simply implements the <a href="StringComparer.html">StringComparer</a> interface.</p>
 Public Property Get BinaryCompare() As StringComparer
     If mBinaryCompare Is Nothing Then
-        Set mBinaryCompare = Cor.NewNonculturalStringComparer(StringComparison.BinaryCompare)
+        Set mBinaryCompare = Cor.NewLegacyStringComparer(False)
     End If
     
     Set BinaryCompare = mBinaryCompare
@@ -82,7 +82,7 @@ End Property
 ' <p>The instance of the <a href="StringComparer.html">StringComparer</a> object returned is a private class and simply implements the <a href="StringComparer.html">StringComparer</a> interface.</p>
 Public Property Get TextCompare() As StringComparer
     If mTextCompare Is Nothing Then
-        Set mTextCompare = Cor.NewNonculturalStringComparer(StringComparison.TextCompare)
+        Set mTextCompare = Cor.NewLegacyStringComparer(True)
     End If
     
     Set TextCompare = mTextCompare
@@ -101,7 +101,7 @@ End Property
 ' <p>The instance of the <a href="StringComparer.html">StringComparer</a> object returned is a private class and simply implements the <a href="StringComparer.html">StringComparer</a> interface.</p>
 Public Property Get Ordinal() As StringComparer
     If mOrdinal Is Nothing Then
-        Set mOrdinal = Cor.NewNonculturalStringComparer(StringComparison.Ordinal)
+        Set mOrdinal = Cor.NewOrdinalStringComparer(False)
     End If
     
     Set Ordinal = mOrdinal
@@ -120,7 +120,7 @@ End Property
 ' <p>The instance of the <a href="StringComparer.html">StringComparer</a> object returned is a private class and simply implements the <a href="StringComparer.html">StringComparer</a> interface.</p>
 Public Property Get OrdinalIgnoreCase() As StringComparer
     If mOrdinalIgnoreCase Is Nothing Then
-        Set mOrdinalIgnoreCase = Cor.NewNonculturalStringComparer(StringComparison.OrdinalIgnoreCase)
+        Set mOrdinalIgnoreCase = Cor.NewOrdinalStringComparer(True)
     End If
     
     Set OrdinalIgnoreCase = mOrdinalIgnoreCase
@@ -190,4 +190,27 @@ End Property
 Public Property Get CurrentCultureIgnoreCase() As StringComparer
     Set CurrentCultureIgnoreCase = Cor.NewCultureAwareStringComparer(CultureInfo.CurrentCulture, True)
 End Property
+
+''
+' Creates a <a href="StringComparer.html">StringComparer</a> object that compares strings according to the rules of a specified culture.
+'
+' @param Culture A culture whose linguistic rules are used to perform a string comparison.
+' @param IgnoreCase <b>True</b> to specify that comparison operations be case-insensitive; <b>False</b> to specify that comparison operations be case-sensitive.
+' @return A new <a href="StringComparer.html">StringComparer</a> object that performs string comparisons according to the comparison rules used by the culture parameter and the case rule specified by the <i>IgnoreCase</i> parameter.
+' <h4>Exceptions</h4>
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ArgumentNullException.html">ArgumentNullException</a></td><td><i>Culture</i> is <b>Nothing</b>.</td>
+'   </tr>
+' </table>
+Public Function Create(ByVal Culture As CultureInfo, ByVal IgnoreCase As Boolean) As StringComparer
+    If Culture Is Nothing Then _
+        Error.ArgumentNull "Culture"
+        
+    Set Create = Cor.NewCultureAwareStringComparer(Culture, IgnoreCase)
+End Function
 

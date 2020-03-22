@@ -49,6 +49,12 @@ Private Function IComparable_CompareTo(Value As Variant) As Long
     Dim OtherValue As Long
     If IsObject(Value) Then
         Dim OtherInt32 As Int32
+        
+        If Value Is Nothing Then
+            IComparable_CompareTo = 1
+            Exit Function
+        End If
+        
         Set OtherInt32 = Value
         OtherValue = OtherInt32.Value
     Else

@@ -2075,6 +2075,36 @@ Public Function NewString(ByRef Value() As Integer, Optional ByRef StartIndex As
     End If
 End Function
 
+''
+' Initializes a new instance of the <a href="CaseInsensitiveComparer.html">CaseInsensitiveComparer</a> class using the specified <a href="CultureInfo.html">CultureInfo</a>.
+'
+' @param Culture The <a href="CultureInfo.html">CultureInfo</a> to use for the new <a href="CaseInsensitiveComparer.html">CaseInsensitiveComparer</a>.
+' @return A new instance of the <a href="CaseInsensitiveComparer.html">CaseInsensitiveComparer</a> class.
+' <h4>Exceptions</h4>
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ArgumentNullException.html">ArgumentNullException</a></td><td><i>Culture</i> is <b>Nothing</b>.</td>
+'   </tr>
+' </table>
+Public Function NewCaseInsensitiveComparer(ByVal Culture As CultureInfo) As CaseInsensitiveComparer
+    Set NewCaseInsensitiveComparer = New CaseInsensitiveComparer
+    NewCaseInsensitiveComparer.Init Culture
+End Function
+
+''
+' Initializes a new instance of the <a href="Comparer.html">Comparer</a> class using the specified <a href="CultureInfo.html">CultureInfo</a>.
+'
+' @param Culture The <a href="CultureInfo.html">CultureInfo</a> to use for the new <a href="Comparer.html">Comparer</a>.
+' @return A new instance of the <a href="Comparer.html">Comparer</a> class using the specified <a href="CultureInfo.html">CultureInfo</a>.
+Public Function NewComparer(ByVal Culture As CultureInfo) As Comparer
+    Set NewComparer = New Comparer
+    NewComparer.Init Culture
+End Function
+
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Internal Constructors
@@ -2129,9 +2159,14 @@ Friend Function NewSafeFindHandle(ByVal PreexistingHandle As Long, ByVal OwnsHan
     NewSafeFindHandle.Init PreexistingHandle, OwnsHandle
 End Function
 
-Friend Function NewNonculturalStringComparer(ByVal ComparisonType As StringComparison) As NonculturalStringComparer
-    Set NewNonculturalStringComparer = New NonculturalStringComparer
-    NewNonculturalStringComparer.Init ComparisonType
+Friend Function NewOrdinalStringComparer(ByVal IgnoreCase As Boolean) As OrdinalStringComparer
+    Set NewOrdinalStringComparer = New OrdinalStringComparer
+    NewOrdinalStringComparer.Init IgnoreCase
+End Function
+
+Friend Function NewLegacyStringComparer(ByVal IgnoreCase As Boolean) As LegacyStringComparer
+    Set NewLegacyStringComparer = New LegacyStringComparer
+    NewLegacyStringComparer.Init IgnoreCase
 End Function
 
 Friend Function NewCultureAwareStringComparer(ByVal Culture As CultureInfo, ByVal IgnoreCase As Boolean) As CultureAwareStringComparer
@@ -2139,3 +2174,7 @@ Friend Function NewCultureAwareStringComparer(ByVal Culture As CultureInfo, ByVa
     NewCultureAwareStringComparer.Init Culture, IgnoreCase
 End Function
 
+Friend Function NewCallbackSorter(ByVal Callback As Long) As CallbackSorter
+    Set NewCallbackSorter = New CallbackSorter
+    NewCallbackSorter.Init Callback
+End Function
