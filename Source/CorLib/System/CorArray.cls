@@ -842,7 +842,6 @@ End Function
 ' @return Value indicating the index the value was found. If a value of less that
 ' the lower-bounds is returned, then the value was not found in the array.
 Public Function IndexOf(ByRef Arr As Variant, ByRef Value As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As Long
-    Dim Ptr     As Long
     Dim Range   As ListRange
         
     ValidateArray Arr
@@ -854,9 +853,8 @@ Public Function IndexOf(ByRef Arr As Variant, ByRef Value As Variant, Optional B
         Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_Count
     
     On Error GoTo Catch
-    Ptr = SAPtrV(Arr)
     
-    If TrySZIndexOf(Ptr, Value, Range.Index, Range.Count, IndexOf) Then
+    If TrySZIndexOf(Arr, Value, Range.Index, Range.Count, IndexOf) Then
         Exit Function
     End If
     
@@ -937,7 +935,6 @@ End Function
 ' @return Value indicating the index the value was found. If no value was found,
 ' then one less than the lower bound of the array is returned.
 Public Function LastIndexOf(ByRef Arr As Variant, ByRef Value As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As Long
-    Dim Ptr         As Long
     Dim ElemIndex   As Long
     Dim ElemCount   As Long
     
@@ -953,9 +950,8 @@ Public Function LastIndexOf(ByRef Arr As Variant, ByRef Value As Variant, Option
         Error.ArgumentOutOfRange "", ArgumentOutOfRange_LBound
     
     On Error GoTo Catch
-    Ptr = SAPtrV(Arr)
     
-    If TrySZLastIndexOf(Ptr, Value, ElemIndex, ElemCount, LastIndexOf) Then
+    If TrySZLastIndexOf(Arr, Value, ElemIndex, ElemCount, LastIndexOf) Then
         Exit Function
     End If
     
@@ -1239,21 +1235,21 @@ End Sub
 '   Internal
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Function InternalBinarySearch(ByRef Arr As Variant, ByVal Index As Long, ByVal Length As Long, ByRef Value As Variant, ByVal Comparer As IComparer) As Long
+    Dim MiddleIndex As Long
+    Dim LowIndex    As Long
+    Dim HighIndex   As Long
+        
     On Error GoTo Catch
     
     If Comparer Is Nothing Then
-        If TrySZBinarySearch(SAPtrV(Arr), Value, Index, Length, InternalBinarySearch) Then
+        If TrySZBinarySearch(Arr, Value, Index, Length, InternalBinarySearch) Then
             Exit Function
         End If
         
         Set Comparer = Statics.Comparer.Default
     End If
-    
+        
     ' perform a search using comparer.
-    Dim MiddleIndex As Long
-    Dim LowIndex    As Long
-    Dim HighIndex   As Long
-    
     LowIndex = Index
     HighIndex = LowIndex + Length - 1
     
