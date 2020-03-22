@@ -62,7 +62,7 @@ Option Explicit
 '    Private Function StringComparer_Compare(x As Variant, y As Variant) As Long
 '        If VarType(x) = vbString Then
 '            If VarType(y) = vbString Then
-'                StringComparer_Compare = StrComp(x, y, mCompareMethod)
+'                StringComparer_Compare = CorString.Compare(x, y, mComparisonType)
 '                Exit Function
 '            End If
 '        End If

@@ -71,8 +71,8 @@ Public Enum StringComparison
     InvariantCultureIgnoreCase = 3
     Ordinal = 4
     OrdinalIgnoreCase = 5
-    BinaryCompare = 6
-    TextCompare = 7
+    BinaryCompare = 100
+    TextCompare = 101
 End Enum
 
 ''
@@ -918,6 +918,19 @@ Public Function Compare(ByRef StrA As String, ByRef StrB As String, Optional ByV
             Compare = StrComp(StrA, StrB, vbTextCompare)
         Case Else
             Compare = CompareHelper(StrPtr(StrA), Len(StrA), StrPtr(StrB), Len(StrB), ComparisonType)
+    End Select
+End Function
+
+' there are places where strings will be held in variants and we don't want to
+' have to convert them to a string variable causing additional string allocations.
+Friend Function CompareV(ByRef StrA As Variant, ByRef StrB As Variant, Optional ByVal ComparisonType As StringComparison = StringComparison.Ordinal) As Long
+    Select Case ComparisonType
+        Case StringComparison.BinaryCompare
+            CompareV = StrComp(StrA, StrB, vbBinaryCompare)
+        Case StringComparison.TextCompare
+            CompareV = StrComp(StrA, StrB, vbTextCompare)
+        Case Else
+            CompareV = CompareHelper(StrPtr(StrA), Len(StrA), StrPtr(StrB), Len(StrB), ComparisonType)
     End Select
 End Function
 

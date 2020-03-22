@@ -40,37 +40,37 @@ Implements StringComparer
 Implements IComparer
 Implements IEqualityComparer
 
-Private mIgnoreCase As BOOL
-Private mDefault    As Comparer
+Private mComparisonType     As StringComparison
+Private mDefaultComparer    As Comparer
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByVal IgnoreCase As Boolean)
-    mIgnoreCase = IIfLong(IgnoreCase, BOOL.BOOL_TRUE, BOOL.BOOL_FALSE)
-    Set mDefault = Comparer.Default
+    mComparisonType = IIfLong(IgnoreCase, StringComparison.OrdinalIgnoreCase, StringComparison.Ordinal)
+    Set mDefaultComparer = Comparer.Default
 End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   StringComaprer
+'   StringComparer
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function StringComparer_Compare(x As Variant, y As Variant) As Long
     If VarType(x) = vbString Then
         If VarType(y) = vbString Then
-            StringComparer_Compare = CompareStringOrdinal(StrPtr(x), Len(x), StrPtr(y), Len(y), mIgnoreCase) - CSTR_EQUAL
+            StringComparer_Compare = CorString.CompareV(x, y, mComparisonType)
             Exit Function
         End If
     End If
     
-    StringComparer_Compare = mDefault.Compare(x, y)
+    StringComparer_Compare = mDefaultComparer.Compare(x, y)
 End Function
 
 Private Function StringComparer_Equals(x As Variant, y As Variant) As Boolean
     If VarType(x) = vbString Then
         If VarType(y) = vbString Then
-            StringComparer_Equals = CompareStringOrdinal(StrPtr(x), Len(x), StrPtr(y), Len(y), mIgnoreCase) = CSTR_EQUAL
+            StringComparer_Equals = CorString.EqualsV(x, y, mComparisonType)
             Exit Function
         End If
     End If
@@ -80,7 +80,7 @@ End Function
 
 Private Function StringComparer_GetHashCode(Obj As Variant) As Long
     If VarType(Obj) = vbString Then
-        If mIgnoreCase = BOOL_TRUE Then
+        If mComparisonType = StringComparison.OrdinalIgnoreCase Then
             StringComparer_GetHashCode = Object.GetHashCode(UCase$(Obj))
             Exit Function
         End If
