@@ -61,7 +61,7 @@ End Sub
 Private Function StringComparer_Compare(x As Variant, y As Variant) As Long
     If VarType(x) = vbString Then
         If VarType(y) = vbString Then
-            StringComparer_Compare = StringMethods.CompareCulturalV(x, y, mCulture, mOptions)
+            StringComparer_Compare = CorString.CompareCulturalV(x, y, mCulture, mOptions)
             Exit Function
         End If
     End If
@@ -72,7 +72,7 @@ End Function
 Private Function StringComparer_Equals(x As Variant, y As Variant) As Boolean
     If VarType(x) = vbString Then
         If VarType(y) = vbString Then
-            StringComparer_Equals = StringMethods.CompareCulturalV(x, y, mCulture, mOptions) = 0
+            StringComparer_Equals = CorString.CompareCulturalV(x, y, mCulture, mOptions) = 0
             Exit Function
         End If
     End If

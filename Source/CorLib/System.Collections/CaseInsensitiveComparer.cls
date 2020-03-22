@@ -69,7 +69,7 @@ Private mDefault As IComparer
 Public Function Compare(ByRef a As Variant, ByRef b As Variant) As Long
     If VarType(a) = vbString Then
         If VarType(b) = vbString Then
-            Compare = StringMethods.CompareCulturalV(a, b, mCulture, CompareOptions.IgnoreCase)
+            Compare = CorString.CompareCulturalV(a, b, mCulture, CompareOptions.IgnoreCase)
             Exit Function
         End If
     End If

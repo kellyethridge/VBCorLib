@@ -549,7 +549,7 @@ End Function
 ' </table>
 Public Function StartsWith(ByRef s As String, ByRef Value As String, Optional ByVal ComparisonType As StringComparison = StringComparison.Ordinal) As Boolean
     If Len(Value) <= Len(s) Then
-        StartsWith = StringMethods.CompareEx(s, 0, Value, 0, Len(Value), ComparisonType) = 0
+        StartsWith = CompareEx(s, 0, Value, 0, Len(Value), ComparisonType) = 0
     End If
 End Function
 
@@ -575,7 +575,7 @@ Public Function EndsWith(ByRef s As String, ByRef Value As String, Optional ByVa
     
     If Len(Value) <= Len(s) Then
         StartIndex = Len(s) - Len(Value)
-        EndsWith = StringMethods.CompareEx(s, StartIndex, Value, 0, Len(Value), ComparisonType) = 0
+        EndsWith = CompareEx(s, StartIndex, Value, 0, Len(Value), ComparisonType) = 0
     End If
 End Function
 
@@ -692,7 +692,7 @@ Private Function FindStringSeparatorIndexes(ByRef s As String, ByRef Separator()
                 Exit For
             End If
             
-            If StringMethods.CompareEx(s, CharIndex, Sep, 0, SepLength, StringComparison.Ordinal) = 0 Then
+            If CompareEx(s, CharIndex, Sep, 0, SepLength, StringComparison.Ordinal) = 0 Then
                 SeparatorIndexes(MatchCount) = CharIndex
                 SeparatorLengths(MatchCount) = SepLength
                 MatchCount = MatchCount + 1
@@ -864,7 +864,27 @@ End Function
 ' @param ComparisonType One of the enumeration values that specifies the rules for the comparison.
 ' @return <b>True</b> if the value of the <i>a</i> parameter is equal to the value of the <i>b</i> parameter; otherwise, <b>False</b>.
 Public Function Equals(ByRef a As String, ByRef b As String, Optional ByVal ComparisonType As StringComparison = StringComparison.Ordinal) As Boolean
-    Equals = StringMethods.Equals(a, b, ComparisonType)
+    Select Case ComparisonType
+        Case StringComparison.BinaryCompare
+            Equals = StrComp(a, b, vbBinaryCompare) = 0
+        Case StringComparison.TextCompare
+            Equals = StrComp(a, b, vbTextCompare) = 0
+        Case Else
+            Equals = CompareHelper(StrPtr(a), Len(a), StrPtr(b), Len(b), ComparisonType) = 0
+    End Select
+End Function
+
+' there are places where strings will be held in variants and we don't want to
+' have to convert them to a string variable causing additional string allocations.
+Friend Function EqualsV(ByRef a As Variant, ByRef b As Variant, Optional ByVal ComparisonType As StringComparison = StringComparison.Ordinal) As Boolean
+    Select Case ComparisonType
+        Case StringComparison.BinaryCompare
+            EqualsV = StrComp(a, b, vbBinaryCompare) = 0
+        Case StringComparison.TextCompare
+            EqualsV = StrComp(a, b, vbTextCompare) = 0
+        Case Else
+            EqualsV = CompareHelper(StrPtr(a), Len(a), StrPtr(b), Len(b), ComparisonType) = 0
+    End Select
 End Function
 
 ''
@@ -891,7 +911,14 @@ End Function
 '    </tr>
 ' </table>
 Public Function Compare(ByRef StrA As String, ByRef StrB As String, Optional ByVal ComparisonType As StringComparison = StringComparison.Ordinal) As Long
-    Compare = StringMethods.Compare(StrA, StrB, ComparisonType)
+    Select Case ComparisonType
+        Case StringComparison.BinaryCompare
+            Compare = StrComp(StrA, StrB, vbBinaryCompare)
+        Case StringComparison.TextCompare
+            Compare = StrComp(StrA, StrB, vbTextCompare)
+        Case Else
+            Compare = CompareHelper(StrPtr(StrA), Len(StrA), StrPtr(StrB), Len(StrB), ComparisonType)
+    End Select
 End Function
 
 ''
@@ -947,7 +974,18 @@ End Function
 '    </tr>
 ' </table>
 Public Function CompareEx(ByRef StrA As String, ByVal IndexA As Long, ByRef StrB As String, ByVal IndexB As Long, ByVal Length As Long, Optional ByVal ComparisonType As StringComparison = StringComparison.Ordinal) As Long
-    CompareEx = StringMethods.CompareEx(StrA, IndexA, StrB, IndexB, Length, ComparisonType)
+    Dim PtrA As Long
+    Dim PtrB As Long
+    Dim LengthA As Long
+    Dim LengthB As Long
+    
+    If ComparisonType = StringComparison.TextCompare Or _
+        ComparisonType = StringComparison.BinaryCompare Then _
+        Error.NotSupported NotSupported_StringComparison
+
+    ValidateAndGetLengths StrA, IndexA, StrB, IndexB, Length, LengthA, LengthB
+    GetOffsetPointers StrA, IndexA, StrB, IndexB, PtrA, PtrB
+    CompareEx = CompareHelper(PtrA, LengthA, PtrB, LengthB, ComparisonType)
 End Function
 
 ''
@@ -974,7 +1012,13 @@ End Function
 '    </tr>
 ' </table>
 Public Function CompareCultural(ByRef StrA As String, ByRef StrB As String, ByVal Culture As CultureInfo, ByVal Options As CompareOptions) As Long
-    CompareCultural = StringMethods.CompareCultural(StrA, StrB, Culture, Options)
+    CompareCultural = CompareCulturalHelper(StrPtr(StrA), Len(StrA), StrPtr(StrB), Len(StrB), Culture, Options)
+End Function
+
+' there are places where strings will be held in variants and we don't want to
+' have to convert them to a string variable causing additional string allocations.
+Friend Function CompareCulturalV(ByRef StrA As Variant, ByRef StrB As Variant, ByRef Culture As CultureInfo, ByVal Options As CompareOptions) As Long
+    CompareCulturalV = CompareCulturalHelper(StrPtr(StrA), Len(StrA), StrPtr(StrB), Len(StrB), Culture, Options)
 End Function
 
 ''
@@ -1004,7 +1048,14 @@ End Function
 '    </tr>
 ' </table>
 Public Function CompareCulturalEx(ByRef StrA As String, ByVal IndexA As Long, ByRef StrB As String, ByVal IndexB As Long, ByVal Length, ByVal Culture As CultureInfo, ByVal Options As CompareOptions) As Long
-    CompareCulturalEx = StringMethods.CompareCulturalEx(StrA, IndexA, StrB, IndexB, Length, Culture, Options)
+    Dim PtrA As Long
+    Dim PtrB As Long
+    Dim LengthA As Long
+    Dim LengthB As Long
+    
+    ValidateAndGetLengths StrA, IndexA, StrB, IndexB, Length, LengthA, LengthB
+    GetOffsetPointers StrA, IndexA, StrB, IndexB, PtrA, PtrB
+    CompareCulturalEx = CompareCulturalHelper(PtrA, LengthA, PtrB, LengthB, Culture, Options)
 End Function
 
 ''
@@ -1029,7 +1080,7 @@ End Function
 '    </tr>
 ' </table>
 Public Function CompareOrdinal(ByRef StrA As String, ByRef StrB As String) As Long
-    CompareOrdinal = StringMethods.Compare(StrA, StrB, StringComparison.Ordinal)
+    CompareOrdinal = Compare(StrA, StrB, StringComparison.Ordinal)
 End Function
 
 ''
@@ -1078,7 +1129,7 @@ End Function
 '   </tr>
 ' </table>
 Public Function CompareOrdinalEx(ByRef StrA As String, ByVal IndexA As Long, ByRef StrB As String, ByVal IndexB As Long, ByVal Length) As Long
-    CompareOrdinalEx = StringMethods.CompareEx(StrA, IndexA, StrB, IndexB, Length, StringComparison.OrdinalIgnoreCase)
+    CompareOrdinalEx = CompareEx(StrA, IndexA, StrB, IndexB, Length, StringComparison.Ordinal)
 End Function
 
 Friend Function LastChar(ByRef s As String) As Integer
@@ -1328,7 +1379,7 @@ Private Function JoinStrings(ByRef Separator As String, ByRef Value As Variant, 
         .cDims = 1
         .cElements = Range.Count
         .fFeatures = &H100
-        .pvData = MemLong(SAPtrV(Value) + PVDATA_OFFSET) + (Range.Index - LBound(Value)) * vbSizeOfPtr
+        .PVData = MemLong(SAPtrV(Value) + PVDATA_OFFSET) + (Range.Index - LBound(Value)) * vbSizeOfPtr
     End With
     
     SAPtr(SubStrings) = VarPtr(ArrayStruct)
@@ -1411,5 +1462,121 @@ Private Function CheckChars(ByRef s As String, ByVal SuccessfulState As Boolean,
     FreeChars Chars
 End Function
 
+Private Sub ValidateAndGetLengths(ByRef StrA As String, ByVal IndexA As Long, ByRef StrB As String, ByVal IndexB As Long, ByVal Length As Long, ByRef LengthA As Long, ByRef LengthB As Long)
+    LengthA = Len(StrA)
+    LengthB = Len(StrB)
 
+    If IndexA < 0 Or IndexB < 0 Then _
+        Error.ArgumentOutOfRange IIf(IndexA < 0, "IndexA", "IndexB"), ArgumentOutOfRange_NeedNonNegNum
+    If IndexA > LengthA Or IndexB > LengthB Then _
+        Error.ArgumentOutOfRange IIf(IndexA > LengthA, "StrA", "StrB"), ArgumentOutOfRange_OffsetLength
+    If Length < 0 Then _
+        Error.ArgumentOutOfRange "Length", ArgumentOutOfRange_NeedNonNegNum
+
+    If IndexA + Length > LengthA Then
+        LengthA = LengthA - IndexA
+    Else
+        LengthA = Length
+    End If
+
+    If IndexB + Length > LengthB Then
+        LengthB = LengthB - IndexB
+    Else
+        LengthB = Length
+    End If
+End Sub
+
+Private Sub GetOffsetPointers(ByRef StrA As String, ByVal IndexA As Long, ByRef StrB As String, ByVal IndexB As Long, ByRef PtrA As Long, ByRef PtrB As Long)
+    PtrA = StrPtr(StrA) + IndexA * vbSizeOfChar
+    PtrB = StrPtr(StrB) + IndexB * vbSizeOfChar
+End Sub
+
+Private Function CompareHelper(ByVal PtrA As Long, ByVal LengthA As Long, ByVal PtrB As Long, ByVal LengthB As Long, ByVal ComparisonType As StringComparison) As Long
+    Dim Result As Long
+    
+    ' do a quick check first
+    If LengthA = 0 And LengthB = 0 Then
+        Exit Function
+    End If
+    
+    Select Case ComparisonType
+        Case StringComparison.Ordinal
+            Result = CompareStringOrdinal(PtrA, LengthA, PtrB, LengthB, BOOL_FALSE)
+        Case StringComparison.OrdinalIgnoreCase
+            Result = CompareStringOrdinal(PtrA, LengthA, PtrB, LengthB, BOOL_TRUE)
+        Case StringComparison.CurrentCulture
+            Result = CompareString(CultureInfo.CurrentCulture.LCID, 0, PtrA, LengthA, PtrB, LengthB)
+        Case StringComparison.CurrentCultureIgnoreCase
+            Result = CompareString(CultureInfo.CurrentCulture.LCID, NORM_IGNORECASE, PtrA, LengthA, PtrB, LengthB)
+        Case StringComparison.InvariantCulture
+            Result = CompareString(CultureInfo.InvariantCulture.LCID, 0, PtrA, LengthA, PtrB, LengthB)
+        Case StringComparison.InvariantCultureIgnoreCase
+            Result = CompareString(CultureInfo.InvariantCulture.LCID, NORM_IGNORECASE, PtrA, LengthA, PtrB, LengthB)
+        Case Else
+            Error.Argument NotSupported_StringComparison, "ComparisonType"
+    End Select
+    
+    If Result = 0 Then _
+        Error.Win32Error Err.LastDllError
+    
+    ' CompareString and CompareStringOrdinal return a windows defined result so we adjust for typical comparison results.
+    ' CSTR_LESS_THAN = 1
+    ' CSTR_EQUAL = 2
+    ' CSTR_GREATER_THAN = 3
+    CompareHelper = Result - 2
+End Function
+
+Private Function CompareCulturalHelper(ByVal PtrA As Long, ByVal LengthA As Long, ByVal PtrB As Long, ByVal LengthB As Long, ByRef Culture As CultureInfo, ByVal Options As CompareOptions) As Long
+    Dim Flags As Long
+    
+    If Culture Is Nothing Then _
+        Error.ArgumentNull "Culture"
+        
+    If LengthA = 0 And LengthB = 0 Then
+        Exit Function
+    End If
+    
+    Select Case Options
+        Case CompareOptions.OrdinalOption
+            CompareCulturalHelper = CompareStringOrdinal(PtrA, LengthA, PtrB, LengthB, BOOL_FALSE) - 2
+        Case CompareOptions.OrdinalIgnoreCaseOption
+            CompareCulturalHelper = CompareStringOrdinal(PtrA, LengthA, PtrB, LengthB, BOOL_TRUE) - 2
+        Case Else
+            Flags = GetCompareFlags(Options)
+            CompareCulturalHelper = CompareString(Culture.LCID, Flags, PtrA, LengthA, PtrB, LengthB) - 2
+    End Select
+End Function
+
+Private Function GetCompareFlags(ByVal Options As CompareOptions) As Long
+    Dim Flags As Long
+    
+    Debug.Assert (Options And CompareOptions.OrdinalOption) = 0
+    Debug.Assert (Options And CompareOptions.OrdinalIgnoreCaseOption) = 0
+    
+    If Options And CompareOptions.IgnoreCase Then
+        Flags = Flags Or NORM_IGNORECASE
+    End If
+    
+    If Options And CompareOptions.IgnoreKanaType Then
+        Flags = Flags Or NORM_IGNOREKANATYPE
+    End If
+    
+    If Options And CompareOptions.IgnoreNonSpace Then
+        Flags = Flags Or NORM_IGNORENONSPACE
+    End If
+    
+    If Options And CompareOptions.IgnoreSymbols Then
+        Flags = Flags Or NORM_IGNORESYMBOLS
+    End If
+    
+    If Options And CompareOptions.IgnoreWidth Then
+        Flags = Flags Or NORM_IGNOREWIDTH
+    End If
+    
+    If Options And CompareOptions.StringSort Then
+        Flags = Flags Or SORT_STRINGSORT
+    End If
+    
+    GetCompareFlags = Flags
+End Function
 

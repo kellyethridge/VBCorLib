@@ -204,7 +204,7 @@ End Sub
 Private Function EqualStringOrInt(ByRef x As Variant, ByRef y As Variant) As Boolean
     If VarType(x) = vbString Then
         If VarType(y) = vbString Then
-            EqualStringOrInt = StringMethods.EqualsV(x, y, StringComparison.OrdinalIgnoreCase)
+            EqualStringOrInt = CorString.EqualsV(x, y, StringComparison.OrdinalIgnoreCase)
         End If
     Else
         EqualStringOrInt = (x = y)

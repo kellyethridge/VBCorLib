@@ -115,7 +115,7 @@ Public Function Equals(ByRef ObjA As Variant, ByRef ObjB As Variant) As Boolean
     Select Case VarType(ObjA)
         Case vbString
             If VarType(ObjB) = vbString Then
-                Equals = StringMethods.EqualsV(ObjA, ObjB, StringComparison.Ordinal)
+                Equals = CorString.EqualsV(ObjA, ObjB, StringComparison.Ordinal)
             End If
         Case vbDate
             Equals = Statics.CorDateTime.Equals(ObjA, ObjB)
@@ -217,7 +217,7 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function HashString(ByRef Value As Variant) As Long
     mCharBuffer.cElements = Len(Value)
-    mCharBuffer.pvData = StrPtr(Value)
+    mCharBuffer.PVData = StrPtr(Value)
     
     Dim i As Long
     For i = 0 To UBound(mChars)

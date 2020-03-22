@@ -126,7 +126,7 @@ Public Function Compare(ByRef a As Variant, ByRef b As Variant) As Long
     Select Case AVarType
         Case vbString
             If BVarType = vbString Then
-                Compare = StringMethods.CompareCulturalV(a, b, mCulture, CompareOptions.None)
+                Compare = CorString.CompareCulturalV(a, b, mCulture, CompareOptions.None)
                 Exit Function
             End If
         Case vbNull
