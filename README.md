@@ -10,8 +10,7 @@ sharing between a .NET application and VB6.
 * Provides several encryption algorithms: Rijndael, RSA, TripleDES, DES.
 * Provides many hashing algorithms: SHA1, SHA256, SHA384, SHA516, RIPMED160, MD5.
 * Sign and verify data using HMAC.
-* Provides easy access to many encodings for text and file handling: UTF8, UTF7, UTF16, and Windows
-  supported encodings.
+* Provides easy access to many encodings for text and file handling: UTF8, UTF7, UTF16, UTF32, and Windows supported encodings.
 * Easy String, Array and Date manipulation with a variety of functions.
 * Manipulate files with a variety of file handling classes.
 * Handles files larger than 2 gigs.
@@ -21,7 +20,7 @@ sharing between a .NET application and VB6.
 
 ## Documentation
 
-The currently available documentation is for version 2.3 and is online at
+The currently available documentation is for version 3.0 and is online at
 <http://www.kellyethridge.com/vbcorlib/doc/VBCorLib.html>.
 
 ## Blog

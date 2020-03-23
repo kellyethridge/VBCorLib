@@ -38,17 +38,15 @@ Attribute VB_Exposed = True
 ''
 ' A list that dynamically increases in size to hold a number of items.
 '
-' @remarks This class contains an internal array of <b>Variants</b>. As new items are
-' added to the list, the capacity will increase as necessary.
+' @remarks This class contains an internal array of <b>Variants</b>. As new items are added to the list, the capacity will increase as necessary.
 ' <p>The capacity of the list is the current number of elements in the internal array.</p>
 ' <p>To lower the capacity to save memory, use the <a href="ArrayList.TrimToSize.html">TrimToSize</a> method, or set <a href="ArrayList.Set.Capacity.html">Capacity</a> directly.</p>
-' <p>The default capacity is 16. The Item index is zero based.</p>
-' <p>This class is persistable.</p>
+' <p>The default capacity is 16.</p>
+' <p>Elements in this collection can be accessed using an integer index. Indexes in this collection are zero-based.</p>
 '
 ' @see Constructors
 ' @see ArrayListStatic
-' @see IList
-'
+' @include "../DocIncludes/ArrayList.html"
 Option Explicit
 Implements IObject
 Implements ICollection
@@ -81,6 +79,12 @@ Private mComparer   As IComparer
 '
 ' @param value The item to be added to the list.
 ' @return The index at which the item was added.
+' @remarks As items are added, the capacity is increased as necessary. The items
+' are appended to the end of the list and maintain the order they were added,
+' provided no other method is used to change the order, such as <a href="ArrayList.Insert.html">Insert</a> or <a href="ArrayList.Remove.html">Remove</a>.
+' @see #AddRange
+' @see #Insert
+' @see #Count
 ' @include "..\DocIncludes\ArrayList.Add.html"
 Public Function Add(ByRef Value As Variant) As Long
     Add = mCount
@@ -91,15 +95,17 @@ End Function
 ' Adds the items from a collection to the list.
 '
 ' @param Source The collection of items to add.
-' The collection can be a <b>VBA.Collection</b>, <b>ICollection</b> object,
-' or an <b>Array</b>.
-' @remarks The elements in the collection added by using For..Each to
-' iterate each element. The elements are added to the end of the list in the
-' same order as the For..Each loop produces them.
-' <p>If the number of elements to be added is more than the available
-' capacity in the <b>ArrayList</b>, then the capacity is increased to accommodate
-' the collection of elements.</p>
+' @remarks The collection can be a <b>VBA.Collection</b>, <a href="ICollection.html">ICollection</a> object, or an <b>Array</b>.
+' <p>The elements are added to the end of the list in the same order as a For..Each loop produces.</p>
+' <p>If the number of elements to be added is more than the available capacity in the <a href="ArrayList.html">ArrayList</a>,
+' then the capacity is increased to accommodate the collection of elements.</p>
 ' @see ICollection
+' @see #Capacity
+' @see #Count
+' @see #Add
+' @see #InsertRange
+' @see #SetRange
+' @see #RemoveRange
 ' @include "..\DocIncludes\ArrayList.AddRange.html"
 Public Sub AddRange(ByRef Source As Variant)
     InsertRange mCount, Source

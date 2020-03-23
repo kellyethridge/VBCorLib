@@ -33,13 +33,7 @@ Attribute VB_Exposed = True
 '
 
 ''
-' Provides a collections that maintains a list of items in a First-in-First-Out
-' sequence.
-'
-' @see Constructors
-' @see ICollection
-' @see IEnumerable
-' @see ICloneable
+' Provides a collections that maintains a list of items in a First-in-First-Out sequence.
 '
 Option Explicit
 Implements IObject
@@ -66,8 +60,7 @@ Private mVersion    As Long
 ''
 ' Clears the contents of the queue
 '
-' @remarks Even though the contents are cleared, the capacity
-' of the queue is unchanged.
+' @remarks Even though the contents are cleared, the capacity of the queue is unchanged.
 '
 Public Sub Clear()
     mCount = 0

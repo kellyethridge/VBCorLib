@@ -1,30 +1,29 @@
-@remarks 
-<h4>Exceptions</h4>
-<table>
+@exceptions 
+<table style="width: auto">
 <tr>
-<th width="50%">Exception Type</th><th>Condition</th>
+<th>Exception Type</th><th>Condition</th>
 </tr><tr>
-<td>ArgumentNullException</td>
-<td><i>c</i> is an uninitialized array.<br>
-- or -<br>
-<i>c</i> is Nothing.</td>
+<td><a href="ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>c</i> is an uninitialized array.<br/>
+-or-<br/>
+<i>c</i> is <b>Nothing</b>.</td>
 </tr>
 <tr>
-<td>NotSupportedException</td>
-<td>The <b>ArrayList</b> is Read-Only<br>
-- or -<br>
-The <b>ArrayList</b> is Fixed-Size.</td>
+<td><a href="NotSupportedException.html">NotSupportedException</a></td>
+<td>The <a href="ArrayList.html">ArrayList</a> is read-only<br/>
+-or-<br/>
+The <a href="ArrayList.html">ArrayList</a> is fixed size.</td>
 </tr>
 <tr>
-<td>InvalidCastException</td><td><i>c</i> is not a <b>VBA.Collection</b>, <b>ICollection</b> object, or an <b>Array</b>.</td>
+<td><a href="InvalidCastException.html">InvalidCastException</a></td><td><i>c</i> is not a <b>VBA.Collection</b>, <a href="ICollection.html">ICollection</a> object, or an <b>Array</b>.</td>
 </tr>
 </table>
-<h4>Example</h4>
+@example
 The following example shows how to add the elements from an existing
-collection to the <b>ArrayList</b> using the AddRange method.
-<p>An <b>ArrayList</b> is created and filled with an initial set of
-elements, then a <b>Queue</b> is filled with additional elements that
-will be added to the <b>ArrayList</b> using AddRange.
+collection to the <a href="ArrayList.html">ArrayList</a> using the AddRange method.
+<p>An <a href="ArrayList.html">ArrayList</a> is created and filled with an initial set of
+elements, then a <a href="Queue.html">Queue</a> is filled with additional elements that
+will be added to the <a href="ArrayList.html">ArrayList</a> using <b>AddRange</b>.
 <pre>
 Private Sub Main()
     Dim List As New ArrayList

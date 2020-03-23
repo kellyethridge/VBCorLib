@@ -38,6 +38,8 @@ Attribute VB_Exposed = True
 ''
 ' Provides methods for manipulating a 64-bit signed integer.
 '
+' @remarks The 64-bit value is stored in an <a href="Int64Static.Int64.html">Int64</a> UDT represented by a low 32bits and high 32bits.
+' @include "..\DocIncludes\Int64Static.html"
 Option Explicit
 
 Private mMaxDecimalValue As Variant
@@ -647,7 +649,7 @@ End Function
 ' @param s A string containing a number to convert.
 ' @param Result When this method returns, contains the 64-bit signed integer value equivalent of the number contained in <i>s</i>, if the conversion succeeded, or zero if the conversion failed. The conversion fails if the <i>s</i> parameter is empty, is not in a format compliant withstyle, or represents a number less than <a href="Int64Static.get.MinValue.html">MinValue</a> or greater than <a href="Int64Static.get.MaxValue.html">MaxValue</a>. This parameter is passed uninitialized; any value originally supplied in <i>Result</i> will be overwritten.
 ' @return <b>True</b> if s was converted successfully; otherwise, <b>False</b>.
-' @remarks <p>The <b>TryParse</b> method is like the <a href="Int64Static.Parse.html">Parse</a> method, except the <b>TryParse</b> method does not throw an exception if the conversion fails. It eliminates the need to use exception handling to test for a <a href="FormatException.html">FormatException<a/> in the event that <i>s</i> is invalid and cannot be successfully parsed.</p>
+' @remarks <p>The <b>TryParse</b> method is like the <a href="Int64Static.Parse.html">Parse</a> method, except the <b>TryParse</b> method does not throw an exception if the conversion fails. It eliminates the need to use exception handling to test for a <a href="FormatException.html">FormatException</a> in the event that <i>s</i> is invalid and cannot be successfully parsed.</p>
 ' <p>The s parameter contains a number of the form:</p>
 ' <p>[ws][sign]digits[ws]</p>
 ' <p>Elements in square brackets ([ and ]) are optional. The following table describes each element.</p>
@@ -777,7 +779,7 @@ Friend Sub DoubleToInt64(ByVal Value As Double, ByRef Result As Int64)
     DigitsSA.cbElements = 1
     DigitsSA.cDims = 1
     DigitsSA.cElements = 20
-    DigitsSA.pvData = Helper.Ecvt(Value, 20, DecimalPosition, IsNegative)
+    DigitsSA.PVData = Helper.Ecvt(Value, 20, DecimalPosition, IsNegative)
     SAPtr(Digits) = VarPtr(DigitsSA)
     
     On Error GoTo Catch

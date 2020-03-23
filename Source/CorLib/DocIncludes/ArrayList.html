@@ -1,0 +1,33 @@
+@example
+<pre>
+Public Sub Main()
+    Dim List As New ArrayList
+    
+    List.Add "Hello"
+    List.Add "World"
+    List.Add "!"
+    
+    Console.WriteLine "List"
+    Console.WriteLine "    Count:    {0}", List.Count
+    Console.WriteLine "    Capacity: {0}", List.Capacity
+    Console.WriteValue "      Values:"
+    PrintValues List
+    
+    Console.ReadKey
+End Sub
+
+Private Sub PrintValues(ByVal List As IEnumerable)
+    Dim Value As Variant
+    
+    For Each Value In List
+        Console.WriteValue "  {0}", Value
+    Next
+End Sub
+
+'' This code produces the following:
+''
+'' List
+''     Count:    3
+''     Capacity: 16
+''     Values:  Hello  World  !
+</pre>

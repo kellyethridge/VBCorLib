@@ -1,0 +1,33 @@
+@example
+<pre>
+Public Sub Main()
+    Dim x As Int64
+    Dim y As Int64
+    Dim r As Int64
+    
+    x = CInt64(55)
+    y = CInt64(500)
+    
+    r = Int64.Add(x, y)
+    PrintOutput "+", x, y, r
+    
+    r = Int64.Subtract(x, y)
+    PrintOutput "-", x, y, r
+    
+    r = Int64.Multiply(x, y)
+    PrintOutput "*", x, y, r
+    
+    r = Int64.Divide(y, x)
+    PrintOutput "/", x, y, r
+End Sub
+
+Private Sub PrintOutput(ByVal Op As String, ByRef x As Int64, ByRef y As Int64, ByRef r As Int64)
+    Debug.Print CorString.Format("{1} {0} {2} = {3}", Op, x, y, r)
+End Sub
+
+'' This code produces the following.
+''    55 + 500 = 555
+''    55 - 500 = -445
+''    55 * 500 = 27500
+''    55 / 500 = 9
+</pre>
