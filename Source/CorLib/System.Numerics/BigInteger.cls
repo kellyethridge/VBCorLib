@@ -1377,7 +1377,7 @@ End Function
 '   IComparable
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IComparable_CompareTo(Value As Variant) As Long
-    IComparable_CompareTo = CompareTo(Cor.BInt(Value))
+    IComparable_CompareTo = CompareTo(CBigInt(Value))
 End Function
 
 

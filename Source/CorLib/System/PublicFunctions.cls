@@ -202,46 +202,6 @@ Private Function TryHexToChar(ByVal Ch As Integer, ByRef Result As Long) As Bool
 End Function
 
 ''
-' Converts a Char value greater than 32768 to the corrisponding negative Integer value without overflow.
-'
-' @param Value The Long ASCII value to be converted.
-' @return Integer version of the Long value.
-' @remarks The Value can only range from -32767 to 65535, otherwise
-' an <a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a> will be thrown.
-Public Function LongToChar(ByVal Value As Long) As Integer
-    If Value < -32767 Or Value > 65535 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Value", "Value must be between -32767 and 65535 inclusively.")
-    
-    LongToChar = AsWord(Value)
-End Function
-
-''
-' Converts an Integer to the corrisponding Long Ascii char.
-'
-' @param Value An Integer character.
-' @return A positive representation of the character.
-'
-Public Function CharToLong(ByVal Value As Integer) As Long
-    AsWord(CharToLong) = Value
-End Function
-
-''
-' Returns character value from a string at the specified index.
-'
-' @param s The string to return the character from.
-' @param Index The position of the character in the string.
-' @return An integer representing the character.
-' @remarks The index is zero based.
-Public Function CharAt(ByRef s As String, ByVal Index As Long) As Integer
-    If Index < 0 Then _
-        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_NeedNonNegNum
-    If Index >= Len(s) Then _
-        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_Index
-    
-    CharAt = MemWord(StrPtr(s) + Index * 2)
-End Function
-
-''
 ' Provides a way to move a variant datatype to another variant without
 ' the knowledge if Set needs to be used for objects.
 '
@@ -270,24 +230,6 @@ Public Sub CopyVariant(ByRef Destination As Variant, ByRef Source As Variant)
 End Sub
 
 ''
-' Returns the controlling IUnknown interface of the object.
-'
-' @param Obj The object get the controlling interface of.
-' @return The controlling IUnknown interface.
-Public Function CUnk(ByVal Obj As IUnknown) As IUnknown
-    Set CUnk = Obj
-End Function
-
-''
-' Returns the instance as type Object.
-'
-' @param Obj The instance to convert.
-' @return Returns the instance as type Object.
-Public Function CObj(ByVal Obj As Object) As Object
-    Set CObj = Obj
-End Function
-
-''
 ' Returns the collection version for a collection that implements <a href="IVersionable.html">IVersionable</a>.
 '
 ' @param Obj The collection to retrieve the version from.
@@ -298,21 +240,3 @@ Public Function GetCollectionVersion(ByVal Obj As Object) As Long
     GetCollectionVersion = Enumeration.GetCollectionVersion(Obj)
 End Function
 
-''
-' Converts a value to a CorDateTime object.
-'
-' @param Value The value to be converted to a<a href="CorDateTime.html">CorDateTime</a> object.
-' @return The converted value.
-' @remark This is a short-cut version of <a href="Convert.ToDateTime.html">Convert.ToDateTime</a>.
-Public Function CDateTime(ByRef Value As Variant) As CorDateTime
-    Set CDateTime = Convert.ToDateTime(Value)
-End Function
-
-''
-' Converts a value to a 64-bit signed integer.
-'
-' @param Value The value to be converted
-' @return Returns a 64-bit signed integer.
-Public Function CInt64(ByRef Value As Variant) As Int64
-    CInt64 = Conversion.CInt64(Value)
-End Function

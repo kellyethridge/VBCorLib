@@ -1696,46 +1696,6 @@ Public Function NewBigInteger(ByRef Value As Variant) As BigInteger
 End Function
 
 ''
-' Attempts to convert a value to a valid <a href="BigInteger.html">BigInteger</a> instance.
-'
-' @param value The value to be converted to <a href="BigInteger.html">BigInteger</a>.
-' @return A new <a href="BigInteger.html">BigInteger</a> instance representing the converted value.
-' @remarks The follow datatypes are supported:<br>
-' vbString<br>
-' vbLong<br>
-' vbInteger<br>
-' vbByte<br>
-' vbDoube<br>
-' vbSingle<br>
-' vbCurrency<br>
-' vbDecimal<br>
-' vbByte Array<br>
-' <a href="Int64Static.Int64.html">Int64</a>
-' BigInteger (returns same instance)<br>
-' Nothing (returns BigInteger.Zero)<br>
-'
-' <pre>
-' Dim b As BigInteger
-' Set b = BInt(12345)
-' </pre>
-Public Function BInt(ByRef Value As Variant) As BigInteger
-    Select Case VarType(Value)
-        Case vbObject, vbDataObject
-            If Value Is Nothing Then
-                Set BInt = BigInteger.Zero
-            Else
-                Set BInt = Value
-            End If
-            
-        Case vbString
-            Set BInt = BigInteger.Parse(CStr(Value))
-            
-        Case Else
-            Set BInt = NewBigInteger(Value)
-    End Select
-End Function
-
-''
 ' Initializes a new instance of a <b>Collection</b> with items.
 '
 ' @param Values The values to initialize the collection with.

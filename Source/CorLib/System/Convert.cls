@@ -319,7 +319,7 @@ End Function
 ' @param Value A value that is convertable to <a href="Int64Static.Int64.html">Int64</a>.
 ' @return A 64-bit signed integer that is equivalent to <i>Value</i>.
 Public Function ToInt64(ByRef Value As Variant) As Int64
-    ToInt64 = Conversion.CInt64(Value)
+    ToInt64 = ConversionMethods.CInt64(Value)
 End Function
 
 

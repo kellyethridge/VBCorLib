@@ -164,6 +164,9 @@ version 3.0 (BREAKING CHANGES)
 	* Fixed CaseInsensitiveCompare.Default; should use culture-sensistive comparison.
 	* Fixed CorArray.Sort; when sorting strings, should be culture aware. * may produce different results from previous. *
 	* Improved CorArray.Sort when sorting strings.
+	* Re-implemented global CharToLong and LongToChar methods to Char.ConvertToInt32 and Char.ConvertFromInt32 methods.
+	* Renamed BInt public method to CBigInt to align better with conversion method naming conventions.
+	* Re-implemented global CharAt method to CorString.CharAt method.
 	
 version 2.3
 	* Updated ASM code to not trigger DEP protection.

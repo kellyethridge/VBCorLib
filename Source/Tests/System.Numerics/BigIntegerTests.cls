@@ -251,18 +251,18 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use &HFFF80000, "x8", "fff80000"
             
         Case "Compare_WithWithValues_ReturnsExpected"
-            Test.Use(BInt(0), BInt(0)).Expect Iz.EqualTo(0)
+            Test.Use(CBigInt(0), CBigInt(0)).Expect Iz.EqualTo(0)
             Test.Use(Nothing, Nothing).Expect Iz.EqualTo(0)
-            Test.Use(Nothing, BInt(0)).Expect Iz.EqualTo(0)
-            Test.Use(BInt(0), Nothing).Expect Iz.EqualTo(0)
-            Test.Use(BInt(1), BInt(1)).Expect Iz.EqualTo(0)
-            Test.Use(BInt(1), BInt(0)).Expect Iz.Positive
-            Test.Use(BInt(0), BInt(1)).Expect Iz.Negative
-            Test.Use(BInt(-1), BInt(-10)).Expect Iz.Positive
-            Test.Use(BInt(-10), BInt(-1)).Expect Iz.Negative
-            Test.Use(BInt(-128), BInt(-129)).Expect Iz.Positive
-            Test.Use(BInt(&H80000000), BInt(&H7FFFFFFF)).Expect Iz.Negative
-            Test.Use(BInt(&H7FFFFFFF), BInt(&H80000000)).Expect Iz.Positive
+            Test.Use(Nothing, CBigInt(0)).Expect Iz.EqualTo(0)
+            Test.Use(CBigInt(0), Nothing).Expect Iz.EqualTo(0)
+            Test.Use(CBigInt(1), CBigInt(1)).Expect Iz.EqualTo(0)
+            Test.Use(CBigInt(1), CBigInt(0)).Expect Iz.Positive
+            Test.Use(CBigInt(0), CBigInt(1)).Expect Iz.Negative
+            Test.Use(CBigInt(-1), CBigInt(-10)).Expect Iz.Positive
+            Test.Use(CBigInt(-10), CBigInt(-1)).Expect Iz.Negative
+            Test.Use(CBigInt(-128), CBigInt(-129)).Expect Iz.Positive
+            Test.Use(CBigInt(&H80000000), CBigInt(&H7FFFFFFF)).Expect Iz.Negative
+            Test.Use(CBigInt(&H7FFFFFFF), CBigInt(&H80000000)).Expect Iz.Positive
 
         Case "Negate_WithValue_ReturnsExpected"
             Test.Use 0, 0
@@ -277,10 +277,10 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use &H8000, 32768
 
         Case "Absolute_WithValue_ReturnsExpected"
-            Test.Use BInt(0), BInt(0)
-            Test.Use BInt(1), BInt(1)
-            Test.Use BInt(-1), BInt(1)
-            Test.Use BInt(&H80000000), BInt(2147483648#)
+            Test.Use CBigInt(0), CBigInt(0)
+            Test.Use CBigInt(1), CBigInt(1)
+            Test.Use CBigInt(-1), CBigInt(1)
+            Test.Use CBigInt(&H80000000), CBigInt(2147483648#)
             
         Case "Add_WithValues_ReturnsExpected"
             Test.Use 0, 0, 0
@@ -583,7 +583,7 @@ End Sub
 Public Sub ToString_WithFormatting_ReturnsFormattedNumber(ByVal Value As Variant, ByVal Format As String, ByVal Expected As String)
     Dim Number As BigInteger
     Dim Actual As String
-    Set Number = BInt(Value)
+    Set Number = CBigInt(Value)
         
     Actual = Number.ToString(Format)
     
@@ -601,14 +601,14 @@ End Function
 Public Sub Negate_WithValue_ReturnsExpected(ByRef Value As Variant, ByRef Expected As Variant)
     Dim Actual As BigInteger
     
-    Set Actual = BInt(Value).Negate
+    Set Actual = CBigInt(Value).Negate
     
-    Assert.That Actual, Equals(BInt(Expected))
+    Assert.That Actual, Equals(CBigInt(Expected))
 End Sub
 
 Public Sub Negate_WhenNegativeToPositive_ShouldSetPrecision()
     Dim Number As BigInteger
-    Set Number = BInt("-12345678901234567890")
+    Set Number = CBigInt("-12345678901234567890")
     
     Dim Actual As Long
     Actual = Number.Negate.Precision
@@ -628,54 +628,54 @@ Public Sub Add_WithValues_ReturnsExpected(ByRef LValue As Variant, ByRef RValue 
     Dim LHS As BigInteger
     Dim RHS As BigInteger
     
-    Set LHS = BInt(LValue)
-    Set RHS = BInt(RValue)
+    Set LHS = CBigInt(LValue)
+    Set RHS = CBigInt(RValue)
     
     Dim Actual As BigInteger
     Set Actual = LHS.Add(RHS)
     
-    Assert.That Actual, Equals(BInt(Expected))
+    Assert.That Actual, Equals(CBigInt(Expected))
 End Sub
 
 Public Sub Subtract_WithValues_ReturnsExpected(ByRef LValue As Variant, ByRef RValue As Variant, ByRef Expected As Variant)
     Dim LHS As BigInteger
     Dim RHS As BigInteger
     
-    Set LHS = BInt(LValue)
-    Set RHS = BInt(RValue)
+    Set LHS = CBigInt(LValue)
+    Set RHS = CBigInt(RValue)
     
     Dim Actual As BigInteger
     Set Actual = LHS.Subtract(RHS)
     
-    Assert.That Actual, Equals(BInt(Expected))
+    Assert.That Actual, Equals(CBigInt(Expected))
 End Sub
 
 Public Sub Mulitply_WithValues_ReturnsExpected(ByRef LValue As Variant, ByRef RValue As Variant, ByRef Expected As Variant)
     Dim LHS As BigInteger
     Dim RHS As BigInteger
     
-    Set LHS = BInt(LValue)
-    Set RHS = BInt(RValue)
+    Set LHS = CBigInt(LValue)
+    Set RHS = CBigInt(RValue)
     
     Dim Actual As BigInteger
     Set Actual = LHS.Multiply(RHS)
     
-    Assert.That Actual, Equals(BInt(Expected))
+    Assert.That Actual, Equals(CBigInt(Expected))
 End Sub
 
 Public Sub Divide_WithValues_ReturnsExpected(ByRef DividendValue As Variant, ByRef DivisorValue As Variant, ByRef Expected As Variant)
     Dim Dividend As BigInteger
     Dim Divisor As BigInteger
     
-    Set Dividend = BInt(DividendValue)
-    Set Divisor = BInt(DivisorValue)
+    Set Dividend = CBigInt(DividendValue)
+    Set Divisor = CBigInt(DivisorValue)
     
     Dim Actual As BigInteger
     Set Actual = Dividend.Divide(Divisor)
     
-    Assert.That Actual, Equals(BInt(Expected))
-    Assert.That Dividend, Equals(BInt(DividendValue))
-    Assert.That Divisor, Equals(BInt(DivisorValue))
+    Assert.That Actual, Equals(CBigInt(Expected))
+    Assert.That Dividend, Equals(CBigInt(DividendValue))
+    Assert.That Divisor, Equals(CBigInt(DivisorValue))
 End Sub
 
 Public Sub DivRem_WithValues_ReturnsExpected(ByRef DividendValue As Variant, ByRef DivisorValue As Variant, ByRef ExpectedQuotient As Variant, ByRef ExpectedRemainder As Variant)
@@ -683,21 +683,21 @@ Public Sub DivRem_WithValues_ReturnsExpected(ByRef DividendValue As Variant, ByR
     Dim Divisor As BigInteger
     Dim Remainder As BigInteger
     
-    Set Dividend = BInt(DividendValue)
-    Set Divisor = BInt(DivisorValue)
+    Set Dividend = CBigInt(DividendValue)
+    Set Divisor = CBigInt(DivisorValue)
     
     Dim Actual As BigInteger
     Set Actual = Dividend.DivRem(Divisor, Remainder)
     
-    Assert.That Actual, Equals(BInt(ExpectedQuotient))
-    Assert.That Remainder, Equals(BInt(ExpectedRemainder))
+    Assert.That Actual, Equals(CBigInt(ExpectedQuotient))
+    Assert.That Remainder, Equals(CBigInt(ExpectedRemainder))
 End Sub
 
 
 Public Sub Factorial_WithNegativeValue_ThrowsArgumentOutOfRangeException()
     On Error Resume Next
     
-    BInt(-1).Factorial
+    CBigInt(-1).Factorial
     
     AssertArgumentOutOfRangeException Err
 End Sub
@@ -705,23 +705,23 @@ End Sub
 Public Sub Factorial_WithValue_ReturnsExpected()
     Dim Actual As BigInteger
     
-    Set Actual = BInt(4).Factorial
+    Set Actual = CBigInt(4).Factorial
     
-    Assert.That Actual, Equals(BInt(24))
+    Assert.That Actual, Equals(CBigInt(24))
 End Sub
 
 Public Sub Pow_WithValues_ReturnsExpected(ByVal Value As Long, ByVal Exponent As Long, ByRef Expected As Variant)
     Dim Actual As BigInteger
     
-    Set Actual = BInt(Value).Pow(Exponent)
+    Set Actual = CBigInt(Value).Pow(Exponent)
     
-    Assert.That Actual, Equals(BInt(Expected))
+    Assert.That Actual, Equals(CBigInt(Expected))
 End Sub
 
 Public Sub Pow_WithNegativeExponent_ThrowsArgumentOutOfRangeException()
     On Error Resume Next
     
-    BigInteger.Pow BInt(2), -2
+    BigInteger.Pow CBigInt(2), -2
     
     AssertArgumentOutOfRangeException Err, "Exponent"
 End Sub
@@ -729,9 +729,9 @@ End Sub
 Public Sub SquareRoot_WithValue_ReturnsExpected(ByRef Value As Variant, ByRef Expected As Variant)
     Dim Actual As BigInteger
 
-    Set Actual = BInt(Value).SquareRoot
+    Set Actual = CBigInt(Value).SquareRoot
 
-    Assert.That Actual, Equals(BInt(Expected))
+    Assert.That Actual, Equals(CBigInt(Expected))
 End Sub
 
 Public Sub ShiftRight_WhenShiftingZeroBits_ReturnsOriginalValue()
@@ -745,23 +745,23 @@ End Sub
 Public Sub ShiftRight_WhenShiftingForPositiveValue_ShiftsBits()
     Dim Actual As BigInteger
     
-    Set Actual = BInt(&H7FFFFFFF).ShiftRight(1)
+    Set Actual = CBigInt(&H7FFFFFFF).ShiftRight(1)
     
-    Assert.That Actual, Equals(BInt(&H3FFFFFFF))
+    Assert.That Actual, Equals(CBigInt(&H3FFFFFFF))
 End Sub
 
 Public Sub ShiftRight_WithNegativeCount_ShiftsLeft()
     Dim Actual As BigInteger
     
-    Set Actual = BInt(1).ShiftRight(-1)
+    Set Actual = CBigInt(1).ShiftRight(-1)
     
-    Assert.That Actual, Equals(BInt(2))
+    Assert.That Actual, Equals(CBigInt(2))
 End Sub
 
 Public Sub ShiftRight_WhenShiftingAllBitsForPositiveValue_ReturnsZero()
     Dim Actual As BigInteger
     
-    Set Actual = BInt(&H7FFFFFFF).ShiftRight(32)
+    Set Actual = CBigInt(&H7FFFFFFF).ShiftRight(32)
     
     Assert.That Actual, Equals(BigInteger.Zero)
 End Sub
@@ -769,7 +769,7 @@ End Sub
 Public Sub ShiftRight_WithOne_ReturnsZero()
     Dim Actual As BigInteger
     
-    Set Actual = BInt(1).ShiftRight(1)
+    Set Actual = CBigInt(1).ShiftRight(1)
     
     Assert.That Actual.IsZero, Iz.True
 End Sub
@@ -777,7 +777,7 @@ End Sub
 Public Sub ShiftRight_WhenAlreadyShiftedAllBits_ReturnsZero()
     Dim Actual As BigInteger
     
-    Set Actual = BInt(1).ShiftRight(1).ShiftRight(1)
+    Set Actual = CBigInt(1).ShiftRight(1).ShiftRight(1)
     
     Assert.That Actual.IsZero, Iz.True
 End Sub
@@ -785,7 +785,7 @@ End Sub
 Public Sub ShiftRight_WhenShiftingAllBitsForNegativeValue_ReturnsMinusOne()
     Dim Actual As BigInteger
     
-    Set Actual = BInt(&H80000000).ShiftRight(128)
+    Set Actual = CBigInt(&H80000000).ShiftRight(128)
     
     Assert.That Actual, Equals(BigInteger.MinusOne)
 End Sub
@@ -801,39 +801,39 @@ End Sub
 Public Sub ShiftLeft_WhenShiftingForPositiveValue_ShiftsBits()
     Dim Actual As BigInteger
     
-    Set Actual = BInt(&H3FFFFFFF).ShiftLeft(1)
+    Set Actual = CBigInt(&H3FFFFFFF).ShiftLeft(1)
     
-    Assert.That Actual, Equals(BInt(&H7FFFFFFE))
+    Assert.That Actual, Equals(CBigInt(&H7FFFFFFE))
 End Sub
 
 Public Sub ShiftLeft_WithNegativeCount_ShiftsRight()
     Dim Actual As BigInteger
     
-    Set Actual = BInt(&H7FFFFFFF).ShiftLeft(-1)
+    Set Actual = CBigInt(&H7FFFFFFF).ShiftLeft(-1)
     
-    Assert.That Actual, Equals(BInt(&H3FFFFFFF))
+    Assert.That Actual, Equals(CBigInt(&H3FFFFFFF))
 End Sub
 
 Public Sub ShiftLeft_WhenShiftingAllBits_ShiftsBits()
     Dim Actual As BigInteger
     
-    Set Actual = BInt(&HFFFF&).ShiftLeft(16)
+    Set Actual = CBigInt(&HFFFF&).ShiftLeft(16)
     
-    Assert.That Actual, Equals(BInt(NewBytes(0, 0, &HFF, &HFF, 0)))
+    Assert.That Actual, Equals(CBigInt(NewBytes(0, 0, &HFF, &HFF, 0)))
 End Sub
 
 Public Sub ShiftLeft_WhenShiftingNegativeOne_ReturnsMinus65536()
     Dim Actual As BigInteger
     
-    Set Actual = BInt(-1).ShiftLeft(16)
+    Set Actual = CBigInt(-1).ShiftLeft(16)
     
-    Assert.That Actual, Equals(BInt(&HFFFF0000))
+    Assert.That Actual, Equals(CBigInt(&HFFFF0000))
 End Sub
 
 Public Sub TestBit_WithValue_ReturnsExpected(ByRef Value As Variant, ByVal Bit As Long, ByVal Expected As Boolean)
     Dim Actual As Boolean
     
-    Actual = BInt(Value).TestBit(Bit)
+    Actual = CBigInt(Value).TestBit(Bit)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
@@ -841,7 +841,7 @@ End Sub
 Public Sub SetBit_WithNegativeValue_ThrowsArgumentOutOfRangeException()
     On Error Resume Next
     
-    BInt(1).SetBit -1
+    CBigInt(1).SetBit -1
     
     AssertArgumentOutOfRangeException Err, "Bit"
 End Sub
@@ -849,7 +849,7 @@ End Sub
 Public Sub SetBit_WithValue_SetsExpectedBit(ByRef Value As Variant, ByVal Bit As Long, ByRef ExpectedBytes() As Byte, ByVal ExpectedSign As Long)
     Dim Actual As BigInteger
     
-    Set Actual = BInt(Value).SetBit(Bit)
+    Set Actual = CBigInt(Value).SetBit(Bit)
     
     Assert.That Actual.ToByteArray, Iz.EqualTo(ExpectedBytes), "Wrong byte array"
     Assert.That Actual.Sign, Iz.EqualTo(ExpectedSign), "Wrong sign"
@@ -858,7 +858,7 @@ End Sub
 Public Sub ClearBit_WithNegativeValue_ThrowsArgumentOutOfRangeException()
     On Error Resume Next
     
-    BInt(1).ClearBit -1
+    CBigInt(1).ClearBit -1
     
     AssertArgumentOutOfRangeException Err, "Bit"
 End Sub
@@ -866,7 +866,7 @@ End Sub
 Public Sub ClearBit_WithValue_ClearsExpectedBit(ByRef Value As Variant, ByVal Bit As Long, ByRef ExpectedBytes() As Byte, ByVal ExpectedSign As Long)
     Dim Actual As BigInteger
     
-    Set Actual = BInt(Value).ClearBit(Bit)
+    Set Actual = CBigInt(Value).ClearBit(Bit)
     
     Assert.That Actual.ToByteArray, Iz.EqualTo(ExpectedBytes), "Wrong byte array"
     Assert.That Actual.Sign, Iz.EqualTo(ExpectedSign), "Wrong sign"
@@ -875,41 +875,41 @@ End Sub
 Public Sub BitwiseAnd_WithValue_ReturnsAndedValue(ByRef Value1 As Variant, ByRef Value2 As Variant, ByRef Expected As Variant)
     Dim Actual As BigInteger
     
-    Set Actual = BInt(Value1).BitwiseAnd(BInt(Value2))
+    Set Actual = CBigInt(Value1).BitwiseAnd(CBigInt(Value2))
     
-    Assert.That Actual, Equals(BInt(Expected))
+    Assert.That Actual, Equals(CBigInt(Expected))
 End Sub
 
 Public Sub BitwiseAndNot_WithValue_ReturnsAndNottedValue(ByRef Value1 As Variant, ByRef Value2 As Variant, ByRef Expected As Variant)
     Dim Actual As BigInteger
     
-    Set Actual = BInt(Value1).BitwiseAndNot(BInt(Value2))
+    Set Actual = CBigInt(Value1).BitwiseAndNot(CBigInt(Value2))
     
-    Assert.That Actual, Equals(BInt(Expected))
+    Assert.That Actual, Equals(CBigInt(Expected))
 End Sub
 
 Public Sub BitwiseOr_WithValue_ReturnsOredValue(ByRef Value1 As Variant, ByRef Value2 As Variant, ByRef Expected As Variant)
     Dim Actual As BigInteger
     
-    Set Actual = BInt(Value1).BitwiseOr(BInt(Value2))
+    Set Actual = CBigInt(Value1).BitwiseOr(CBigInt(Value2))
     
-    Assert.That Actual, Equals(BInt(Expected))
+    Assert.That Actual, Equals(CBigInt(Expected))
 End Sub
 
 Public Sub BitwiseXor_WithValue_ReturnsXoredValue(ByRef Value1 As Variant, ByRef Value2 As Variant, ByRef Expected As Variant)
     Dim Actual As BigInteger
     
-    Set Actual = BInt(Value1).BitwiseXor(BInt(Value2))
+    Set Actual = CBigInt(Value1).BitwiseXor(CBigInt(Value2))
     
-    Assert.That Actual, Equals(BInt(Expected))
+    Assert.That Actual, Equals(CBigInt(Expected))
 End Sub
 
 Public Sub BitwiseNot_WhenCalled_ReturnsExpected(ByRef Value As Variant, ByRef Expected As Variant)
     Dim Actual As BigInteger
     
-    Set Actual = BInt(Value).BitwiseNot
+    Set Actual = CBigInt(Value).BitwiseNot
     
-    Assert.That Actual, Equals(BInt(Expected))
+    Assert.That Actual, Equals(CBigInt(Expected))
 End Sub
 
 Public Sub Rnd_WhenCalled_ReturnsRandomNumber()
@@ -943,7 +943,7 @@ End Sub
 Public Sub Precision_WithValue_ReturnsExpected(ByRef Value As Variant, ByVal Expected As Long)
     Dim Actual As Long
     
-    Actual = BInt(Value).Precision
+    Actual = CBigInt(Value).Precision
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
@@ -1021,7 +1021,7 @@ End Sub
 Public Sub Equals_WithValues_ReturnsExpected(ByRef a As Variant, ByRef b As Variant, ByVal Expected As Boolean)
     Dim Actual As Boolean
     
-    Actual = BigInteger.Equals(BInt(a), BInt(b))
+    Actual = BigInteger.Equals(CBigInt(a), CBigInt(b))
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
@@ -1037,7 +1037,7 @@ End Sub
 Public Sub Divide_WithDivisorOfZero_ThrowsDivideByZeroException()
     On Error Resume Next
     
-    BInt(10).Divide BigInteger.Zero
+    CBigInt(10).Divide BigInteger.Zero
     
     AssertDivideByZeroException Err
 End Sub
@@ -1045,7 +1045,7 @@ End Sub
 Public Sub DivRem_WithDivisorOfZero_ThrowsDivideByZeroException()
     On Error Resume Next
     
-    BInt(10).DivRem BigInteger.Zero, Nothing
+    CBigInt(10).DivRem BigInteger.Zero, Nothing
     
     AssertDivideByZeroException Err
 End Sub
@@ -1055,18 +1055,18 @@ Public Sub Modulus_WithValues_ReturnsExpected(ByRef DividendValue As Variant, By
     Dim Divisor As BigInteger
     Dim Actual As BigInteger
     
-    Set Dividend = BInt(DividendValue)
-    Set Divisor = BInt(DivisorValue)
+    Set Dividend = CBigInt(DividendValue)
+    Set Divisor = CBigInt(DivisorValue)
     
     Set Actual = Dividend.Modulus(Divisor)
     
-    Assert.That Actual, Equals(BInt(ExpectedValue))
+    Assert.That Actual, Equals(CBigInt(ExpectedValue))
 End Sub
 
 Public Sub IsEven_WithValue_ReturnsExpected(ByRef Value As Variant, ByVal Expected As Boolean)
     Dim Actual As Boolean
     
-    Actual = BInt(Value).IsEven
+    Actual = CBigInt(Value).IsEven
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
@@ -1074,9 +1074,9 @@ End Sub
 Public Sub GreatestCommonDivisor_WithValues_ReturnsExpected(ByRef Left As Variant, ByRef Right As Variant, ByRef Expected As Variant)
     Dim Actual As BigInteger
     
-    Set Actual = BigInteger.GreatestCommonDivisor(BInt(Left), BInt(Right))
+    Set Actual = BigInteger.GreatestCommonDivisor(CBigInt(Left), CBigInt(Right))
     
-    Assert.That Actual, Equals(BInt(Expected))
+    Assert.That Actual, Equals(CBigInt(Expected))
 End Sub
 
 Public Sub NewBigInteger_WithInt64_InitializesBigInteger(ByRef Value As Variant, ByRef ExpectedBytes() As Byte, ByVal ExpectedSign As Long)

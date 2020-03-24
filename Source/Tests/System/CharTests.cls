@@ -177,6 +177,16 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use t("\xD800\xDC00"), &H10000
             Test.Use t("\xDBFF\xDFFF"), &H10FFFF
             
+        Case "ConvertToInt32_WithValue_ReturnsExpected"
+            Test.Use Char.MinValue, 0
+            Test.Use Char.MaxValue, &HFFFF&
+            Test.Use &H8000, 32768
+            
+        Case "ConvertFromInt32_WithValue_ReturnsExpected"
+            Test.Use 0, Char.MinValue
+            Test.Use 65535, Char.MaxValue
+            Test.Use 32768, -32768
+            
     End Select
 End Sub
 
@@ -393,3 +403,34 @@ Public Sub ConvertToUtf32Str_WithFirstCharAsLowSurrogate_ThrowsArgumentException
      AssertArgumentException Err, "s"
 End Sub
 
+Public Sub ConvertToInt32_WithValue_ReturnsExpected(ByVal Ch As Integer, ByVal Expected As Long)
+    Dim Actual As Long
+    
+    Actual = Char.ConvertToInt32(Ch)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub ConvertFromInt32_WithValue_ReturnsExpected(ByVal Value As Long, ByVal Expected As Integer)
+    Dim Actual As Integer
+    
+    Actual = Char.ConvertFromInt32(Value)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub ConvertFromInt32_WithTooLargeValue_ThrowsArgumentOutOfRangeException()
+    On Error Resume Next
+    
+    Char.ConvertFromInt32 65536
+    
+    AssertArgumentOutOfRangeException Err, "Value"
+End Sub
+
+Public Sub ConvertFromInt32_WithTooSmallValue_ThrowsArgumentOutOfRangeException()
+    On Error Resume Next
+    
+    Char.ConvertFromInt32 -1
+    
+    AssertArgumentOutOfRangeException Err, "Value"
+End Sub

@@ -1036,6 +1036,37 @@ Public Sub Split_WithCharSeparators_ReturnsExpected(ByVal StringToSplit As Strin
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
+Public Sub CharAt_WhenCalled_ReturnsExpected()
+    Dim s As String
+    s = "abc"
+    
+    Assert.That CorString.CharAt(s, 0), Iz.EqualTo(97)
+    Assert.That CorString.CharAt(s, 2), Iz.EqualTo(99)
+End Sub
+
+Public Sub CharAt_WithEmptyStringAndZeroIndex_ThrowsArgumentOutOfRangeException()
+    On Error Resume Next
+    
+    CorString.CharAt "", 0
+    
+    AssertArgumentOutOfRangeException Err, "Index"
+End Sub
+
+Public Sub CharAt_WithNegativeIndex_ThrowsArgumentOutOfRangeException()
+    On Error Resume Next
+    
+    CorString.CharAt "abc", -1
+    
+    AssertArgumentOutOfRangeException Err, "Index"
+End Sub
+
+Public Sub CharAt_WithTooLargeIndex_ThrowsArgumentOutOfRangeException()
+    On Error Resume Next
+    
+    CorString.CharAt "abc", 3
+    
+    AssertArgumentOutOfRangeException Err, "Index"
+End Sub
 
 Private Property Get WhiteSpaces() As String
     WhiteSpaces = ChrW$(&H20) & ChrW$(&HD) & ChrW$(&H9) & ChrW$(&HA) & ChrW$(&HB) & ChrW$(&HC) & ChrW$(&H85) & ChrW$(&HA0) & ChrW$(&H1680) & ChrW$(&H180E) & _

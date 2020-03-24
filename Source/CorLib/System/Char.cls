@@ -276,3 +276,45 @@ End Function
 Public Function ConvertToUtf32Str(ByRef s As String, ByVal Index As Long) As Long
     ConvertToUtf32Str = CharMethods.ConvertToUtf32Str(s, Index)
 End Function
+
+''
+' Converts the character value to a 32-bit signed integer.
+'
+' @param c The character to be converted.
+' @return A 32-bit signed integer representing the numeric value of the character.
+' @remarks In VBCorLib characters are represented with 16-bit signed integers. In order
+' to represent all characters, the numeric value may be represented with a negative value.
+' <p>If the numeric value is negative, converted positive value will have the same 16-bit binary representation.</p>
+' <p>A character value of -1(&hFFFF) is converted to 65535(&hFFFF&). Both values have the same 16-bit binary representation.</p>
+Public Function ConvertToInt32(ByVal c As Integer) As Long
+    ConvertToInt32 = c And &HFFFF&
+End Function
+
+''
+' Converts a 32-bit signed integer value to a 16-bit signed integer as a character.
+'
+' @param Value The 32-bit signed integer value to be converted to a corrisponding 16-bit integer character.
+' @return A 16-bit signed integer character.
+' @remarks The 16-bit result will be a binary equivalent of the first 16 bits of the <i>Value</i> parameter.
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+'        <td><i>Value</i> is less than 0 or greater than 65535.</td>
+'   </tr>
+' </table>
+Public Function ConvertFromInt32(ByVal Value As Long) As Integer
+    If Value < 0 Or Value > &HFFFF& Then _
+        Throw Cor.NewArgumentOutOfRangeException("Value", Environment.GetResourceString(ArgumentOutOfRange_Range, 0, &HFFFF&))
+
+    ConvertFromInt32 = Value And &H7FFF&
+    
+    If Value And &H8000& Then
+        ConvertFromInt32 = ConvertFromInt32 Or &H8000
+    End If
+End Function
+

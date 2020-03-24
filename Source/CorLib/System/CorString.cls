@@ -1145,6 +1145,22 @@ Public Function CompareOrdinalEx(ByRef StrA As String, ByVal IndexA As Long, ByR
     CompareOrdinalEx = CompareEx(StrA, IndexA, StrB, IndexB, Length, StringComparison.Ordinal)
 End Function
 
+''
+' Returns character value from a string at the specified index.
+'
+' @param s The string to return the character from.
+' @param Index The position of the character in the string.
+' @return An integer representing the character.
+' @remarks The index is zero based.
+Public Function CharAt(ByRef s As String, ByVal Index As Long) As Integer
+    If Index < 0 Then _
+        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_NeedNonNegNum
+    If Index >= Len(s) Then _
+        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_Index
+    
+    CharAt = MemWord(StrPtr(s) + Index * vbSizeOfChar)
+End Function
+
 Friend Function LastChar(ByRef s As String) As Integer
     Dim Length As Long
     Dim LastCharIndex As Long
@@ -1155,12 +1171,6 @@ Friend Function LastChar(ByRef s As String) As Integer
         LastCharIndex = Length - 1
         LastChar = MemWord(StrPtr(s) + LastCharIndex * vbSizeOfChar)
     End If
-End Function
-
-Friend Function CharAt(ByRef s As String, ByVal Index As Long) As Integer
-    Debug.Assert Index >= 0 And Index < Len(s)
-    
-    CharAt = MemWord(StrPtr(s) + Index * vbSizeOfChar)
 End Function
 
 Friend Function AllChars(ByRef s As String, ByVal Predicate As Long) As Boolean
