@@ -38,8 +38,8 @@ Attribute VB_Exposed = True
 ''
 ' Provides static functions to format and manipulate string values.
 '
-' @remarks This class cannot be directly instantiated. The methods are accessed
-' through the class name itself.
+' @remarks This class cannot be directly instantiated. The methods are accessed through the class name itself.
+' @example
 ' <pre>
 ' s = CorString.Trim(s, "\")
 ' </pre>
@@ -227,6 +227,24 @@ End Function
 ' @param StartIndex The start index in the string to begin converting to a char array. This is zero-based.
 ' @param Length The number of characters to convert to chars.
 ' @return An array containing the converted characters from the string.
+' @remarks The <i>StartIndex</i> parameter is zero-based. That is, the index of the first character in the string <i>s</i> is zero.
+' <p>If <i>Length</i> is zero, the returned array is empty and has a zero length. If <i>s</i> is an empty string (""),
+' the returned array is empty and has a zero length.</p>
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+'        <td>
+'           <i>StartIndex</i> or <i>Length</i> is less than zero.<br/>
+'           -or-<br/>
+'           <i>StartIndex</i> plus <i>Length</i> is greater than the length of <i>s</i>.
+'        </td>
+'   </tr>
+' </table>
 Public Function ToCharArray(ByRef s As String, Optional ByRef StartIndex As Variant, Optional ByRef Length As Variant) As Integer()
     Dim Range   As ListRange
     Dim Chars() As Integer
@@ -290,11 +308,21 @@ End Function
 ' Trims the beginning of the string.
 '
 ' @param s The string to be trimmed.
-' @param trimChars The characters to remove.
+' @param TrimChars The characters to remove.
 ' @return The trimmed string.
-' @remarks Unlike VB's LTrim function, this can trim multiple character types, not just spaces.
-' <p>The <i>trimChars</i> can be either a string of the characters or an integer array
+' @remarks Unlike VB's <b>LTrim</b> function, this can trim multiple character types, not just spaces.
+' <p>The <i>TrimChars</i> can be either a string of the characters or an <b>Integer</b> array
 ' of characters that will be trimmed from the beginning.</p>
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ArgumentException.html">ArgumentException</a></td><td><i>TrimChars</i> was neither a <b>String</b> or <b>Integer</b> array.</td>
+'   </tr>
+' </table>
 Public Function TrimStart(ByRef s As String, Optional ByRef TrimChars As Variant) As String
     TrimStart = TrimCore(s, TrimChars, True, False)
 End Function
@@ -305,9 +333,19 @@ End Function
 ' @param s The string to be trimmed.
 ' @param TrimChars The characters to remove.
 ' @return The trimmed string.
-' @remarks Unlike VB's RTrim function, this can trim multiple character types, not just spaces.
+' @remarks Unlike VB's <b>RTrim</b> function, this can trim multiple character types, not just spaces.
 ' <p>The <i>TrimChars</i> can be either a string of the characters or an <b>Integer</b> array
 ' of characters that will be trimmed from the end.</p>
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ArgumentException.html">ArgumentException</a></td><td><i>TrimChars</i> was neither a <b>String</b> or <b>Integer</b> array.</td>
+'   </tr>
+' </table>
 Public Function TrimEnd(ByRef s As String, Optional ByRef TrimChars As Variant) As String
     TrimEnd = TrimCore(s, TrimChars, False, True)
 End Function
@@ -318,9 +356,19 @@ End Function
 ' @param s The string to be trimmed.
 ' @param TrimChars The characters to remove.
 ' @return The trimmed string.
-' @remarks Unlike VB's Trim function, this can trim multiple character types, not just spaces.
+' @remarks Unlike VB's <b>Trim</b> function, this can trim multiple character types, not just spaces.
 ' <p><i>TrimChars</i> can be either a string of the characters or an <i>Integer</i> array
 ' of characters that will be trimmed from both ends.</p>
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ArgumentException.html">ArgumentException</a></td><td><i>TrimChars</i> was neither a <b>String</b> or <b>Integer</b> array.</td>
+'   </tr>
+' </table>
 Public Function Trim(ByRef s As String, Optional ByRef TrimChars As Variant) As String
     Trim = TrimCore(s, TrimChars, True, True)
 End Function
@@ -333,6 +381,23 @@ End Function
 ' @param StartIndex The starting element in <i>Arr</i> to begin joining from.
 ' @param Count The number of string elements to join together.
 ' @return A string containing elements joined from the array separated by the delimiter.
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+'        <td>
+'           <i>StartIndex</i> is less than the lower-bound of <i>Value</i>.<br/>
+'           -or-<br/>
+'           <i>Count</i> is less than zero.<br/>
+'           -or-<br/>
+'           <i>StartIndex</i> plus <i>Count</i> is greater than the upper-bound of <i>Value</i>.
+'        </td>
+'   </tr>
+' </table>
 Public Function Join(ByRef Separator As String, ByRef Value As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As String
     Dim Range As ListRange
     
@@ -476,7 +541,7 @@ End Function
 ' @param StartIndex The starting index of <i>s</i> to begin searching.
 ' @param Count The number of characters in <i>s</i> to search.
 ' @return The index of a character from the set, or -1 if none are found.
-' @remarks The indexing of <i>s</i> is zero-based.
+' @remarks The <i>StartIndex</i> is zero-based.
 Public Function LastIndexOfAny(ByRef s As String, ByRef OfAny As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As Long
     Dim Range As ListRange
     
@@ -503,7 +568,7 @@ End Function
 ' @param StartIndex The starting position to insert the string.
 ' @param Value The string to be inserted.
 ' @return A string containing the new string created from the insertion.
-' @remarks Index is zero-based.
+' @remarks <i>StartIndex</i> is zero-based.
 Public Function Insert(ByRef s As String, ByVal StartIndex As Long, ByRef Value As String) As String
     Dim ValueLength As Long
     Dim SourcePtr As Long
@@ -537,7 +602,7 @@ End Function
 ' @param Value The string to compare to the substring at the beginning of <i>s</i>.
 ' @param ComparisonType One of the enumeration values that determines how <i>s</i> and <i>Value</i> are compared.
 ' @return <b>True</b> if the <i>s</i> parameter begins with <i>Value</i>; otherwise <b>False</b>.
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
 '       <th>Exception</th>
@@ -563,7 +628,7 @@ End Function
 ' @param s The string to check.
 ' @param Value The string to compare to the substring at the beginning of <i>s</i>.
 ' @param IgnoreCase <b>True</b> to ignore case during comparison; otherwise <b>False</b>.
-' @param Culture Cultural information that determines how <i>s</i> and <i>Value</> are compared. If <i>Culture</i> is <b>Nothing</b>, the current culture is used.
+' @param Culture Cultural information that determines how <i>s</i> and <i>Value</i> are compared. If <i>Culture</i> is <b>Nothing</b>, the current culture is used.
 ' @return <b>True</b> if the <i>s</i> parameter begins with <i>Value</i>; otherwise <b>False</b>.
 Public Function StartsWithEx(ByRef s As String, ByRef Value As String, ByVal IgnoreCase As Boolean, ByVal Culture As CultureInfo) As Boolean
     Dim LenValue As Long
@@ -586,7 +651,7 @@ End Function
 ' @param Value The string to compare to the substring at the end of <i>s</i>.
 ' @param ComparisonType One of the enumeration values that determines how <i>s</i> and <i>Value</i> are compared.
 ' @return <b>True</b> if the <i>Value</i> parameter matches the end of <i>s</i>; otherwise <b>False</b>.
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
 '       <th>Exception</th>
@@ -614,7 +679,7 @@ End Function
 ' @param s The string to check.
 ' @param Value The string to compare to the substring at the end of the <i>s</i> parameter.
 ' @param IgnoreCase <b>True</b> to ignore case during comparison; otherwise <b>False</b>.
-' @param Culture Cultural information that determines how <i>s</i> and <i>Value</> are compared. If <i>Culture</i> is <b>Nothing</b>, the current culture is used.
+' @param Culture Cultural information that determines how <i>s</i> and <i>Value</i> are compared. If <i>Culture</i> is <b>Nothing</b>, the current culture is used.
 ' @return <b>True</b> if the <i>Value</i> parameter matches the end of <i>s</i>; otherwise <b>False</b>.
 Public Function EndsWithEx(ByRef s As String, ByRef Value As String, ByVal IgnoreCase As Boolean, ByVal Culture As CultureInfo) As Boolean
     Dim StartIndex  As Long
@@ -642,7 +707,7 @@ End Function
 ' @param Count The maximum number of substrings to return.
 ' @param Options <a href="CorString.StringSplitOptions.html">StringSplitOptions.RemoveEmptyEntries</a> to omit empty array elements from the array returned; or <a href="CorString.StringSplitOptions.html">StringSplitOptions.None</a> to include empty array elements in the array returned.
 ' @return An array whose elements contain the substrings in this string that are delimited by one or more strings in <i>Separator</i>. For more information, see the Remarks section.
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
 '       <th>Exception</th>
@@ -948,8 +1013,7 @@ End Function
 ' @param StrA The first string to compare.
 ' @param StrB The second string to compare.
 ' @param ComparisonType One of the enumeration values that specifies the rules to use in the comparison.
-' @return A 32-bit signed integer that indicates the lexical relationship between the two comparands.
-' <h4>Exceptions</h4>
+' @return A 32-bit signed integer that indicates the lexical relationship between the two comparands, as shown in the following table
 ' <table style="width: auto">
 '   <tr>
 '       <th>Value</th>
@@ -1016,7 +1080,7 @@ End Function
 ' </table>
 ' @remarks The substrings to compare start in <i>StrA</i> at <i>IndexA</i> and in <i>StrB</i> at <i>IndexB</i>. Both <i>IndexA</i> and <i>IndexB</i> are zero-based;
 ' that is, the first character in <i>StrA</i> and <i>StrB</i> is at position zero, not position one.
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
 '       <th>Exception</th>
@@ -1177,7 +1241,7 @@ End Function
 ' </table>
 ' @remarks The <i>IndexA</i>, <i>IndexB</i>, and <i>Length</i> parameters must be nonnegative.
 ' <p>The number of characters compared is the lesser of the length of <i>StrA</i> less <i>IndexA</i>, the length of <i>StrB</i> less <i>IndexB</i>, and <i>Length</i>.</p>
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
 '       <th>Exception</th>
@@ -1205,8 +1269,23 @@ End Function
 '
 ' @param s The string to return the character from.
 ' @param Index The position of the character in the string.
-' @return An integer representing the character.
-' @remarks The index is zero based.
+' @return A 16-bit integer representing the character.
+' @remarks <i>Index</i> is zero-based.
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'       <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+'       <td>
+'           <i>Index</i> is less than zero.<br/>
+'           -or-<br/>
+'           <i>Index</i> is equal to or greater than the length of <i>s</i>.
+'       </td>
+'   </tr>
+' </table>
 Public Function CharAt(ByRef s As String, ByVal Index As Long) As Integer
     If Index < 0 Then _
         Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_NeedNonNegNum
