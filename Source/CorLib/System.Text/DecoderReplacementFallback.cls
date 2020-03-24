@@ -112,8 +112,8 @@ Friend Sub Init(ByRef Replacement As String)
     Dim i           As Long
     
     For i = 0 To Len(Replacement) - 1
-        If IsSurrogateStr(Replacement, i) Then
-            If IsHighSurrogateStr(Replacement, i) Then
+        If Char.IsSurrogateStr(Replacement, i) Then
+            If Char.IsHighSurrogateStr(Replacement, i) Then
                 If FoundHigh Then
                     Exit For
                 End If
@@ -121,7 +121,7 @@ Friend Sub Init(ByRef Replacement As String)
                 FoundHigh = True
             End If
             
-            If IsLowSurrogateStr(Replacement, i) Then
+            If Char.IsLowSurrogateStr(Replacement, i) Then
                 If Not FoundHigh Then
                     FoundHigh = True
                     Exit For

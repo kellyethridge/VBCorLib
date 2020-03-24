@@ -68,14 +68,36 @@ End Property
 '
 ' @param a A character to compare with.
 ' @param b A character to compare with.
-' @return <p>Returns a <b>negative</b> value if parameter <i>a</i> is less than parameter <i>b</i>.</p>
-' <p>Returns a <b>positive</b> value if parameter <i>a</i> is greater than parameter <i>b</i>.</p>
-' <p>Returns a <b>zero</b> if parameter <i>a</i> is equal to parameter <i>b</i>.</p>
+' @return A signed number indicating the position of <i>a</i> parameter in the sort order in relation to the <i>b</i> parameter.
+' <table style="width: auto">
+'   <tr>
+'       <th>Return Value</th>
+'       <th>Description</th>
+'   </tr>
+'   <tr>
+'        <td>Less than zero</td><td><i>a</i> precedes <i>b</i>.</td>
+'   </tr>
+'    <tr>
+'        <td>Zero</td><td><i>a</i> has the same position in the sort order as <i>b</i></td>
+'    </tr>
+'    <tr>
+'        <td>Greater than zero</td><td><i>a</i> follows <i>b</i> in the sort order.</td>
+'    </tr>
+' </table>
 ' @remarks This method handles the discrepancy between integers and longs particularly when
 ' dealing with negative integer values that should map to positive long values.
-'
 Public Function Compare(ByVal a As Long, ByVal b As Long) As Long
-    Compare = CharMethods.Compare(a, b)
+    If (Not IsValidChar(a)) Or (Not IsValidChar(b)) Then _
+        Throw Cor.NewArgumentOutOfRangeException(IIf(IsValidChar(a), "b", "a"), Environment.GetResourceString(ArgumentOutOfRange_Range))
+            
+    a = a And &HFFFF&
+    b = b And &HFFFF&
+    
+    If a < b Then
+        Compare = -1
+    ElseIf a > b Then
+        Compare = 1
+    End If
 End Function
 
 ''
@@ -86,9 +108,11 @@ End Function
 ' @return <b>true</b> if parameter <i>a</i> is equal to parameter <i>b</i>; otherwise <b>false</b>.
 ' @remarks This method handles the discrepancy between integers and longs particularly when
 ' dealing with negative integer values that should map to positive long values.
-'
 Public Function Equals(ByVal a As Long, ByVal b As Long) As Boolean
-    Equals = CharMethods.Equals(a, b)
+    If Not IsValidChar(a) Or Not IsValidChar(b) Then _
+        ThrowInvalidChar IIf(IsValidChar(a), "b", "a")
+        
+    Equals = (a And &HFFFF&) = (b And &HFFFF&)
 End Function
 
 ''
@@ -107,7 +131,13 @@ End Function
 ' </ul>
 ' </p>
 Public Function IsWhiteSpaceStr(ByRef s As String, ByVal Index As Long) As Boolean
-    IsWhiteSpaceStr = CharMethods.IsWhiteSpaceStr(s, Index)
+    Dim Ptr As Long
+    
+    If Index < 0 Or Index >= Len(s) Then _
+        Error.ArgumentOutOfRange "Index"
+        
+    Ptr = StrPtr(s) + Index * vbSizeOfChar
+    IsWhiteSpaceStr = CharMethods.IsWhiteSpace(MemWord(Ptr))
 End Function
 
 ''
@@ -124,8 +154,10 @@ End Function
 ' </ul>
 ' <p>This method handles the discrepancy between integers and longs particularly when
 ' dealing with negative integer values that should map to positive long values.</p>
-'
 Public Function IsWhiteSpace(ByVal c As Long) As Boolean
+    If Not IsValidChar(c) Then _
+        ThrowInvalidChar "c"
+    
     IsWhiteSpace = CharMethods.IsWhiteSpace(c)
 End Function
 
@@ -135,8 +167,7 @@ End Function
 ' @param s A string.
 ' @param Index The position of the character to evaluate in <i>s</i>.
 ' @return <b>true</b> if the value of <i>c</i> parameter ranges from U+D800 to U+DBFF; otherwise, <b>false</b>.
-' @remarks
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width:auto">
 '   <tr>
 '       <th>Exception</th><th>Condition</th>
@@ -147,7 +178,13 @@ End Function
 '   </tr>
 ' </table>
 Public Function IsHighSurrogateStr(ByRef s As String, ByVal Index As Long) As Boolean
-    IsHighSurrogateStr = CharMethods.IsHighSurrogateStr(s, Index)
+    Dim Ptr As Long
+
+    If Index < 0 Or Index >= Len(s) Then _
+        Error.ArgumentOutOfRange "Index"
+    
+    Ptr = StrPtr(s) + Index * vbSizeOfChar
+    IsHighSurrogateStr = CharMethods.IsHighSurrogate(MemWord(Ptr))
 End Function
 
 ''
@@ -157,8 +194,10 @@ End Function
 ' @return <b>true</b> if the value of <i>c</i> parameter ranges from U+D800 to U+DBFF; otherwise, <b>false</b>.
 ' @remarks <p>This method handles the discrepancy between integers and longs particularly when
 ' dealing with negative integer values that should map to positive long values.</p>
-'
 Public Function IsHighSurrogate(ByVal c As Long) As Boolean
+    If Not IsValidChar(c) Then _
+        ThrowInvalidChar "c"
+    
     IsHighSurrogate = CharMethods.IsHighSurrogate(c)
 End Function
 
@@ -167,20 +206,25 @@ End Function
 '
 ' @param s A string.
 ' @param Index The position of the character to evaluate in <i>s</i>.
-' @return <b>true</b> if the specified character in the <i>s</i> parameter ranges from U+DC00 to U+DFFF; otherwise, <b>false</b>.
-' @remarks
-' <h4>Exceptions</h4>
+' @return <b>True</b> if the specified character in the <i>s</i> parameter ranges from U+DC00 to U+DFFF; otherwise, <b>False</b>.
+' @exceptions
 ' <table style="width:auto">
 '   <tr>
 '       <th>Exception</th><th>Condition</th>
 '   </tr>
 '   <tr>
 '       <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
-'       <td><i>index</i> is not a position within <i>s</i>.</td>
+'       <td><i>Index</i> is not a position within <i>s</i>.</td>
 '   </tr>
 ' </table>
 Public Function IsLowSurrogateStr(ByRef s As String, ByVal Index As Long) As Boolean
-    IsLowSurrogateStr = CharMethods.IsLowSurrogateStr(s, Index)
+    Dim Ptr As Long
+    
+    If Index < 0 Or Index >= Len(s) Then _
+        Error.ArgumentOutOfRange "Index"
+    
+    Ptr = StrPtr(s) + Index * vbSizeOfChar
+    IsLowSurrogateStr = CharMethods.IsLowSurrogate(MemWord(Ptr))
 End Function
 
 ''
@@ -192,6 +236,9 @@ End Function
 ' dealing with negative integer values that should map to positive long values.</p>
 '
 Public Function IsLowSurrogate(ByVal c As Long) As Boolean
+    If Not IsValidChar(c) Then _
+        ThrowInvalidChar "c"
+
     IsLowSurrogate = CharMethods.IsLowSurrogate(c)
 End Function
 
@@ -209,9 +256,14 @@ End Function
 ' @see IsHighSurrogateStr
 ' @see IsLowSurrogate
 ' @see IsLowSurrogateStr
-'
 Public Function IsSurrogateStr(ByRef s As String, ByVal Index As Long) As Boolean
-    IsSurrogateStr = CharMethods.IsSurrogateStr(s, Index)
+    Dim Ptr As Long
+    
+    If Index < 0 Or Index >= Len(s) Then _
+        Error.ArgumentOutOfRange "Index"
+    
+    Ptr = StrPtr(s) + Index * vbSizeOfChar
+    IsSurrogateStr = CharMethods.IsSurrogate(MemWord(Ptr))
 End Function
 
 ''
@@ -228,8 +280,10 @@ End Function
 ' @see IsHighSurrogateStr
 ' @see IsLowSurrogate
 ' @see IsLowSurrogateStr
-'
 Public Function IsSurrogate(ByVal c As Long) As Boolean
+    If Not IsValidChar(c) Then _
+        ThrowInvalidChar "c"
+    
     IsSurrogate = CharMethods.IsSurrogate(c)
 End Function
 
@@ -239,8 +293,7 @@ End Function
 ' @param HighSurrogate A high surrogate code unit (that is, a code unit ranging from U+D800 through U+DBFF).
 ' @param LowSurrogate A low surrogate code unit (that is, a code unit ranging from U+DC00 through U+DFFF).
 ' @return The 21-bit Unicode code point represented by the highSurrogate and lowSurrogate parameters.
-' @remarks
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width:auto">
 '   <tr><th>Exception</th><th>Condition</th></tr>
 '   <tr>
@@ -248,8 +301,14 @@ End Function
 '       <td><i>HighSurrogate</i> is not in the range U+D800 through U+DBFF, or <i>LowSurrogate</i> is not in the range U+DC00 through U+DFFF.</td>
 '   </tr>
 ' </table>
-'
 Public Function ConvertToUtf32(ByVal HighSurrogate As Long, ByVal LowSurrogate As Long) As Long
+    If Not IsValidChar(HighSurrogate) Or Not IsValidChar(LowSurrogate) Then _
+        ThrowInvalidChar IIf(IsValidChar(HighSurrogate), "LowSurrogate", "HighSurrogate")
+    If Not CharMethods.IsHighSurrogate(HighSurrogate) Then _
+        Error.ArgumentOutOfRange "HighSurrogate", ArgumentOutOfRange_InvalidHighSurrogate
+    If Not CharMethods.IsLowSurrogate(LowSurrogate) Then _
+        Error.ArgumentOutOfRange "LowSurrogate", ArgumentOutOfRange_InvalidLowSurrogate
+
     ConvertToUtf32 = CharMethods.ConvertToUtf32(HighSurrogate, LowSurrogate)
 End Function
 
@@ -259,8 +318,7 @@ End Function
 ' @param s A string that contains a character or surrogate pair.
 ' @param Index The index position of the character or surrogate pair in s.
 ' @return The 21-bit Unicode code point represented by the character or surrogate pair at the position in the <i>s</i> parameter specified by the <i>index</i> parameter.
-' @remarks
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width:auto">
 '   <tr><th>Exception</th><th>Condition</th></tr>
 '   <tr>
@@ -272,9 +330,63 @@ End Function
 '       <td>The specified index position contains a surrogate pair, and either the first character in the pair is not a valid high surrogate or the second character in the pair is not a valid low surrogate.</td>
 '   </tr>
 ' </table>
-'
 Public Function ConvertToUtf32Str(ByRef s As String, ByVal Index As Long) As Long
-    ConvertToUtf32Str = CharMethods.ConvertToUtf32Str(s, Index)
+    Dim Char1   As Long
+    Dim Char2   As Long
+    Dim Ptr     As Long
+    
+    If Index < 0 Or Index >= Len(s) Then _
+        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_Index
+    
+    Ptr = StrPtr(s) + Index * vbSizeOfChar
+    Char1 = MemWord(Ptr) And &HFFFF&
+    
+    If IsLowSurrogate(Char1) Then _
+        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidLowSurrogate, Index), "s")
+    
+    If IsHighSurrogate(Char1) Then
+        Char2 = MemWord(Ptr + vbSizeOfChar) And &HFFFF&
+                
+        If Not IsLowSurrogate(Char2) Then _
+            Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidHighSurrogate, Index), "s")
+        
+        ConvertToUtf32Str = CharMethods.ConvertToUtf32(Char1, Char2)
+    Else
+        ConvertToUtf32Str = Char1
+    End If
+End Function
+
+''
+' Converts the specified Unicode code point into a UTF-16 encoded string.
+'
+' @param Utf32 A 21-bit Unicode code point.
+' @return A string consisting of one character or a surrogate pair of characters equivalent to the code point specified by the <i>Utf32</i> parameter.
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+'        <td><i>Utf32</i> is not a valid 21-bit Unicode code point ranging from U+0 through U+10FFFF, excluding the surrogate pair range from U+D800 through U+DFFF.</td>
+'   </tr>
+' </table>
+Public Function ConvertFromUtf32(ByVal UTF32 As Long) As String
+    Dim High As Long
+    Dim Low As Long
+    
+    If (UTF32 < 0 Or UTF32 > UnicodePlane16End) Or (UTF32 >= SurrogateStart And UTF32 <= SurrogateEnd) Then _
+        Error.ArgumentOutOfRange "Utf32", ArgumentOutOfRange_InvalidUTF32
+    
+    If UTF32 < CharMethods.UnicodePlane1Start Then
+        ConvertFromUtf32 = ChrW$(UTF32)
+    Else
+        UTF32 = UTF32 - UnicodePlane1Start
+        High = (UTF32 And &HFFC00) \ vbShift10Bits + HighSurrogateStart
+        Low = (UTF32 And &H3FF&) + LowSurrogateStart
+        ConvertFromUtf32 = ChrW$(High) & ChrW$(Low)
+    End If
 End Function
 
 ''
@@ -304,12 +416,12 @@ End Function
 '   </tr>
 '   <tr>
 '        <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
-'        <td><i>Value</i> is less than 0 or greater than 65535.</td>
+'        <td><i>Value</i> is less than -32768 or greater than 65535.</td>
 '   </tr>
 ' </table>
 Public Function ConvertFromInt32(ByVal Value As Long) As Integer
-    If Value < 0 Or Value > &HFFFF& Then _
-        Throw Cor.NewArgumentOutOfRangeException("Value", Environment.GetResourceString(ArgumentOutOfRange_Range, 0, &HFFFF&))
+    If Not IsValidChar(Value) Then _
+        ThrowInvalidChar "Value"
 
     ConvertFromInt32 = Value And &H7FFF&
     
@@ -318,3 +430,10 @@ Public Function ConvertFromInt32(ByVal Value As Long) As Integer
     End If
 End Function
 
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Helpers
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Sub ThrowInvalidChar(ByVal ParamName As String)
+    Throw Cor.NewArgumentOutOfRangeException(ParamName, Environment.GetResourceString(ArgumentOutOfRange_Range, MinCharValue, MaxCharValue))
+End Sub

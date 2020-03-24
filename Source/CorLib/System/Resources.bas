@@ -230,6 +230,7 @@ Public Enum ResourceStringKey
     ArgumentOutOfRange_StreamLength = 752
     ArgumentOutOfRange_NegativeCount = 753
     ArgumentOutOfRange_OffsetLength = 754
+    ArgumentOutOfRange_InvalidUTF32 = 755
     
     IOException_Exception = 400 '?
     IO_AlreadyExists_Name = 401 '?
@@ -408,6 +409,8 @@ Public Enum ParameterName
     NameOfKeyBlob = 2039
     NameOfArrayIndex = 2040
     NameOfDestination = 2041
+    NameOfa = 2042
+    NameOfb = 2043
 End Enum
 
 Private Declare Function DeleteObject Lib "gdi32.dll" (ByVal hObject As Long) As Long
