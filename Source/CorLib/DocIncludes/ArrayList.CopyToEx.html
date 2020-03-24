@@ -1,0 +1,30 @@
+@exceptions
+<table style="width: auto">
+    <tr><th>Exception</th><th>Condition</th></tr>
+    <tr>
+        <td><a href="ArgumentNullException.html">ArgumentNullException</a></td><td>The <i>Arr</i> is uninitialized.</td>
+    </tr>
+    <tr>
+        <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+        <td><i>Index</i> is less than zero.<br/>
+            -or-<br/>
+            <i>ArrayIndex</i> is less than zero.<br/>
+            -or-<br/>
+            <i>Count</i> is less than zero.
+        </td>
+    </tr>
+    <tr>
+    <td><a href="ArgumentException.html">ArgumentException</a></td>
+        <td>
+            <i>Arr</i> is multidimension.<br/>
+            -or-<br/>
+            <i>Index</i> is equal to or greater than <a href="ArrayList.Get.Count.html">Count</a> of the source <a href="ArrayList.html">ArrayList</a>.<br/>
+            -or-<br/>
+            The number of elements from <i>Index</i> to the end of the source <a href="ArrayList.html">ArrayList</a> is greater than the available space from <i>ArrayIndex</i> to the end of the destination <i>Arr</i>.
+        </td>
+    </tr>
+    <tr>
+        <td><a href="InvalidCastException.html">InvalidCastException</a></td>
+        <td>Elements in the <a href="ArrayList.html">ArrayList</a> cannot be converted to a compatible type of the destination <i>Arr</i>.</td>
+    </tr>
+</table>

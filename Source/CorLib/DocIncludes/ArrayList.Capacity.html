@@ -1,10 +1,7 @@
-@remarks
-<h4>Exceptions</h4>
-<table>
-<tr>
-<th width="50%">Exception Type</th><th>Condition</th>
-</tr><tr>
-<td>ArgumentException</td>
-<td>The Capacity was set to a value that is less than Count.</td>
-</tr>
-</table>
+@remarks <b>Capacity</b> is the number of elements that the <a href="ArrayList.html">ArrayList</a> can store.
+<a href="ArrayList.Get.Count.html">Count</a> is the number of elements that are actually in the <a href="ArrayList.html">ArrayList</a>.
+<p><b>Capacity</b> is always greater than or equal to <a href="ArrayList.Get.Count.html">Count</a>. If <a href="ArrayList.Get.Count.html">Count</a>
+exceeds <b>Capacity</b> while adding elements, the capacity is automatically increased by reallocating the internal array before copying the old elements and adding the new elements.</p>
+<p>The capacity can be decreased by calling <a href="ArrayList.TrimToSize.html">TrimToSize</a> or by setting the <b>Capacity</b> property explicitly.
+When the value of <b>Capacity</b> is set explicitly, the internal array is also reallocated to accommodate the specified capacity.</p>
+<p>If the capacity is set to zero, then it is set to the default capacity of 16.</p>

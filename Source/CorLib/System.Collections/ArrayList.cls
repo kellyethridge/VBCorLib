@@ -112,12 +112,13 @@ Public Sub AddRange(ByRef Source As Variant)
 End Sub
 
 ''
-' Performs a binary search for the value over the entire list.
+' Searches the entire sorted <a href="ArrayList.html">ArrayList</a> for an element using the specified comparer and returns the zero-based index of the element.
 '
-' @param Value The value to search for.
-' @param Comparer A comparer object to perform user-defined comparison logic.
-' @return The index at which the value was found, or a negative value indicating
-' the value was not found.
+' @param Value The value to search for. The value can be <b>Null</b> or <b>Empty</b>.
+' @param Comparer A comparer object to use when comparing values.<br/>
+' -or-<br/>
+' <b>Nothing</b> to use the default comparer.
+' @return The index at which the value was found, or a negative value indicating the value was not found.
 ' @see IComparer
 ' @see IComparable
 ' @include "..\DocIncludes\ArrayList.BinarySearch.html"
@@ -126,14 +127,15 @@ Public Function BinarySearch(ByRef Value As Variant, Optional ByVal Comparer As 
 End Function
 
 ''
-' Performs a binary search for the value within a specified range of the list.
+' Searches the entire sorted <a href="ArrayList.html">ArrayList</a> for an element using the specified comparer and returns the zero-based index of the element.
 '
-' @param Index  The zero-based index to begin the search.
+' @param Index The zero-based index to begin the search.
 ' @param Count The number of elements to search in from the <i>Index</i>.
-' @param Value The value to search for.
-' @param Comparer A comparer object to perform user-defined comparison logic.
-' @return The index at which the value was found, or a negative value indicating
-' the value was not found.
+' @param Value The value to search for. The value can be <b>Null</b> or <b>Empty</b>.
+' @param Comparer A comparer object to use when comparing values.<br/>
+' -or-<br/>
+' <b>Nothing</b> to use the default comparer.
+' @return The index at which the value was found, or a negative value indicating the value was not found.
 ' @remarks The search assumes the <a href="ArrayList.html">ArrayList</a> is sorted.
 ' <p>The default comparison method requires the values to be of the same
 ' intrinsic Visual Basic datatype. A <b>vbLong</b> will fail to compare against a <b>vbInteger</b>,
@@ -144,6 +146,32 @@ End Function
 ' determine where the value should have been found, negate (Not) the return value.</p>
 ' @see IComparer
 ' @see IComparable
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ArgumentException.html">ArgumentException</a></td>
+'        <td>
+'           <i>Index</b> and <i>Count</i> do not denote a valid range in the <a href="ArrayList.html">ArrayList</a>.<br/>
+'           -or-<br/>
+'           <i>Comparer</i> is <b>Nothing</b> and neither <i>Value</i> nor the elements of <a href="ArrayList.html">ArrayList</a> implement the <a href="IComparer.html">IComparer</a> interface.
+'        </td>
+'   </tr>
+'    <tr>
+'        <td><a href="InvalidOperationException.html">InvalidOperationException</a></td><td><i>Comparer</i> is <b>Nothing</b> and <i>Value</i> is not of the same type as the elements of the <a href="ArrayList.html">ArrayList</a>.</td>
+'    </tr>
+'   <tr>
+'       <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+'       <td>
+'           <i>Index</i> is less than zero.<br/>
+'           -or-<br/>
+'           <i>Count</i> is less than zero.
+'        </td>
+'    </tr>
+' </table>
 Public Function BinarySearchEx(ByVal Index As Long, ByVal Count As Long, ByRef Value As Variant, Optional ByVal Comparer As IComparer) As Long
     If Index < 0 Then _
         Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_NeedNonNegNum
@@ -165,21 +193,33 @@ Public Function BinarySearchEx(ByVal Index As Long, ByVal Count As Long, ByRef V
 End Function
 
 ''
-' Returns the total number of elements in the the internal array.
+' Gets the number of elements that the ArrayList can contain.
 '
 ' @return The number of elements allocated internally.
-' @remarks This is not the same as <a href="ArrayList.Get.Count.html">Count</a>. <a href="ArrayList.Get.Count.html">Count</a> returns
-' the number of items that have been added to the list.
+' @see #Count
+' @include "..\DocIncludes\ArrayList.Capacity.html"
 Public Property Get Capacity() As Long
     Capacity = mCapacity
 End Property
 
 ''
-' Sets the number of allocated elements in the array.
+' Sets the number of elements that the ArrayList can contain.
 '
 ' @param Value The number of elements to set the array to.
-' @remarks The capacity cannot be set less than the number of items in the list.
-' If the capacity is set to zero, then it is set to the default capacity (16).
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td><td><b>Capacity</b> is set to a value less than <a href="ArrayList.Get.Count.html">Count</a>.</td>
+'   </tr>
+'    <tr>
+'        <td><a href="OutOfMemoryException.html">OutOfMemoryException</a></td><td>There is not enough memory available on the system.</td>
+'    </tr>
+' </table>
+' @see #Count
 ' @include "..\DocIncludes\ArrayList.Capacity.html"
 Public Property Let Capacity(ByVal Value As Long)
     If Value < mCount Then _
@@ -198,9 +238,26 @@ End Property
 ''
 ' Clears the list of all values.
 '
-' @remarks The internal array is cleared of values. The count is reset
-' to zero, but the capacity remains the same. To lower the number of
-' elements in the array, use <a href="ArrayList.TrimToSize.html">TrimToSize</a> or set <a href="ArrayList.Let.Capacity.html">Capacity</a> directly.
+' @remarks <a href="ArrayList.Get.Count.html">Count</a> is set to zero, and references to other objects from elements of the collection are also released.
+' <p><a href="ArrayList.Get.Capacity.html">Capacity</a> remains unchanged. To reset the capacity of the <a href="ArrayList.html">ArrayList</a>,
+' call <a href="ArrayList.TrimToSize.html">TrimToSize</a> or set the <a href="ArrayList.Let.Capacity.html">Capacity</a> property directly.
+' Trimming an empty <a href="ArrayList.html">ArrayList</a> sets the capacity of the <a href="ArrayList.html">ArrayList</a> to the default capacity.</p>
+' <p>This method is an O(<i>n</i>) operation, where <i>n</i> is <a href="ArrayList.Get.Count.html">Count</a>.</p>
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="NotSupportedException.html">NotSupportedException</a></td>
+'        <td>
+'           The <a href="ArrayList.html">ArrayList</a> is read-only.<br/>
+'           -or-<br/>
+'           The <a href="ArrayList.html">ArrayList</a> is fixed size.
+'        </td>
+'   </tr>
+' </table>
 Public Sub Clear()
     ReDim mItems(0 To mCapacity - 1)
     mCount = 0
@@ -240,8 +297,7 @@ End Function
 ' @param Arr The array to copy the items to.
 ' @param ArrayIndex  The index to start copying items to in the destination array.
 ' @remarks The destination array must be large enough to hold all of the items. If an
-' <i>ArrayIndex</i> is specified, then the destination array must be large enough to hold all of
-' the items from that index on.
+' <i>ArrayIndex</i> is specified, then the destination array must be large enough to hold all of the items from that index on.
 ' @include "..\DocIncludes\ArrayList.CopyTo.html"
 Public Sub CopyTo(ByRef Arr As Variant, Optional ByRef ArrayIndex As Variant)
     ValidateArray Arr
@@ -256,6 +312,7 @@ End Sub
 ' @param ArrayIndex The index in the destination array to start copying items to.
 ' @param Count The number of items to copy.
 ' @remarks The destination array must be large enough to hold the number of elements being copied.
+' @include "..\DocIncludes\ArrayList.CopyToEx.html"
 Public Sub CopyToEx(ByVal Index As Long, ByRef Arr As Variant, ByVal ArrayIndex As Long, ByVal Count As Long)
     ValidateArray Arr
     If mCount - Index < Count Then _

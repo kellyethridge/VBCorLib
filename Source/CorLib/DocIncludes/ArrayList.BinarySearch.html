@@ -6,21 +6,21 @@ an exception will be thrown.</p>
 <p>The comparison behaviour can be overridden by supplying a custom <a href="IComparer.html">IComparer</a> compatible object.</P>
 <p>If the return value is negative, then the value was not found in the list. To
 determine where the value should have been found, negate (Not) the return value.</p>
-<h4>Exceptions</h4>
-<table>
-<thead>
-<th style="width:50%">Exception Type</th><th>Condition</th>
-</thead>
-<tr>
-<td>ArgumentException</td>
-<td>Neither <em>value</em> nor the elements in the list support the <strong>IComparable</strong> interface.</td>
-</tr>
-<tr>
-<td>InvalidOperationException</td>
-<td><em>value</em> and the elements in the array are not of the same datatype.</td>
-</tr>
+@exceptions
+<table style="width: auto">
+    <tr>
+        <th>Exception</th><th>Condition</th>
+    </tr>
+    <tr>
+        <td><a href="ArgumentException.html">ArgumentException</a></td>
+        <td><i>Comparer</i> is <b>Nothing</b> and neither <i>Value</i> nor the elements in the list support the <a href="IComparable.html">IComparable</a> interface.</td>
+    </tr>
+    <tr>
+        <td><a href="InvalidOperationException.html">InvalidOperationException</a></td>
+        <td><i>Comparer</i> is <b>Nothing</b> and <i>Value</i> is not the same type as the elements in the <a href="ArrayList.html">ArrayList</a>.</td>
+    </tr>
 </table>
-<h4>Example</h4>
+@example
 The following code demonstrates how to search for a value in an <b>ArrayList</b> using BinarySearch.
 <pre>
 Private Sub Main()

@@ -1,22 +1,23 @@
-@remarks
-<h4>Exceptions</h4>
-<table>
-<tr><th width="50%">Exception Type</th><th>Condition</th></tr>
-<tr>
-<td>ArgumentNullException</td><td>The destination array is a null array.</td>
-</tr>
-<tr>
-<td>ArgumentException</td><td><i>dstArray</i> is Multi-Dimension.<br>
-- or -<br>
-The number of elements in the <b>ArrayList</b> is greater than the
-destination array can contain.</td>
-</tr>
-<tr>
-<td>InvalidCastException</td><td>Elements in the <b>ArrayList</b> cannot be
-converted to a compatible datatype of the <i>dstArray</i>.</td>
-</tr>
+@exceptions
+<table style="width: auto">
+    <tr><th>Exception</th><th>Condition</th></tr>
+    <tr>
+        <td><a href="ArgumentNullException.html">ArgumentNullException</a></td><td>The <i>Arr</i> is uninitialized.</td>
+    </tr>
+    <tr>
+    <td><a href="ArgumentException.html">ArgumentException</a></td>
+        <td>
+            <i>Arr</i> is multidimension.<br/>
+            -or-<br/>
+            The number of elements in the <a href="ArrayList.html">ArrayList</a> is greater than the destination <i>Arr</i> can contain.
+        </td>
+    </tr>
+    <tr>
+        <td><a href="InvalidCastException.html">InvalidCastException</a></td>
+        <td>Elements in the <a href="ArrayList.html">ArrayList</a> cannot be converted to a compatible type of the destination <i>Arr</i>.</td>
+    </tr>
 </table>
-<h4>Example</h4>
+@example
 This example shows how to copy elements from an <b>ArrayList</b> into an
 existing array, replacing any elements in the destination array.
 <pre>
