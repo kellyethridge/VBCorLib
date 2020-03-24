@@ -548,8 +548,34 @@ End Function
 '   </tr>
 ' </table>
 Public Function StartsWith(ByRef s As String, ByRef Value As String, Optional ByVal ComparisonType As StringComparison = StringComparison.Ordinal) As Boolean
-    If Len(Value) <= Len(s) Then
-        StartsWith = CompareEx(s, 0, Value, 0, Len(Value), ComparisonType) = 0
+    Dim LenValue As Long
+    
+    LenValue = Len(Value)
+    
+    If LenValue <= Len(s) Then
+        StartsWith = CompareHelper(StrPtr(s), LenValue, StrPtr(Value), LenValue, ComparisonType) = 0
+    End If
+End Function
+
+''
+' Determines whether the beginning of this string instance matches the specified string when compared using the specified culture.
+'
+' @param s The string to check.
+' @param Value The string to compare to the substring at the beginning of <i>s</i>.
+' @param IgnoreCase <b>True</b> to ignore case during comparison; otherwise <b>False</b>.
+' @param Culture Cultural information that determines how <i>s</i> and <i>Value</> are compared. If <i>Culture</i> is <b>Nothing</b>, the current culture is used.
+' @return <b>True</b> if the <i>s</i> parameter begins with <i>Value</i>; otherwise <b>False</b>.
+Public Function StartsWithEx(ByRef s As String, ByRef Value As String, ByVal IgnoreCase As Boolean, ByVal Culture As CultureInfo) As Boolean
+    Dim LenValue As Long
+    
+    If Culture Is Nothing Then
+        Set Culture = CultureInfo.CurrentCulture
+    End If
+    
+    LenValue = Len(Value)
+    
+    If LenValue <= Len(s) Then
+        StartsWithEx = CompareCulturalHelper(StrPtr(s), LenValue, StrPtr(Value), LenValue, Culture, IIfLong(IgnoreCase, CompareOptions.IgnoreCase, CompareOptions.None)) = 0
     End If
 End Function
 
@@ -571,11 +597,40 @@ End Function
 '   </tr>
 ' </table>
 Public Function EndsWith(ByRef s As String, ByRef Value As String, Optional ByVal ComparisonType As StringComparison = StringComparison.Ordinal) As Boolean
-    Dim StartIndex As Long
+    Dim StartIndex  As Long
+    Dim LenValue    As Long
     
-    If Len(Value) <= Len(s) Then
-        StartIndex = Len(s) - Len(Value)
-        EndsWith = CompareEx(s, StartIndex, Value, 0, Len(Value), ComparisonType) = 0
+    LenValue = Len(Value)
+    
+    If LenValue <= Len(s) Then
+        StartIndex = (Len(s) - LenValue) * vbSizeOfChar
+        EndsWith = CompareHelper(StrPtr(s) + StartIndex, LenValue, StrPtr(Value), LenValue, ComparisonType) = 0
+    End If
+End Function
+
+''
+' Determines whether the end of this string instance matches the specified string when compared using the specified culture.
+'
+' @param s The string to check.
+' @param Value The string to compare to the substring at the end of the <i>s</i> parameter.
+' @param IgnoreCase <b>True</b> to ignore case during comparison; otherwise <b>False</b>.
+' @param Culture Cultural information that determines how <i>s</i> and <i>Value</> are compared. If <i>Culture</i> is <b>Nothing</b>, the current culture is used.
+' @return <b>True</b> if the <i>Value</i> parameter matches the end of <i>s</i>; otherwise <b>False</b>.
+Public Function EndsWithEx(ByRef s As String, ByRef Value As String, ByVal IgnoreCase As Boolean, ByVal Culture As CultureInfo) As Boolean
+    Dim StartIndex  As Long
+    Dim LenValue    As Long
+    Dim Options     As CompareOptions
+    
+    If Culture Is Nothing Then
+        Set Culture = CultureInfo.CurrentCulture
+    End If
+    
+    LenValue = Len(Value)
+    Options = IIfLong(IgnoreCase, CompareOptions.IgnoreCase, CompareOptions.None)
+    
+    If LenValue <= Len(s) Then
+        StartIndex = (Len(s) - LenValue) * vbSizeOfChar
+        EndsWithEx = CompareCulturalHelper(StrPtr(s) + StartIndex, LenValue, StrPtr(Value), LenValue, Culture, Options) = 0
     End If
 End Function
 

@@ -199,6 +199,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "", "", True
             Test.Use vbNullString, vbNullString, True
             Test.Use "abc", "abc", True
+            Test.Use "abc", "A", False
             Test.Use "abcdef", "ab", True
             Test.Use "abcdef", "a", True
             Test.Use "abcdef", "", True
@@ -217,18 +218,67 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "abcdef", vbNullString, True
             Test.Use "abc", "B", False
             Test.Use "abc", "b", False
-        
+            
+        Case "StartsWithEx_WithValue_ReturnsExpected"
+            Test.Use "", "", True
+            Test.Use vbNullString, vbNullString, True
+            Test.Use "abc", "abc", True
+            Test.Use "abcdef", "ab", True
+            Test.Use "abcdef", "a", True
+            Test.Use "abc", "A", False
+            Test.Use "abcdef", "", True
+            Test.Use "abcdef", vbNullString, True
+            Test.Use "abc", "b", False
+            
+        Case "StartsWithEx_WithValueIgnoringCase_ReturnsExpected"
+            Test.Use "", "", True
+            Test.Use vbNullString, vbNullString, True
+            Test.Use "ABC", "abc", True
+            Test.Use "abc", "AbC", True
+            Test.Use "abcdef", "aB", True
+            Test.Use "abcdef", "A", True
+            Test.Use "abcdef", "a", True
+            Test.Use "abcdef", "", True
+            Test.Use "abcdef", vbNullString, True
+            Test.Use "abc", "B", False
+            Test.Use "abc", "b", False
+                
         Case "EndsWith_WithValues_ReturnsExpected"
             Test.Use "", "", True
             Test.Use vbNullString, vbNullString, True
             Test.Use "abc", "abc", True
             Test.Use "abcdef", "ef", True
             Test.Use "abcdef", "f", True
+            Test.Use "abcdef", "F", False
             Test.Use "abcdef", "", True
             Test.Use "abcdef", vbNullString, True
             Test.Use "abc", "b", False
             
         Case "EndsWith_WithValuesWhenIgnoringCase_ReturnsExpected"
+            Test.Use "", "", True
+            Test.Use vbNullString, vbNullString, True
+            Test.Use "ABC", "abc", True
+            Test.Use "abc", "AbC", True
+            Test.Use "abcdef", "Ef", True
+            Test.Use "abcdef", "F", True
+            Test.Use "abcdef", "f", True
+            Test.Use "abcdef", "", True
+            Test.Use "abcdef", vbNullString, True
+            Test.Use "abc", "B", False
+            Test.Use "abc", "b", False
+            
+        Case "EndsWithEx_WhenNotIgnoringCaseWithSourceAndValue_ReturnsExpected"
+            Test.Use "", "", True
+            Test.Use vbNullString, vbNullString, True
+            Test.Use "abc", "abc", True
+            Test.Use "abcdef", "ef", True
+            Test.Use "abcdef", "f", True
+            Test.Use "abcdef", "F", False
+            Test.Use "abcdef", "", True
+            Test.Use "abcdef", vbNullString, True
+            Test.Use "abc", "b", False
+            
+        Case "EndsWithEx_WhenIgnoringCaseWithSourceAndValue_ReturnsExpected"
             Test.Use "", "", True
             Test.Use vbNullString, vbNullString, True
             Test.Use "ABC", "abc", True
@@ -988,6 +1038,22 @@ Public Sub StartsWith_WithValuesWhenIgnoringCase_ReturnsExpected(ByVal Source As
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
+Public Sub StartsWithEx_WithValue_ReturnsExpected(ByVal Source As String, ByVal Value As String, ByVal Expected As Boolean)
+    Dim Actual As Boolean
+    
+    Actual = CorString.StartsWithEx(Source, Value, False, CultureInfo.InvariantCulture)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub StartsWithEx_WithValueIgnoringCase_ReturnsExpected(ByVal Source As String, ByVal Value As String, ByVal Expected As Boolean)
+    Dim Actual As Boolean
+    
+    Actual = CorString.StartsWithEx(Source, Value, True, CultureInfo.InvariantCulture)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
 Public Sub EndsWith_WithValues_ReturnsExpected(ByVal Source As String, ByVal Value As String, ByVal Expected As Boolean)
     Dim Actual As Boolean
     
@@ -1000,6 +1066,22 @@ Public Sub EndsWith_WithValuesWhenIgnoringCase_ReturnsExpected(ByVal Source As S
     Dim Actual As Boolean
     
     Actual = CorString.EndsWith(Source, Value, StringComparison.OrdinalIgnoreCase)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub EndsWithEx_WhenNotIgnoringCaseWithSourceAndValue_ReturnsExpected(ByVal Source As String, ByVal Value As String, ByVal Expected As Boolean)
+    Dim Actual As Boolean
+    
+    Actual = CorString.EndsWithEx(Source, Value, False, CultureInfo.InvariantCulture)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub EndsWithEx_WhenIgnoringCaseWithSourceAndValue_ReturnsExpected(ByVal Source As String, ByVal Value As String, ByVal Expected As Boolean)
+    Dim Actual As Boolean
+    
+    Actual = CorString.EndsWithEx(Source, Value, True, CultureInfo.InvariantCulture)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub

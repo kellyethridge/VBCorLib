@@ -167,6 +167,7 @@ version 3.0 (BREAKING CHANGES)
 	* Re-implemented global CharToLong and LongToChar methods to Char.ConvertToInt32 and Char.ConvertFromInt32 methods.
 	* Renamed BInt public method to CBigInt to align better with conversion method naming conventions.
 	* Re-implemented global CharAt method to CorString.CharAt method.
+	* Added CorString.StartsWithEx and CorString.EndsWithEx to support specified cultures.
 	
 version 2.3
 	* Updated ASM code to not trigger DEP protection.
