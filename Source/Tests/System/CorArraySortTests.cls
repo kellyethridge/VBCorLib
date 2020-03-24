@@ -61,6 +61,13 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use StringComparer.TextCompare
             Test.Use New AscendingComparer
             
+        Case "SortKey_WithItemsAndStringComparison_SortsItems"
+            Test.Use StringComparer.Ordinal
+            Test.Use StringComparer.InvariantCulture
+            Test.Use StringComparer.BinaryCompare
+            Test.Use StringComparer.CurrentCulture
+            Test.Use New AscendingComparer
+            
     End Select
 End Sub
 
@@ -381,6 +388,24 @@ Public Sub SortKey_WhenCalled_SortsItemsByKeys()
     Dim Expected() As Long
     Expected = NewLongs(5, 3, 1, 2, 4)
     Assert.That Items, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub SortKey_WithItemsAndStringComparison_SortsItems(ByVal Comparer As CorLib.IComparer)
+    Dim Keys() As String
+    Dim Items() As String
+    Dim i As Long
+    
+    Rnd -13
+    ReDim Keys(0 To 40)
+    For i = 0 To 40
+        Keys(i) = Rnd
+    Next
+    
+    Items = Keys
+    
+    CorArray.SortKey Keys, Items, Comparer
+    
+    Assert.That Items, Iz.EqualTo(Keys)
 End Sub
 
 Public Sub SortKey_WithComparer_SortsKeys()

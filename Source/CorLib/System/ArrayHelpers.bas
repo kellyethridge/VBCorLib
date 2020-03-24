@@ -514,10 +514,12 @@ Private Sub QuickSortCompareStringOrdinal(ByRef Context As StringSortContext, By
     Dim i As Long, j As Long, t As Long, m As Long
     Dim PtrX As Long
     Dim LenX As Long
-        
-    If Right - Left < 15 Then
-        InsertionSortCompareStringOrdinal Context, Left, Right
-        Exit Sub
+    
+    If Not mHasSortItems Then
+        If Right - Left < 15 Then
+            InsertionSortCompareStringOrdinal Context, Left, Right
+            Exit Sub
+        End If
     End If
     
     Do While Left < Right
@@ -588,10 +590,12 @@ Private Sub QuickSortCompareString(ByRef Context As StringSortContext, ByVal Lef
     Dim i As Long, j As Long, t As Long, m As Long
     Dim PtrX As Long
     Dim LenX As Long
-        
-    If Right - Left < 15 Then
-        InsertionSortCompareString Context, Left, Right
-        Exit Sub
+       
+    If Not mHasSortItems Then
+        If Right - Left < 15 Then
+            InsertionSortCompareString Context, Left, Right
+            Exit Sub
+        End If
     End If
     
     Do While Left < Right
@@ -661,9 +665,11 @@ End Sub
 Private Sub QuickSortStrComp(ByRef Context As StringSortContext, ByVal Left As Long, ByVal Right As Long)
     Dim i As Long, j As Long, t As Long, x As String
     
-    If Right - Left < 15 Then
-        InsertionSortStrComp Context, Left, Right
-        Exit Sub
+    If Not mHasSortItems Then
+        If Right - Left < 15 Then
+            InsertionSortStrComp Context, Left, Right
+            Exit Sub
+        End If
     End If
     
     Do While Left < Right
@@ -730,9 +736,11 @@ End Sub
 Private Sub QuickSortStringComparer(ByRef Context As StringSortContext, ByVal Left As Long, ByVal Right As Long)
     Dim i As Long, j As Long, t As Long, x As String
     
-    If Right - Left < 15 Then
-        InsertionSortStrComp Context, Left, Right
-        Exit Sub
+    If Not mHasSortItems Then
+        If Right - Left < 15 Then
+            InsertionSortStrComp Context, Left, Right
+            Exit Sub
+        End If
     End If
     
     Do While Left < Right
@@ -757,10 +765,10 @@ Private Sub QuickSortStringComparer(ByRef Context As StringSortContext, ByVal Le
         Loop While i <= j
         
         If j - Left <= Right - i Then
-            If Left < j Then QuickSortStrComp Context, Left, j
+            If Left < j Then QuickSortStringComparer Context, Left, j
             Left = i
         Else
-            If i < Right Then QuickSortStrComp Context, i, Right
+            If i < Right Then QuickSortStringComparer Context, i, Right
             Right = j
         End If
         
@@ -801,33 +809,6 @@ Private Sub QuickSortObject(ByRef Keys() As Object, ByVal Left As Long, ByVal Ri
     Do While Left < Right
         i = Left: j = Right: Set x = Keys((i + j) \ 2)
         Do
-'            Set Key = Keys(i)
-'            Do
-'                If Not Key Is Nothing Then
-'                    If Key.CompareTo(x) >= 0 Then
-'                        Exit Do
-'                    End If
-'                ElseIf x Is Nothing Then
-'                    Exit Do
-'                End If
-'
-'                i = i + 1
-'                Set Key = Keys(i)
-'            Loop
-'
-'            Set Key = Keys(j)
-'            Do
-'                If Not Key Is Nothing Then
-'                    If Key.CompareTo(x) <= 0 Then
-'                        Exit Do
-'                    End If
-'                ElseIf x Is Nothing Then
-'                    Exit Do
-'                End If
-'
-'                j = j - 1
-'                Set Key = Keys(j)
-'            Loop
             Do While Comparer.Default.Compare(Keys(i), x) < 0: i = i + 1: Loop
             Do While Comparer.Default.Compare(Keys(j), x) > 0: j = j - 1: Loop
             
