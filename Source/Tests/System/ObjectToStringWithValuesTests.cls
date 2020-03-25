@@ -152,6 +152,16 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
     End Select
 End Sub
 
+Public Sub ToString_WithInt64InVariant_ReturnsString()
+    Dim Value As Variant
+    Dim Actual As String
+    
+    Value = CInt64(4)
+    Actual = Object.ToString(Value)
+    
+    Assert.That Actual, Iz.EqualTo("4")
+End Sub
+
 Public Sub ToString_WithInt64AsCharacter_ReturnsCharacter()
     Dim Actual As String
     

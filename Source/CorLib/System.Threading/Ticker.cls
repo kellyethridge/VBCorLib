@@ -85,7 +85,7 @@ Private mInterval       As Long
 Private mAutoReset      As Boolean
 Private mTimerId        As Long
 Private mData           As Variant
-Private mCallbackDel    As Delegate
+Private mDelegate       As Delegate
 Private mCallback       As Action_T_T
 
 
@@ -260,7 +260,7 @@ Friend Sub OnElapsed()
     RaiseEvent Elapsed(mData)
     
     If Not mCallback Is Nothing Then
-        mCallback.Invoke VarPtr(Me), VarPtr(mData)
+        mCallback.Invoke Me, mData
     End If
 End Sub
 
@@ -274,7 +274,11 @@ Friend Sub Init(ByVal Interval As Long, ByRef Data As Variant, ByVal AutoReset A
     VariantCopyInd mData, Data
     
     If AddressOfCallback <> vbNullPtr Then
-        Set mCallback = InitDelegate(mCallbackDel, AddressOfCallback)
+        ' We maintain our own delegate because this could be a long
+        ' living object. If the object exists as the app closes
+        ' the Release method may no longer be available causing a crash.
+        ' We will unhook our object and the delegate will just be a UDT.
+        Set mCallback = InitDelegate(mDelegate, AddressOfCallback)
     End If
 End Sub
 

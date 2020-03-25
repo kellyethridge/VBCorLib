@@ -710,14 +710,34 @@ Public Sub AppendFormat_WithObjectPlaceHolder_FormatsObject()
     Assert.That sb.ToString, Iz.EqualTo("00:00:00")
 End Sub
 
+Public Sub AppendFormat_WithInt64InVariant_FormatsObject()
+    Dim sb As New StringBuilder
+    Dim Value As Variant
+    
+    Value = CInt64(4)
+    sb.AppendFormat "{0}", Value
+    
+    Assert.That sb.ToString, Iz.EqualTo("4")
+End Sub
+
+Public Sub AppendFormat_WithInt32InVariant_FormatsObject()
+    Dim sb As New StringBuilder
+    Dim Value As Variant
+    
+    Value = 4&
+    sb.AppendFormat "{0}", Value
+    
+    Assert.That sb.ToString, Iz.EqualTo("4")
+End Sub
+
 Public Sub AppendFormat_WithRepeatedPlaceHolder_RepeatsFormat()
     Dim sb As New StringBuilder
     
-    sb.AppendFormat "{0} {0}", "a"
+    sb.AppendFormat "{0} {0}", CInt64(4)
     
     Dim Actual As String
     Actual = sb.ToString
-    Assert.That Actual, Iz.EqualTo("a a")
+    Assert.That Actual, Iz.EqualTo("4 4")
 End Sub
 
 Public Sub AppendFormat_WithUnpairedOpenBrace_ThrowsFormatException()

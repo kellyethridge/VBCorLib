@@ -315,6 +315,8 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use vbNullString, NewStrings(""), NewStrings("")
             Test.Use "a b c", NewStrings(), NewStrings("a", "b", "c")
             Test.Use "a b c", NullStrings, NewStrings("a", "b", "c")
+            Test.Use "a,b,c", ",", NewStrings("a", "b", "c")
+            Test.Use "a b c", "", NewStrings("a", "b", "c")
             
         Case "Split_WithRemoveEmptyEntries_ReturnsFilledStringsOnly"
             Test.Use "abbc", NewStrings("b"), NewStrings("a", "c")
@@ -1086,7 +1088,7 @@ Public Sub EndsWithEx_WhenIgnoringCaseWithSourceAndValue_ReturnsExpected(ByVal S
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub Split_WithStringSeparators_ReturnsExpected(ByVal StringToSplit As String, ByRef Separators() As String, ByRef Expected() As String)
+Public Sub Split_WithStringSeparators_ReturnsExpected(ByVal StringToSplit As String, ByRef Separators As Variant, ByRef Expected() As String)
     Dim Actual() As String
     
     Actual = CorString.Split(StringToSplit, Separators)

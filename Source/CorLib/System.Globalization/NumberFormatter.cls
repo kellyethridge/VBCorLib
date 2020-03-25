@@ -96,16 +96,9 @@ Private mFormatInfo         As NumberFormatInfo
 
 
 Friend Function Format(ByRef Value As Variant, ByRef FormatText As String, ByVal Provider As IFormatProvider) As String
-    Dim vt As Long
-    
     Set mFormatInfo = NumberFormatInfo.GetInstance(Provider)
-    vt = VarType(Value)
     
-    If vt = vbVariant Then
-        vt = MemLong(MemLong(VarPtr(Value) + VARIANTDATA_OFFSET)) And &HFF
-    End If
-    
-    Select Case vt
+    Select Case VarType(Value)
         Case vbLong, vbInteger, vbByte
             Format = Int32ToString(Value, FormatText)
         Case vbDouble
@@ -183,7 +176,7 @@ Private Sub InitNumberBuffer()
 End Sub
 
 Private Sub InitCustomNumberBuffer(ByVal BufferPtr As Long, ByVal Size As Long)
-    mNumber.DigitsSA.pvData = BufferPtr
+    mNumber.DigitsSA.PVData = BufferPtr
     mNumber.DigitsSA.cElements = Size
 End Sub
 

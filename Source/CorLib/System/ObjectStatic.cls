@@ -162,18 +162,14 @@ End Function
 ' @see IFormattable
 ' @see IFormatProvider
 Public Function ToString(ByRef Value As Variant, Optional ByRef Format As String, Optional ByVal Provider As IFormatProvider) As String
-    Dim ValueType As VbVarType
-    
-    ValueType = VarType(Value)
-    
-    If ValueType = vbVariant Then
-        ' when the datatype is a variant, it contains a reference to the
-        ' actual value, so we must dereference again to that value to
-        ' get the actual datatype.
-        ValueType = MemLong(DataPtr(Value)) And &HFF
-    End If
-    
-    Select Case ValueType
+    Select Case VarType(Value)
+        Case vbVariant
+            ' when the datatype is a variant, it contains a reference to the
+            ' actual value, so we must dereference again to that value to
+            ' get the actual datatype.
+            Dim InnerVariant As Variant
+            VariantCopyInd InnerVariant, Value
+            ToString = ToString(InnerVariant, Format, Provider)
         Case vbLong, vbInteger, vbByte, vbDouble, vbSingle, vbDecimal
             ToString = NumberFormatter.Format(Value, Format, Provider)
         Case vbDate

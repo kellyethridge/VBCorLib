@@ -735,8 +735,14 @@ Public Function Split(ByRef s As String, ByRef Separator As Variant, Optional By
         Dim SeparatorIndexes()  As Long
         Dim SeparatorLengths()  As Long
         Dim MatchCount          As Long
-    
-        If CorArray.IsNullOrEmpty(Separator) Then
+                
+        If VarType(Separator) = vbString Then
+            If Len(Separator) = 0 Then
+                MatchCount = FindWhitespaceSeparatorIndexes(s, SeparatorIndexes, SeparatorLengths)
+            Else
+                MatchCount = FindSeparatorIndexes(s, Separator, SeparatorIndexes, SeparatorLengths)
+            End If
+        ElseIf CorArray.IsNullOrEmpty(Separator) Then
             MatchCount = FindWhitespaceSeparatorIndexes(s, SeparatorIndexes, SeparatorLengths)
         Else
             MatchCount = FindSeparatorIndexes(s, Separator, SeparatorIndexes, SeparatorLengths)
@@ -770,6 +776,10 @@ Private Function FindSeparatorIndexes(ByRef s As String, ByRef Separator As Vari
         Case vbIntegerArray
             SAPtr(CharSeparator) = SAPtrV(Separator)
             FindSeparatorIndexes = FindCharSeparatorIndexes(s, CharSeparator, SeparatorIndexes, SeparatorLengths)
+        Case vbString
+            ReDim StringSeparator(0)
+            StringSeparator(0) = Separator
+            FindSeparatorIndexes = FindStringSeparatorIndexes(s, StringSeparator, SeparatorIndexes, SeparatorLengths)
         Case Else
             Error.Argument Argument_CharArrayRequired, "Separator"
     End Select
