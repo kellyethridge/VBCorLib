@@ -50,7 +50,7 @@ Implements EncoderFallbackBuffer
 ' @param UnknownLowSurrogate The low surrogate of the input pair.
 ' @param Index The index position of the surrogate pair in the input buffer.
 ' @return None. No value is returned because the <b>Fallback</b> method always throws an exception.
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
 '       <th>Exception</th>

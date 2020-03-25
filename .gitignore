@@ -6,3 +6,4 @@ Binaries
 *.log
 *.tmp
 /Source/Tests/TestOutput.txt
+/Install/*.exe

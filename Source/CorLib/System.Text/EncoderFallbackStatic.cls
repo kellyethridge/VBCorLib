@@ -34,6 +34,12 @@ Attribute VB_Exposed = True
 '
 ' Module: EncoderFallbackStatic
 '
+
+''
+' Provides a failure-handling mechanism, called a fallback, for an input character that cannot be converted to an encoded output byte sequence.
+'
+' @see EncoderExceptionFallback
+' @see EncoderReplacementFallback
 Option Explicit
 
 Private mReplacementFallback    As New EncoderReplacementFallback

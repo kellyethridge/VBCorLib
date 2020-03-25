@@ -44,9 +44,8 @@ Option Explicit
 ' When implemented in a derived class, gets the number of characters in the current EncoderFallbackBuffer object that remain to be processed.
 '
 ' @return The number of characters in the current fallback buffer that have not yet been processed.
-' @remarks The Fallback method returns <em>true</em> if <em>Remaining<em> is a nonzero value.
+' @remarks The Fallback method returns <b>True</b> if <b>Remaining</b> is a nonzero value.
 ' For an exception fallback handler, the Remaining method should return zero.
-'
 Public Property Get Remaining() As Long: End Property
 
 ''
@@ -55,9 +54,8 @@ Public Property Get Remaining() As Long: End Property
 ' @param UnknownCharOrHighSurrogate Can be a non-surrogate charactor or a high surrogate of a surrogate pair.
 ' @param UnknownLowSurrogate The low surrogate matched with the high surrogate of the surrogate pair.
 ' @param Index The index position of the surrogate pair in the input buffer.
-' @return <b>true</b> if the fallback buffer can process <i>UnknownCharOrHighSurrogate</i> as a non-surrogate or
-' process <em>UnknownCharOrHighSurrogate</em> and <em>LowSurrogate</em> as a surrogate pair; <b>false</b> if the fallback buffer ignores the characters.
-'
+' @return <b>True</b> if the fallback buffer can process <i>UnknownCharOrHighSurrogate</i> as a non-surrogate or
+' process <i>UnknownCharOrHighSurrogate</i> and <i>LowSurrogate</i> as a surrogate pair; <b>False</b> if the fallback buffer ignores the characters.
 Public Function Fallback(ByVal UnknownCharOrHighSurrogate As Long, Optional ByRef UnknownLowSurrogate As Variant, Optional ByVal Index As Long) As Boolean: End Function
 
 ''
@@ -70,14 +68,14 @@ Public Function GetNextChar() As Integer: End Function
 ''
 ' When implemented in a derived class, causes the next call to the GetNextChar method to access the data buffer character position that is prior to the current character position.
 '
-' @return <b>true</b> if the MovePrevious operation was successful; otherwise, <b>false</b>.
+' @return <b>True</b> if the MovePrevious operation was successful; otherwise, <b>False</b>.
 '
 Public Function MovePrevious() As Boolean: End Function
 
 ''
 ' Initializes all data and state information pertaining to this fallback buffer.
 '
-' @remarks After calling the Reset method, the Remaining property should return 0, the GetNextChar method should return U+0000, and the MovePrevious method should return <em>false</em>.
+' @remarks After calling the Reset method, the Remaining property should return 0, the GetNextChar method should return U+0000, and the MovePrevious method should return <b>False</b>.
 '
 Public Sub Reset(): End Sub
 
