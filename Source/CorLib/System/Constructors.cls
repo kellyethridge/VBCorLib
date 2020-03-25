@@ -531,7 +531,7 @@ End Function
 ' @remarks <p>If an instance allows optional characters, Unicode code points are encoded with a corresponding optional
 ' character instead of a modified base 64 character. The optional characters are exclamation point ("!"), backward slash ("\"),
 ' vertical line ("|"), double quote ("""), number sign ("#"), dollar sign ("$"), percent sign ("%"), ampersand ("&"), asterisk ("*"),
-' semicolon (";"), left angle bracket ("<"), right angle bracket (">"), left curly bracket ("{"), right curly bracket ("}"),
+' semicolon (";"), left angle bracket ("&lt;"), right angle bracket ("&gt;"), left curly bracket ("{"), right curly bracket ("}"),
 ' left square bracket ("["), right square bracket ("]"), equal sign ("="), at sign ("@"), circumflex accent ("^"), underscore ("_"), and grave accent ("`").</p>
 Public Function NewUTF7Encoding(ByVal AllowOptionals As Boolean) As UTF7Encoding
     Set NewUTF7Encoding = New UTF7Encoding

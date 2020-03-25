@@ -58,11 +58,11 @@ Private mIndex              As Long
 ' @return The text with the valid XML representation.
 ' @remarks This replaces the following characters:
 ' <pre>
-' "&" = &amp;
-' "<" = &lt;
-' ">" = &gt;
-' Double Quote = &quot;
-' Single Quote = &apos;
+' "&" = &amp;amp;
+' "&lt;" = &amp;lt;
+' "&gt;" = &amp;gt;
+' Double Quote = &amp;quot;
+' Single Quote = &amp;apos;
 ' </pre>
 '
 Public Function Escape(ByRef Text As String) As String
@@ -101,7 +101,7 @@ End Function
 '
 ' @param Tag The tag to be tested.
 ' @return Returns True if the tag is valid, False otherwise.
-' @remarks A tag is not valid if it contains any of the following: "<", ">", or a space.
+' @remarks A tag is not valid if it contains any of the following: "&lt;", "&gt;", or a space.
 '
 Public Function IsValidTag(ByRef Tag As String) As Boolean
     IsValidTag = CorString.AllChars(Tag, AddressOf IsValidTagCallback)
@@ -112,7 +112,7 @@ End Function
 '
 ' @param Text The text to be tested.
 ' @return Returns True if the text is valid, False otherwise.
-' @remarks The text is not valid if it contains any of the following: "<", ">".
+' @remarks The text is not valid if it contains any of the following: "&lt;", "&gt;".
 '
 Public Function IsValidText(ByRef Text As String) As Boolean
     IsValidText = CorString.AllChars(Text, AddressOf IsValidTextCallback)
@@ -123,7 +123,7 @@ End Function
 '
 ' @param Name The name of the attribute to test.
 ' @return Returns True if the attribute name is valid, False otherwise.
-' @remarks The name if not valid if it contains any of the following: "<", ">", or a space.
+' @remarks The name if not valid if it contains any of the following: "&lt;", "&gt;", or a space.
 '
 Public Function IsValidAttributeName(ByRef Name As String) As Boolean
     IsValidAttributeName = IsValidTag(Name)
@@ -134,7 +134,7 @@ End Function
 '
 ' @param Value The attribute value to test.
 ' @return Returns True if the value is valid, False otherwise.
-' @remarks The value is not valid if it contains any of the following: "<", ">".
+' @remarks The value is not valid if it contains any of the following: "&lt;", "&gt;".
 '
 Public Function IsValidAttributeValue(ByRef Value As String) As Boolean
     IsValidAttributeValue = CorString.AllChars(Value, AddressOf IsValidAttributeValueCallback)

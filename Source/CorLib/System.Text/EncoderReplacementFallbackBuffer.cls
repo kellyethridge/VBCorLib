@@ -98,7 +98,7 @@ Public Function GetNextChar() As Integer
 End Function
 
 ''
-' Causes the next call to the <a href="EncoderReplacementFallbackBuffer.GetNextChar.html>GetNextChar</a> method to access the character position in the replacement fallback buffer prior to the current character position.
+' Causes the next call to the <a href="EncoderReplacementFallbackBuffer.GetNextChar.html">GetNextChar</a> method to access the character position in the replacement fallback buffer prior to the current character position.
 '
 ' @return <b>True</b> if the <b>MovePrevious</b> operation was successful; otherwise, <b>False</b>.
 Public Function MovePrevious() As Boolean
