@@ -46,11 +46,10 @@ Public Function StartTicker(ByVal Source As Ticker) As Long
 End Function
 
 Public Sub StopTicker(ByVal TimerId As Long)
-    If KillTimer(vbNullPtr, TimerId) = BOOL_FALSE Then
-        Error.Win32Error Err.LastDllError
+    If mTickers.ContainsKey(TimerId) Then
+        mTickers.Remove TimerId
+        KillTimer vbNullPtr, TimerId
     End If
-        
-    mTickers.Remove TimerId
 End Sub
 
 ''
