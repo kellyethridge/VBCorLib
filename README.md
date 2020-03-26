@@ -22,7 +22,7 @@ sharing between a .NET application and VB6.
 ## Documentation
 
 * Browse online at <http://www.kellyethridge.com/vbcorlib/doc/CorLib.html>.
-* Download offline from <http://www.kellyethridge.com/vbcorlib/doc/corlib.chm">.
+* Download offline from <http://www.kellyethridge.com/vbcorlib/doc/CorLib.chm>.
 
 ## Blog
 
