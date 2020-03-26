@@ -7,3 +7,4 @@ Binaries
 *.tmp
 /Source/Tests/TestOutput.txt
 /Install/*.exe
+/Source/CorLib/doc.zip
