@@ -39,6 +39,8 @@ Attribute VB_Exposed = True
 ' Provides methods for manipulating a 64-bit signed integer.
 '
 ' @remarks The 64-bit value is stored in an <a href="Int64Static.Int64.html">Int64</a> UDT represented by a low 32bits and high 32bits.
+' @see Constructors
+' @see Conversion
 ' @include "..\DocIncludes\Int64Static.html"
 Option Explicit
 
@@ -52,6 +54,16 @@ Private mInt64Guid       As VBGUID
 '
 ' @param LowPart The least significant 32-bits of the integer value.
 ' @param HighPart The most significant 32-bits of the integer value.
+' @remarks An <b>Int64</b> can be created using one of several methods.
+' <ul>
+'   <li>Using the conversion method <a href="Conversion.CInt64.html">CInt64()</a>.</li>
+'   <li>Calling the <a href="Constructors.NewInt64.html">NewInt64(lo, hi)</a> constructor method.</li>
+'   <li>Parsing a string using one of the parse methods: <a href="Int64Static.Parse.html">Int64.Parse</a> or <a href="Int64Static.TryParse.html">Int64.TryParse</a>.</li>
+' </ul>
+' @see Conversion
+' @see Constructors
+' @see #Parse
+' @see #TryParse
 Public Type Int64
     LowPart     As Long ' the ordering is important to remain consistant with memory layout of a 64-bit integer.
     HighPart    As Long
@@ -61,7 +73,7 @@ Private mParser As New Int64Parser
 
 
 ''
-' Represents the smallest possible value of an <a href="Int64Static.Int64.html">Int64</a>. This field is constant.
+' Represents the smallest possible value of an <a href="Int64Static.Int64.html">Int64</a>.
 '
 ' @return The minimum value constant.
 ' @remarks The value of this constant is negative 9,223,372,036,854,775,808; that is, hexadecimal 0x8000000000000000.
@@ -70,7 +82,7 @@ Public Property Get MinValue() As Int64
 End Property
 
 ''
-' Represents the largest possible value of an <a href="Int64Static.Int64.html">Int64</a>. This field is constant.
+' Represents the largest possible value of an <a href="Int64Static.Int64.html">Int64</a>.
 '
 ' @return The maximum value constant.
 ' @remarks The value of this constant is 9,223,372,036,854,775,807; that is, hexadecimal 0x7FFFFFFFFFFFFFFF.
@@ -136,7 +148,6 @@ End Function
 '
 ' @param Value The number to return the sign of.
 ' @return The sign of the number.
-' <h4>Exceptions</h4>
 ' <table style="width: auto">
 '   <tr>
 '       <th>Value</th>
@@ -196,17 +207,8 @@ End Function
 ' @param Format A numeric format string.
 ' @param Provider An object that supplies culture-specific formatting information about this instance.
 ' @return The string representation of the value of this instance as specified by <i>Format</i> and <i>Provider</i>.
-' @remarks
-' <h4>Exceptions</h4>
-' <table style="width: auto">
-'   <tr>
-'       <th>Exception</th>
-'       <th>Condition</th>
-'   </tr>
-'   <tr>
-'        <td><a href="FormatException.html">FormatException</a></td><td><i>Format</i> is invalid or not supported.</td>
-'   </tr>
-' </table>
+' @see IFormatProvider
+' @include "..\DocIncludes\Int64Static.ToString.html"
 Public Function ToString(ByRef Value As Int64, Optional ByRef Format As String, Optional ByVal Provider As IFormatProvider) As String
     ToString = NumberFormatter.FormatInt64(Value, Format, Provider)
 End Function
@@ -253,6 +255,20 @@ End Function
 '        <td>Greater than zero</td><td><i>X</i> is greater than <i>Y</i>.</td>
 '    </tr>
 ' </table>
+' @example The following code illustrates comparing two 64-bit integer values.
+' <pre>
+'    Public Sub Main()
+'        Dim x As Int64
+'        Dim y As Int64
+'
+'        x = CInt64(1922)
+'        y = CInt64(400)
+'
+'        Debug.Print Int64.Compare(x, y) ' Displays 1
+'        Debug.Print Int64.Compare(x, x) ' Displays 0
+'        Debug.Print Int64.Compare(y, x) ' Displays -1
+'    End Sub
+' </pre>
 Public Function Compare(ByRef a As Int64, ByRef b As Int64) As Long
     If a.HighPart < b.HighPart Then
         Compare = -1
@@ -321,6 +337,7 @@ End Function
 '
 ' @param Value The value to return the absolute value of.
 ' @return The absolute value of <i>Value</i>.
+' @include "..\DocIncludes\Int64Static.Absolute.html"
 Public Function Absolute(ByRef Value As Int64) As Int64
     If Value.HighPart And &H80000000 Then
         Absolute = Negate(Value)
@@ -335,6 +352,7 @@ End Function
 ' @param a The first value to be added.
 ' @param b The second value to be added.
 ' @return The sum of <i>a</i> and <i>b</i>.
+' @include "..\DocIncludes\Int64Static.html"
 Public Function Add(ByRef a As Int64, ByRef b As Int64) As Int64
 #If Release Then
     Add.LowPart = a.LowPart + b.LowPart
@@ -355,6 +373,7 @@ End Function
 ' @param a The value to be subtracted from.
 ' @param b The value to be subtracted.
 ' @return The difference of <i>a</i> and <i>b</i>.
+' @include "..\DocIncludes\Int64Static.html"
 Public Function Subtract(ByRef a As Int64, ByRef b As Int64) As Int64
 #If Release Then
     Subtract.LowPart = a.LowPart - b.LowPart
@@ -375,6 +394,7 @@ End Function
 ' @param a The first value to be multiplied.
 ' @param b The second value to be multiplied.
 ' @return The product of <i>a</i> and <i>b</i>.
+' @include "..\DocIncludes\Int64Static.html"
 Public Function Multiply(ByRef a As Int64, ByRef b As Int64) As Int64
     If a.HighPart And &H80000000 Then
         If b.HighPart And &H80000000 Then
@@ -396,6 +416,17 @@ End Function
 ' @param Divisor The value to divide by.
 ' @return The integer quotient of the division.
 ' @remarks This method performs integer division, discarding the remainder.
+' @exceptions
+' <table style="width: auto">
+'    <tr>
+'        <th>Exception</th><th>Condition</th>
+'    </tr>
+'    <tr>
+'        <td><a href="DivideByZeroException.html">DivideByZeroException</a></td>
+'        <td>Attempt to divide by zero.</td>
+'    </tr>
+' </table>
+' @include "..\DocIncludes\Int64Static.html"
 Public Function Divide(ByRef Dividend As Int64, ByRef Divisor As Int64) As Int64
     Dim Remainder As Int64
     
@@ -408,6 +439,8 @@ End Function
 ' @param Dividend The value to be divided.
 ' @param Divisor The value to divide by.
 ' @return Returns the remainder portion of the division operation.
+' @remarks A modulus operation is used to calculate the remainder of a division operation.
+' @include "..\DocIncludes\Int64Static.Modulus.html"
 Public Function Modulus(ByRef Dividend As Int64, ByRef Divisor As Int64) As Int64
     DivRem Dividend, Divisor, Modulus
 End Function
@@ -419,6 +452,7 @@ End Function
 ' @param Divisor The value to divide by.
 ' @param Remainder The remainder of the division.
 ' @return The integer quotient of the division.
+' @include "..\DocIncludes\Int64Static.DivRem.html"
 Public Function DivRem(ByRef Dividend As Int64, ByRef Divisor As Int64, ByRef Remainder As Int64) As Int64
     If IsZero(Divisor) Then _
         Throw New DivideByZeroException
@@ -455,6 +489,10 @@ End Function
 ' @param a The first value of the AND operation.
 ' @param b The second value of the AND operation.
 ' @return A new <a href="Int64Static.Int64.html">Int64</a> value containing the performed bitwise operation.
+' @see #BitwiseOr
+' @see #BitwiseNot
+' @see #BitwiseXor
+' @include "..\DocIncludes\Int64Static.BitwiseAnd.html"
 Public Function BitwiseAnd(ByRef a As Int64, ByRef b As Int64) As Int64
     BitwiseAnd.HighPart = a.HighPart And b.HighPart
     BitwiseAnd.LowPart = a.LowPart And b.LowPart
@@ -466,6 +504,10 @@ End Function
 ' @param a The first value of the OR operation.
 ' @param b The second value of the OR operation.
 ' @return A new <a href="Int64Static.Int64.html">Int64</a> value containing the performed bitwise operation.
+' @see #BitwiseAnd
+' @see #BitwiseNot
+' @see #BitwiseXor
+' @inlcude "..\DocIncludes\Int64Static.BitwiseOr.html"
 Public Function BitwiseOr(ByRef a As Int64, ByRef b As Int64) As Int64
     BitwiseOr.HighPart = a.HighPart Or b.HighPart
     BitwiseOr.LowPart = a.LowPart Or b.LowPart
@@ -477,6 +519,10 @@ End Function
 ' @param a The first value of the NOT operation.
 ' @param b The second value of the NOT operation.
 ' @return A new <a href="Int64Static.Int64.html">Int64</a> value containing the performed bitwise operation.
+' @see #BitwiseAnd
+' @see #BitwiseOr
+' @see #BitwiseXor
+' @include "..\DocIncludes\Int64Static.BitwiseNot.html"
 Public Function BitwiseNot(ByRef a As Int64) As Int64
     BitwiseNot.HighPart = Not a.HighPart
     BitwiseNot.LowPart = Not a.LowPart
@@ -488,6 +534,10 @@ End Function
 ' @param a The first value of the XOR operation.
 ' @param b The second value of the XOR operation.
 ' @return A new <a href="Int64Static.Int64.html">Int64</a> value containing the performed bitwise operation.
+' @see #BitwiseAnd
+' @see #BitwiseOr
+' @see #BitwiseNot
+' @include "..\DocIncludes\Int64Static.BitwiseXor.html"
 Public Function BitwiseXor(ByRef a As Int64, ByRef b As Int64) As Int64
     BitwiseXor.HighPart = a.HighPart Xor b.HighPart
     BitwiseXor.LowPart = a.LowPart Xor b.LowPart
@@ -500,6 +550,7 @@ End Function
 ' @param BitCount The number of bits the value is to be shifted left.
 ' @return Returns a new <a href="Int64Static.Int64.html">Int64</a> containing the shifted value.
 ' @remarks If <i>BitCount</i> is negative, then a right shift is performed.
+' @see #ShiftRight
 Public Function ShiftLeft(ByRef Value As Int64, ByVal BitCount As Long) As Int64
     If BitCount = 0 Then
         ShiftLeft = Value
@@ -537,6 +588,7 @@ End Function
 ' @param BitCount The number of bits the value is to be shifted right.
 ' @return Returns a new <a href="Int64Static.Int64.html">Int64</a> containing the shifted value.
 ' @remarks If <i>BitCount</i> is negative, then a left shift is performed.
+' @see #ShiftLeft
 Public Function ShiftRight(ByRef Value As Int64, ByVal BitCount As Long) As Int64
     If BitCount = 0 Then
         ShiftRight = Value
@@ -564,25 +616,10 @@ End Function
 '
 ' @param s A string containing a number to convert.
 ' @return A 64-bit signed integer equivalent to the number contained in <i>s</i>.
-' @remarks <p>The <i>s</i> parameter contains a number of the form:</p>
-' <p>[ws][sign]digits[ws]</p>
-' <p>Elements in square brackets ([ and ]) are optional. The following table describes each element.</p>
-' <table style="width: auto">
-'   <tr>
-'       <th>Element</th>
-'       <th>Description</th>
-'   </tr>
-'   <tr>
-'        <td>ws</td><td>Optional white space.</td>
-'   </tr>
-'    <tr>
-'        <td>sign</td><td>An optional sign.</td>
-'    </tr>
-'    <tr>
-'        <td>digits</td><td>A sequence of digits ranging from 0 to 9.</td>
-'    </tr>
-' </table>
-' <p>The <i>s</i> parameter is interpreted using the <a href="NumberFormatInfoStatic.NumberStyles.html">NumberStyles.Integer</a> style. In addition to decimal digits, only leading and trailing spaces together with a leading sign are allowed. To explicitly define the style elements that can be present in <i>s</i>, use <a href="Int64Static.ParseEx.html">Int64.ParseEx(String, NumberStyles)</a> or the <a href="Int64Static.ParseEx.html">Int64.Parse(String, NumberStyles, IFormatProvider)</a> method.</p>
+' @see #ParseEx
+' @see #TryParse
+' @see #TryParseEx
+' @include "..\DocIncludes\Int64Static.Parse.html"
 Public Function Parse(ByRef s As String) As Int64
     If Not TryParse(s, Parse) Then
         mParser.ThrowError
@@ -596,47 +633,10 @@ End Function
 ' @param Style A bitwise combination of enumeration values that indicates the style elements that can be present in <i>s</i>. A typical value to specify is <a href="NumberFormatInfoStatic.NumberStyles.html">Integer</a>.
 ' @param Provider An <a href="IFormatProvider.html">IFormatProvider</a> that supplies culture-specific formatting information about <i>s</i>.
 ' @return A 64-bit signed integer equivalent to the number specified in <i>s</i>.
-' @remarks <p>The <i>Style</i> parameter defines the style elements (such as white space or the positive sign) that are allowed in the <i>s</i> parameter for the parse operation to succeed. It must be a combination of bit flags from the <a href="NumberFormatInfoStatic.NumberStyles.html">NumberStyles</a> enumeration. Depending on the value of <i>Style</i>, the <i>s</i> parameter may include the following elements:</p>
-' <p>[ws][$][sign][digits,]digits[.fractional_digits][e[sign]exponential_digits][ws]</p>
-' <p>Or, if style includes <a href="NumberFormatInfoStatic.NumberStyles.html">AllowHexSpecifier</a>:</p>
-' <p>[ws]hexdigits[ws]</p>
-' <p>Elements in square brackets ([ and ]) are optional. The following table describes each element.</p>
-' <table style="width: auto">
-'   <tr>
-'       <th>Element</th>
-'       <th>Description</th>
-'   </tr>
-'   <tr>
-'        <td><i>ws</i></td><td>Optional white space. White space can appear at the beginning of <i>s</i> if <i>Style</i> includes the <a href="NumberFormatInfoStatic.NumberStyles.html">NumberStyles.AllowLeadingWhite</a> flag, and it can appear at the end of <i>s</i> if <i>Style</i> includes the <a href="NumberFormatInfoStatic.NumberStyles.html">NumberStyles.AllowTrailingWhite</a> flag.</td>
-'   </tr>
-'    <tr>
-'        <td><i>$</i></td><td>A culture-specific currency symbol. Its position in the string is defined by the <a href="NumberFormatInfo.get.CurrencyPositivePattern.html">NumberFormatInfo.CurrencyPositivePattern</a> property of the <a href="NumberFormatInfo.html">NumberFormatInfo</a> object returned by the <a href="IFormatProvider.GetFormat.html">GetFormat</a> method of the <i>Provider</i> parameter. The currency symbol can appear in <i>s</i> if style includes the <a href="NumberFormatInfoStatic.NumberStyles.html">NumberStyles.AllowCurrencySymbol</a> flag.</td>
-'    </tr>
-'    <tr>
-'        <td>
-'           <i>digits</i><br/>
-'           <i>fractional_digits</i><br/>
-'           <i>expontial_digits</i>
-'        </td>
-'        <td>A sequence of digits from 0 through 9.</td>
-'    </tr>
-'    <tr>
-'        <td><i>,</i></td><td>A culture-specific thousands separator symbol. The thousands separator of the culture specified by <i>Provider</i> can appear in <i>s</i> if <i>Style</i> includes the <a href="NumberFormatInfoStatic.NumberStyles.html">NumberStyles.AllowThousands</a> flag.</td>
-'    </tr>
-'    <tr>
-'        <td><i>.</i></td>
-'        <td>
-'           A culture-specific decimal point symbol. The decimal point symbol of the culture specified by <i>Provider</i> can appear in <i>s</i> if style includes the <a href="NumberFormatInfoStatic.NumberStyles.html">NumberStyles.AllowDecimalPoint</a> flag.<br/>
-'           Only the digit 0 can appear as a fractional digit for the parse operation to succeed; if <i>fractional_digits</i> includes any other digit, an <a href="OverflowException.html">OverflowException</a> is thrown.
-'        </td>
-'    </tr>
-'    <tr>
-'        <td><i>e</i></td><td>The 'e' or 'E' character, which indicates that the value is represented in exponential notation. The <i>s</i> parameter can represent a number in exponential notation if <i>Style</i> includes the <a href="NumberFormatInfoStatic.NumberStyles.html">NumberStyles.AllowExponent</a> flag.</td>
-'    </tr>
-'    <tr>
-'        <td><i>hexdigits</i></td><td>A sequence of hexadecimal digits from 0 through f, or 0 through F.</td>
-'    </tr>
-' </table>
+' @see #Parse
+' @see #TryParse
+' @see #TryParseEx
+' @include "..\DocIncludes\Int64Static.ParseEx.html"
 Public Function ParseEx(ByRef s As String, ByVal Style As NumberStyles, ByVal Provider As IFormatProvider) As Int64
     If Not TryParseEx(s, Style, Provider, ParseEx) Then
         mParser.ThrowError
@@ -669,6 +669,9 @@ End Function
 '    </tr>
 ' </table>
 ' <p>The <i>s</i> parameter is interpreted using the <a href="NumberFormatInfoStatic.NumberStyles.html">NumberStyles.Integer</a> style. In addition to decimal digits, only leading and trailing spaces together with a leading sign are allowed. To explicitly define the style elements that can be present in <i>s</i>, use <a href="Int64Static.ParseEx.html">Int64.ParseEx(String, NumberStyles)</a> or the <a href="Int64Static.ParseEx.html">Int64.Parse(String, NumberStyles, IFormatProvider)</a> method.</p>
+' @see #Parse
+' @see #ParseEx
+' @see #TryParseEx
 Public Function TryParse(ByRef s As String, ByRef Result As Int64) As Boolean
     TryParse = TryParseEx(s, NumberStyles.Integer, Nothing, Result)
 End Function
@@ -681,47 +684,10 @@ End Function
 ' @param Provider An <a href="IFormatProvider.html">IFormatProvider</a> that supplies culture-specific formatting information about <i>s</i>.
 ' @param Result When this method returns, contains the 64-bit signed integer value equivalent of the number contained in <i>s</i>, if the conversion succeeded, or zero if the conversion failed. The conversion fails if the <i>s</i> parameter is empty, is not in a format compliant withstyle, or represents a number less than <a href="Int64Static.get.MinValue.html">MinValue</a> or greater than <a href="Int64Static.get.MaxValue.html">MaxValue</a>. This parameter is passed uninitialized; any value originally supplied in <i>Result</i> will be overwritten.
 ' @return <b>True</b> if s was converted successfully; otherwise, <b>False</b>.
-' @remarks <p>The <i>Style</i> parameter defines the style elements (such as white space or the positive sign) that are allowed in the <i>s</i> parameter for the parse operation to succeed. It must be a combination of bit flags from the <a href="NumberFormatInfoStatic.NumberStyles.html">NumberStyles</a> enumeration. Depending on the value of <i>Style</i>, the <i>s</i> parameter may include the following elements:</p>
-' <p>[ws][$][sign][digits,]digits[.fractional_digits][e[sign]exponential_digits][ws]</p>
-' <p>Or, if style includes <a href="NumberFormatInfoStatic.NumberStyles.html">AllowHexSpecifier</a>:</p>
-' <p>[ws]hexdigits[ws]</p>
-' <p>Elements in square brackets ([ and ]) are optional. The following table describes each element.</p>
-' <table style="width: auto">
-'   <tr>
-'       <th>Element</th>
-'       <th>Description</th>
-'   </tr>
-'   <tr>
-'        <td><i>ws</i></td><td>Optional white space. White space can appear at the beginning of <i>s</i> if <i>Style</i> includes the <a href="NumberFormatInfoStatic.NumberStyles.html">NumberStyles.AllowLeadingWhite</a> flag, and it can appear at the end of <i>s</i> if <i>Style</i> includes the <a href="NumberFormatInfoStatic.NumberStyles.html">NumberStyles.AllowTrailingWhite</a> flag.</td>
-'   </tr>
-'    <tr>
-'        <td><i>$</i></td><td>A culture-specific currency symbol. Its position in the string is defined by the <a href="NumberFormatInfo.get.CurrencyPositivePattern.html">NumberFormatInfo.CurrencyPositivePattern</a> property of the <a href="NumberFormatInfo.html">NumberFormatInfo</a> object returned by the <a href="IFormatProvider.GetFormat.html">GetFormat</a> method of the <i>Provider</i> parameter. The currency symbol can appear in <i>s</i> if style includes the <a href="NumberFormatInfoStatic.NumberStyles.html">NumberStyles.AllowCurrencySymbol</a> flag.</td>
-'    </tr>
-'    <tr>
-'        <td>
-'           <i>digits</i><br/>
-'           <i>fractional_digits</i><br/>
-'           <i>expontial_digits</i>
-'        </td>
-'        <td>A sequence of digits from 0 through 9.</td>
-'    </tr>
-'    <tr>
-'        <td><i>,</i></td><td>A culture-specific thousands separator symbol. The thousands separator of the culture specified by <i>Provider</i> can appear in <i>s</i> if <i>Style</i> includes the <a href="NumberFormatInfoStatic.NumberStyles.html">NumberStyles.AllowThousands</a> flag.</td>
-'    </tr>
-'    <tr>
-'        <td><i>.</i></td>
-'        <td>
-'           A culture-specific decimal point symbol. The decimal point symbol of the culture specified by <i>Provider</i> can appear in <i>s</i> if style includes the <a href="NumberFormatInfoStatic.NumberStyles.html">NumberStyles.AllowDecimalPoint</a> flag.<br/>
-'           Only the digit 0 can appear as a fractional digit for the parse operation to succeed; if <i>fractional_digits</i> includes any other digit, an <a href="OverflowException.html">OverflowException</a> is thrown.
-'        </td>
-'    </tr>
-'    <tr>
-'        <td><i>e</i></td><td>The 'e' or 'E' character, which indicates that the value is represented in exponential notation. The <i>s</i> parameter can represent a number in exponential notation if <i>Style</i> includes the <a href="NumberFormatInfoStatic.NumberStyles.html">NumberStyles.AllowExponent</a> flag.</td>
-'    </tr>
-'    <tr>
-'        <td><i>hexdigits</i></td><td>A sequence of hexadecimal digits from 0 through f, or 0 through F.</td>
-'    </tr>
-' </table>
+' @see #Parse
+' @see #ParseEx
+' @see #TryParse
+' @include "..\DocIncludes\Int64Static.TryParseEx.html"
 Public Function TryParseEx(ByRef s As String, ByVal Style As NumberStyles, ByVal Provider As IFormatProvider, ByRef Result As Int64) As Boolean
     TryParseEx = mParser.TryParse(s, Style, Provider, Result)
 End Function

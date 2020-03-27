@@ -18,7 +18,7 @@ Public Sub Main()
     PrintOutput "*", x, y, r
     
     r = Int64.Divide(y, x)
-    PrintOutput "/", x, y, r
+    PrintOutput "/", y, x, r
 End Sub
 
 Private Sub PrintOutput(ByVal Op As String, ByRef x As Int64, ByRef y As Int64, ByRef r As Int64)
@@ -29,5 +29,5 @@ End Sub
 ''    55 + 500 = 555
 ''    55 - 500 = -445
 ''    55 * 500 = 27500
-''    55 / 500 = 9
+''    500 / 55 = 9
 </pre>

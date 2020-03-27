@@ -1,0 +1,33 @@
+@remarks <p>The <i>s</i> parameter contains a number of the form:</p>
+<p>[ws][sign]digits[ws]</p>
+<p>Elements in square brackets ([ and ]) are optional. The following table describes each element.</p>
+<table style="width: auto">
+  <tr>
+      <th>Element</th>
+      <th>Description</th>
+  </tr>
+  <tr>
+       <td>ws</td><td>Optional white space.</td>
+  </tr>
+   <tr>
+       <td>sign</td><td>An optional sign.</td>
+   </tr>
+   <tr>
+       <td>digits</td><td>A sequence of digits ranging from 0 to 9.</td>
+   </tr>
+</table>
+<p>The <i>s</i> parameter is interpreted using the <a href="NumberFormatInfoStatic.NumberStyles.html">NumberStyles.Integer</a> style. In addition to decimal digits, only leading and trailing spaces together with a leading sign are allowed. To explicitly define the style elements that can be present in <i>s</i>, use <a href="Int64Static.ParseEx.html">Int64.ParseEx(String, NumberStyles)</a> or the <a href="Int64Static.ParseEx.html">Int64.Parse(String, NumberStyles, IFormatProvider)</a> method.</p>
+@exceptions
+<table style="width: auto">
+	<tr>
+		<th>Exception</th><th>Condition</th>
+	</tr>
+	<tr>
+		<td><a href="FormatException.html">FormatException</a></td>
+		<td><i>s</i> is not in the correct format.</td>
+	</tr>
+	<tr>
+		<td><a href="OverflowException.html">OverflowException</a></td>
+		<td><i>s</i> represents a number less than <a href="Int64Static.Get.MinValue.html">MinValue</a> or greater than <a href="Int64Static.Get.MaxValue.html">MaxValue</a>.</td>
+	</tr>
+</table>

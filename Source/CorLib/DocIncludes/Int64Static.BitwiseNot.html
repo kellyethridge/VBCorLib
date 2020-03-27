@@ -1,0 +1,15 @@
+@example The following code performs a NOT operation on a 64-bit integer value.
+<pre>
+Public Sub Main()
+    Dim x As Int64
+    Dim r As Int64
+    
+    x = CInt64("0xf0000000")
+    r = Int64.BitwiseNot(x)
+    
+    Debug.Print CorString.Format("NOT 0x{0:x} = 0x{1:x8}", x, r)
+End Sub
+
+''This code produces the following.
+''    NOT 0xf0000000 = 0xffffffff0fffffff
+</pre>

@@ -1,0 +1,17 @@
+@example The following code performs a bitwise and operation between two 64-bit integer values.
+<pre>
+Public Sub Main()
+    Dim x As Int64
+    Dim y As Int64
+    Dim r As Int64
+    
+    x = CInt64("0xfffffff0")
+    y = CInt64("0xffff")
+    r = Int64.BitwiseAnd(x, y)
+    
+    Debug.Print CorString.Format("0x{0:x} AND 0x{1:x8} = 0x{2:x8}", x, y, r)
+End Sub
+
+''This code produces the following.
+''    0xfffffff0 AND 0x0000ffff = 0x0000fff0
+</pre>

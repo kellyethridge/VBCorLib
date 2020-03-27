@@ -1,0 +1,17 @@
+@example The following code performs a bitwise OR operation on between two 64-bit integers.
+<pre>
+Public Sub Main()
+    Dim x As Int64
+    Dim y As Int64
+    Dim r As Int64
+    
+    x = CInt64("0xf0000000")
+    y = CInt64("0xffff")
+    r = Int64.BitwiseOr(x, y)
+    
+    Debug.Print CorString.Format("0x{0:x} OR 0x{1:x8} = 0x{2:x8}", x, y, r)
+End Sub
+
+''This code produces the following.
+''    0xf0000000 OR 0x0000ffff = 0xf000ffff
+</pre>

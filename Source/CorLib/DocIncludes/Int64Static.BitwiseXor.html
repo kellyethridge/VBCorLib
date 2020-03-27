@@ -1,0 +1,17 @@
+@example The following code performs a bitwise exclusive-or operation between two 64-bit integers.
+<pre>
+Public Sub Main()
+    Dim x As Int64
+    Dim y As Int64
+    Dim r As Int64
+    
+    x = CInt64("0xffffffff")
+    y = CInt64("0x000ff000")
+    r = Int64.BitwiseXor(x, y)
+    
+    Debug.Print CorString.Format("0x{0:x8} XOR 0x{1:x8} = 0x{2:x8}", x, y, r)
+End Sub
+
+''This code produces the following.
+''    0xffffffff XOR 0x000ff000 = 0xfff00fff
+</pre>

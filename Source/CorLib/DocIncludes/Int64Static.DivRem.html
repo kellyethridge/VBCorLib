@@ -1,0 +1,30 @@
+@exceptions
+<table style="width: auto">
+	<tr>
+		<th>Exception</th><th>Condition</th>
+	</tr>
+	<tr>
+		<td><a href="DivideByZeroException.html">DivideByZeroException</a></td>
+		<td>Attempt to divide by zero.</td>
+	</tr>
+</table>
+@example The following code will calculate the quotient and remainder of a division operation.
+<pre>
+Public Sub Main()
+    Dim x As Int64
+    Dim y As Int64
+    Dim q As Int64
+    Dim r As Int64
+    
+    x = CInt64(500)
+    y = CInt64(55)
+    q = Int64.DivRem(x, y, r)
+    
+    Debug.Print CorString.Format("The quotient of {0} / {1} = {2}", x, y, q)
+    Debug.Print CorString.Format("The remainder of {0} / {1} = {2}.", x, y, r)
+End Sub
+
+''This code produces the following.
+''    The quotient of 500 / 55 = 9
+''    The remainder of 500 / 55 = 5.
+</pre>

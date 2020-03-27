@@ -1,0 +1,15 @@
+@example The following code displays the absolute value of a give value.
+<pre>
+Public Sub Main()
+    PrintAbsolute CInt64(100)
+    PrintAbsolute CInt64(-200)
+End Sub
+
+Private Sub PrintAbsolute(ByRef Value As Int64)
+    Debug.Print CorString.Format("The absolute value of {0} is {1}.", Value, Int64.Absolute(Value))
+End Sub
+
+'This code produces the following.
+'    The absolute value of 100 is 100.
+'    The absolute value of -200 is 200.
+</pre>

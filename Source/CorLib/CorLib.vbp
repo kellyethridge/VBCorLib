@@ -418,24 +418,28 @@ ThreadingModel=1
 DebugStartupOption=0
 
 [TaskList]
-Num=3
+Num=0
 
 [TASK1]
-Description=Add tests for FromBase64Transform.TransformFinalBlock
-Status=0
-Priority=1
-Comment=Add tests to exercise when mTermCount > 0 in TransformFinalBlock method.
+Description=
+Status=
+Priority=
+Comment=
+AssignedTo=
 
 [TASK2]
-Description=TimeZoneInfo class
-Status=0
-Priority=1
-Comment=Investigate implementation.
+Description=
+Status=
+Priority=
+Comment=
+AssignedTo=
 
 [TASK3]
-Description=Add CryptDeriveKey method to Rfc2898DeriveBytes class
-Status=0
-Priority=1
+Description=
+Status=
+Priority=
+Comment=
+AssignedTo=
 
 [TASK4]
 Description=
