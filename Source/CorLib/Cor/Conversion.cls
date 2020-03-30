@@ -55,6 +55,9 @@ End Function
 '
 ' @param Value The value to be converted
 ' @return Returns a 64-bit signed integer.
+' @see Int64Static
+' @see Constructors
+' @include "..\DocIncludes\Conversion.CInt64.html"
 Public Function CInt64(ByRef Value As Variant) As Int64
     CInt64 = ConversionMethods.CInt64(Value)
 End Function

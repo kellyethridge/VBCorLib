@@ -1,0 +1,23 @@
+@example
+The following code uses the callback <b>Person18OrOlder</b> with the <b>Exists</b> method to search an array of <b>Long</b>s.
+The callback method is passed individual values representing a person's age and returns <b>True</b> if the age is of an
+adult or <b>False</b> if not.
+<pre>
+Public Sub Main()
+    Dim Ages() As Long
+    Dim Found As Boolean
+    
+    Ages = NewLongs(4, 16, 10, 22, 14, 19)
+    
+    Found = CorArray.Exists(Ages, AddressOf Person18OrOlder)
+    
+    Debug.Print "There is at least one adult: " & Found
+End Sub
+
+Private Function Person18OrOlder(ByRef Age As Long) As Boolean
+    Person18OrOlder = Age >= 18
+End Function
+
+'' The code example produces the following output.
+''  There is at least one adult: True
+</pre>

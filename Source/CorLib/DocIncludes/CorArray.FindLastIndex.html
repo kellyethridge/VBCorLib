@@ -1,0 +1,43 @@
+@exceptions
+<table style="width: auto">
+	<tr>
+		<th>Exception</th><th>Condition</th>
+	</tr>
+	<tr>
+		<td><a href="ArgumentNullException.html">ArgumentNullException</a></td><td><i>Arr</i> is uninitialized.</td>
+	</tr>
+	<tr>
+		<td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+		<td>
+			<i>StartIndex</i> is outside the range of valid indexes for <i>Arr</i>.<br/>
+			-or-<br/>
+			<i>Count</i> is less than zero.<br/>
+			-or-<br/>
+			<i>StartIndex</i> and <i>Count</i> do not specify a valid section in <i>Arr</i>.
+		</td>
+	</tr>
+</table>
+@example The following example will search a given array for the last age that is over 25 and return the index.
+<pre>
+Private Sub Main()
+    Dim Ages() As Long
+    Dim Index As Long
+    
+    Ages = NewLongs(14, 22, 31, 27, 18)
+    
+    '' To find the index of the last age over 25, pass the array and
+    '' address of the callback method to CorArray.FindLastIndex.
+    Index = CorArray.FindLastIndex(Ages, AddressOf AgeOver25)
+    
+    '' Dispay the index found.
+    Debug.Print "The last age over 25 found at index " & Index
+End Sub
+
+'' The method accepts a ByRef parameter of the array element type.
+Private Function AgeOver25(ByRef Age As Long) As Boolean
+    AgeOver25 = Age > 25
+End Function
+
+'' This code example produces the following output.
+''  The last age over 25 found at index 3
+</pre>

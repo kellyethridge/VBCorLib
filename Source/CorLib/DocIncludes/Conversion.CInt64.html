@@ -1,0 +1,88 @@
+@remarks This method will attempt to convert various data types to an <a href="Int64Static.Int64.html">Int64</a> value.
+<table style="width: auto">
+	<tr>
+		<th>Type</th><th>Operation</th>
+	</tr>
+	<tr>
+		<td><a href="Int64Static.Int64.html">Int64</a></td>
+		<td>Returns value.</td>
+	</tr>
+	<tr>
+		<td><b>String</b></td>
+		<td>Attemps to parse the string expression using <a href="Int64Static.Parse.html">Int64.Parse</a>.</td>
+	</tr>
+	<tr>
+		<td>
+			<b>Long</b><br/>
+			-or-<br/>
+			<b>Integer</b><br/>
+			-or-<br/>
+			<b>Byte</b>
+		</td>
+		<td>
+			Directly assigns to <b>LowPart</b> in the <a href="Int64Static.Int64.html">Int64</a> and
+			sets the <b>HighPart</b> to -1 if the value is negative.
+		</td>		
+	</tr>
+	<tr>
+		<td>
+			<b>Double</b><br/>
+			-or-<br/>
+			<b>Single</b><br/>
+			-or-<br/>
+			<b>Currency</b><br/>
+			-or-<br/>
+			<b>Decimal</b>
+		</td>
+		<td>Assigns the value rounding off any fractions using <b>Round</b>.</td>
+	</tr>
+</table>
+@exceptions
+<table style="width: auto">
+	<tr>
+		<th>Exception</th><th>Condition</th>
+	</tr>
+	<tr>
+		<td><a href="InvalidCastException.html">InvalidCastException</a></td>
+		<td>Count not convert from specified type.</td>
+	</tr>
+	<tr>
+		<td><a href="OverflowException.html">OverflowException</a></td>
+		<td><i>Value</i> represented a value outside the <a href="Int64Static.Int64.html">Int64</a> valid range from <a href="Int64Static.Get.MinValue.html">MinValue</a>
+			to <a href="Int64Static.Get.MaxValue.html">MaxValue</a>.
+		</td>
+	</tr>
+</table>
+@example The following code demonstrates the various types that can be converted.
+<pre>
+Public Sub Main()
+    ConvertValue "80278098"
+    ConvertValue "0xffff"
+    ConvertValue CLng(-223432)
+    ConvertValue CInt(23214)
+    ConvertValue CByte(255)
+    ConvertValue CDbl(1234.4323)
+    ConvertValue CSng(1234.43)
+    ConvertValue CCur(492398.724)
+    ConvertValue CDec(492398.724)
+End Sub
+
+Private Sub ConvertValue(ByRef Value As Variant)
+    Dim x As Int64
+    
+    x = CInt64(Value)
+    
+    Debug.Print CorString.Format("{0} of {1} = {2}", TypeName(Value), Value, x)
+End Sub
+
+'' This code produces the following output.
+''    String of 80278098 = 80278098
+''    String of 0xffff = 65535
+''    Long of -223432 = -223432
+''    Integer of 23214 = 23214
+''    Byte of 255 = 255
+''    Double of 1234.4323 = 1234
+''    Single of 1234.43 = 1234
+''    Currency of 492398.724 = 492399
+''    Decimal of 492398.724 = 492399
+</pre>

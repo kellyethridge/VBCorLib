@@ -1,0 +1,33 @@
+@exceptions
+<table style="width: auto">
+	<tr>
+		<th>Exception</th><th>Condition</th>
+	</tr>
+	<tr>
+		<td><a href="ArgumentNullException.html">ArgumentNullException</a></td>
+		<td><i>Arr</i> is uninitialized.</td>
+	</tr>
+	<tr>
+		<td><a href="RankException.html">RankException</a></td>
+		<td><i>Arr</i> has more than one dimension.</td>
+	</tr>
+</table>
+@example The following example shows how to use <b>ForEach</b> to display the squares of each element in an integer array.
+<pre>
+Private Sub Main()
+    Dim IntArray() As Integer
+    
+    IntArray = NewIntegers(2, 3, 4)
+    
+    CorArray.ForEach IntArray, AddressOf ShowSquares
+End Sub
+
+Private Sub ShowSquares(ByRef Value As Integer)
+    Debug.Print CorString.Format("{0} squared = {1}", Value, Value * Value)
+End Sub
+
+'' This code example produces the following output.
+''   2 squared = 4
+''   3 squared = 9
+''   4 squared = 16
+</pre>

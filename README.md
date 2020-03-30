@@ -19,7 +19,7 @@ sharing between a .NET application and VB6.
 * Provides easy access to a console window.
 * And much more...
 
-## Documentation
+## Documentation (Updated 2020-03-30)
 
 * Browse online at <http://www.kellyethridge.com/vbcorlib/doc/CorLib.html>.
 * Download offline from <http://www.kellyethridge.com/vbcorlib/doc/CorLib.chm>.

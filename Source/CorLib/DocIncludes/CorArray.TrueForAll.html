@@ -1,0 +1,42 @@
+@exceptions
+<table style="width: auto">
+	<tr>
+		<th>Exception</th><th>Conditioni</th>
+	</tr>
+	<tr>
+		<td><a href="ArgumentNullException.html">ArgumentNullException</a></td>
+		<td><i>Arr</i> is uninitialized</td>
+	</tr>
+	<tr>
+		<td><a href="RankException.html">RankException</a></td>
+		<td><i>Arr</i> has more than one dimension.</td>
+	</tr>
+</table>
+@example The following code example checks two arrays for containing only ages 18 or older.
+<pre>
+Private Sub Main()
+    Dim Adults() As Long
+    Dim Mixed() As Long
+        
+    Adults = NewLongs(22, 45, 37, 62, 18)
+    Mixed = NewLongs(29, 33, 16, 49, 13)
+    
+    Debug.Print "Adults array has only adults:"
+    Debug.Print CorArray.TrueForAll(Adults, AddressOf Age18OrOlder)
+    
+    Debug.Print t("\nMixed array has only adults:")
+    Debug.Print CorArray.TrueForAll(Mixed, AddressOf Age18OrOlder)
+End Sub
+
+'' The method accepts a ByRef parameter of the array element type.
+Private Function Age18OrOlder(ByRef Age As Long) As Boolean
+    Age18OrOlder = Age >= 18
+End Function
+
+'' This code example produces the following output.
+''    Adults array has only adults:
+''    True
+''
+''    Mixed array has only adults:
+''    False
+</pre>

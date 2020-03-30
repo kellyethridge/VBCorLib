@@ -669,6 +669,7 @@ End Function
 '    </tr>
 ' </table>
 ' <p>The <i>s</i> parameter is interpreted using the <a href="NumberFormatInfoStatic.NumberStyles.html">NumberStyles.Integer</a> style. In addition to decimal digits, only leading and trailing spaces together with a leading sign are allowed. To explicitly define the style elements that can be present in <i>s</i>, use <a href="Int64Static.ParseEx.html">Int64.ParseEx(String, NumberStyles)</a> or the <a href="Int64Static.ParseEx.html">Int64.Parse(String, NumberStyles, IFormatProvider)</a> method.</p>
+' <p>A string expression beginning with "0x" or "&h" will be parsed as a hex value.</p>
 ' @see #Parse
 ' @see #ParseEx
 ' @see #TryParseEx

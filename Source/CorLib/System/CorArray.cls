@@ -36,14 +36,12 @@ Attribute VB_Exposed = True
 '
 
 ''
-' Provides methods for manipulating, searching and sorting arrays.
+' Provides methods for creating, manipulating, searching, and sorting arrays.
 '
-' @remarks This class cannot be directly instantiated. To access the methods
-' use the class name directly.
-' <pre>
-' Debug.Print CorArray.Length(MyArray)
-' </pre>
-'
+' @remarks Arrays are a common data structure used when building applications. The <b>CorArray</b> class
+' provides several methods to help manage arrays through the course of an applications lifetime.
+' @see PublicFunctions
+' @include "..\DocIncludes\CorArray.html"
 Option Explicit
 
 
@@ -64,27 +62,27 @@ End Type
 
 
 ''
-' Uses a callback method to check if an element in an array exists.
+' Determines whether the specified array contains elements that match the conditions defined by the specified predicate.
 '
-' @param arr The one-dimensional array to check if an element exists according to the callback criteria.
-' @param AddressOfPredicate The AddressOf the callback method used to determine if
-' an element matches the specified criteria.
-' @return Indication of the element existing in the array.
-' @remarks Each array element is passed into a user callback method. The user
-' then checks the element value to determine if it matches any criteria necessary
-' and returns the result. The criteria is defined outside of the
-' <b>Exists</b> method. How the criteria is defined and checked is up to the
-' user of the function.
-' <p>The function signature for the callback has a specific format.
+' @param Arr The one-dimensional array to search.
+' @param AddressOfPredicate The <b>AddressOf</b> a callback method used to determine if an element matches the specified criteria.
+' @return <b>True</b> if <i>Arr</i> contains one or more elements that match the conditions defined by the specified predicate callback; otherwise, <b>False</b>.
+' @remarks The <i>AddressOfPredicate</i> is an address to a method that returns <b>True</b> if the value passed to it matches the conditions defined in the callback method.
+' The elements of <i>Arr</i> are individually passed to the callback method, and processing is stopped when the method returns <b>False</b> for any element.
+' <p>The callback method should have a signature resembling the following:</p>
 ' <pre>
-' Public Function ExistsCallback(ByRef x As [Array Datatype]) As Boolean
-'     '' return True if x matches your criteria.
-' End Sub
+' Public Function CallbackMethod(ByRef Value As &lt;Type&gt;) As Boolean
+'   '' Evaluate value
+' End Function
 ' </pre>
-' The [Array Datatype] must be replaced with the datatype of the array. If the
-' array is an array of Variants, then [Array Datatype] would be a Variant, not
-' any specific sub-type within the variants of the array.</p>
-'
+' <p>It has one parameter that is defined as <b>ByRef</b> and should be the same type as the elements in the array to be searched.</p>
+' <p>It is extremely important to define the callback method correctly. If the method is incorrect, the application may crash.</p>
+' @see #Find
+' @see #FindIndex
+' @see #FindLast
+' @see #FindLastIndex
+' @see #FindAll
+' @include "..\DocIncludes\CorArray.Exists.html"
 Public Function Exists(ByRef Arr As Variant, ByVal AddressOfPredicate As Long) As Boolean
     Exists = (FindIndex(Arr, AddressOfPredicate) >= LBound(Arr))
 End Function
@@ -93,19 +91,23 @@ End Function
 ' Uses a callback method to search an array for the first element that matches the criteria.
 '
 ' @param arr The one-dimensional array to search.
-' @param AddressOfPredicate The callback method address used to determine if an element
-' matches the specified criteria.
+' @param AddressOfPredicate The callback method address used to determine if an element matches the specified criteria.
 ' @return The element value if a match is found, otherwise a default for that element type.
-' @remarks <p>The function signature for the callback has a specific format.
+' @remarks The <i>AddressOfPredicate</i> is an address to a method that returns <b>True</b> if the value passed to it matches the conditions defined in the callback method.
+' The elements of <i>Arr</i> are individually passed to the callback method, and processing is stopped when the method returns <b>False</b> for any element.
+' <p>The callback method should have a signature resembling the following:</p>
 ' <pre>
-' Public Function FindCallback(ByRef x As [Array Datatype]) As Boolean
-'     '' return True if x matches your criteria.
-' End Sub
+' Public Function CallbackMethod(ByRef Value As &lt;Type&gt;) As Boolean
+'   '' Evaluate value
+' End Function
 ' </pre>
-' The [Array Datatype] must be replaced with the datatype of the array. If the
-' array is an array of Variants, then [Array Datatype] would be a Variant, not
-' any specific sub-type within the variants of the array.</p>
-'
+' <p>It has one parameter that is defined as <b>ByRef</b> and should be the same type as the elements in the array to be searched.</p>
+' <p>It is extremely important to define the callback method correctly. If the method is incorrect, the application may crash.</p>
+' @see #Exists
+' @see #FindIndex
+' @see #FindLast
+' @see #FindLastIndex
+' @see #FindAll
 ' @include "..\DocIncludes\CorArray.Find.html"
 Public Function Find(ByRef Arr As Variant, ByVal AddressOfPredicate As Long) As Variant
     Dim Index As Long
@@ -119,25 +121,33 @@ Public Function Find(ByRef Arr As Variant, ByVal AddressOfPredicate As Long) As 
 End Function
 
 ''
-' Finds the index of the first array element that matches the criteria
-' specified by the callback function.
+' Searches for an element that matches the conditions defined by the specified callback method,
+' and returns the lower-bound based index of the first occurrence within the range of elements
+' in the array that starts at the specified index and contains the specified number of elements.
 '
-' @param arr The one-dimensional array to be searched.
+' @param Arr The one-dimensional array to be searched.
 ' @param AddressOfPredicate The address of the callback function used to match the array elements.
-' @param Index The starting element of the array to beging the matching process.
-' @param Count The number of elements to include in the array search.
-' @return The index of the matched element, or LowerBound - 1 if none is found.
-' @remarks <p>The function signature for the callback has a specific format.
+' @param Index The starting index of the search.
+' @param Count The number of elements in the section to search.
+' @return The index of the first occurrence of an element that matches the conditions
+' defined in the callback method, if found; otherwise the lower-bound of the array minus one.
+' @remarks The <i>AddressOfPredicate</i> is an address to a method that returns <b>True</b> if the value passed to it matches the conditions defined in the callback method.
+' The elements of <i>Arr</i> are individually passed to the callback method, and processing is stopped when the method returns <b>False</b> for any element.
+' <p>The callback method should have a signature resembling the following:</p>
 ' <pre>
-' Public Function FindIndexCallback(ByRef x As [Array Datatype]) As Boolean
-'     '' return True if x matches your criteria.
-' End Sub
+' Public Function CallbackMethod(ByRef Value As &lt;Type&gt;) As Boolean
+'   '' Evaluate value
+' End Function
 ' </pre>
-' The [Array Datatype] must be replaced with the datatype of the array. If the
-' array is an array of Variants, then [Array Datatype] would be a Variant, not
-' any specific sub-type within the variants of the array.</p>
-'
-' @include "..\DocIncludes\CorArray.Find.html"
+' <p>It has one parameter that is defined as <b>ByRef</b> and should be the same type as the elements in the array to be searched.</p>
+' <p>It is extremely important to define the callback method correctly. If the method is incorrect, the application may crash.</p>
+' <p>The search is based on the array lower-bound, not zero-based.</p>
+' @see #Exists
+' @see #Find
+' @see #FindLast
+' @see #FindLastIndex
+' @see #FindAll
+' @include "..\DocIncludes\CorArray.FindIndex.html"
 Public Function FindIndex(ByRef Arr As Variant, ByVal AddressOfPredicate As Long, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Long
     Dim Info As ArrayInfo
     Dim ElementIndex   As Long
@@ -174,22 +184,28 @@ Public Function FindIndex(ByRef Arr As Variant, ByVal AddressOfPredicate As Long
 End Function
 
 ''
-' Finds all matching elements in an array, returning an array of the matched elements.
+' Retrieves all the elements that match the conditions defined by the specified callback method.
 '
-' @param arr The one-dimensional array to find all matching elements.
+' @param Arr The one-dimensional array to find all matching elements.
 ' @param AddressOfPredicate The callback address of the matching criteria method.
 ' @return An array of all matched elements.
-' @remarks <p>The function signature for the callback has a specific format.
+' @remarks The <i>AddressOfPredicate</i> is an address to a method that returns <b>True</b> if the value passed to it matches the conditions defined in the callback method.
+' The elements of <i>Arr</i> are individually passed to the callback method, and processing is stopped when the method returns <b>False</b> for any element.
+' <p>The callback method should have a signature resembling the following:</p>
 ' <pre>
-' Public Function FindAllCallback(ByRef x As [Array Datatype]) As Boolean
-'     '' return True if x matches your criteria.
-' End Sub
+' Public Function CallbackMethod(ByRef Value As &lt;Type&gt;) As Boolean
+'   '' Evaluate value
+' End Function
 ' </pre>
-' The [Array Datatype] must be replaced with the datatype of the array. If the
-' array is an array of Variants, then [Array Datatype] would be a Variant, not
-' any specific sub-type within the variants of the array.</p>
-'
-' @include "..\DocIncludes\CorArray.Find.html"
+' <p>It has one parameter that is defined as <b>ByRef</b> and should be the same type as the elements in the array to be searched.</p>
+' <p>It is extremely important to define the callback method correctly. If the method is incorrect, the application may crash.</p>
+' <p>The returned array is of the same type as <i>Arr</i>.</p>
+' @see #Exists
+' @see #Find
+' @see #FindIndex
+' @see #FindLast
+' @see #FindLastIndex
+' @include "..\DocIncludes\CorArray.FindAll.html"
 Public Function FindAll(ByRef Arr As Variant, ByVal AddressOfPredicate As Long) As Variant
     Dim Info                As ArrayInfo
     Dim MatchCount          As Long
@@ -284,23 +300,27 @@ Private Sub SetFindAllUdtResult(ByRef Arr As Variant, ByRef Info As ArrayInfo, B
 End Sub
 
 ''
-' Finds the last occurence of a matched element in the array.
+' Searches for an element that matches the conditions defined by the specified callback method, and returns the last occurrence within the entire array.
 '
 ' @param arr The array to search.
 ' @param AddressOfPredicate A callback address of the matching criteria method.
-' @return The last element in the array to match the criteria, or the
-' default for the array type if no elements matched.
-' @remarks <p>The function signature for the callback has a specific format.
+' @return The last element in the array to match the criteria, or the default for the array type if no elements matched.
+' @remarks The <i>AddressOfPredicate</i> is an address to a method that returns <b>True</b> if the value passed to it matches the conditions defined in the callback method.
+' The elements of <i>Arr</i> are individually passed to the callback method, and processing is stopped when the method returns <b>False</b> for any element.
+' <p>The callback method should have a signature resembling the following:</p>
 ' <pre>
-' Public Function FindLastCallback(ByRef x As [Array Datatype]) As Boolean
-'     '' return True if x matches your criteria.
-' End Sub
+' Public Function CallbackMethod(ByRef Value As &lt;Type&gt;) As Boolean
+'   '' Evaluate value
+' End Function
 ' </pre>
-' The [Array Datatype] must be replaced with the datatype of the array. If the
-' array is an array of Variants, then [Array Datatype] would be a Variant, not
-' any specific sub-type within the variants of the array.</p>
-'
-' @include "..\DocIncludes\CorArray.Find.html"
+' <p>It has one parameter that is defined as <b>ByRef</b> and should be the same type as the elements in the array to be searched.</p>
+' <p>It is extremely important to define the callback method correctly. If the method is incorrect, the application may crash.</p>
+' @see #Exists
+' @see #Find
+' @see #FindIndex
+' @see #FindLastIndex
+' @see #FindAll
+' @include "..\DocIncludes\CorArray.FindLast.html"
 Public Function FindLast(ByRef Arr As Variant, ByVal AddressOfPredicate As Long) As Variant
     Dim Index As Long
     
@@ -320,17 +340,22 @@ End Function
 ' @param Index The starting index in the array to begin the backward search.
 ' @param Count The number of elements to search.
 ' @return The index of the last occurence of the matched element.
-' @remarks <p>The function signature for the callback has a specific format.
+' @remarks The <i>AddressOfPredicate</i> is an address to a method that returns <b>True</b> if the value passed to it matches the conditions defined in the callback method.
+' The elements of <i>Arr</i> are individually passed to the callback method, and processing is stopped when the method returns <b>False</b> for any element.
+' <p>The callback method should have a signature resembling the following:</p>
 ' <pre>
-' Public Function FindLastIndexCallback(ByRef x As [Array Datatype]) As Boolean
-'     '' return True if x matches your criteria.
-' End Sub
+' Public Function CallbackMethod(ByRef Value As &lt;Type&gt;) As Boolean
+'   '' Evaluate value
+' End Function
 ' </pre>
-' The [Array Datatype] must be replaced with the datatype of the array. If the
-' array is an array of Variants, then [Array Datatype] would be a Variant, not
-' any specific sub-type within the variants of the array.</p>
-'
-' @include "..\DocIncludes\CorArray.Find.html"
+' <p>It has one parameter that is defined as <b>ByRef</b> and should be the same type as the elements in the array to be searched.</p>
+' <p>It is extremely important to define the callback method correctly. If the method is incorrect, the application may crash.</p>
+' @see #Exists
+' @see #Find
+' @see #FindIndex
+' @see #FindLast
+' @see #FindAll
+' @include "..\DocIncludes\CorArray.FindLastIndex.html"
 Public Function FindLastIndex(ByRef Arr As Variant, ByVal AddressOfPredicate As Long, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Long
     Dim Info        As ArrayInfo
     Dim ElementPtr  As Long
@@ -367,21 +392,23 @@ Public Function FindLastIndex(ByRef Arr As Variant, ByVal AddressOfPredicate As 
 End Function
 
 ''
-' Returns a boolean indicating if all elements in the array matched the criteria.
+' Determines whether every element in the array matches the conditions defined by the specified callback method.
 '
-' @param arr The array to compare against the criteria.
+' @param Arr The array to check against the conditions.
 ' @param AddressOfPredicate The callback address used to match the criteria.
-' @Return Indication of the entire array matching the criteria or not.
-' @remarks <p>The function signature for the callback has a specific format.
+' @Return <b>True</b> if every element in array matches the conditions defined by the specified predicate; otherwise, <b>False</b>.
+' If there are no elements in the array, the return value is <b>True</b>.
+' @remarks The <i>AddressOfPredicate</i> is an address to a method that returns <b>True</b> if the value passed to it matches the conditions defined in the callback method.
+' The elements of <i>Arr</i> are individually passed to the callback method, and processing is stopped when the method returns <b>False</b> for any element.
+' <p>The callback method should have a signature resembling the following:</p>
 ' <pre>
-' Public Function TrueForAllCallback(ByRef x As [Array Datatype]) As Boolean
-'     '' return True if x matches your criteria.
-' End Sub
+' Public Function CallbackMethod(ByRef Value As &lt;Type&gt;) As Boolean
+'   '' Evaluate value
+' End Function
 ' </pre>
-' The [Array Datatype] must be replaced with the datatype of the array. If the
-' array is an array of Variants, then [Array Datatype] would be a Variant, not
-' any specific sub-type within the variants of the array.</p>
-'
+' <p>It has one parameter that is defined as <b>ByRef</b> and should be the same type as the elements in the array to be searched.</p>
+' <p>It is extremely important to define the callback method correctly. If the method is incorrect, the application may crash.</p>
+' @include "..\DocIncludes\CorArray.TrueForAll.html"
 Public Function TrueForAll(ByRef Arr As Variant, ByVal AddressOfPredicate As Long) As Boolean
     Dim Info        As ArrayInfo
     Dim ElementPtr  As Long
@@ -405,21 +432,20 @@ Public Function TrueForAll(ByRef Arr As Variant, ByVal AddressOfPredicate As Lon
 End Function
 
 ''
-' Iterates over an array passing in each element into an Action function to be performed on the element.
+' Performs the specified action on each element of the specified array.
 '
 ' @param Arr The one-dimensional array containing the elements to be processed.
 ' @param AddressOfAction The callback address of the function to process an array element.
-' @remarks <p>The callback method must be a Sub with a single ByRef parameter of the same
-' type as the array.
+' @remarks The <i>AddressOfAction</i> is an address to a method that will perform an action on the value passed to it.
+' <p>The callback method should have a signature resembling the following:</p>
 ' <pre>
-' Public Sub ActionMethod(ByRef e As [Data Type])
-'     '' Perform action on e.
+' Public Sub CallbackMethod(ByRef Value As &lt;Type&gt;)
+'   '' Perform action using Value
 ' End Sub
 ' </pre>
-' The [Array Datatype] must be replaced with the datatype of the array. If the
-' array is an array of Variants, then the [Array Datatype] would be a Variant, not
-' any specific sub-type within the variants of the array.</p>
-'
+' <p>It has one parameter that is defined as <b>ByRef</b> and should be the same type as the elements in the array to be searched.</p>
+' <p>It is extremely important to define the callback method correctly. If the method is incorrect, the application may crash.</p>
+' @include "..\DocIncludes\CorArray.ForEach.html"
 Public Sub ForEach(ByRef Arr As Variant, ByVal AddressOfAction As Long)
     Dim Info        As ArrayInfo
     Dim ElementPtr  As Long
@@ -438,20 +464,29 @@ Public Sub ForEach(ByRef Arr As Variant, ByVal AddressOfAction As Long)
 End Sub
 
 ''
-' Performs a binary search on a given array. A subportion of the array can
-' be searched using the startindex and length parameters. A custom user
-' comparer can optionally be supplied to perform special comparisons
-' between elements in the array.
+' Searches the entire one-dimensional sorted array for a specific element, using an optionally specified <a href="IComparer.html">IComparer</a> interface.
 '
-' @param Arr The array to search for a specific value.
+' @param Arr The sorted one-dimensional array to search.
 ' @param Value The value to search for in the array.
-' @param Comparer A user supplied object to compare elements within the array.
-' @return The index at which the value was found.
-' @remarks If the returned value is less than the lower bound of the array, then
-' the value indicates where the value would have been found in the array. The
-' following is how to convert the return value to the array index:<br><br>
-' Lowerbound of 0:  return = Not return<br>
-' Other lowerbound: return = (Not (return - lowerbound)) + lowerbound<br>
+' @param Comparer An object used to compare elements within the array. If this is <b>Nothing</b> then <a href="ComparerStatic.Get.Default.html">Comparer.Default</a> is used.
+' @return The index of the specified <i>Value</i> in the specified array, if <i>Value</i> is found. If <i>Value</i> is not found and <i>Value</i> is less than one or more
+' elements in <i>Arr</i>, a negative number which is the bitwise complement of the index of the first element that is larger than <i>Value</i>. If <i>Value</i> is not found
+' and <i>Value</i> is greater than any of the elements in <i>Arr</i>, a negative number which is the bitwise complement of (the index of the last element plus 1).
+' @remarks The <i>Arr</i> must be sorted before calling this method.
+' <p>If the returned value is less than the lower bound of the array, the value is a bitwise <b>Not</b> indication of where the value would have been found in the array.
+' The following shows how to convert the result for a value that is not found.
+' <table style="width: auto">
+'   <tr>
+'       <th>Lower Bound of <i>Arr</i></th><th>Conversion Method</th>
+'   </tr>
+'   <tr>
+'       <td>Zero</td><td>Index = Not Result</td>
+'   </tr>
+'   <tr>
+'       <td>Non-zero</td><td>Index = (Not (Result - LBound(<i>Arr</i>))) + LBound(<i>Arr</i>)</td>
+'   </tr>
+' </table>
+' @see #BinarySearchEx
 ' @include "..\DocIncludes\CorArray.BinarySearch.html"
 Public Function BinarySearch(ByRef Arr As Variant, ByRef Value As Variant, Optional ByVal Comparer As IComparer) As Long
     ValidateArray Arr
@@ -459,23 +494,35 @@ Public Function BinarySearch(ByRef Arr As Variant, ByRef Value As Variant, Optio
 End Function
 
 ''
-' Performs a binary search on a given array. A subportion of the array can
-' be searched using the startindex and length parameters. A custom user
-' comparer can optionally be supplied to perform special comparisons
-' between elements in the array.
+' Searches a range of elements in a one-dimensional sorted <i>Arr</i> for a value, using an optionally specified <a href="IComparer.html">IComparer</a> interface.
 '
-' @param Arr The array to search for a specific value.
-' @param Index The starting index in the array to begin searching.
-' @param Length The number of elements to search, starting at startindex.
+' @param Arr The sorted one-dimensional array to search.
+' @param Index The starting index in the range to search.
+' @param Length The length of the range to search.
 ' @param Value The value to search for in the array.
-' @param Comparer A user supplied object to compare elements within the array.
-' @return The index at which the value was found.
+' @param Comparer The <a href="IComparer.html">IComparer</a> implementation to use when comparing elements.<br/>
+' -or-<br/>
+' <b>Nothing</b> to use the default <a href="ComparerStatic.Get.Default.html">Comparer</a> implementation.
+' @return The index of the specified <i>Value</i> in the specified array, if <i>Value</i> is found. If <i>Value</i> is not found and <i>Value</i> is less than one or more
+' elements in <i>Arr</i>, a negative number which is the bitwise complement of the index of the first element that is larger than <i>Value</i>. If <i>Value</i> is not found
+' and <i>Value</i> is greater than any of the elements in <i>Arr</i>, a negative number which is the bitwise complement of (the index of the last element plus 1).
+' @remarks The <i>Arr</i> must be sorted before calling this method.
 ' @remarks If the returned value is less than the lower bound of the array, then
-' the value indicates where the value would have been found in the array. The
-' following is how to convert the return value to the array index:<br><br>
-' Lowerbound of 0:  return = Not return<br>
-' Other lowerbound: return = (Not (return - lowerbound)) + lowerbound<br>
-' @include "..\DocIncludes\CorArray.BinarySearch.html"
+' <p>If the returned value is less than the lower bound of the array, the value is a bitwise <b>Not</b> indication of where the value would have been found in the array.
+' The following shows how to convert the result for a value that is not found.
+' <table style="width: auto">
+'   <tr>
+'       <th>Lower Bound of <i>Arr</i></th><th>Conversion Method</th>
+'   </tr>
+'   <tr>
+'       <td>Zero</td><td>Index = Not Result</td>
+'   </tr>
+'   <tr>
+'       <td>Non-zero</td><td>Index = (Not (Result - LBound(<i>Arr</i>))) + LBound(<i>Arr</i>)</td>
+'   </tr>
+' </table>
+' @see #BinarySearch
+' @include "..\DocIncludes\CorArray.BinarySearchEx.html"
 Public Function BinarySearchEx(ByRef Arr As Variant, ByVal Index As Long, ByVal Length As Long, ByRef Value As Variant, Optional ByVal Comparer As IComparer) As Long
     ValidateArrayRange Arr, Index, Length, CountName:=NameOfLength
     BinarySearchEx = InternalBinarySearch(Arr, Index, Length, Value, Comparer)
@@ -487,7 +534,26 @@ End Function
 ' @param Arr The array to clear elements from.
 ' @param Index The starting element to being clearing.
 ' @param Length The number of elements to be cleared.
-'
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ArgumentNullException.html">ArgumentNullException</a></td><td><i>Arr</i> is uninitialized.</td>
+'   </tr>
+'    <tr>
+'        <td><a href="IndexOutOfRangeException.html">IndexOutOfRangeException</a></td>
+'        <td>
+'           <i>Index</i> is less than the lower-bound of <i>Arr</i>.<br/>
+'           -or-<br/>
+'           <i>Length</i> is less than zero.<br/>
+'           -or-<br/>
+'           The sum of <i>Index</i> and <i>Length</i> is greater than the upper-bound of <i>Arr</i>.
+'        </td>
+'    </tr>
+' </table>
 Public Sub Clear(ByRef Arr As Variant, ByVal Index As Long, ByVal Length As Long)
     Dim pSafeArray  As Long
     
@@ -541,11 +607,10 @@ End Sub
 ' @param SourceArray The array from which to copy the elements.
 ' @param DestinationArray The array in which to place the elements.
 ' @param Length The number of elements to copy.
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
-'       <th>Exception</th>
-'       <th>Condition</th>
+'       <th>Exception</th><th>Condition</th>
 '   </tr>
 '   <tr>
 '        <td><a href="ArgumentNullException.html">ArgumentNullException</a></td>
@@ -581,6 +646,7 @@ End Sub
 ' <p>When copying between multidimensional arrays, the array behaves like a long one-dimensional array, where the rows (or columns) are conceptually
 ' laid end to end. For example, if an array has three rows (or columns) with four elements each, copying six elements from the beginning of the array
 ' would copy all four elements of the first row (or column) and the first two elements of the second row (or column).</p>
+' @include "..\DocIncludes\CorArray.html"
 Public Sub Copy(ByRef SourceArray As Variant, ByRef DestinationArray As Variant, ByVal Length As Long)
     If IsNull(SourceArray) Then _
         Error.ArgumentNull "SourceArray", ArgumentNull_Array
@@ -598,7 +664,7 @@ End Sub
 ' @param Destinationarray The array in which to place the elements.
 ' @param Destinationindex The starting element in the destination array to place elements.
 ' @param Length The number of elements to copy.
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
 '       <th>Exception</th>
@@ -645,6 +711,7 @@ End Sub
 ' <p>When copying between multidimensional arrays, the array behaves like a long one-dimensional array, where the rows (or columns) are conceptually
 ' laid end to end. For example, if an array has three rows (or columns) with four elements each, copying six elements from the beginning of the array
 ' would copy all four elements of the first row (or column) and the first two elements of the second row (or column).</p>
+' @include "..\DocIncludes\CorArray.html"
 Public Sub CopyEx(ByRef SourceArray As Variant, ByVal SourceIndex As Long, ByRef DestinationArray As Variant, ByVal DestinationIndex As Long, ByVal Length As Long)
     Dim pSourceSafeArray        As Long
     Dim pDestinationSafeArray   As Long
@@ -730,7 +797,7 @@ End Sub
 ' If one length is defined as zero, then all other defined lengths must be zero.
 ' This does not mean that lengths 2 and 3 need to be set to zero if only an empty
 ' one-dimensional array is being created.
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
 '       <th>Exception</th>
@@ -790,7 +857,7 @@ End Function
 ' Gets a 32-bit integer that represents the total number of elements in all dimensions of the array.
 '
 ' @param Arr The array to retrieve the number of elements from.
-' @return A 32-bit integer that represents the total number of elements in all the dimensions of the Array; zero if there are no elements in the array.
+' @return A 32-bit integer that represents the total number of elements in all the dimensions of <i>Arr</i>; zero if there are no elements in the array.
 Public Function Length(ByRef Arr As Variant) As Long
     Dim Ptr As Long
     
@@ -1041,20 +1108,23 @@ End Sub
 '
 ' @param Arr The array to sort.
 ' @param Comparer (Optional) An IComparer object or address of a comparer callback function.
-' @remarks The Comparer parameter can be an <b>IComparer</b> object or a
+' @remarks The <i>Comparer</i> parameter can be an <a href="IComparer.html">IComparer</a> interface or a
 ' callback address to a compare function using the <b>AddressOf</b> method. The
 ' callback method signature is defined as follows:
 ' <pre>
-' Public Function SortCallback(ByRef x As [Array Datatype], ByRef y As [Array Datatype]) As Long
-'     '' return a negative value if x is less than y.
-'     '' return a positive value if x is greater than y.
-'     '' return 0 if x equals y.
+' Public Function SortCallback(ByRef x As &lt;Type&gt;, ByRef y As &lt;Type&gt;) As Long
+'     '' return less than zero if x is less than y.
+'     '' return greater than zero if x is greater than y.
+'     '' return zero if x equals y.
 ' End Function
 ' </pre>
-' The [Array Datatype] must be replaced with the datatype of the array. If the
-' array is an array of Variants, then [Array Datatype] would be a Variant, not
-' any specific sub-type within the variants of the array.</p>
-'
+' The &lt;Type&gt; the type of element of the array. If the
+' array is an array of <b>Variants</b>, then &lt;Type&gt; would be a <b>Variant</b>, not
+' any specific sub-type within the variant elements of the array.</p>
+' @see IComparer
+' @see #SortEx
+' @see #SortKey
+' @see #SortKeyEx
 ' @include "..\DocIncludes\CorArray.Sort.html"
 Public Sub Sort(ByRef Arr As Variant, Optional ByRef Comparer As Variant)
     If IsNull(Arr) Then _
@@ -1072,20 +1142,23 @@ End Sub
 ' @param Index The starting index in the array to start sorting.
 ' @param Length The number of elements to be sorted.
 ' @param Comparer An IComparer object or address of a comparer callback function.
-' @remarks The Comparer parameter can be an <b>IComparer</b> object or a
+' @remarks The <i>Comparer</i> parameter can be an <a href="IComparer.html">IComparer</a> interface or a
 ' callback address to a compare function using the <b>AddressOf</b> method. The
 ' callback method signature is defined as follows:
 ' <pre>
-' Public Function SortCallback(ByRef x As [Array Datatype], ByRef y As [Array Datatype]) As Long
-'     '' return a negative value if x is less than y.
-'     '' return a positive value if x is greater than y.
-'     '' return 0 if x equals y.
+' Public Function SortCallback(ByRef x As &lt;Type&gt;, ByRef y As &lt;Type&gt;) As Long
+'     '' return less than zero if x is less than y.
+'     '' return greater than zero if x is greater than y.
+'     '' return zero if x equals y.
 ' End Function
 ' </pre>
-' The [Array Datatype] must be replaced with the datatype of the array. If the
-' array is an array of Variants, then [Array Datatype] would be a Variant, not
-' any specific sub-type within the variants of the array.</p>
-'
+' The &lt;Type&gt; the type of element of the array. If the
+' array is an array of <b>Variants</>, then &lt;Type&gt; would be a <b>Variant</b>, not
+' any specific sub-type within the variant elements of the array.</p>
+' @see IComparer
+' @see #Sort
+' @see #SortKey
+' @see #SortKeyEx
 Public Sub SortEx(ByRef Arr As Variant, ByVal Index As Long, ByVal Length As Long, Optional ByRef Comparer As Variant)
     If IsNull(Arr) Then _
         Error.ArgumentNull "Arr", ArgumentNull_Array
@@ -1100,20 +1173,23 @@ End Sub
 ' @param keys An array the sorting is based on.
 ' @param items An array that is sorted based on the sorting of keys.
 ' @param Comparer (Optional) An IComparer object or address of a comparer callback function.
-' @remarks The Comparer parameter can be an <b>IComparer</b> object or a
+' @remarks The <i>Comparer</i> parameter can be an <a href="IComparer.html">IComparer</a> interface or a
 ' callback address to a compare function using the <b>AddressOf</b> method. The
 ' callback method signature is defined as follows:
 ' <pre>
-' Public Function SortCallback(ByRef x As [Array Datatype], ByRef y As [Array Datatype]) As Long
-'     '' return a negative value if x is less than y.
-'     '' return a positive value if x is greater than y.
-'     '' return 0 if x equals y.
+' Public Function SortCallback(ByRef x As &lt;Type&gt;, ByRef y As &lt;Type&gt;) As Long
+'     '' return less than zero if x is less than y.
+'     '' return greater than zero if x is greater than y.
+'     '' return zero if x equals y.
 ' End Function
 ' </pre>
-' The [Array Datatype] must be replaced with the datatype of the array. If the
-' array is an array of Variants, then [Array Datatype] would be a Variant, not
-' any specific sub-type within the variants of the array.</p>
-'
+' The &lt;Type&gt; the type of element of the array. If the
+' array is an array of <b>Variants</b>, then &lt;Type&gt; would be a <b>Variant</b>, not
+' any specific sub-type within the variant elements of the array.</p>
+' @see IComparer
+' @see #Sort
+' @see #SortEx
+' @see #SortKeyEx
 ' @include "..\DocIncludes\CorArray.SortKey.html"
 Public Sub SortKey(ByRef Keys As Variant, ByRef Items As Variant, Optional ByRef Comparer As Variant)
     If IsNull(Keys) Then _
@@ -1132,20 +1208,23 @@ End Sub
 ' @param Index The starting index in the array to start sorting.
 ' @param Length The number of elements to be sorted.
 ' @param Comparer (Optional) An IComparer object or address of a comparer callback function.
-' @remarks The Comparer parameter can be an <b>IComparer</b> object or a
+' @remarks The <i>Comparer</i> parameter can be an <a href="IComparer.html">IComparer</a> interface or a
 ' callback address to a compare function using the <b>AddressOf</b> method. The
 ' callback method signature is defined as follows:
 ' <pre>
-' Public Function SortCallback(ByRef x As [Array Datatype], ByRef y As [Array Datatype]) As Long
-'     '' return a negative value if x is less than y.
-'     '' return a positive value if x is greater than y.
-'     '' return 0 if x equals y.
+' Public Function SortCallback(ByRef x As &lt;Type&gt;, ByRef y As &lt;Type&gt;) As Long
+'     '' return less than zero if x is less than y.
+'     '' return greater than zero if x is greater than y.
+'     '' return zero if x equals y.
 ' End Function
 ' </pre>
-' The [Array Datatype] must be replaced with the datatype of the array. If the
-' array is an array of Variants, then [Array Datatype] would be a Variant, not
-' any specific sub-type within the variants of the array.</p>
-'
+' The &lt;Type&gt; the type of element of the array. If the
+' array is an array of <b>Variants</b>, then &lt;Type&gt; would be a <b>Variant</b>, not
+' any specific sub-type within the variant elements of the array.</p>
+' @see IComparer
+' @see #Sort
+' @see #SortEx
+' @see #SortKey
 Public Sub SortKeyEx(ByRef Keys As Variant, ByRef Items As Variant, ByVal Index As Long, ByVal Length As Long, Optional ByRef Comparer As Variant)
     Dim KeysPtr     As Long
     Dim ItemsPtr    As Long
