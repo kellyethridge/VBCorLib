@@ -159,6 +159,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use 100, "", "100"
             Test.Use &H7FFFFFFF, "", "2147483647"
             Test.Use &H80000000, "", "-2147483648"
+            Test.Use "5555555555555555555555555", "", "5555555555555555555555555"
             
             ' General Format (.NET ignores g formatting rules and just displays the whole number)
             Test.Use 0, "g", "0"
@@ -171,12 +172,15 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use -1, "g0", "-1"
             Test.Use &H7FFFFFFF, "g0", "2147483647"
             Test.Use &H80000000, "g0", "-2147483648"
-            Test.Use 0, "g5", "0"
-            Test.Use 1, "g5", "1"
-            Test.Use -1, "g5", "-1"
+            Test.Use 0, "g5", "00000"
+            Test.Use 1, "g5", "00001"
+            Test.Use -1, "g5", "-00001"
             Test.Use &H7FFFFFFF, "g5", "2147483647"
             Test.Use &H80000000, "g5", "-2147483648"
             Test.Use 12345, "ggg", "ggg"
+            Test.Use "5555555555555555555555555", "g", "5555555555555555555555555"
+            Test.Use "5555555555555555555555555", "g30", "000005555555555555555555555555"
+            Test.Use "5555555555555555555555555", "g20", "5555555555555555555555555"
         
             ' Currency Format
             Test.Use 1, "c", "$1.00"

@@ -331,9 +331,9 @@ Private Function BigNumberToString(ByRef Value As BigNumber, ByRef Specifiers As
     
     Select Case Specifiers.Format
         Case FormatSpecifier.GeneralLowerSpecifier
-            FormatGeneralInteger 0, vbLowerEChar, Output
+            FormatGeneralInteger CorMath.Max(mNumber.Precision, Specifiers.Precision), vbLowerEChar, Output, True
         Case FormatSpecifier.GeneralUpperSpecifier
-            FormatGeneralInteger 0, vbUpperEChar, Output
+            FormatGeneralInteger CorMath.Max(mNumber.Precision, Specifiers.Precision), vbUpperEChar, Output, True
         Case FormatSpecifier.CurrencyLowerSpecifier, FormatSpecifier.CurrencyUpperSpecifier
             FormatCurrency Specifiers.Precision, Output
         Case FormatSpecifier.DecimalUpperSpecifier, FormatSpecifier.DecimalLowerSpecifier
@@ -1501,9 +1501,14 @@ Private Sub DoubleToNumber(ByVal Value As Double, ByVal FormatPrecision As Long)
     End With
 End Sub
 
-Private Sub FormatGeneralInteger(ByVal FormatPrecision As Long, ByVal ExpChar As Long, ByRef Output As OutputBuffer)
-    If FormatPrecision = UnknownPrecision Or FormatPrecision = 0 Then
-        FormatPrecision = DefaultIntegerPrecision
+Private Sub FormatGeneralInteger(ByVal FormatPrecision As Long, ByVal ExpChar As Long, ByRef Output As OutputBuffer, Optional ByVal IsBigInteger As Boolean = False)
+    Dim MaxPrecision As Long
+    Dim i As Long
+    
+    If Not IsBigInteger Then
+        If FormatPrecision = UnknownPrecision Or FormatPrecision = 0 Then
+            FormatPrecision = DefaultIntegerPrecision
+        End If
     End If
     
     If mNumber.IsNegative Then
@@ -1515,15 +1520,23 @@ Private Sub FormatGeneralInteger(ByVal FormatPrecision As Long, ByVal ExpChar As
     ' go the scientific format route.
     Dim HasExponent As Boolean
     If FormatPrecision < mNumber.Precision Then
+        MaxPrecision = FormatPrecision
         mNumber.DecimalPosition = 1
         RoundNumber FormatPrecision
         HasExponent = True
     Else
-        FormatPrecision = mNumber.Precision
+        If IsBigInteger Then
+            If FormatPrecision > mNumber.Precision Then
+                For i = 1 To FormatPrecision - mNumber.Precision
+                    AppendChar vbZeroChar, Output
+                Next
+            End If
+        End If
+        
+        MaxPrecision = mNumber.Precision
     End If
     
-    Dim i As Long
-    For i = 0 To FormatPrecision - 1
+    For i = 0 To MaxPrecision - 1
         If i = mNumber.DecimalPosition Then
             AppendString mFormatInfo.NumberDecimalSeparator, Output
         End If
