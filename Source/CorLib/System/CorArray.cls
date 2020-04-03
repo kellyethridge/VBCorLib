@@ -556,6 +556,8 @@ End Function
 ' </table>
 Public Sub Clear(ByRef Arr As Variant, ByVal Index As Long, ByVal Length As Long)
     Dim pSafeArray  As Long
+    Dim SubArray    As GuidSafeArray1d
+    Dim IIDOffset   As Long
     
     pSafeArray = SAPtrV(Arr)
     If pSafeArray = vbNullPtr Then _
@@ -569,28 +571,15 @@ Public Sub Clear(ByRef Arr As Variant, ByVal Index As Long, ByVal Length As Long
     
     If Length = 0 Then Exit Sub
     
-    Dim IIDOffset As Long
     Select Case VarType(Arr) And &HFF   ' knock off the vbArray bit
         Case vbObject
             IIDOffset = vbSizeOfGuid
-            
         Case vbString, vbUserDefinedType
             IIDOffset = 4
-            
         Case Else
-            ' we can use ZeroMemory for everything else.
-            Dim ElemSize As Long
-            ElemSize = SafeArrayGetElemsize(pSafeArray)
-            
-            Dim pElem As Long
-            pElem = MemLong(pSafeArray + PVDATA_OFFSET)
-            
-            ' optimize by zeroing out the memory directly.
-            ZeroMemory ByVal pElem + (Index - LBound(Arr)) * ElemSize, Length * ElemSize
-            Exit Sub
+            IIDOffset = 0 ' We don't need to set this, but we like explicit defaults here.
     End Select
     
-    Dim SubArray As GuidSafeArray1d
     CopyMemory ByVal VarPtr(SubArray.SA) - IIDOffset, ByVal pSafeArray - IIDOffset, Len(SubArray.SA) + IIDOffset
     
     With SubArray.SA
@@ -598,6 +587,7 @@ Public Sub Clear(ByRef Arr As Variant, ByVal Index As Long, ByVal Length As Long
         .PVData = .PVData + (Index - LBound(Arr)) * .cbElements
         .cElements = Length
     End With
+    
     SafeArrayDestroyData VarPtr(SubArray.SA)
 End Sub
 

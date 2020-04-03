@@ -277,6 +277,18 @@ Public Sub Clear_WithStrings_SetsToEmpty()
     Assert.That Actual, Has.All.Empty
 End Sub
 
+Public Sub Clear_WithVariantsWithReferenceType_ClearArray()
+    Dim Actual() As Variant
+    Dim Count As Count
+    
+    Actual = Array(1, New TerminateEventCount)
+    Set Count = Actual(1).Count
+    
+    CorArray.Clear Actual, 0, 2
+    
+    Assert.That Count.Value, Iz.EqualTo(1)
+End Sub
+
 Public Sub ForEach_WhenCalled_CallsMethodOnArrayElements()
     Dim Actual(10) As Long
 

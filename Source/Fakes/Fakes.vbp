@@ -20,6 +20,7 @@ Class=NullEncoderFallback; NullEncoderFallback.cls
 Class=FakePictureResourceInfo; FakePictureResourceInfo.cls
 Class=FakeStructures; FakeStructures.cls
 Class=FakeTypes; FakeTypes.cls
+Class=TerminateEventCount; TerminateEventCount.cls
 Startup="(None)"
 Command32=""
 Name="Fakes"
