@@ -67,20 +67,21 @@ End Function
 '
 ' @param value The value to be converted to <a href="BigInteger.html">BigInteger</a>.
 ' @return A new <a href="BigInteger.html">BigInteger</a> instance representing the converted value.
-' @remarks The follow datatypes are supported:<br>
-' vbString<br>
-' vbLong<br>
-' vbInteger<br>
-' vbByte<br>
-' vbDoube<br>
-' vbSingle<br>
-' vbCurrency<br>
-' vbDecimal<br>
-' vbByte Array<br>
-' <a href="Int64Static.Int64.html">Int64</a>
-' BigInteger (returns same instance)<br>
-' Nothing (returns BigInteger.Zero)<br>
-'
+' @remarks The follow types are supported:<br/>
+' <ul>
+'   <li>String</li>
+'   <li><a href="Int64Static.Int64.html">Int64</a></li>
+'   <li>Long</li>
+'   <li>Integer</li>
+'   <li>Byte</li>
+'   <li>Double</li>
+'   <li>Single</li>
+'   <li>Currency</li>
+'   <li>Decimal</li>
+'   <li>Byte Array</li>
+'   <li><a href="BigInteger.html">BigInteger</a></li>
+'   <li><b>Nothing</b></li>
+' </ul>
 ' <pre>
 ' Dim b As BigInteger
 ' Set b = CBigInt(12345)

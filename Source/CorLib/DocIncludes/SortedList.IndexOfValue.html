@@ -1,0 +1,48 @@
+@example The following code example shows how to determine the index of a key or a value in a <a href="SortedList.html">SortedList</a> object.
+<pre>
+Public Sub Main()
+    Dim List As New SortedList
+    Dim Key As Integer
+    Dim Value As String
+    
+    List.Add 1, "one"
+    List.Add 3, "three"
+    List.Add 2, "two"
+    List.Add 4, "four"
+    List.Add 0, "zero"
+    
+    Debug.Print "The SortedList contains the following values:"
+    PrintIndexAndKeysAndValues List
+    
+    Key = 2
+    Debug.Print CorString.Format("The key ""{0}"" is at index {1}.", Key, List.IndexOfKey(Key))
+    
+    Value = "three"
+    Debug.Print CorString.Format("The value ""{0}"" is at index {1}.", Value, List.IndexOfValue(Value))
+End Sub
+
+Private Sub PrintIndexAndKeysAndValues(ByVal List As SortedList)
+    Dim i As Long
+    
+    Debug.Print t("-INDEX-\t-KEY-\t-VALUE-")
+    
+    For i = 0 To List.Count - 1
+        Debug.Print CorString.Format(t("[{0}]:\t{1}\t{2}"), i, List.GetKey(i), List.GetByIndex(i))
+    Next
+    
+    Debug.Print
+End Sub
+
+'' The following code produces the following output.
+''
+''    The SortedList contains the following values:
+''    -INDEX- -KEY-   -VALUE-
+''    [0]:    0   zero
+''    [1]:    1   one
+''    [2]:    2   two
+''    [3]:    3   three
+''    [4]:    4   four
+''
+''    The key "2" is at index 2.
+''    The value "three" is at index 3.
+</pre>

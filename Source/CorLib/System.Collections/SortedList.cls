@@ -38,7 +38,7 @@ Attribute VB_Exposed = True
 ''
 ' Provides a means to maintain a list of sorted items based on an associated key.
 '
-' @remarks The SortedList maintains sort order for every key/value pair
+' @remarks The <b>SortedList</b> maintains sort order for every key/value pair
 ' added to the list. The list is expanded as needed with the addition of new items.
 ' If a key already exists in the list, an exception is thrown.
 '
@@ -69,11 +69,19 @@ Private mVersion    As Long
 
 
 ''
-' Adds a key/value pair to the list.
+' Adds an element with the specified key and value to a <a href="SortedList.html">SortedList</a> object..
 '
 ' @param key The value to used to maintain a sorted order.
 ' @param value The value associated with the key.
-' @remark key must be unique.
+' @remark The insertion point is determined based on the comparer selected, either explicitly or by default, when the SortedList object was created.
+' <p>You can also use the <a href="SortedList.Let.Item.html">Item</a> property to add new elements by setting the value of a key that does not exist in the <a href="SortedList.html">SortedList</a> object
+' (for example, myCollection("myNonexistentKey") = myValue). However, if the specified key already exists in the <a href="SortedList.html">SortedList</a>, setting the <a href="SortedList.Let.Item.html">Item<a/> property overwrites the old value.
+' In contrast, the <b>Add</b> method does not modify existing elements.</p>
+' <p>The elements of a <a href="SortedList.html">SortedList</a> object are sorted by the keys either according to a specific <a href="IComparer.html">IComparer</a> implementation
+' specified when the <a href="SortedList.html">SortedList</a> is created.</p>
+' @see #Item
+' @see IComparer
+' @include "..\DocIncludes\SortedList.Add.html"
 Public Sub Add(ByRef Key As Variant, ByRef Value As Variant)
     Dim Index As Long
     
@@ -91,23 +99,38 @@ End Sub
 
 
 ''
-' Returns the size of the underlying array.
+' Gets the capacity of the <a href="SortedList.html">SortedList</a> object.
 '
-' @return The number of elements the underlying array can hold
-' before needing to be resized.
-'
+' @return The number of elements that the <a href="SortedList.html">SortedList</a> object can contain.
+' @remarks <b>Capacity</b> is the number of elements that the <a href="SortedList.html">SortedList</a> object can store. <b>Count</b> is the number of elements that are actually in the <a href="SortedList.html">SortedList</a>.
+' <p><b>Capacity</b> is always greater than or equal to <a href="SortedList.Get.Count.html">Count</a>. If <a href="SortedList.Get.Count.html">Count</a> exceeds <b>Capacity</b> while adding elements,
+' the capacity is automatically increased by reallocating the internal array before copying the old elements and adding the new elements.</p>
+' <p>The capacity can be decreased by calling <a href="SortedList.TrimToSize.html">TrimToSize</a> or by setting the <b>Capacity</b> property explicitly.
+' When the value of <b>Capacity</b> is set explicitly, the internal array is also reallocated to accommodate the specified capacity.</p>
 Public Property Get Capacity() As Long
     Capacity = mCapacity
 End Property
 
 ''
-' Sets the size of the underlying array.
+' Gets the capacity of the <a href="SortedList.html">SortedList</a> object.
 '
-' @param Value The number of elements the underlying array can contain
-' before it needs to be resized.
-' @remarks If the capacity is set less than the number of items in the
-' array, an ArgumentOutOfRangeException exception will be thrown.
-'
+' @param Value The number of elements the <a href="SortedList.html">SortedList</a> object can contain.
+' @remarks <b>Capacity</b> is the number of elements that the <a href="SortedList.html">SortedList</a> object can store. <b>Count</b> is the number of elements that are actually in the <a href="SortedList.html">SortedList</a>.
+' <p><b>Capacity</b> is always greater than or equal to <a href="SortedList.Get.Count.html">Count</a>. If <a href="SortedList.Get.Count.html">Count</a> exceeds <b>Capacity</b> while adding elements,
+' the capacity is automatically increased by reallocating the internal array before copying the old elements and adding the new elements.</p>
+' <p>The capacity can be decreased by calling <a href="SortedList.TrimToSize.html">TrimToSize</a> or by setting the <b>Capacity</b> property explicitly.
+' When the value of <b>Capacity</b> is set explicitly, the internal array is also reallocated to accommodate the specified capacity.</p>
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'       <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+'       <td>The value assigned is less than the current number of elements in the <a href="SortedList.html">SortedList</a> object.</td>
+'   </tr>
+' </table>
 Public Property Let Capacity(ByVal Value As Long)
     If Value < mCount Then _
         Error.ArgumentOutOfRange "Value", ArgumentOutOfRange_SmallCapacity
@@ -124,10 +147,11 @@ Public Property Let Capacity(ByVal Value As Long)
 End Property
 
 ''
-' Removes all of the items from the list.
+' Removes all of the items from the <a href="SortedList.html">SortedList</a> object.
 '
-' @remarks The Count is set to 0, but the capacity remains unchanged.
-'
+' @remarks <a href="SortedList.Get.Count.html">Count</a> is set to zero and elements are cleared from the collection.
+' <p><a href="SortedList.Get.Capacity.html">Capacity</a> remains unchanged. To reset the capacity of the <a href="SortedList.html">SortedList</a> object,
+' call <a href="SortedList.TrimToSize.html">TrimToSize</a> or set the <a href="SortedList.Let.Capacity.html">Capacity</a> property directly.</p>
 Public Sub Clear()
     ReDim mKeys(0 To mCapacity - 1)
     ReDim mValues(0 To mCapacity - 1)
@@ -141,52 +165,87 @@ End Sub
 ' @remarks Reference types are not cloned. If there are object types
 ' in the list, then a new reference to the object is created, but the
 ' object itself is not cloned.
-'
 Public Function Clone() As SortedList
     Set Clone = New SortedList
     Clone.InitClone mKeys, mValues, mCount, mComparer
 End Function
 
 ''
-' Searches the list to determine if the key is contained in the list.
+' Determines whether a <a href="SortedList.html">SortedList</a> object contains a specific key.
 '
-' @param Key The key to check if exists in the list.
-' @return Indication of the key existing in the list.
-' @remarks Internally this function calls <b>ContainsKey</b>.
-'
+' @param Key The key to locate in the <a href="SortedList.html">SortedList</a> object.
+' @return <b>True</b> if the <a href="SortedList.html">SortedList</a> object contains an element with specified <i>Key</i>; otherwise <b>False</b>.
+' @remarks The elements of a <a href="SortedList.html">SortedList</a> object are sorted by the keys either according to a specific <a href="IComparer.html">IComparer</a>
+' implementation specified when the <a href="SortedList.html">SortedList</a> is created.
+' <p>This method behaves exactly as the <a href="SortedList.ContainsKey.html">ContainsKey</a> method.</p>
+' <p>This method uses a binary search algorithm; therefore, this method is an O(log <i>n</i>) operation, where <i>n</i> is <a href="SortedList.Get.Count.html">Count</a>.</p>
+' @see #ContainsKey
+' @see #ContainsValue
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="InvalidOperationException.html">InvalidOperationException</a></td><td>The comparer throws an exception.</td>
+'   </tr>
+' </table>
+' @include "..\DocIncludes\SortedList.Contains.html"
 Public Function Contains(ByRef Key As Variant) As Boolean
     Contains = ContainsKey(Key)
 End Function
 
 ''
-' Searches the list to determine if the key is contained in the list.
+' Determines whether a <a href="SortedList.html">SortedList</a> object contains a specific key.
 '
-' @param Key The key to check if exists in the list.
+' @param Key The key to locate in the <a href="SortedList.html">SortedList</a> object.
 ' @return Indication of the key existing in the list.
-'
+' @remarks The elements of a <a href="SortedList.html">SortedList</a> object are sorted by the keys either according to a specific <a href="IComparer.html">IComparer</a>
+' implementation specified when the <a href="SortedList.html">SortedList</a> is created.
+' <p>This method behaves exactly as the <a href="SortedList.Contains.html">Contains</a>.</p>
+' <p>This method uses a binary search algorithm; therefore, this method is an O(log <i>n</i>) operation, where <i>n</i> is <a href="SortedList.Get.Count.html">Count</a>.</p>
+' @see #Contains
+' @see #ContainsValue
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="InvalidOperationException.html">InvalidOperationException</a></td><td>The comparer throws an exception.</td>
+'   </tr>
+' </table>
+' @include "..\DocIncludes\SortedList.Contains.html"
 Public Function ContainsKey(ByRef Key As Variant) As Boolean
     ContainsKey = CorArray.InternalBinarySearch(mKeys, 0, mCount, Key, mComparer) >= 0
 End Function
 
 ''
-' Searches the list to determine if the value is contained in the list.
+' Determines whether a <a href="SortedList.html">SortedList</a> object contains a specific value.
 '
-' @param value The value to search for in the list.
-' @param comparer A user-supplied IComparer object to perform special comparisons as necessary.
-' @return Indication of the value being found in the list.
-'
+' @param value The value to locate for in the <a href="SortedList.html">SortedList</a> object.
+' @return <b>True</b> if the <a href="SortedList.html">SortedList</a> object contains an element with the specified <i>Value</i>; otherwise, <b>False</b>.
+' @remarks This method performs a linear search; therefore, the average execution time is proportional to <a href="SortedList.Get.Count.html">Count</a>.
+' That is, this method is an O(<i>n</i>) operation, where <i>n</i> is <a href="SortedList.Get.Count.html">Count</a>.
+' @see Contains
+' @see ContainsKey
+' @include "..\DocIncludes\SortedList.Contains.html"
 Public Function ContainsValue(ByRef Value As Variant) As Boolean
     ContainsValue = CorArray.IndexOf(mValues, Value, 0, mCount) >= 0
 End Function
 
 ''
-' Creates a DictionaryEntry for each Key/Value pair and places it in the array.
+' Copies <a href="SortedList.html">SortedList</a> elements to a one-dimensional array, starting at the specified index in the array.
 '
-' @param Arr The array to copy the DictionaryEntry objects to.
-' @param ArrayIndex The starting index in dstArray to begin copying to.
-' @remarks Because DictionaryEntry objects are being stored in the array,
-' the array must be able to accept that type of object.
-'
+' @param Arr The one-dimensional array that is the destination of the <a href="DictionaryEntry.html">DictionaryEntry</a> objects copied from <a href="SortedList.html">SortedList</a>.
+' @param ArrayIndex The starting index in <i>Arr</i> to begin copying to.
+' @remarks The key/value pairs are copied to the array in the same order in which the enumerator iterates through the <a href="SortedList.html">SortedList</a> object.
+' <p>To copy only the keys in the <a href="SortedList.html">SortedList</a>, use <code>SortedList.Keys.CopyTo</code>.</p>
+' <p>To copy only the values in the <a href="SortedList.html">SortedList</a>, use <code>SortedList.Values.CopyTo</code>.</p>
+' @see DictionaryEntry
+' @include "..\DocIncludes\SortedList.CopyTo.html"
 Public Sub CopyTo(ByRef Arr As Variant, ByVal ArrayIndex As Long)
     If CorArray.IsNull(Arr) Then _
         Error.ArgumentNull "Arr", ArgumentNull_Array
@@ -204,10 +263,13 @@ Public Sub CopyTo(ByRef Arr As Variant, ByVal ArrayIndex As Long)
 End Sub
 
 ''
-' Returns the number of items in the list.
+' Gets the number of elements contained in a <a href="SortedList.html">SortedList</a> object.
 '
-' @return The number of items in the list.
-'
+' @return The number of elements in the <a href="SortedList.html">SortedList</a> object.
+' @remarks <b>Capacity</b> is the number of elements that the <a href="SortedList.html">SortedList</a> object can store. <b>Count</b> is the number of elements that are actually in the <a href="SortedList.html">SortedList</a>.
+' <p><b>Capacity</b> is always greater than or equal to <a href="SortedList.Get.Count.html">Count</a>. If <a href="SortedList.Get.Count.html">Count</a> exceeds <b>Capacity</b> while adding elements,
+' the capacity is automatically increased by reallocating the internal array before copying the old elements and adding the new elements.</p>
+' @see Capacity
 Public Property Get Count() As Long
     Count = mCount
 End Property
@@ -223,14 +285,17 @@ Public Function Equals(ByRef Value As Variant) As Boolean
 End Function
 
 ''
-' Retrieves a value in the list by an index.
+' Gets the value at the specified index of a <a href="SortedList.html">SortedList</a> object.
 '
-' @param Index The index into the list from which to retrieve the value.
-' @return The value at the specified index in the list.
-' @remarks Since the list maintains sort order with each addition
-' and removal of a key/value pair, there is no garauntee the same value
-' will be returned by the same index in future calls.
-'
+' @param Index The zero-based index of the value to get.
+' @return The value at the specified index in the <a href="SortedList.html">SortedList</a> object.
+' @remarks The index sequence is based on the sort sequence. When an element is added, it is inserted into
+' <a href="SortedList.html">SortedList</a> in the correct sort order, and the indexing adjusts accordingly.
+' When an element is removed, the indexing also adjusts accordingly. Therefore, the index of a specific key/value pair
+' might change as elements are added or removed from the <a href="SortedList.html">SortedList</a> object.
+' @see #IndexOfKey
+' @see #IndexOfValue
+' @include "..\DocIncludes\SortedList.GetByIndex.html"
 Public Function GetByIndex(ByVal Index As Long) As Variant
     If Index < 0 Or Index >= mCount Then _
         Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_Index
@@ -265,7 +330,7 @@ End Function
 ' @remarks Since the list maintains sort order, when an item is
 ' added or removed, there is no garauntee that the same key will be
 ' found at the same index in future calls.
-'
+' @include "..\DocIncludes\SortedList.GetKey.html"
 Public Function GetKey(ByVal Index As Long) As Variant
     If Index < 0 Or Index >= mCount Then _
         Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_Index
@@ -274,34 +339,52 @@ Public Function GetKey(ByVal Index As Long) As Variant
 End Function
 
 ''
-' Returns a ReadOnly IList object that is used to access the keys in the list.
+' Gets the keys in a <a href="SortedList.html">SortedList</a> object.
 '
-' @return An IList object containing the keys in the list.
-' @remarks The IList object maintains a reference to the original sorted list.
-' It will reflect any changes in the sorted list.
-'
+' @return An <a href="IList.html">IList</a> object containing the keys in the <a href="SortedList.html">SortedList</a> object.
+' @remarks The returned <a href="IList.html">IList</a> object is a read-only view of the keys of the <a href="SortedList.html">SortedList</a> object.
+' Modifications made to the underlying <a href="SortedList.html">SortedList</a> are immediately reflected in the <a href="IList.html">IList</a>.
+' <p>The elements of the returned <a href="IList.html">IList</a> are sorted in the same order as the keys of the <a href="SortedList.html">SortedList</a>.</p>
+' <p>This method is similar to the <a href="SortedList.Get.Keys.html">Keys</a> property, but returns an <a href="IList.html">IList</a> object instead of an <a href="ICollection.html">ICollection</a> object.</p>
+' @see IList
+' @see #GetValueList
+' @see #Keys
+' @include "..\DocIncludes\SortedList.GetKeyList.html"
 Public Function GetKeyList() As IList
     Set GetKeyList = NewSortedKeyList
 End Function
 
 ''
-' Returns a ReadOnly IList object that is used to access the values in the list.
+' Gets the values in a <a href="SortedList.html">SortedList</a> object.
 '
-' @return An IList object used to access the values in the list.
-' @remarks The IList object maintains a reference to the original sorted list.
-' Any changes in the sorted list will be reflected in the IList object.
-'
+' @return An <a href="IList.html">IList</a> object containing the values in the <a href="SortedList.html">SortedList</a> object.
+' @remarks The returned <a href="IList.html">IList</a> object is a read-only view of the values of the <a href="SortedList.html">SortedList</a> object.
+' Modifications made to the underlying <a href="SortedList.html">SortedList</a> are immediately reflected in the <a href="IList.html">IList</a>.
+' <p>The elements of the returned <a href="IList.html">IList</a> are sorted in the same order as the values of the <a href="SortedList.html">SortedList</a>.</p>
+' <p>This method is similar to the <a href="SortedList.Get.Values.html">Values</a> property, but returns an <a href="IList.html">IList</a> object instead of an <a href="ICollection.html">ICollection</a> object.</p>
+' @see IList
+' @see #GetKeyList
+' @see #Values
+' @include "..\DocIncludes\SortedList.GetValueList.html"
 Public Function GetValueList() As IList
     Set GetValueList = NewSortedValueList
 End Function
 
 ''
-' Searches for a key in the list and returns the index it was found.
+' Returns the zero-based index of the specified key in a <a href="SortedList.html">SortedList</a> object.
 '
-' @param Key The key to find the index of.
-' @return The index for the specified key. If a -1 is returned, then
-' the key was not found in the list.
-'
+' @param Key The key to locate in the <a href="SortedList.html">SortedList</a> object.
+' @return The zero-based index of the <i>Key</i> parameter, if <i>Key</i> is found in the <a href="SortedList.html">SortedList</a> object; otherwise, -1.
+' @remarks The elements of a <a href="SortedList.html">SortedList</a> object are sorted by the keys either according to a specific
+' <a href="IComparer.html">IComparer</a> implementation specified when the <a href="SortedList.html">SortedList</a> is created, or
+' the default <a href="ComparerStatic.Get.Defaultr.html">Comparer</a>.
+' <p>The index sequence is based on the sort sequence. When an element is added, it is inserted into <a href="SortedList.html">SortedList</a> in the correct sort order,
+' and the indexing adjusts accordingly. When an element is removed, the indexing also adjusts accordingly. Therefore, the index of a specific key/value pair might change
+' as elements are added or removed from the <a href="SortedList.html">SortedList</a>.</p>
+' <p>This method uses a binary search algorithm; therefore, this method is an O(log <i>n</i>) operation, where <i>n</i> is <a href="SortedList.Get.Count.html">Count</a>.</p>
+' @see #ContainsKey
+' @see #IndexOfValue
+' @include "..\DocIncludes\SortedList.IndexOfKey.html"
 Public Function IndexOfKey(ByRef Key As Variant) As Long
     Dim Index As Long
     Index = CorArray.InternalBinarySearch(mKeys, 0, mCount, Key, mComparer)
@@ -314,46 +397,66 @@ Public Function IndexOfKey(ByRef Key As Variant) As Long
 End Function
 
 ''
-' Searches for a value in the list and returns the index it was found.
+' Returns the zero-based index of the first occurrence of the specified value in a <a href="SortedList.html">SortedList</a> object.
 '
-' @param Value The value to search for.
-' @param Comparer A user-supplied comparer for special comparison, especially for user-defined types.
-' @return The index the value was found, or a -1 if the value was not found.
-'
+' @param Value The value to locate in the <a href="SortedList.html">SortedList</a> object. The value can be <b>Nothing</b>.
+' @return The zero-based index of the first occurrence of the value parameter, if value is found in the <a href="SortedList.html">SortedList</a> object; otherwise, -1.
+' @remarks The index sequence is based on the sort sequence. When an element is added, it is inserted into <a href="SortedList.html">SortedList</a> in the correct sort order,
+' and the indexing adjusts accordingly. When an element is removed, the indexing also adjusts accordingly. Therefore, the index of a specific
+' key/value pair might change as elements are added or removed from the <a href="SortedList.html">SortedList</a> object.
+' <p>The values of the elements of the <a href="SortedList.html">SortedList</a> are compared to the specified value using the <a href="ObjectStatic.Equals.html">Equals</a> method.</p>
+' <p>This method uses a linear search; therefore, this method is an O(<i>n</i>) operation, where <i>n</i> is <a href="SortedList.Get.Count.html">Count</a>.</p>
+' @see #ContainsValue
+' @see #IndexOfKey
+' @include "..\DocIncludes\SortedList.IndexOfValue.html"
 Public Function IndexOfValue(ByRef Value As Variant) As Long
     IndexOfValue = CorArray.IndexOf(mValues, Value, 0, mCount)
 End Function
 
 ''
-' Returns if the list can change in size or not.
+' Gets a value indicating whether a <a href="SortedList.html">SortedList</a> object has a fixed size.
 '
-' @return Indication if the list is fixed or not.
-' @remarks Fixed size means items cannot be added or removed from the list.
-' It does not prevent the existing items from being modified.
-'
+' @return <b>True</b> if the <a href="SortedList.html">SortedList</a> object has a fixed size; otherwise, <b>False</b>. The default is <b>False</b>.
+' @remarks A collection with a fixed size does not allow the addition or removal of elements after the collection is created, but does allow the modification of existing elements.
+' <p>A collection with a fixed size is simply a collection with a wrapper that prevents adding and removing elements; therefore, if changes are made to the underlying collection, including the addition or removal of elements, the fixed-size collection reflects those changes.</p>
 Public Property Get IsFixedSize() As Boolean
     IsFixedSize = False
 End Property
 
 ''
-' Returns if the list can be modified in any way.
+' Gets a value indicating whether a <a href="SortedList.html">SortedList</a> object is read-only.
 '
-' @return Indication if the list can be modified.
-' @remarks A ReadOnly list cannot have items added or removed, nor
-' can the existing items be altered. This does not mean properties
-' on objects in the list are prohibited.
-'
+' @return <b>True</b> if the <a href="SortedList.html">SortedList</a> object is read-only; otherwise, <b>False</b>. The default is <b>False</b>.
+' @remarks A collection that is read-only does not allow the addition, removal, or modification of elements after the collection is created.
+' <p>A collection that is read-only is simply a collection with a wrapper that prevents modifying the collection; therefore, if changes are made to the underlying collection, the read-only collection reflects those changes.</p>
 Public Property Get IsReadOnly() As Boolean
     IsReadOnly = False
 End Property
 
 ''
-' Returns the value associated with the given key.
+' Gets the value associated with a specific key in a <a href="SortedList.html">SortedList</a> object.
 '
-' @param Key The key of the value to be returned.
-' @return The value associated with the key.
-' @remarks If the key was not found, then Empty is returned.
-'
+' @param Key The key associated with the value to get.
+' @return The value associated with the <i>Key</i> parameter in the <a href="SortedList.html">SortedList</a> object, if key is found; otherwise, <b>Empty</b>.
+' @remarks You can use the Item property to access a specific element in a collection by specifying the following syntax: <code>myCollection(key)</code>.
+' <p>You can also use this property to add new elements by setting the value of a key that does not exist in the <a href="SortedList.html">SortedList</a> object (for example, <code>myCollection("myNonexistentKey") = myValue</code>).
+' However, if the specified key already exists in the <a href="SortedList.html">SortedList</a>, setting the <b>Item</b> property overwrites the old value.
+' In contrast, the <a href="SortedList.Add.html">Add</a> method does not modify existing elements.</p>
+' <p>The elements of a <a href="SortedList.html">SortedList</a> are sorted by the keys either according to a specific <a href="IComparer.html">IComparer</a> implementation
+' specified when the <a href="SortedList.html">SortedList</a> is created, or by the default <a href="ComparerStatic.Get.Default.html">Comparer</a>.</p>
+' @see #Add
+' @see #Contains
+' @see #ContainsKey
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="InvalidOperationException.html">InvalidOperationException</a></td><td>The comparer throws an exception.</td>
+'   </tr>
+' </table>
 Public Property Get Item(ByRef Key As Variant) As Variant
 Attribute Item.VB_UserMemId = 0
     Dim Index As Long
@@ -365,14 +468,37 @@ Attribute Item.VB_UserMemId = 0
 End Property
 
 ''
-' Sets a value to a key.
+' Sets the value associated with a specific key in a <a href="SortedList.html">SortedList</a> object.
 '
-' @param Key The key to associate the value with.
-' @param Value The value to be associated to the key.
-' @remarks If the key already exists in the list, then that value
-' is replaced with the new value. If the key does not exist, then
-' it is added with the associated value.
-'
+' @param Key The key associated with the value to set.
+' @param Value The value associated with the <i>Key</i> parameter in the <a href="SortedList.html">SortedList</a> object.
+' @remarks You can use the Item property to access a specific element in a collection by specifying the following syntax: <code>myCollection(key)</code>.
+' <p>You can also use this property to add new elements by setting the value of a key that does not exist in the <a href="SortedList.html">SortedList</a> object (for example, <code>myCollection("myNonexistentKey") = myValue</code>).
+' However, if the specified key already exists in the <a href="SortedList.html">SortedList</a>, setting the <b>Item</b> property overwrites the old value.
+' In contrast, the <a href="SortedList.Add.html">Add</a> method does not modify existing elements.</p>
+' <p>The elements of a <a href="SortedList.html">SortedList</a> are sorted by the keys either according to a specific <a href="IComparer.html">IComparer</a> implementation
+' specified when the <a href="SortedList.html">SortedList</a> is created, or by the default <a href="ComparerStatic.Get.Default.html">Comparer</a>.</p>
+' @see #Add
+' @see #Contains
+' @see #ContainsKey
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'    <tr>
+'        <td><a href="NotSupportedException.html">NotSupportedException</a></td>
+'        <td>
+'           The property is set and the <a href="SortedList.html">SortedList</a> object is read-only.<br/>
+'           -or-<br/>
+'           The property is set, <i>Key</i> does not exist in the collection, and the <a href="SortedList.html">SortedList</a> has a fixed size.
+'        </td>
+'    </tr>
+'   <tr>
+'        <td><a href="InvalidOperationException.html">InvalidOperationException</a></td><td>The comparer throws an exception.</td>
+'   </tr>
+' </table>
 Public Property Let Item(ByRef Key As Variant, ByRef Value As Variant)
     Dim Index As Long
     Index = CorArray.InternalBinarySearch(mKeys, 0, mCount, Key, mComparer)
@@ -386,14 +512,37 @@ Public Property Let Item(ByRef Key As Variant, ByRef Value As Variant)
 End Property
 
 ''
-' Sets a value to a key.
+' Sets the value associated with a specific key in a <a href="SortedList.html">SortedList</a> object.
 '
-' @param Key The key to associate the value with.
-' @param Value The value to be associated to the key.
-' @remarks If the key already exists in the list, then that value
-' is replaced with the new value. If the key does not exist, then
-' it is added with the associated value.
-'
+' @param Key The key associated with the value to set.
+' @param Value The value associated with the <i>Key</i> parameter in the <a href="SortedList.html">SortedList</a> object.
+' @remarks You can use the Item property to access a specific element in a collection by specifying the following syntax: <code>myCollection(key)</code>.
+' <p>You can also use this property to add new elements by setting the value of a key that does not exist in the <a href="SortedList.html">SortedList</a> object (for example, <code>myCollection("myNonexistentKey") = myValue</code>).
+' However, if the specified key already exists in the <a href="SortedList.html">SortedList</a>, setting the <b>Item</b> property overwrites the old value.
+' In contrast, the <a href="SortedList.Add.html">Add</a> method does not modify existing elements.</p>
+' <p>The elements of a <a href="SortedList.html">SortedList</a> are sorted by the keys either according to a specific <a href="IComparer.html">IComparer</a> implementation
+' specified when the <a href="SortedList.html">SortedList</a> is created, or by the default <a href="ComparerStatic.Get.Default.html">Comparer</a>.</p>
+' @see #Add
+' @see #Contains
+' @see #ContainsKey
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'    <tr>
+'        <td><a href="NotSupportedException.html">NotSupportedException</a></td>
+'        <td>
+'           The property is set and the <a href="SortedList.html">SortedList</a> object is read-only.<br/>
+'           -or-<br/>
+'           The property is set, <i>Key</i> does not exist in the collection, and the <a href="SortedList.html">SortedList</a> has a fixed size.
+'        </td>
+'    </tr>
+'   <tr>
+'        <td><a href="InvalidOperationException.html">InvalidOperationException</a></td><td>The comparer throws an exception.</td>
+'   </tr>
+' </table>
 Public Property Set Item(ByRef Key As Variant, ByRef Value As Variant)
     Dim Index As Long
     Index = CorArray.InternalBinarySearch(mKeys, 0, mCount, Key, mComparer)
@@ -407,10 +556,17 @@ Public Property Set Item(ByRef Key As Variant, ByRef Value As Variant)
 End Property
 
 ''
-' Returns the keys in the sorted list.
+' Gets the keys in the <a href="SortedList.html">SortedList</a> object.
 '
-' @return An ICollection object containing the keys.
-'
+' @return An ICollection object containing the keys in the <a href="SortedList.html">SortedList</a> object.
+' @remarks The <a href="ICollection.html">ICollection</a> object is a read-only view of the keys of the <a href="SortedList.html">SortedList</a> object.
+' Modifications made to the underlying <a href="SortedList.html">SortedList</a> are immediately reflected in the <a href="ICollection.html">ICollection</a>.
+' <p>The elements of the <a href="ICollection.html">ICollection</a> are sorted in the same order as the keys of the <a href="SortedList.html">SortedList</a>.</p>
+' <p>This property is similar to the <a href="SortedKey.GetKeyList.html">GetKeyList</a> method,
+' but returns an <a href="ICollection.html">ICollection</a> object instead of an <a href="IList.html">IList</a> object.</p>
+' @see ICollection
+' @see #Values
+' @see #GetKeyList
 Public Property Get Keys() As ICollection
     Set Keys = NewSortedKeyList
 End Property
@@ -418,7 +574,7 @@ End Property
 ''
 ' Returns a For..Each compatible enumerator.
 '
-' @return The enumerator.
+' @return The enumerator used to iterate the <a href="SortedList.html">SortedList</a> object.
 '
 Public Function NewEnum() As IUnknown
 Attribute NewEnum.VB_UserMemId = -4
@@ -427,10 +583,12 @@ Attribute NewEnum.VB_MemberFlags = "40"
 End Function
 
 ''
-' Removes a key/value pair based on the key.
+' Removes the element with the specified key from a <a href="SortedList.html">SortedList</a> object.
 '
-' @param Key The key used to find the value to be removed.
-'
+' @param Key The key of the element to remove.
+' @remarks If the <a href="SortedList.html">SortedList</a> object does not contain an element with the specified key, the <a href="SortedList.html">SortedList</a> remains unchanged. No exception is thrown.
+' @see #RemoveAt
+' @include "..\DocIncludes\SortedList.Remove.html"
 Public Sub Remove(ByRef Key As Variant)
     If mCount = 0 Then
         Exit Sub
@@ -445,10 +603,13 @@ Public Sub Remove(ByRef Key As Variant)
 End Sub
 
 ''
-' Removes a key/value pair at a specific index in the list.
+' Removes the element at the specified index of a <a href="SortedList.html">SortedList</a> object.
 '
-' @param Index The index of the key/value pair to be removed.
-'
+' @param Index The zero-based index of the element to remove.
+' @remarks The index sequence is based on the sort sequence. When an element is added, it is inserted into <a href="SortedList.html">SortedList</a> in the correct sort order,
+' and the indexing adjusts accordingly. When an element is removed, the indexing also adjusts accordingly. Therefore, the index of a specific key/value pair might change as elements are added or removed from the <a href="SortedList.html">SortedList</a> object.
+' @see #Remove
+' @include "..\DocIncludes\SortedList.RemoveAt.html"
 Public Sub RemoveAt(ByVal Index As Long)
     If Index < 0 Or Index >= mCount Then _
         Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_Index
@@ -476,12 +637,14 @@ Public Sub RemoveAt(ByVal Index As Long)
 End Sub
 
 ''
-' Sets the value at a specific index in the list.
+' Replaces the value at a specific index in a <a href="SortedList.html">SortedList</a> object.
 '
-' @param Index The index at which to set the value.
-' @param Value The value to set at the specified index.
-' @remarks The key at the index will be associated with the new value.
-'
+' @param Index The zero-based index at which to set the value.
+' @param Value The value to save into the <a href="SortedList.html">SortedList</a> object.
+' @remarks The index sequence is based on the sort sequence. When an element is added, it is inserted into <a href="SortedList.html">SortedList</a> in the correct sort order,
+' and the indexing adjusts accordingly. When an element is removed, the indexing also adjusts accordingly. Therefore, the index of a specific
+' key/value pair might change as elements are added or removed from the <a href="SortedList.html">SortedList</a> object.
+' @include "..\DocIncludes\SortedList.SetByIndex.html"
 Public Sub SetByIndex(ByVal Index As Long, ByRef Value As Variant)
     If Index < 0 Or Index >= mCount Then _
         Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_Index
@@ -499,21 +662,31 @@ Public Function ToString() As String
 End Function
 
 ''
-' Sets the capacity to the number of items in the list.
+' Sets the capacity to the actual number of elements in a <a href="SortedList.html">SortedList</a> object.
 '
-' @remarks This is used to release extra space being used by
-' the internal array. The capacity is set to the number of
-' items already in the list.
-'
+' @remarks This method can be used to minimize a collection's memory overhead if no new elements will be added to the collection.
+' <p>To reset a <a href="SortedList.html">SortedList</a> object to its initial state, call the <a href="SortedList.Clear.html">Clear</a> method
+' before calling <b>TrimToSize</b>. Trimming an empty <a href="SortedList.html">SortedList</a> sets the capacity of the <a href="SortedList.html">SortedList</a> to the default capacity.</p>
+' @see #Clear
+' @see #Capacity
+' @see #Count
+' @include "..\DocIncludes\SortedList.TrimToSize.html"
 Public Sub TrimToSize()
     Capacity = mCount
 End Sub
 
 ''
-' Returns a list of the values in the list.
+' Gets the values in the <a href="SortedList.html">SortedList</a> object.
 '
-' @return An ICollection object used to access the values.
-'
+' @return An ICollection object containing the values in the <a href="SortedList.html">SortedList</a> object.
+' @remarks The <a href="ICollection.html">ICollection</a> object is a read-only view of the values of the <a href="SortedList.html">SortedList</a> object.
+' Modifications made to the underlying <a href="SortedList.html">SortedList</a> are immediately reflected in the <a href="ICollection.html">ICollection</a>.
+' <p>The elements of the <a href="ICollection.html">ICollection</a> are sorted in the same order as the values of the <a href="SortedList.html">SortedList</a>.</p>
+' <p>This property is similar to the <a href="SortedKey.GetValueList.html">GetValueList</a> method,
+' but returns an <a href="ICollection.html">ICollection</a> object instead of an <a href="IList.html">IList</a> object.</p>
+' @see ICollection
+' @see #Keys
+' @see #GetValueList
 Public Property Get Values() As ICollection
     Set Values = NewSortedValueList
 End Property

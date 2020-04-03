@@ -1,0 +1,41 @@
+@exceptions
+<table style="width: auto">
+    <tr>
+        <th>Exception</th><th>Condition</th>
+    </tr>
+    <tr>
+        <td><a href="ArgumentException.html">ArgumentException</a></td>
+        <td>
+            Neither <i>a</i> nor <i>b</i> implements the <a href="IComparable.html">IComparable</a> interface.<br/>
+            -or-<br/>
+            <i>a</i> and <i>b</i> are of different types and cannot be compared.
+        </td>
+    </tr>
+</table>
+@example The following code example shows how <a href="Comparer.Compare.html">Compare</a> returns different values depending on the culture associated with the <b>Comparer</b>.
+<pre>
+Public Sub Main()
+    Const Str1 As String = "Apple"
+    Const Str2 As String = "Æble"
+    
+    Debug.Print CorString.Format("Comparing ""{0}"" and ""{1}"" ...", Str1, Str2)
+    
+    Debug.Print CorString.Format("          Invariant Comparer: {0}", Comparer.DefaultInvariant.Compare(Str1, Str2))
+    
+    Dim CompUS As Comparer
+    Set CompUS = NewComparer(NewCultureInfo("en-US", False))
+    Debug.Print CorString.Format("English (United States) Sort: {0}", CompUS.Compare(Str1, Str2))
+    
+    Dim CompDK As Comparer
+    Set CompDK = NewComparer(NewCultureInfo("da-DK", False))
+    Debug.Print CorString.Format("        dansk (Danmark) Sort: {0}", CompDK.Compare(Str1, Str2))
+    
+End Sub
+
+'' This code produces the following output.
+''
+''    Comparing "Apple" and "Æble" ...
+''              Invariant Comparer: 1
+''    English (United States) Sort: 1
+''            dansk (Danmark) Sort: -1
+</pre>

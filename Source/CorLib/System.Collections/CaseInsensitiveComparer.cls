@@ -38,6 +38,8 @@ Attribute VB_Exposed = True
 ''
 ' Provides a comparer that is case-insensitive when comparing strings.
 '
+' @see CaseInsensitiveComparerStatic
+' @see Constructors
 Option Explicit
 Implements IObject
 Implements IComparer

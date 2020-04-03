@@ -1,0 +1,104 @@
+@exceptions
+<table style="width: auto;">
+	<tr>
+		<th>Exception</th><th>Condition</th>
+	</tr>
+	<tr>
+		<td><a href="NotSupportedException.html">NotSupportedException</a></td>
+		<td>
+			The <a href="SortedList.html">SortedList</a> object is read-only.<br/>
+			-or-<br/>
+			The <a href="SortedList.html">SortedList</a> is fixed size.
+		</td>
+	</tr>
+</table>
+@example The following code example shows how to trim the unused portions of a <a href="SortedList.html">SortedList</a> object and how to clear its values.
+<pre>
+Public Sub Main()
+    Dim List As New SortedList
+
+    List.Add "one", "The"
+    List.Add "two", "quick"
+    List.Add "three", "brown"
+    List.Add "four", "fox"
+    List.Add "five", "jumped"
+    
+    Debug.Print "Initially,"
+    Debug.Print CorString.Format("   Count    : {0}", List.Count)
+    Debug.Print CorString.Format("   Capacity : {0}", List.Capacity)
+    Debug.Print CorString.Format("   Values:")
+    PrintKeysAndValues List
+    
+    List.TrimToSize
+    
+    Debug.Print "After TrimToSize,"
+    Debug.Print CorString.Format("   Count    : {0}", List.Count)
+    Debug.Print CorString.Format("   Capacity : {0}", List.Capacity)
+    Debug.Print CorString.Format("   Values:")
+    PrintKeysAndValues List
+    
+    List.Clear
+    
+    Debug.Print "After Clear,"
+    Debug.Print CorString.Format("   Count    : {0}", List.Count)
+    Debug.Print CorString.Format("   Capacity : {0}", List.Capacity)
+    Debug.Print CorString.Format("   Values:")
+    PrintKeysAndValues List
+    
+    List.TrimToSize
+    
+    Debug.Print "After the second TrimToSize,"
+    Debug.Print CorString.Format("   Count    : {0}", List.Count)
+    Debug.Print CorString.Format("   Capacity : {0}", List.Capacity)
+    Debug.Print CorString.Format("   Values:")
+    PrintKeysAndValues List
+End Sub
+
+Private Sub PrintKeysAndValues(ByVal List As SortedList)
+    Dim i As Long
+    
+    Debug.Print t("\t-KEY-\t-VALUE-")
+    
+    For i = 0 To List.Count - 1
+        Debug.Print CorString.Format(t("\t{0}:\t{1}"), List.GetKey(i), List.GetByIndex(i))
+    Next
+    
+    Debug.Print
+End Sub
+
+'' The following code produces the following output.
+''
+''    Initially,
+''       Count    : 5
+''       Capacity : 256
+''    Values:
+''        -KEY-   -VALUE-
+''    five:                   jumped
+''    four:                   fox
+''    one:                    the
+''    three:                  brown
+''    two:                    quick
+''    
+''    After TrimToSize,
+''       Count    : 5
+''       Capacity : 5
+''    Values:
+''        -KEY-   -VALUE-
+''    five:                   jumped
+''    four:                   fox
+''    one:                    the
+''    three:                  brown
+''    two:                    quick
+''    
+''    After Clear,
+''       Count    : 0
+''       Capacity : 5
+''    Values:
+''        -KEY-   -VALUE-
+''    
+''    After the second TrimToSize,
+''       Count    : 0
+''       Capacity : 0
+''    Values:
+''        -KEY-   -VALUE-
+</pre>

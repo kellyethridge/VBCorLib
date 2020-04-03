@@ -1,0 +1,58 @@
+@exceptions
+<table style="width: auto">
+  <tr>
+      <th>Exception</th>
+      <th>Condition</th>
+  </tr>
+  <tr>
+      <td><a href="ArgumentException.html">ArgumentException</a></td>
+      <td>
+      An element with the specified <i>Key</i> already exists in the <a href="SortedList.html">SortedList</a> object.<br/>
+      -or-<br/>
+      The comparer throws an exception.
+      </td>
+  </tr>
+   <tr>
+      <td><a href="NotSupportedException.html">NotSupportedException</a></td>
+      <td>
+          The <a href="SortedList.html">SortedList</a> is read-only.<br/>
+          -or-<br/>
+          The <a href="SortedList.html">SortedList</a> has a fixed size.
+      </td>
+   </tr>
+</table>
+@example The following code example shows how to add elements to a <a href="SortedList.html">SortedList</a> object.
+<pre>
+Public Sub Main()
+    Dim List As New SortedList
+    
+    List.Add "one", "The"
+    List.Add "two", "quick"
+    List.Add "three", "brown"
+    List.Add "four", "fox"
+    
+    Debug.Print "The SortedList contains the following sorted by key:"
+    PrintKeysAndValues List
+End Sub
+
+Private Sub PrintKeysAndValues(ByVal List As SortedList)
+    Dim i As Long
+    
+    Debug.Print "-KEY-", "-VALUE-"
+    
+    For i = 0 To List.Count - 1
+        Debug.Print List.GetKey(i), List.GetByIndex(i)
+    Next
+    
+    Debug.Print
+End Sub
+
+'' This code produces the following output.
+''
+''    The SortedList contains the following:
+''    -KEY-         -VALUE-
+''    four          fox
+''    one           The
+''    three         brown
+''    two           quick
+</pre>

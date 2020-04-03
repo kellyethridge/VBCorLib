@@ -1,0 +1,76 @@
+@exceptions
+<table style="width: auto">
+	<tr>
+		<th>Exception</th><th>Condition</th>
+	</tr>
+	<tr>
+		<td><a href="ArgumentNullException.html">ArgumentNullException</a></td>
+		<td><i>Arr</i> is uninitialized.</td>
+	</tr>
+	<tr>
+		<td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+		<td><i>ArrayIndex</i> is less than the lower-bound of <i>Arr</i>.</td>
+	</tr>
+	<tr>
+		<td><a href="ArgumentException.html">ArgumentException</a></td>
+		<td>
+			<i>Arr</i> is multidimensional.<br/>
+			-or-<br/>
+			The number of elements in the source <a href="SortedList.html">SortedList</a> object is greater than the available space from <i>ArrayIndex</i> to the end of the destination array.
+		</td>
+	</tr>
+	<tr>
+		<td><a href="InvalidCastException.html">InvalidCastException</a></td>
+		<td>The type of the source <a href="SortedList.html">SortedList</a> cannot be cast automatically to the type of the destination array.</td>
+	</tr>
+</table>
+@example The following code example shows how to copy the values in a <a href="SortedList.html">SortedList</a> object into a one-dimensional array.
+<pre>
+Public Sub Main()
+    Dim List As New SortedList
+    Dim TempArray() As String
+    Dim TargetArray() As DictionaryEntry
+    Dim i As Long
+    
+    List.Add 2, "cats"
+    List.Add 3, "in"
+    List.Add 1, "napping"
+    List.Add 4, "the"
+    List.Add 0, "three"
+    List.Add 5, "barn"
+    
+    TempArray = NewStrings("The", "quick", "brown", "fox", "jumped", "over", "the", "lazy", "dog")
+    ReDim TargetArray(0 To 14)
+    
+    For i = 0 To UBound(TargetArray)
+        If i &lt;= UBound(TempArray) Then
+            Set TargetArray(i) = NewDictionaryEntry(i, TempArray(i))
+        Else
+            Set TargetArray(i) = NewDictionaryEntry(i, "")
+        End If
+    Next
+    
+    Debug.Print "The target Array contains the following (before and after copying):"
+    PrintValues TargetArray
+    
+    List.CopyTo TargetArray, 6
+    
+    PrintValues TargetArray
+End Sub
+
+Private Sub PrintValues(ByRef Arr() As DictionaryEntry)
+    Dim i As Long
+    
+    For i = LBound(Arr) To UBound(Arr)
+        Debug.Print " "; Arr(i).Value;
+    Next
+    
+    Debug.Print
+End Sub
+
+'' The code produces the following output.
+''
+''    The target Array contains the following (before and after copying):
+''     The quick brown fox jumped over the lazy dog
+''     The quick brown fox jumped over three napping cats in the barn
+</pre>

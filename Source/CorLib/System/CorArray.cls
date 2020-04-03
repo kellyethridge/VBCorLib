@@ -945,7 +945,7 @@ End Function
 '
 ' @param arr The array to test for initialization.
 ' @return Returns <b>True</b> if the array is uninitialized, <b>False</b> otherwise.
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
 '       <th>Exception</th>
@@ -967,7 +967,7 @@ End Function
 '
 ' @param Arr The array to inspectd.
 ' @return Returns <b>True</b> if the array is unitialized or has zero elements, <b>False</b> otherwise.
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
 '       <th>Exception</th>

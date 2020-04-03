@@ -36,25 +36,51 @@ Attribute VB_Exposed = True
 '
 
 ''
-' Provides a standard interface used to compare an object to a value.
+' Defines a generalized type-specific comparison method that a value type or class implements to order or sort its instances.
 '
-' @remarks
-' This interface is required to allow collections to compare two objects
-' when sorting or searching. If there are objects in the collection that don't
-' implement this interface, then those methods will fail unless an custom
-' comparer is supplied.
-'
+' @remarks This interface is implemented by types whose values can be ordered or sorted. It requires that implementing types define a single method,
+' <a href="IComparable.CompareTo.html">CompareTo(Value)</a>, that indicates whether the position of the current instance in the sort order is
+' before, after, or the same as a second object of the same type. The instance's <b>IComparable</b> implementation is called automatically by methods such
+' as <a href="CorArray.Sort.html">CorArray.Sort</a> and <a href="ArrayList.Sort.html">ArrayList.Sort</a>.
+' <p>The implementation of the <a href="IComparable.CompareTo.html">CompareTo(Value)</a> method must return a 32-bit integer that has one of three values, as shown in the following table.</p>
+' <table style="width: auto">
+'   <tr>
+'       <th>Value</th><th>Meaning</th>
+'   </tr>
+'   <tr>
+'       <td>Less than zero</td><td>The current instance precedes the value specified by the <a href="IComparable.CompareTo.html">CompareTo</a> method in the sort order.</td>
+'   </tr>
+'   <tr>
+'       <td>Zero</td><td>This current instance occurs in the same position in the sort order as the value specified by the <a href="IComparable.CompareTo.html">CompareTo</a> method.</td>
+'   </tr>
+'   <tr>
+'       <td>Greater than zero</td><td>This current instance follows the object specified by the <a href="IComparable.CompareTo.html">CompareTo</a> method in the sort order.</td>
+'   </tr>
+' </table>
+' <p>All number types (such as <b>Long</b> and <b>Double</b>) are supported by the default <a href="Comparer.html">Comparer</a>, as are <b>String</b> and <b>Date</b>.
+' Custom types should also provide their own implementation of <b>IComparable</b> to enable object instances to be ordered or sorted.</p>
+' @include "..\DocIncludes\IComparable.html"
 Option Explicit
 
 ''
-' Compares a value to the current object instance.
+' Compares the current instance with another object of the same type and returns an integer that indicates whether the current instance precedes, follows, or occurs in the same position in the sort order as the other object.
 '
-' @param value The value to compare this object to.
-' @return Value indicating its relationship to the value.
-' @remarks Comparison guide:<br>
-' This object is the same value as value returns a 0.<br>
-' This object is less than the value returns a negative value.<br>
-' This object is greater than the value returns a positive value.<br>
-'
+' @param Value A value to compare with this instance.
+' @return A value that indicates the relative order of the objects being compared. The return value has these meanings:
+' <table style="width: auto">
+'   <tr>
+'       <th>Value</th><th>Meaning</th>
+'   </tr>
+'   <tr>
+'       <td>Less than zero</td><td>The current instance precedes the value specified by the <a href="IComparable.CompareTo.html">CompareTo</a> method in the sort order.</td>
+'   </tr>
+'   <tr>
+'       <td>Zero</td><td>This current instance occurs in the same position in the sort order as the value specified by the <a href="IComparable.CompareTo.html">CompareTo</a> method.</td>
+'   </tr>
+'   <tr>
+'       <td>Greater than zero</td><td>This current instance follows the object specified by the <a href="IComparable.CompareTo.html">CompareTo</a> method in the sort order.</td>
+'   </tr>
+' </table>
+' @include "..\DocIncludes\IComparable.CompareTo.html"
 Public Function CompareTo(ByRef Value As Variant) As Long: End Function
 

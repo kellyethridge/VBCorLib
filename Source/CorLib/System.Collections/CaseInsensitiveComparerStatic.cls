@@ -40,6 +40,7 @@ Attribute VB_Exposed = True
 '
 ' @remarks This class cannot be instantiated. To access the defined properties use the class name.
 ' <code>Set c = CaseInsensitiveComparer.Default</code>
+' @see CaseInsensitiveComparer
 Option Explicit
 
 Private mDefaultInvariant As CaseInsensitiveComparer

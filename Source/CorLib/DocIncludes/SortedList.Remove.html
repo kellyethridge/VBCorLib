@@ -1,0 +1,91 @@
+@exceptions
+<table style="width: auto">
+  <tr>
+      <th>Exception</th>
+      <th>Condition</th>
+  </tr>
+  <tr>
+       <td><a href="NotSupportedException.html">NotSupportedException</a></td>
+       <td>
+          The <a href="SortedList.html">SortedList</a> object is read-only.<br/>
+          -or-<br/>
+          The <a href="SortedList.html">SortedList</a> has a fixed size.
+       </td>
+  </tr>
+</table>
+@example The following code example shows how to remove elements from a <a href="SortedList.html">SortedList</a> object.
+<pre>
+Public Sub Main()
+    Dim List As New SortedList
+
+    List.Add "3c", "dog"
+    List.Add "2c", "over"
+    List.Add "1c", "brown"
+    List.Add "1a", "The"
+    List.Add "1b", "quick"
+    List.Add "3a", "the"
+    List.Add "3b", "lazy"
+    List.Add "2a", "fox"
+    List.Add "2b", "jumped"
+    
+    Debug.Print "The SortedList initially contains the following:"
+    PrintKeysAndValues List
+    
+    List.Remove "3b"
+    
+    Debug.Print "After removing ""lazy"":"
+    PrintKeysAndValues List
+    
+    List.RemoveAt 5
+    
+    Debug.Print "After removing the element at index 5:"
+    PrintKeysAndValues List
+End Sub
+
+Private Sub PrintKeysAndValues(ByVal List As SortedList)
+    Dim i As Long
+    
+    Debug.Print t("\t-KEY-\t-VALUE-")
+    
+    For i = 0 To List.Count - 1
+        Debug.Print CorString.Format(t("\t{0}:\t{1}"), List.GetKey(i), List.GetByIndex(i))
+    Next
+    
+    Debug.Print
+End Sub
+
+'' The following code produces the following output.
+''
+''    The SortedList initially contains the following:
+''        -KEY-   -VALUE-
+''    		1a:    the
+''    		1b:    quick
+''    		1c:    brown
+''    		2a:    fox
+''    		2b:    jumped
+''    		2c:    over
+''    		3a:    the
+''    		3b:    lazy
+''    		3c:    dog
+''    		
+''    		After removing "lazy":
+''    		    -KEY-   -VALUE-
+''    		1a:    the
+''    		1b:    quick
+''    		1c:    brown
+''    		2a:    fox
+''    		2b:    jumped
+''    		2c:    over
+''    		3a:    the
+''    		3c:    dog
+''    		
+''    		After removing the element at index 5:
+''    		    -KEY-   -VALUE-
+''    		1a:    the
+''    		1b:    quick
+''    		1c:    brown
+''    		2a:    fox
+''    		2b:    jumped
+''    		3a:    the
+''    		3c:    dog
+</pre>

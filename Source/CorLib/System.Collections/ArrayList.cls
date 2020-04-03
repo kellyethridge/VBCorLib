@@ -670,13 +670,17 @@ Public Sub SetRange(ByVal Index As Long, ByRef Source As Variant)
 End Sub
 
 ''
-' Sorts the items in the list.
+' Sorts the items in the entire <a href="ArrayList.html">ArrayList</a> or range of elements in <a href="ArrayList.html">ArrayList</a>.
 '
 ' @param Index The zero-based index to start sorting the items.
-' @param Count The number of items to include in the sort.
-' @param Comparer A custom comparer used to compare items in the list.
-' @remarks The list is sorted in ascending order by default. By providing
-' a custom comparer, the list can be sorted in special ways, such as descending order.
+' @param Count The length of the range to sort.
+' @param Comparer The <a href="IComparer.html">IComparer</a> implementation to use when comparing elements.<br/>
+' -or-<br/>
+' A <b>Nothing</b> reference to use the default <a href="Comparer.html">Comparer</a> implementation.
+' @remarks If comparer is set to <b>Nothing</b>, this method performs a comparison sort (also called an unstable sort); that is, if two elements are equal,
+' their order might not be preserved. In contrast, a stable sort preserves the order of elements that are equal. To perform a stable sort, you must
+' implement a custom <a href="IComparer.html">IComparer</a> interface.
+' @include "..\DocIncludes\ArrayList.Sort.html"
 Public Sub Sort(Optional ByRef Index As Variant, Optional ByRef Count As Variant, Optional ByVal Comparer As IComparer)
     Dim Range As ListRange
     Range = MakeDefaultRange(Index, 0, Count, mCount)

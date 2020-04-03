@@ -36,25 +36,18 @@ Attribute VB_Exposed = True
 '
 
 ''
-' Provides a default mechanism to compare two values. The values must be of the
-' same datatype to be compared. Otherwise an exception will be thrown.
+' Compares two values for equivalence, where string comparisons are case-sensitive.
 '
-' @remarks <p>The default comparer requires that the two datatypes being compared be
-' the same. This includes comparing two numbers such that comparing a vbLong type to
-' a vbInteger type will result in an exception.<br>
-' Strings will not be converted to numbers for comparison, even though VB supports this
-' action. The comparisons of strings is case-sensitive. For case-insensitive comparisons,
-' use an instance of <a href="CaseInsensitiveComparer.html">CaseInsensitiveComparer</a> class.</p>
-' <p>In order for objects to be accepted in the comparison, they must implement the
-' <a href="IComparable.html">IComparable</a> interface. The comparer will then call the object through the <a href="IComparable.Compare.html">IComparable.Compare</a>
-' method, passing in the value for the object to compare itself with.<br><br>
-' The return value should indicate the objects relation to the value passed in:<br>
-' Positive number = object > value<br/>
-' Negative number = object < value<br/>
-' Return of zero  = object = value<br/>
-'
+' @remarks This class is the default implementation of the <a href="IComparer.html">IComparer</a> interface. The <a href="CaseInsensitiveComparer.html">CaseInsensitiveComparer</a> class
+' is the implementation of the <a href="IComparer.html">IComparer</a> interface that performs case-insensitive string comparisons.
+' <p>Comparison procedures use the <a href="ThreadStatic.Get.CurrentCulture.html">Thread.CurrentCulture</a> of the current thread unless otherwise specified. String comparisons might have different results depending on the culture.</p>
 ' @see ComparerStatic
-'
+' @see Constructors
+' @see IComparer
+' @see IComparable
+' @see CaseInsensitiveComparer
+' @see ThreadStatic
+' @include "..\DocIncludes\Comparer.html"
 Option Explicit
 Implements IObject
 Implements IComparer
@@ -92,15 +85,15 @@ Public Function ToString() As String
 End Function
 
 ''
-' Returns the comparison between to values.
+' Performs a case-sensitive comparison of two values of the same type and returns a value indicating whether one is less than, equal to, or greater than the other.
 '
 ' @param a The left-hand-side of the equation.
 ' @param b the right-hand-side of the equation.
-' @return A signed integer that indicates the relative values of a and b, as shown in the following table.
+' @return A signed integer that indicates the relative values of <i>a</i> and <i>b</i>, as shown in the following table.
 ' <table style="width: auto">
 '   <tr>
 '       <th>Value</th>
-'       <th>Condition</th>
+'       <th>Meaning</th>
 '   </tr>
 '   <tr>
 '        <td>Less than zero</td><td><i>a</i> is less than <i>b</i>.</td>
@@ -115,6 +108,9 @@ End Function
 ' @remarks If <i>a</i> implements <a href="IComparable.html">IComparable</a>, then <i>a</i>.<b>CompareTo</b>(<i>b</i>)
 ' is returned; otherwise, if <i>b</i> implements <a href="IComparable.html">IComparable</a>, then the negated result of <i>b</i>.<b>CompareTo</b>(<i>a</i>) is returned.
 ' <p>String comparisons might have different results depending on the culture.</i>
+' @see IComparable
+' @see CultureInfo
+' @include "..\DocIncludes\Comparer.Compare.html"
 Public Function Compare(ByRef a As Variant, ByRef b As Variant) As Long
     Dim Comparable As IComparable
     Dim AVarType As VbVarType

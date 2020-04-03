@@ -1,0 +1,118 @@
+@exceptions
+<table style="width: auto">
+	<tr>
+		<th>Exception</th><th>Condition</th>
+	</tr>
+	<tr>
+		<td><a href="ArgumentOutOfRangeException">ArgumentOutOfRangeException</a></td>
+		<td>
+			<i>Index</i> is less than zero.<br/>
+			-or-<br/>
+			<i>Count</i> is less than zero.
+		</td>
+	</tr>
+	<tr>
+		<td><a href="ArgumentException.html">ArgumentException</a></td>
+		<td><i>Index</i> and <i>Count</i> do not specify a valid range in the <a href="ArrayList.html">ArrayList</a>.</td>
+	</tr>
+	<tr>
+		<td><a href="InvalidOperationException.html">InvalidOperationException</a></td>
+		<td>An error occurred while comparing two elements.</td>
+	</tr>
+</table>
+@example The following code example shows how to sort the values in a range of elements in an <a href="ArrayList.html">ArrayList</a> using the default comparer and a custom comparer that reverses the sort order.
+<p>There are two modules created for this example. A BAS module containing the <b>Main</b> method
+and a Class module implementing the <a href="IComparer.html">IComparer</a> interface.</p>
+<p>The following is a <b>Visual Basic Class</b> module named <b>MyReverserClass</b>.</p>
+<pre>
+Option Explicit
+Implements IComparer
+
+Private mComparer As New CaseInsensitiveComparer
+
+Public Function Compare(ByRef a As Variant, ByRef b As Variant) As Long
+    Compare = mComparer.Compare(b, a)
+End Function
+
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+''   IComparer
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Function IComparer_Compare(a As Variant, b As Variant) As Long
+    IComparer_Compare = Compare(a, b)
+End Function
+</pre>
+<br/>
+<p>The following is a <b>Visual Basic BAS</b> module containing <b>Main</b> start-up method.</p>
+<pre>
+Public Sub Main()
+    Dim List As New ArrayList
+    Dim MyComparer As New MyReverserClass
+    
+    List.Add "The"
+    List.Add "QUICK"
+    List.Add "BROWN"
+    List.Add "FOX"
+    List.Add "jumped"
+    List.Add "over"
+    List.Add "the"
+    List.Add "lazy"
+    List.Add "dog"
+    
+    Debug.Print "The ArrayList initially contains the following values:"
+    PrintIndexAndValues List
+    
+    List.Sort 1, 3, Nothing
+    Debug.Print "After sorting from index 1 to index 3 with the default comparer:"
+    PrintIndexAndValues List
+    
+    List.Sort 1, 3, MyComparer
+    Debug.Print "After sorting from index 1 to index 3 with the reverse case-insensitive comparer:"
+    PrintIndexAndValues List
+End Sub
+
+Private Sub PrintIndexAndValues(ByVal List As ArrayList)
+    Dim i As Long
+    
+    For i = 0 To List.Count - 1
+        Debug.Print CorString.Format(t("\t[{0}]:\t{1}"), i, List(i))
+    Next
+    
+    Debug.Print
+End Sub
+
+'' This code produces the following output (individual values may vary because they are randomly generate):
+''
+'' The ArrayList initially contains the following values:
+''    [0]:    The
+''    [1]:    QUICK
+''    [2]:    BROWN
+''    [3]:    FOX
+''    [4]:    jumped
+''    [5]:    over
+''    [6]:    the
+''    [7]:    lazy
+''    [8]:    dog
+''
+'' After sorting from index 1 to index 3 with the default comparer:
+''    [0]:    The
+''    [1]:    BROWN
+''    [2]:    FOX
+''    [3]:    QUICK
+''    [4]:    jumped
+''    [5]:    over
+''    [6]:    the
+''    [7]:    lazy
+''    [8]:    dog
+''
+'' After sorting from index 1 to index 3 with the reverse case-insensitive comparer:
+''    [0]:    The
+''    [1]:    QUICK
+''    [2]:    FOX
+''    [3]:    BROWN
+''    [4]:    jumped
+''    [5]:    over
+''    [6]:    the
+''    [7]:    lazy
+''    [8]:    dog
+</pre>

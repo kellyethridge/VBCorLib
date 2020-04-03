@@ -1,0 +1,88 @@
+@example The following example illustrates the implementation of <a href="IComparable.html">IComparable</a> and the requisite <a href="IComparable.CompareTo.html">CompareTo</a> method.
+<p>There are two modules created for this example. A BAS module containing the <b>Main</b> method
+and a Class module implementing the <a href="IComparable.html">IComparable</a> interface.</p>
+<p>The following is a <b>Visual Basic Class</b> module named <b>Temperature</b>.</p>
+<pre>
+Option Explicit
+Implements IComparable
+
+Private mTemperatureF As Double
+
+Public Function CompareTo(ByRef Value As Variant) As Long
+    Dim Other As Temperature
+    
+    On Error GoTo Catch
+    Set Other = Value
+    
+    If Other Is Nothing Then
+        CompareTo = 1
+    Else
+        CompareTo = Comparer.Default.Compare(mTemperatureF, Other.Fahrenheit)
+    End If
+    Exit Function
+    
+Catch:
+    Throw NewArgumentException("Value is not a Temperature")
+End Function
+
+Public Property Get Fahrenheit() As Double
+    Fahrenheit = mTemperatureF
+End Property
+
+Public Property Let Fahrenheit(ByVal Value As Double)
+    mTemperatureF = Value
+End Property
+
+Public Property Get Celsius() As Double
+    Celsius = (mTemperatureF - 32) * (5# / 9#)
+End Property
+
+Public Property Let Celsius(ByVal Value As Double)
+    mTemperatureF = (Value * 9# / 5#) + 32
+End Property
+
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+''   IComparable
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Function IComparable_CompareTo(Value As Variant) As Long
+    IComparable_CompareTo = CompareTo(Value)
+End Function
+</pre>
+<br/>
+<p>The following is a <b>Visual Basic BAS</b> module containing <b>Main</b> start-up method.</p>
+<pre>
+Public Sub Main()
+    Dim Temperatures As New ArrayList
+    Dim r As New Random
+    Dim i As Long
+    Dim Degrees As Double
+    Dim Temp As Temperature
+    
+    For i = 1 To 10
+        Degrees = r.NextRange(0, 100)
+        Set Temp = New Temperature
+        Temp.Fahrenheit = Degrees
+        Temperatures.Add Temp
+    Next
+    
+    Temperatures.Sort
+    
+    For Each Temp In Temperatures
+        Debug.Print Temp.Fahrenheit
+    Next
+End Sub
+
+'' This code produces the following output (individual values may vary because they are randomly generated):
+''
+''    13
+''    18
+''    31
+''    36
+''    65
+''    65
+''    66
+''    78
+''    92
+''    98
+</pre>

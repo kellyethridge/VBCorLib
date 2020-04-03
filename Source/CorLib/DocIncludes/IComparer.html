@@ -1,0 +1,94 @@
+@example The following code example demonstrates the use of the <b>IComparer</b> interface to sort an <a href="ArrayList.html">ArrayList</a> object. In this example, the <b>IComparer</b> interface is implemented using the <a href="CaseInsensitiveComparer.html">CaseInsensitiveComparer</a> class to reverse the order of the contents of the <a href="ArrayList.html">ArrayList</a>.
+<p>There are two modules created for this example. A BAS module containing the <b>Main</b> method and a Class module implementing the <b>IComparer</b> interface.</p>
+<p>The following is a <b>Visual Basic Class</b> module named <b>MyReverserClass</b>.</p>
+<pre>
+Option Explicit
+Implements IComparer
+
+Private mComparer As New CaseInsensitiveComparer
+
+Public Function Compare(ByRef a As Variant, ByRef b As Variant) As Long
+    Compare = mComparer.Compare(b, a)
+End Function
+
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+''   IComparer
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Function IComparer_Compare(a As Variant, b As Variant) As Long
+    IComparer_Compare = Compare(a, b)
+End Function
+</pre>
+<br/>
+<p>The following is a <b>Visual Basic BAS</b> module containing <b>Main</b> start-up method.</p>
+<pre>
+Public Sub Main()
+    Dim List As New ArrayList
+    
+    List.Add "The"
+    List.Add "quick"
+    List.Add "brown"
+    List.Add "fox"
+    List.Add "jumps"
+    List.Add "over"
+    List.Add "the"
+    List.Add "lazy"
+    List.Add "dog"
+    
+    Debug.Print "The ArrayList initially contains the following values:"
+    PrintIndexAndValues List
+    
+    List.Sort
+    Debug.Print "After sorting with the default comparer:"
+    PrintIndexAndValues List
+    
+    List.Sort Comparer:=New MyReverserClass
+    Debug.Print "After sorting with the reverse case-insensitive comparer:"
+    PrintIndexAndValues List
+End Sub
+
+Private Sub PrintIndexAndValues(ByVal List As ArrayList)
+    Dim i As Long
+    
+    For i = 0 To List.Count - 1
+        Debug.Print CorString.Format(t("\t[{0}]:\t{1}"), i, List(i))
+    Next
+    
+    Debug.Print
+End Sub
+
+'' This code produces the following output.
+''
+''	The ArrayList initially contains the following values:
+''	    [0]:    The
+''	    [1]:    quick
+''	    [2]:    brown
+''	    [3]:    fox
+''	    [4]:    jumps
+''	    [5]:    over
+''	    [6]:    the
+''	    [7]:    lazy
+''	    [8]:    dog
+''
+''	After sorting with the default comparer:
+''	    [0]:    brown
+''	    [1]:    dog
+''	    [2]:    fox
+''	    [3]:    jumps
+''	    [4]:    lazy
+''	    [5]:    over
+''	    [6]:    quick
+''	    [7]:    the
+''	    [8]:    The
+''
+''	After sorting with the reverse case-insensitive comparer:
+''	    [0]:    the
+''	    [1]:    The
+''	    [2]:    quick
+''	    [3]:    over
+''	    [4]:    lazy
+''	    [5]:    jumps
+''	    [6]:    fox
+''	    [7]:    dog
+''	    [8]:    brown
+</pre>
