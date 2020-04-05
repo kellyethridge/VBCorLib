@@ -28,3 +28,73 @@
         <td>Elements in the <a href="ArrayList.html">ArrayList</a> cannot be converted to a compatible type of the destination <i>Arr</i>.</td>
     </tr>
 </table>
+@examples
+This example shows how to copy elements from an <b>ArrayList</b> into an existing array, replacing any elements in the destination array.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> Words <span style="color: #0000ff">As</span> <span style="color: #0000ff">New</span> ArrayList
+    <span style="color: #0000ff">Dim</span> Story() <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+
+    <span style="color: #008000">&#39; Create our initial story in a regular String array.</span>
+    Story = NewStrings(<span style="color: #a31515">&quot;Humpty&quot;</span>, <span style="color: #a31515">&quot;Dumpty&quot;</span>, <span style="color: #a31515">&quot;sat&quot;</span>, <span style="color: #a31515">&quot;on&quot;</span>, <span style="color: #a31515">&quot;a&quot;</span>, <span style="color: #a31515">&quot;wall.&quot;</span>)
+    
+    <span style="color: #008000">&#39; Display the current story.</span>
+    Debug.Print <span style="color: #a31515">&quot;The initial story is:&quot;</span>
+    PrintValues Story
+    
+    <span style="color: #008000">&#39; Create a new story in an ArrayList.</span>
+    Words.Add <span style="color: #a31515">&quot;Peter&quot;</span>
+    Words.Add <span style="color: #a31515">&quot;Rabbit&quot;</span>
+    Words.Add <span style="color: #a31515">&quot;slept&quot;</span>
+    Words.Add <span style="color: #a31515">&quot;under&quot;</span>
+    Words.Add <span style="color: #a31515">&quot;a&quot;</span>
+    Words.Add <span style="color: #a31515">&quot;tree.&quot;</span>
+    
+    <span style="color: #008000">&#39; Copies the third word to same word location in the array.</span>
+    Words.CopyToEx 2, Story, 2, 1
+    
+    <span style="color: #008000">&#39; Display the new story.</span>
+    Debug.Print <span style="color: #a31515">&quot;The story with &#39;sat&#39; substituted by &#39;slept&#39; is:&quot;</span>
+    PrintValues Story
+    
+    <span style="color: #008000">&#39; Copies the first two elements to the first</span>
+    <span style="color: #008000">&#39; two elements in the array.</span>
+    Words.CopyToEx 0, Story, 0, 2
+    
+    <span style="color: #008000">&#39; Display the story with the new name.</span>
+    Debug.Print <span style="color: #a31515">&quot;The story with the name changed is:&quot;</span>
+    PrintValues Story
+    
+    <span style="color: #008000">&#39; Increase the size of the story array.</span>
+    <span style="color: #0000ff">ReDim</span> Preserve Story(0 <span style="color: #0000ff">To</span> 11)
+    
+    <span style="color: #008000">&#39; Append the words to the end of the current story.</span>
+    Words.CopyTo Story, 6
+    
+    <span style="color: #008000">&#39; Display the final story.</span>
+    Debug.Print <span style="color: #a31515">&quot;The final story is:&quot;</span>
+    PrintValues Story
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> PrintValues(<span style="color: #0000ff">ByRef</span> s() <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>)
+    <span style="color: #0000ff">Dim</span> i <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
+    
+    Debug.Print vbTab<span style="border: 1px solid #FF0000">;</span>
+    
+    <span style="color: #0000ff">For</span> i = LBound(s) <span style="color: #0000ff">To</span> UBound(s)
+        Debug.Print CorString.Format(<span style="color: #a31515">&quot;{0} &quot;</span>, s(i))<span style="border: 1px solid #FF0000">;</span>
+    <span style="color: #0000ff">Next</span> i
+    
+    Debug.Print
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; This code produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39; The initial story is:</span>
+<span style="color: #008000">&#39;     Humpty Dumpty sat on a wall.</span>
+<span style="color: #008000">&#39; The story with &#39;sat&#39; substituted by &#39;slept&#39; is:</span>
+<span style="color: #008000">&#39;     Humpty Dumpty slept on a wall.</span>
+<span style="color: #008000">&#39; The story with the name changed is:</span>
+<span style="color: #008000">&#39;     Peter Rabbit slept on a wall.</span>
+<span style="color: #008000">&#39; The final story is:</span>
+<span style="color: #008000">&#39;     Peter Rabbit slept on a wall. Peter Rabbit slept under a tree.</span>
+</pre></div>

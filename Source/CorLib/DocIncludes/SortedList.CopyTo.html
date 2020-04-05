@@ -24,53 +24,52 @@
 		<td>The type of the source <a href="SortedList.html">SortedList</a> cannot be cast automatically to the type of the destination array.</td>
 	</tr>
 </table>
-@example The following code example shows how to copy the values in a <a href="SortedList.html">SortedList</a> object into a one-dimensional array.
-<pre>
-Public Sub Main()
-    Dim List As New SortedList
-    Dim TempArray() As String
-    Dim TargetArray() As DictionaryEntry
-    Dim i As Long
+@examples The following code example shows how to copy the values in a <a href="SortedList.html">SortedList</a> object into a one-dimensional array.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> List <span style="color: #0000ff">As</span> <span style="color: #0000ff">New</span> SortedList
+    <span style="color: #0000ff">Dim</span> TempArray() <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+    <span style="color: #0000ff">Dim</span> TargetArray() <span style="color: #0000ff">As</span> DictionaryEntry
+    <span style="color: #0000ff">Dim</span> i <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
     
-    List.Add 2, "cats"
-    List.Add 3, "in"
-    List.Add 1, "napping"
-    List.Add 4, "the"
-    List.Add 0, "three"
-    List.Add 5, "barn"
+    List.Add 2, <span style="color: #a31515">&quot;cats&quot;</span>
+    List.Add 3, <span style="color: #a31515">&quot;in&quot;</span>
+    List.Add 1, <span style="color: #a31515">&quot;napping&quot;</span>
+    List.Add 4, <span style="color: #a31515">&quot;the&quot;</span>
+    List.Add 0, <span style="color: #a31515">&quot;three&quot;</span>
+    List.Add 5, <span style="color: #a31515">&quot;barn&quot;</span>
     
-    TempArray = NewStrings("The", "quick", "brown", "fox", "jumped", "over", "the", "lazy", "dog")
-    ReDim TargetArray(0 To 14)
+    TempArray = NewStrings(<span style="color: #a31515">&quot;The&quot;</span>, <span style="color: #a31515">&quot;quick&quot;</span>, <span style="color: #a31515">&quot;brown&quot;</span>, <span style="color: #a31515">&quot;fox&quot;</span>, <span style="color: #a31515">&quot;jumped&quot;</span>, <span style="color: #a31515">&quot;over&quot;</span>, <span style="color: #a31515">&quot;the&quot;</span>, <span style="color: #a31515">&quot;lazy&quot;</span>, <span style="color: #a31515">&quot;dog&quot;</span>)
+    <span style="color: #0000ff">ReDim</span> TargetArray(0 <span style="color: #0000ff">To</span> 14)
     
-    For i = 0 To UBound(TargetArray)
-        If i &lt;= UBound(TempArray) Then
-            Set TargetArray(i) = NewDictionaryEntry(i, TempArray(i))
-        Else
-            Set TargetArray(i) = NewDictionaryEntry(i, "")
-        End If
-    Next
+    <span style="color: #0000ff">For</span> i = 0 <span style="color: #0000ff">To</span> UBound(TargetArray)
+        <span style="color: #0000ff">If</span> i &amp;lt<span style="border: 1px solid #FF0000">;</span>= UBound(TempArray) <span style="color: #0000ff">Then</span>
+            <span style="color: #0000ff">Set</span> TargetArray(i) = NewDictionaryEntry(i, TempArray(i))
+        <span style="color: #0000ff">Else</span>
+            <span style="color: #0000ff">Set</span> TargetArray(i) = NewDictionaryEntry(i, <span style="color: #a31515">&quot;&quot;</span>)
+        <span style="color: #0000ff">End</span> <span style="color: #0000ff">If</span>
+    <span style="color: #0000ff">Next</span>
     
-    Debug.Print "The target Array contains the following (before and after copying):"
+    Debug.Print <span style="color: #a31515">&quot;The target Array contains the following (before and after copying):&quot;</span>
     PrintValues TargetArray
     
     List.CopyTo TargetArray, 6
     
     PrintValues TargetArray
-End Sub
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
 
-Private Sub PrintValues(ByRef Arr() As DictionaryEntry)
-    Dim i As Long
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> PrintValues(<span style="color: #0000ff">ByRef</span> Arr() <span style="color: #0000ff">As</span> DictionaryEntry)
+    <span style="color: #0000ff">Dim</span> i <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
     
-    For i = LBound(Arr) To UBound(Arr)
-        Debug.Print " "; Arr(i).Value;
-    Next
+    <span style="color: #0000ff">For</span> i = LBound(Arr) <span style="color: #0000ff">To</span> UBound(Arr)
+        Debug.Print <span style="color: #a31515">&quot; &quot;</span><span style="border: 1px solid #FF0000">;</span> Arr(i).Value<span style="border: 1px solid #FF0000">;</span>
+    <span style="color: #0000ff">Next</span>
     
     Debug.Print
-End Sub
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
 
-'' The code produces the following output.
-''
-''    The target Array contains the following (before and after copying):
-''     The quick brown fox jumped over the lazy dog
-''     The quick brown fox jumped over three napping cats in the barn
-</pre>
+<span style="color: #008000">&#39; The code produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    The target Array contains the following (before and after copying):</span>
+<span style="color: #008000">&#39;     The quick brown fox jumped over the lazy dog</span>
+<span style="color: #008000">&#39;     The quick brown fox jumped over three napping cats in the barn</span>
+</pre></div>

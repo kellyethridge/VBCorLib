@@ -20,24 +20,23 @@ The object that implements <a href="IFormatProvider.html">IFormatProvider</a> ca
        <td><a href="FormatException.html">FormatException</a></td><td><i>Format</i> is invalid or not supported.</td>
   </tr>
 </table>
-@example The following example displays an <a href="Int64Static.Int64.html">Int64</a> value using the default <b>ToString()</b> method. 
+@examples The following example displays an <a href="Int64Static.Int64.html">Int64</a> value using the default <b>ToString()</b> method. 
 It also displays the string representations of the <a href="Int64Static.Int64.html">Int64</a> value that results from using a number of standard format specifiers. 
 The examples are displayed using the formatting conventions of the en-US culture.
-<pre>
-Public Sub Main()
-    Dim Value As Int64
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> Value <span style="color: #0000ff">As</span> Int64
     
     Value = CInt64(-16325091)
     
-    '' Display value with default ToString method.
-    Debug.Print Int64.ToString(Value) '' Displays -16325091
+    <span style="color: #008000">&#39; Display value with default ToString method.</span>
+    Debug.Print Int64.ToString(Value) <span style="color: #008000">&#39;&#39; Displays -16325091</span>
     
-    '' Display value using some standard format specifiers.
-    Debug.Print Int64.ToString(Value, "G")  '' Displays -16325091
-    Debug.Print Int64.ToString(Value, "C")  '' Displays ($16,325,091.00)
-    Debug.Print Int64.ToString(Value, "D")  '' Displays -16325091
-    Debug.Print Int64.ToString(Value, "F")  '' Displays -16325091.00
-    Debug.Print Int64.ToString(Value, "N")  '' Displays -16,325,091.00
-    Debug.Print Int64.ToString(Value, "X")  '' Displays FFFFFFFFFF06E61D
-End Sub
-</pre>
+    <span style="color: #008000">&#39; Display value using some standard format specifiers.</span>
+    Debug.Print Int64.ToString(Value, <span style="color: #a31515">&quot;G&quot;</span>)  <span style="color: #008000">&#39;&#39; Displays -16325091</span>
+    Debug.Print Int64.ToString(Value, <span style="color: #a31515">&quot;C&quot;</span>)  <span style="color: #008000">&#39;&#39; Displays ($16,325,091.00)</span>
+    Debug.Print Int64.ToString(Value, <span style="color: #a31515">&quot;D&quot;</span>)  <span style="color: #008000">&#39;&#39; Displays -16325091</span>
+    Debug.Print Int64.ToString(Value, <span style="color: #a31515">&quot;F&quot;</span>)  <span style="color: #008000">&#39;&#39; Displays -16325091.00</span>
+    Debug.Print Int64.ToString(Value, <span style="color: #a31515">&quot;N&quot;</span>)  <span style="color: #008000">&#39;&#39; Displays -16,325,091.00</span>
+    Debug.Print Int64.ToString(Value, <span style="color: #a31515">&quot;X&quot;</span>)  <span style="color: #008000">&#39;&#39; Displays FFFFFFFFFF06E61D</span>
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+</pre></div>

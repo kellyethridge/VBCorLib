@@ -1,17 +1,16 @@
-@example The following code performs a bitwise and operation between two 64-bit integer values.
-<pre>
-Public Sub Main()
-    Dim x As Int64
-    Dim y As Int64
-    Dim r As Int64
+@examples The following code performs a bitwise and operation between two 64-bit integer values.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> x <span style="color: #0000ff">As</span> Int64
+    <span style="color: #0000ff">Dim</span> y <span style="color: #0000ff">As</span> Int64
+    <span style="color: #0000ff">Dim</span> r <span style="color: #0000ff">As</span> Int64
     
-    x = CInt64("0xfffffff0")
-    y = CInt64("0xffff")
+    x = CInt64(<span style="color: #a31515">&quot;0xfffffff0&quot;</span>)
+    y = CInt64(<span style="color: #a31515">&quot;0xffff&quot;</span>)
     r = Int64.BitwiseAnd(x, y)
     
-    Debug.Print CorString.Format("0x{0:x} AND 0x{1:x8} = 0x{2:x8}", x, y, r)
-End Sub
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;0x{0:x} AND 0x{1:x8} = 0x{2:x8}&quot;</span>, x, y, r)
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
 
-''This code produces the following.
-''    0xfffffff0 AND 0x0000ffff = 0x0000fff0
-</pre>
+<span style="color: #008000">&#39;This code produces the following.</span>
+<span style="color: #008000">&#39;    0xfffffff0 AND 0x0000ffff = 0x0000fff0</span>
+</pre></div>

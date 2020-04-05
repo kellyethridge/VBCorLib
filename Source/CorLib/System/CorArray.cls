@@ -636,6 +636,7 @@ End Sub
 ' <p>When copying between multidimensional arrays, the array behaves like a long one-dimensional array, where the rows (or columns) are conceptually
 ' laid end to end. For example, if an array has three rows (or columns) with four elements each, copying six elements from the beginning of the array
 ' would copy all four elements of the first row (or column) and the first two elements of the second row (or column).</p>
+' @see #CopyEx
 ' @include "..\DocIncludes\CorArray.html"
 Public Sub Copy(ByRef SourceArray As Variant, ByRef DestinationArray As Variant, ByVal Length As Long)
     If IsNull(SourceArray) Then _
@@ -701,6 +702,7 @@ End Sub
 ' <p>When copying between multidimensional arrays, the array behaves like a long one-dimensional array, where the rows (or columns) are conceptually
 ' laid end to end. For example, if an array has three rows (or columns) with four elements each, copying six elements from the beginning of the array
 ' would copy all four elements of the first row (or column) and the first two elements of the second row (or column).</p>
+' @see #Copy
 ' @include "..\DocIncludes\CorArray.html"
 Public Sub CopyEx(ByRef SourceArray As Variant, ByVal SourceIndex As Long, ByRef DestinationArray As Variant, ByVal DestinationIndex As Long, ByVal Length As Long)
     Dim pSourceSafeArray        As Long
@@ -848,6 +850,7 @@ End Function
 '
 ' @param Arr The array to retrieve the number of elements from.
 ' @return A 32-bit integer that represents the total number of elements in all the dimensions of <i>Arr</i>; zero if there are no elements in the array.
+' @see #GetLength
 Public Function Length(ByRef Arr As Variant) As Long
     Dim Ptr As Long
     
@@ -861,6 +864,7 @@ End Function
 ' @param Arr The array to get the dimension length from.
 ' @param Dimension A one-based dimension of the array whose length needs to be determined.
 ' @return A 32-bit integer that represents the number of elements in the specified dimension.
+' @see #Length
 ' @include "..\DocIncludes\CorArray.GetLength.html"
 Public Function GetLength(ByRef Arr As Variant, ByVal Dimension As Long) As Long
     Dim ArrayPtr    As Long
@@ -898,6 +902,7 @@ End Function
 ' @param Count The number of elements to search, starting from startindex.
 ' @return Value indicating the index the value was found. If a value of less that
 ' the lower-bounds is returned, then the value was not found in the array.
+' @see #LastIndexOf
 Public Function IndexOf(ByRef Arr As Variant, ByRef Value As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As Long
     Dim Range   As ListRange
         
@@ -945,6 +950,7 @@ End Function
 '        <td><a href="ArgumentException.html">ArgumentException</a></td><td><i>Arr</i> is not an array.</td>
 '   </tr>
 ' </table>
+' @see #IsNullOrEmpty
 Public Function IsNull(ByRef Arr As Variant) As Boolean
     If Not IsArray(Arr) Then _
         Error.Argument Argument_ArrayRequired, "Arr"
@@ -967,6 +973,7 @@ End Function
 '        <td><a href="ArgumentException.html">ArgumentException</a></td><td><i>Arr</i> is not an array.</td>
 '   </tr>
 ' </table>
+' @see #IsNull
 Public Function IsNullOrEmpty(ByRef Arr As Variant) As Boolean
     Dim Ptr As Long
     
@@ -991,6 +998,7 @@ End Function
 ' @param Count The number of elements to search, starting from startindex.
 ' @return Value indicating the index the value was found. If no value was found,
 ' then one less than the lower bound of the array is returned.
+' @see #IndexOf
 Public Function LastIndexOf(ByRef Arr As Variant, ByRef Value As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As Long
     Dim ElemIndex   As Long
     Dim ElemCount   As Long
@@ -1098,19 +1106,6 @@ End Sub
 '
 ' @param Arr The array to sort.
 ' @param Comparer (Optional) An IComparer object or address of a comparer callback function.
-' @remarks The <i>Comparer</i> parameter can be an <a href="IComparer.html">IComparer</a> interface or a
-' callback address to a compare function using the <b>AddressOf</b> method. The
-' callback method signature is defined as follows:
-' <pre>
-' Public Function SortCallback(ByRef x As &lt;Type&gt;, ByRef y As &lt;Type&gt;) As Long
-'     '' return less than zero if x is less than y.
-'     '' return greater than zero if x is greater than y.
-'     '' return zero if x equals y.
-' End Function
-' </pre>
-' The &lt;Type&gt; the type of element of the array. If the
-' array is an array of <b>Variants</b>, then &lt;Type&gt; would be a <b>Variant</b>, not
-' any specific sub-type within the variant elements of the array.</p>
 ' @see IComparer
 ' @see #SortEx
 ' @see #SortKey

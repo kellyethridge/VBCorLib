@@ -166,11 +166,14 @@ Finally:
 End Function
 
 ''
-' Replaces the format item in a specified string with the string representation of a corresponding value in ParamArray arguments.
+' Replaces the format item in a specified string with the string representation of a corresponding value in a specified array.
 '
-' @param FormatText The string containing formatting information.
-' @param args A list of arguments to use in replacing the formatting information.
-' @return A formatted string.
+' @param FormatText A composite format string (see Remarks).
+' @param args An argument array that contains zero or more values to format.
+' @return A copy of <i>FormatText</i> in which the format items have been replaced by the string representation of the corresponding values in <i>Args</i>.
+' @see #FormatArray
+' @see #FormatEx
+' @see #FormatArrayEx
 ' @see NumberFormatInfo
 ' @see DateTimeFormatInfo
 ' @include "..\DocIncludes\CorString.Format.html"
@@ -181,14 +184,18 @@ Public Function Format(ByRef FormatText As String, ParamArray Args() As Variant)
 End Function
 
 ''
-' Formats a string by replacing each argument with the formatted equivalent.
+' Replaces the format item in a specified string with the string representation of a corresponding object in a specified array. A specified parameter supplies culture-specific formatting information.
 '
-' @param provider A custom format provider that is used to format the argument instead of the default formatting.
-' @param FormatText The string containing formatting information.
-' @param args A list of arguments to use in replacing the formatting information.
-' @return A formatted string.
+' @param Provider An object that supplies culture-specific formatting information.
+' @param FormatText A composite format string (see Remarks).
+' @param Args An argument array that contains zero or more values to format.
+' @return A copy of <i>FormatText</i> in which the format items have been replaced by the string representation of the corresponding values in <i>Args</i>.
+' @see #Format
+' @see #FormatArray
+' @see #FormatArrayEx
 ' @see NumberFormatInfo
 ' @see DateTimeFormatInfo
+' @include "..\DocIncludes\CorString.FormatEx.html"
 Public Function FormatEx(ByVal Provider As IFormatProvider, ByRef FormatText As String, ParamArray Args() As Variant) As String
     Dim SwappedArgs() As Variant
     Helper.Swap4 ByVal ArrPtr(SwappedArgs), ByVal Helper.DerefEBP(20)
@@ -196,26 +203,34 @@ Public Function FormatEx(ByVal Provider As IFormatProvider, ByRef FormatText As 
 End Function
 
 ''
-' Formats a string by replacing each argument with the formatted equivalent.
+' Replaces the format item in a specified string with the string representation of a corresponding value in a specified array.
 '
-' @param FormatText The string containing formatting information.
-' @param args A list of arguments to use in replacing the formatting information.
-' @return A formatted string.
+' @param FormatText A composite format string (see Remarks).
+' @param args An argument array that contains zero or more values to format.
+' @return A copy of <i>FormatText</i> in which the format items have been replaced by the string representation of the corresponding values in <i>Args</i>.
+' @see #Format
+' @see #FormatEx
+' @see #FormatArrayEx
 ' @see NumberFormatInfo
 ' @see DateTimeFormatInfo
+' @include "..\DocIncludes\CorString.Format.html"
 Public Function FormatArray(ByRef FormatText As String, ByRef Args() As Variant) As String
     FormatArray = FormatCore(Nothing, FormatText, Args)
 End Function
 
 ''
-' Formats a string by replacing each argument with the formatted equivalent.
+' Replaces the format item in a specified string with the string representation of a corresponding object in a specified array. A specified parameter supplies culture-specific formatting information.
 '
-' @param Provider A custom format provider that is used to format the argument instead of the default formatting.
-' @param FormatText The string containing formatting information.
-' @param Args A list of arguments to use in replacing the formatting information.
-' @return A formatted string.
+' @param Provider An object that supplies culture-specific formatting information.
+' @param FormatText A composite format string (see Remarks).
+' @param Args An argument array that contains zero or more values to format.
+' @return A copy of <i>FormatText</i> in which the format items have been replaced by the string representation of the corresponding values in <i>Args</i>.
+' @see #Format
+' @see #FormatArray
+' @see #FormatEx
 ' @see NumberFormatInfo
 ' @see DateTimeFormatInfo
+' @include "..\DocIncludes\CorString.FormatEx.html"
 Public Function FormatArrayEx(ByVal Provider As IFormatProvider, ByRef FormatText As String, ByRef Args() As Variant) As String
     FormatArrayEx = FormatCore(Provider, FormatText, Args)
 End Function
@@ -230,21 +245,7 @@ End Function
 ' @remarks The <i>StartIndex</i> parameter is zero-based. That is, the index of the first character in the string <i>s</i> is zero.
 ' <p>If <i>Length</i> is zero, the returned array is empty and has a zero length. If <i>s</i> is an empty string (""),
 ' the returned array is empty and has a zero length.</p>
-' @exceptions
-' <table style="width: auto">
-'   <tr>
-'       <th>Exception</th>
-'       <th>Condition</th>
-'   </tr>
-'   <tr>
-'        <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
-'        <td>
-'           <i>StartIndex</i> or <i>Length</i> is less than zero.<br/>
-'           -or-<br/>
-'           <i>StartIndex</i> plus <i>Length</i> is greater than the length of <i>s</i>.
-'        </td>
-'   </tr>
-' </table>
+' @include "..\DocIncludes\CorString.ToCharArray.html"
 Public Function ToCharArray(ByRef s As String, Optional ByRef StartIndex As Variant, Optional ByRef Length As Variant) As Integer()
     Dim Range   As ListRange
     Dim Chars() As Integer
@@ -269,13 +270,15 @@ Public Function ToCharArray(ByRef s As String, Optional ByRef StartIndex As Vari
 End Function
 
 ''
-' Pads a string's left side.
+' Returns a new string that right-aligns the characters in this instance by padding them on the left with a specified Unicode character, for a specified total length.
 '
 ' @param s The string to be padded.
-' @param totalWidth The total length of the final string.
-' @param paddingChar The character to pad the left of the string with.
-' @return The padded string.
-' @remarks <i>PaddingChar</i> can accept either a number or Chr$ value.
+' @param TotalWidth The number of characters in the resulting string, equal to the number of original characters plus any additional padding characters.
+' @param PaddingChar A Unicode padding character. <b>AscW</b> and <b>Chrw$</b> values are accepted.
+' @return A new string that is equivalent to <i>s</i>, but right-aligned and padded on the left with as many <i>PaddingChar</i> characters as needed to create
+' a length of <i>TotalWidth</i>. However, if <i>TotalWidth</i> is less than the length of <i>s</i>, the method returns <i>s</i>.
+' If <i>TotalWidth</i> is equal to the length of <i>s</i>, the method returns a new string that is identical to <i>s</i>.
+' @include "..\DocIncludes\CorString.PadLeft.html"
 Public Function PadLeft(ByRef s As String, ByVal TotalWidth As Long, Optional ByRef PaddingChar As Variant = 32) As String
     Dim Length As Long
     Length = Len(s)
@@ -287,13 +290,15 @@ Public Function PadLeft(ByRef s As String, ByVal TotalWidth As Long, Optional By
 End Function
 
 ''
-' Pads a string's right side.
+' Returns a new string that left-aligns the characters in this string by padding them on the right with a specified Unicode character, for a specified total length.
 '
 ' @param s The string to be padded.
-' @param totalWidth The total length of the final string.
-' @param paddingChar The character to pad the right of the string with.
-' @return The padded string.
-' @remarks <i>PaddingChar</i> can accept either a number or Chr$ value.
+' @param TotalWidth The number of characters in the resulting string, equal to the number of original characters plus any additional padding characters.
+' @param PaddingChar A Unicode padding character. <b>AscW</b> and <b>Chrw$</b> values are accepted.
+' @return A new string that is equivalent to <i>s</i>, but left-aligned and padded on the right with as many <i>PaddingChar</i> characters as needed to create
+' a length of <i>TotalWidth</i>. However, if <i>TotalWidth</i> is less than the length of <i>s</i>, the method returns <i>s</i>.
+' If <i>TotalWidth</i> is equal to the length of <i>s</i>, the method returns a new string that is identical to <i>s</i>.
+' @include "..\DocIncludes\CorString.PadRight.html"
 Public Function PadRight(ByRef s As String, ByVal TotalWidth As Long, Optional ByRef PaddingChar As Variant = 32) As String
     Dim Length As Long
     Length = Len(s)
@@ -305,99 +310,59 @@ Public Function PadRight(ByRef s As String, ByVal TotalWidth As Long, Optional B
 End Function
 
 ''
-' Trims the beginning of the string.
+' Removes all leading occurrences of a set of characters specified in an array from the <i>s</i> parameter.
 '
 ' @param s The string to be trimmed.
-' @param TrimChars The characters to remove.
-' @return The trimmed string.
-' @remarks Unlike VB's <b>LTrim</b> function, this can trim multiple character types, not just spaces.
-' <p>The <i>TrimChars</i> can be either a string of the characters or an <b>Integer</b> array
-' of characters that will be trimmed from the beginning.</p>
-' @exceptions
-' <table style="width: auto">
-'   <tr>
-'       <th>Exception</th>
-'       <th>Condition</th>
-'   </tr>
-'   <tr>
-'        <td><a href="ArgumentException.html">ArgumentException</a></td><td><i>TrimChars</i> was neither a <b>String</b> or <b>Integer</b> array.</td>
-'   </tr>
-' </table>
+' @param TrimChars An array of Unicode characters to remove. <b>String</b> and <b>Integer()</b> are accepted.
+' @return The string that remains after all occurrences of characters in the <i>TrimChars</i> parameter are removed from the start of <i>s</i>. If <i>TrimChars</i> is missing, white-space characters are removed instead.
+' @see #Trim
+' @see #TrimEnd
+' @see #ToCharArray
+' @include "..\DocIncludes\CorString.TrimStart.html"
 Public Function TrimStart(ByRef s As String, Optional ByRef TrimChars As Variant) As String
     TrimStart = TrimCore(s, TrimChars, True, False)
 End Function
 
 ''
-' Trims the end of the string.
+' Removes all trailing occurrences of a set of characters specified in an array from the <i>s</i> parameter.
 '
 ' @param s The string to be trimmed.
-' @param TrimChars The characters to remove.
-' @return The trimmed string.
-' @remarks Unlike VB's <b>RTrim</b> function, this can trim multiple character types, not just spaces.
-' <p>The <i>TrimChars</i> can be either a string of the characters or an <b>Integer</b> array
-' of characters that will be trimmed from the end.</p>
-' @exceptions
-' <table style="width: auto">
-'   <tr>
-'       <th>Exception</th>
-'       <th>Condition</th>
-'   </tr>
-'   <tr>
-'        <td><a href="ArgumentException.html">ArgumentException</a></td><td><i>TrimChars</i> was neither a <b>String</b> or <b>Integer</b> array.</td>
-'   </tr>
-' </table>
+' @param TrimChars An array of Unicode characters to remove. <b>String</b> and <b>Integer()</b> are accepted.
+' @return The string that remains after all occurrences of characters in the <i>TrimChars</i> parameter are removed from the end of <i>s</i>. If <i>TrimChars</i> is missing, white-space characters are removed instead.
+' @see #Trim
+' @see #TrimStart
+' @see #ToCharArray
+' @include "..\DocIncludes\CorString.TrimEnd.html"
 Public Function TrimEnd(ByRef s As String, Optional ByRef TrimChars As Variant) As String
     TrimEnd = TrimCore(s, TrimChars, False, True)
 End Function
 
 ''
-' Trims both the beginning and end of the string.
+' Removes all leading and trailing occurrences of a set of characters specified in an array from the <i>s</i> parameter.
 '
 ' @param s The string to be trimmed.
-' @param TrimChars The characters to remove.
-' @return The trimmed string.
-' @remarks Unlike VB's <b>Trim</b> function, this can trim multiple character types, not just spaces.
-' <p><i>TrimChars</i> can be either a string of the characters or an <i>Integer</i> array
-' of characters that will be trimmed from both ends.</p>
-' @exceptions
-' <table style="width: auto">
-'   <tr>
-'       <th>Exception</th>
-'       <th>Condition</th>
-'   </tr>
-'   <tr>
-'        <td><a href="ArgumentException.html">ArgumentException</a></td><td><i>TrimChars</i> was neither a <b>String</b> or <b>Integer</b> array.</td>
-'   </tr>
-' </table>
+' @param TrimChars An array of Unicode characters to remove. <b>String</b> and <b>Integer()</b> are accepted.
+' @return The string that remains after all occurrences of characters in the <i>TrimChars</i> parameter are removed from the start and end of <i>s</i>. If <i>TrimChars</i> is missing, white-space characters are removed instead.
+' @see #TrimStart
+' @see #TrimEnd
+' @see #ToCharArray
+' @include "..\DocIncludes\CorString.Trim.html"
 Public Function Trim(ByRef s As String, Optional ByRef TrimChars As Variant) As String
     Trim = TrimCore(s, TrimChars, True, True)
 End Function
 
 ''
-' Joins an array or subarray of strings into a single string, separated by the <i>Delimiter</i>.
+' Concatenates the specified elements of an array or collection, using the specified separator between each element.
 '
-' @param Separator A string inserted between each element when joining into a string.
-' @param Value An array of strings or variants to join together.
-' @param StartIndex The starting element in <i>Arr</i> to begin joining from.
-' @param Count The number of string elements to join together.
-' @return A string containing elements joined from the array separated by the delimiter.
-' @exceptions
-' <table style="width: auto">
-'   <tr>
-'       <th>Exception</th>
-'       <th>Condition</th>
-'   </tr>
-'   <tr>
-'        <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
-'        <td>
-'           <i>StartIndex</i> is less than the lower-bound of <i>Value</i>.<br/>
-'           -or-<br/>
-'           <i>Count</i> is less than zero.<br/>
-'           -or-<br/>
-'           <i>StartIndex</i> plus <i>Count</i> is greater than the upper-bound of <i>Value</i>.
-'        </td>
-'   </tr>
-' </table>
+' @param Separator The string to use as a saparator.
+' @param Value An array or collection that contains the elements to concatenate.
+' @param StartIndex The first element in <i>Value</i> to use.
+' @param Count The number of elements of <i>Value</i> to use.
+' @return A string that consists of the strings in value delimited by the separator string.<br/>
+' -or-<br/>
+' "" if <i>Count</i> is zero, <i>Value</i> has no elements, or <i>Separator</i> and all the elements of <i>Value</i> are "".
+' @see #Split
+' @include "..\DocIncludes\CorString.Join.html"
 Public Function Join(ByRef Separator As String, ByRef Value As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As String
     Dim Range As ListRange
     
@@ -434,31 +399,7 @@ End Function
 ' @param Destination An array of Unicode characters to which characters in the string are copied.
 ' @param DestinationIndex The index in <i>Destination</i> as which the copy operation begins.
 ' @param Count The number of characters in the string to copy to <i>Destination</i>.
-' <h4>Exceptions</h4>
-' <table style="width: auto">
-'   <tr>
-'       <th>Exception</th>
-'       <th>Condition</th>
-'   </tr>
-'   <tr>
-'        <td><a href="ArgumentNullException.html">ArgumentNullException</a></td><td><i>Destination</i> is <b>null</b>.</td>
-'   </tr>
-'    <tr>
-'        <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
-'        <td>
-'           <i>SourceIndex</i> or <i>Count</i> is negative.<br/>
-'           -or-<br/>
-'           <i>DestinationIndex</i> is less than the lower-bound of <i>Destination</i>.<br/>
-'           -or-<br/>
-'           <i>Count</i> is greater than the length of the substring from <i>StartIndex</i> to the end of the string.<br/>
-'           -or-<br/>
-'           <i>Count</i> is greater than the length of the subarray from <i>DestinationIndex</i> to the upper-bound of the <i>Destination</i> array.
-'        </td>
-'    </tr>
-' </table>
-' @remarks This method copies <i>Count</i> characters from the <i>SourceIndex</i> position of <i>Source</i> to the <i>DestinationIndex</i> position of destination character array.
-' This method does not resize the destination character array; it must have a sufficient number of elements to accommodate the copied characters or the method throws an <a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a>.
-' <p><i>SourceIndex</i> is zero-based, and <i>DestinationIndex</i> is lower-bound based.</p>
+' @include "..\DocIncludes\CorString.CopyTo.html"
 Public Sub CopyTo(ByRef Source As String, ByVal SourceIndex As Long, ByRef Destination() As Integer, ByVal DestinationIndex As Long, ByVal Count As Long)
     If CorArray.IsNull(Destination) Then _
         Error.ArgumentNull "Destination", ArgumentNull_Array
@@ -477,12 +418,14 @@ Public Sub CopyTo(ByRef Source As String, ByVal SourceIndex As Long, ByRef Desti
 End Sub
 
 ''
-' Removes a substring from the string, returning a new string with the gap filled with the remaining characters.
+' Returns a new string in which a specified number of characters beginning at a specified position have been deleted.
 '
 ' @param s The string to remove characters from.
-' @param StartIndex The index of the first character to begin removing. This index is zero-based.
-' @param Count The number of characters to be removed.
-' @return A new string with the substring removed.
+' @param StartIndex The zero-based position to begin deleting characters.
+' @param Count The number of characters to delete.
+' @return A new string with the substring deleted.
+' @see #Insert
+' @include "..\DocIncludes\CorString.Remove.html"
 Public Function Remove(ByRef s As String, ByVal StartIndex As Long, Optional ByRef Count As Variant) As String
     Dim CharCount       As Long
     Dim RemovalCount    As Long
@@ -504,14 +447,16 @@ Public Function Remove(ByRef s As String, ByVal StartIndex As Long, Optional ByR
 End Function
 
 ''
-' Returns the index of the first character found in the <i>OfAny<i> set of characters.
+' Reports the zero-based index of the first occurrence in <i>s</i> of any character in a specified array of Unicode characters.
+' The search starts at a specified character position and examines a specified number of character positions.
 '
 ' @param s The string to be searched.
-' @param OfAny The set of characters to search for (String or Integer() Array).
-' @param StartIndex The starting index of <i>s</i> to begin searching.
+' @param OfAny A Unicode character array containing one or more characters to seek. This accepts <b>String</b> or <b>Integer()</b>.
+' @param StartIndex The zero-based starting index of <i>s</i> to begin searching.
 ' @param Count The number of characters in <i>s</i> to search.
-' @return The index of a character from the set, or -1 if none are found.
-' @remarks The indexing of <i>s</i> is zero-based.
+' @return The zero-based index position of the first occurrence in <i>s</i> where any character in <i>AnyOf</i> was found; -1 if no character in <i>AnyOf</i> was found.
+' @see #LastIndexOfAny
+' @include "..\DocIncludes\CorString.IndexOfAny.html"
 Public Function IndexOfAny(ByRef s As String, ByRef OfAny As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As Long
     Dim Range As ListRange
     
@@ -534,14 +479,16 @@ Public Function IndexOfAny(ByRef s As String, ByRef OfAny As Variant, Optional B
 End Function
 
 ''
-' Returns the index of the first character found in the <i>OfAny<i> set of characters searching from the end of the string.
+' Reports the zero-based index of the first occurrence in <i>s</i> of any character in a specified array of Unicode characters.
+' The search starts at a specified character position and examines a specified number of character positions.
 '
 ' @param s The string to be searched.
-' @param OfAny The set of characters to search for (String or Integer() Array).
-' @param StartIndex The starting index of <i>s</i> to begin searching.
-' @param Count The number of characters in <i>s</i> to search.
-' @return The index of a character from the set, or -1 if none are found.
-' @remarks The <i>StartIndex</i> is zero-based.
+' @param OfAny A Unicode character array containing one or more characters to seek. This accepts <b>String</b> or <b>Integer()</b>.
+' @param StartIndex The search starting position. The search proceeds from <i>StartIndex</i> toward the beginning of <i>s</i>.
+' @param Count The number of characters in <i>s</i> to examine.
+' @return The index position of the last occurrence in <i>s</i> where any character in <i>AnyOf</i> was found; -1 if no character in <i>AnyOf</i> was found or if <i>s</i> is empty.
+' @see #IndexOfAny
+' @include "..\DocIncludes\CorString.LastIndexOfAny.html"
 Public Function LastIndexOfAny(ByRef s As String, ByRef OfAny As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As Long
     Dim Range As ListRange
     
@@ -562,13 +509,14 @@ Public Function LastIndexOfAny(ByRef s As String, ByRef OfAny As Variant, Option
 End Function
 
 ''
-' Inserts a string into an existing string, returning the result.
+' Returns a new string in which a specified string is inserted at a specified index position in <i>s</i>.
 '
 ' @param s The string to insert to.
-' @param StartIndex The starting position to insert the string.
-' @param Value The string to be inserted.
-' @return A string containing the new string created from the insertion.
-' @remarks <i>StartIndex</i> is zero-based.
+' @param StartIndex The zero-base index position of the insertion.
+' @param Value The string to insert.
+' @return A new string that is equivalent to this instance, but with <i>Value</i> inserted at position <i>StartIndex</i>.
+' @see #Remove
+' @include "..\DocIncludes\CorString.Insert.html"
 Public Function Insert(ByRef s As String, ByVal StartIndex As Long, ByRef Value As String) As String
     Dim ValueLength As Long
     Dim SourcePtr As Long
@@ -1364,7 +1312,7 @@ Private Function FormatCore(ByRef Provider As IFormatProvider, ByRef Format As S
         Error.ArgumentNull "Args", ArgumentNull_Array
     
     Dim Output As StringBuilder
-    Set Output = StringBuilderCache.Acquire
+    Set Output = StringBuilderCache.Acquire(Len(Format) + Len1D(Args) * 8)
     Output.AppendFormatArrayEx Provider, Format, Args
     FormatCore = StringBuilderCache.GetStringAndRelease(Output)
 End Function

@@ -20,99 +20,97 @@
 		<td>An error occurred while comparing two elements.</td>
 	</tr>
 </table>
-@example The following code example shows how to sort the values in a range of elements in an <a href="ArrayList.html">ArrayList</a> using the default comparer and a custom comparer that reverses the sort order.
+@examples The following code example shows how to sort the values in a range of elements in an <a href="ArrayList.html">ArrayList</a> using the default comparer and a custom comparer that reverses the sort order.
 <p>There are two modules created for this example. A BAS module containing the <b>Main</b> method
 and a Class module implementing the <a href="IComparer.html">IComparer</a> interface.</p>
 <p>The following is a <b>Visual Basic Class</b> module named <b>MyReverserClass</b>.</p>
-<pre>
-Option Explicit
-Implements IComparer
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Option</span> Explicit
+<span style="color: #0000ff">Implements</span> IComparer
 
-Private mComparer As New CaseInsensitiveComparer
+<span style="color: #0000ff">Private</span> mComparer <span style="color: #0000ff">As</span> <span style="color: #0000ff">New</span> CaseInsensitiveComparer
 
-Public Function Compare(ByRef a As Variant, ByRef b As Variant) As Long
+<span style="color: #0000ff">Public</span> <span style="color: #0000ff">Function</span> Compare(<span style="color: #0000ff">ByRef</span> a <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>, <span style="color: #0000ff">ByRef</span> b <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>) <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
     Compare = mComparer.Compare(b, a)
-End Function
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Function</span>
 
 
-''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-''   IComparer
-''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Function IComparer_Compare(a As Variant, b As Variant) As Long
+<span style="color: #008000">&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;</span>
+<span style="color: #008000">&#39;   IComparer</span>
+<span style="color: #008000">&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;</span>
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Function</span> IComparer_Compare(a <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>, b <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>) <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
     IComparer_Compare = Compare(a, b)
-End Function
-</pre>
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Function</span>
+</pre></div>
 <br/>
 <p>The following is a <b>Visual Basic BAS</b> module containing <b>Main</b> start-up method.</p>
-<pre>
-Public Sub Main()
-    Dim List As New ArrayList
-    Dim MyComparer As New MyReverserClass
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> List <span style="color: #0000ff">As</span> <span style="color: #0000ff">New</span> ArrayList
+    <span style="color: #0000ff">Dim</span> MyComparer <span style="color: #0000ff">As</span> <span style="color: #0000ff">New</span> MyReverserClass
     
-    List.Add "The"
-    List.Add "QUICK"
-    List.Add "BROWN"
-    List.Add "FOX"
-    List.Add "jumped"
-    List.Add "over"
-    List.Add "the"
-    List.Add "lazy"
-    List.Add "dog"
+    List.Add <span style="color: #a31515">&quot;The&quot;</span>
+    List.Add <span style="color: #a31515">&quot;QUICK&quot;</span>
+    List.Add <span style="color: #a31515">&quot;BROWN&quot;</span>
+    List.Add <span style="color: #a31515">&quot;FOX&quot;</span>
+    List.Add <span style="color: #a31515">&quot;jumped&quot;</span>
+    List.Add <span style="color: #a31515">&quot;over&quot;</span>
+    List.Add <span style="color: #a31515">&quot;the&quot;</span>
+    List.Add <span style="color: #a31515">&quot;lazy&quot;</span>
+    List.Add <span style="color: #a31515">&quot;dog&quot;</span>
     
-    Debug.Print "The ArrayList initially contains the following values:"
+    Debug.Print <span style="color: #a31515">&quot;The ArrayList initially contains the following values:&quot;</span>
     PrintIndexAndValues List
     
-    List.Sort 1, 3, Nothing
-    Debug.Print "After sorting from index 1 to index 3 with the default comparer:"
+    List.Sort 1, 3, <span style="color: #0000ff">Nothing</span>
+    Debug.Print <span style="color: #a31515">&quot;After sorting from index 1 to index 3 with the default comparer:&quot;</span>
     PrintIndexAndValues List
     
     List.Sort 1, 3, MyComparer
-    Debug.Print "After sorting from index 1 to index 3 with the reverse case-insensitive comparer:"
+    Debug.Print <span style="color: #a31515">&quot;After sorting from index 1 to index 3 with the reverse case-insensitive comparer:&quot;</span>
     PrintIndexAndValues List
-End Sub
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
 
-Private Sub PrintIndexAndValues(ByVal List As ArrayList)
-    Dim i As Long
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> PrintIndexAndValues(<span style="color: #0000ff">ByVal</span> List <span style="color: #0000ff">As</span> ArrayList)
+    <span style="color: #0000ff">Dim</span> i <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
     
-    For i = 0 To List.Count - 1
-        Debug.Print CorString.Format(t("\t[{0}]:\t{1}"), i, List(i))
-    Next
+    <span style="color: #0000ff">For</span> i = 0 <span style="color: #0000ff">To</span> List.Count - 1
+        Debug.Print CorString.Format(t(<span style="color: #a31515">&quot;\t[{0}]:\t{1}&quot;</span>), i, List(i))
+    <span style="color: #0000ff">Next</span>
     
     Debug.Print
-End Sub
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
 
-'' This code produces the following output (individual values may vary because they are randomly generate):
-''
-'' The ArrayList initially contains the following values:
-''    [0]:    The
-''    [1]:    QUICK
-''    [2]:    BROWN
-''    [3]:    FOX
-''    [4]:    jumped
-''    [5]:    over
-''    [6]:    the
-''    [7]:    lazy
-''    [8]:    dog
-''
-'' After sorting from index 1 to index 3 with the default comparer:
-''    [0]:    The
-''    [1]:    BROWN
-''    [2]:    FOX
-''    [3]:    QUICK
-''    [4]:    jumped
-''    [5]:    over
-''    [6]:    the
-''    [7]:    lazy
-''    [8]:    dog
-''
-'' After sorting from index 1 to index 3 with the reverse case-insensitive comparer:
-''    [0]:    The
-''    [1]:    QUICK
-''    [2]:    FOX
-''    [3]:    BROWN
-''    [4]:    jumped
-''    [5]:    over
-''    [6]:    the
-''    [7]:    lazy
-''    [8]:    dog
-</pre>
+<span style="color: #008000">&#39; This code produces the following output (individual values may vary because they are randomly generate):</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39; The ArrayList initially contains the following values:</span>
+<span style="color: #008000">&#39;    [0]:    The</span>
+<span style="color: #008000">&#39;    [1]:    QUICK</span>
+<span style="color: #008000">&#39;    [2]:    BROWN</span>
+<span style="color: #008000">&#39;    [3]:    FOX</span>
+<span style="color: #008000">&#39;    [4]:    jumped</span>
+<span style="color: #008000">&#39;    [5]:    over</span>
+<span style="color: #008000">&#39;    [6]:    the</span>
+<span style="color: #008000">&#39;    [7]:    lazy</span>
+<span style="color: #008000">&#39;    [8]:    dog</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39; After sorting from index 1 to index 3 with the default comparer:</span>
+<span style="color: #008000">&#39;    [0]:    The</span>
+<span style="color: #008000">&#39;    [1]:    BROWN</span>
+<span style="color: #008000">&#39;    [2]:    FOX</span>
+<span style="color: #008000">&#39;    [3]:    QUICK</span>
+<span style="color: #008000">&#39;    [4]:    jumped</span>
+<span style="color: #008000">&#39;    [5]:    over</span>
+<span style="color: #008000">&#39;    [6]:    the</span>
+<span style="color: #008000">&#39;    [7]:    lazy</span>
+<span style="color: #008000">&#39;    [8]:    dog</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39; After sorting from index 1 to index 3 with the reverse case-insensitive comparer:</span>
+<span style="color: #008000">&#39;    [0]:    The</span>
+<span style="color: #008000">&#39;    [1]:    QUICK</span>
+<span style="color: #008000">&#39;    [2]:    FOX</span>
+<span style="color: #008000">&#39;    [3]:    BROWN</span>
+<span style="color: #008000">&#39;    [4]:    jumped</span>
+<span style="color: #008000">&#39;    [5]:    over</span>
+<span style="color: #008000">&#39;    [6]:    the</span>
+<span style="color: #008000">&#39;    [7]:    lazy</span>
+<span style="color: #008000">&#39;    [8]:    dog</span>
+</pre></div>

@@ -18,53 +18,45 @@
    </tr>
 </table>
 <p><i>Args</i> represents the objects to be formatted. Each format item in <i>Format</i> is replaced with the string representation of the corresponding object in <i>args</i>. If the format item includes <i>formatString</i> and the corresponding object in <i>Args</i> implements the <a href="IFormattable.html">IFormattable</a> interface, then <b>Args(index).ToString(formatString, provider)</b> defines the formatting. Otherwise, <b>Object.ToString(Args(index))</b> defines the formatting.</p>
-<h4>Example</h4>
-<pre>
-'' This example uses the <b>AppendFormat</b> method to insert
-'' values into the string with formatting information. The
-'' output will show how the formatting information was used
-'' to transform the arguments into a formatted output.
-Private Sub Main()
-    Dim sb As New StringBuilder
+@examples This example uses the <b>AppendFormat</b> method to insert values into the string with formatting information. The output will show how the formatting information was used to transform the arguments into a formatted output.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> sb <span style="color: #0000ff">As</span> <span style="color: #0000ff">New</span> StringBuilder
     
-    '' Indicates the index of the supplied
-    '' arguments to be inserted into the string.
-    sb.AppendFormat "My name {0}.", "Kelly"
+    <span style="color: #008000">&#39; Indicates the index of the supplied</span>
+    <span style="color: #008000">&#39; arguments to be inserted into the string.</span>
+    sb.AppendFormat <span style="color: #a31515">&quot;My name {0}.&quot;</span>, <span style="color: #a31515">&quot;Kelly&quot;</span>
     sb.AppendLine
     
-    '' Insert an integer value that is 5 digits
-    '' in length, prepending leading zeros if necessary.
-    sb.AppendFormat "A number with leading zeros: {0:d5}.", 23
+    <span style="color: #008000">&#39; Insert an integer value that is 5 digits</span>
+    <span style="color: #008000">&#39; in length, prepending leading zeros if necessary.</span>
+    sb.AppendFormat <span style="color: #a31515">&quot;A number with leading zeros: {0:d5}.&quot;</span>, 23
     sb.AppendLine
     
-    '' Inserts the value into a column of 10 characters
-    '' with alignment to the right of the column.
-    sb.AppendFormat "Right aligned 10 character column: '{0,10}'.", "right"
+    <span style="color: #008000">&#39; Inserts the value into a column of 10 characters</span>
+    <span style="color: #008000">&#39; with alignment to the right of the column.</span>
+    sb.AppendFormat <span style="color: #a31515">&quot;Right aligned 10 character column: &#39;{0,10}&#39;.&quot;</span>, <span style="color: #a31515">&quot;right&quot;</span>
     sb.AppendLine
     
-    '' Inserts the value into a column of 10 characters
-    '' with alignment fo the left of the column.
-    sb.AppendFormat "Left aligned 10 character column: '{0,-10}'.", "left"
+    <span style="color: #008000">&#39; Inserts the value into a column of 10 characters</span>
+    <span style="color: #008000">&#39; with alignment fo the left of the column.</span>
+    sb.AppendFormat <span style="color: #a31515">&quot;Left aligned 10 character column: &#39;{0,-10}&#39;.&quot;</span>, <span style="color: #a31515">&quot;left&quot;</span>
     sb.AppendLine
     
-    '' To prevent the insertion of an argument and allow
-    '' for curly braces to be inserted into the string, two
-    '' braces must be placed together to cause an escape from
-    '' the formatting sequence.
-    sb.AppendFormat "Use two braces to put a single brace in the output without formatting. {{0}}", "No Used"
+    <span style="color: #008000">&#39; To prevent the insertion of an argument and allow</span>
+    <span style="color: #008000">&#39; for curly braces to be inserted into the string, two</span>
+    <span style="color: #008000">&#39; braces must be placed together to cause an escape from</span>
+    <span style="color: #008000">&#39; the formatting sequence.</span>
+    sb.AppendFormat <span style="color: #a31515">&quot;Use two braces to put a single brace in the output without formatting. {{0}}&quot;</span>, <span style="color: #a31515">&quot;Not Used&quot;</span>
     
-    '' Display the contents of the StringBuilder
-    Console.WriteLine sb
-    
-    '' Wait for user to press enter
-    Console.ReadLine
-End Sub
+    <span style="color: #008000">&#39; Display the contents of the StringBuilder</span>
+    Debug.Print sb.ToString
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
 
-'' This code produces the following output.
-''
-'' My name Kelly.
-'' A number with leading zeros: 00023.
-'' Right aligned 10 character column: '     right'.
-'' Left aligned 10 character column: 'left      '.
-'' Use two braces to put a single brace in the output without formatting. {0}
-</pre>
+<span style="color: #008000">&#39; This code produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39; My name Kelly.</span>
+<span style="color: #008000">&#39; A number with leading zeros: 00023.</span>
+<span style="color: #008000">&#39; Right aligned 10 character column: &#39;     right&#39;.</span>
+<span style="color: #008000">&#39; Left aligned 10 character column: &#39;left      &#39;.</span>
+<span style="color: #008000">&#39; Use two braces to put a single brace in the output without formatting. {0}</span>
+</pre></div>

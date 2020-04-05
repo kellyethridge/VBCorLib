@@ -20,44 +20,43 @@
         <td><i>Value</i> is not comparable to the elements in <i>Arr</i>.</td>
     </tr>
 </table>
-@example The example code searches a sorted list for values, displaying the index found, or the index the value should have been found.
-<pre>
-Private Sub Main()
-    Dim Ints() As Integer
+@examples The example code searches a sorted list for values, displaying the index found, or the index the value should have been found.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> Ints() <span style="color: #0000ff">As</span> <span style="color: #2b91af">Integer</span>
     
-    '' Create a sorted array with the value 7 missing.
+    <span style="color: #008000">&#39; Create a sorted array with the value 7 missing.</span>
     Ints = NewIntegers(1, 2, 3, 4, 5, 6, 8, 9, 10)
     
-    '' Search for the value 6.
+    <span style="color: #008000">&#39; Search for the value 6.</span>
     Search Ints, 6
     
-    '' Search for the missing value 7.
+    <span style="color: #008000">&#39; Search for the missing value 7.</span>
     Search Ints, 7
-End Sub
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
 
-'' Performs a binary search on the array, searching for
-'' the requested value. If the value is found, then the
-'' search index will be equal or greater than the lower-bound
-'' of the array, otherwise, the value was not found.
-Private Sub Search(ByRef Ints() As Integer, ByVal Value As Integer)
-    Dim Index As Long
+<span style="color: #008000">&#39; Performs a binary search on the array, searching for</span>
+<span style="color: #008000">&#39; the requested value. If the value is found, then the</span>
+<span style="color: #008000">&#39; search index will be equal or greater than the lower-bound</span>
+<span style="color: #008000">&#39; of the array, otherwise, the value was not found.</span>
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> Search(<span style="color: #0000ff">ByRef</span> Ints() <span style="color: #0000ff">As</span> <span style="color: #2b91af">Integer</span>, <span style="color: #0000ff">ByVal</span> Value <span style="color: #0000ff">As</span> <span style="color: #2b91af">Integer</span>)
+    <span style="color: #0000ff">Dim</span> Index <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
     
     Index = CorArray.BinarySearch(Ints, Value)
     
-    '' If the index is not less then then lower-bound
-    '' of the array, then the value was found.
-    If Index >= LBound(Ints) Then
-        Debug.Print CorString.Format("Value [{0}] found at index [{1}].", Value, Index)
-    Else
-        '' The value was not found. To determine where
-        '' the value should have been found, use Not to
-        '' negate the returned index value.
-        Index = Not Index
-        Debug.Print CorString.Format("Value [{0}] should be at index [{1}].", Value, Index)
-    End If
-End Sub
+    <span style="color: #008000">&#39; If the index is not less then then lower-bound</span>
+    <span style="color: #008000">&#39; of the array, then the value was found.</span>
+    <span style="color: #0000ff">If</span> Index &gt;= LBound(Ints) <span style="color: #0000ff">Then</span>
+        Debug.Print CorString.Format(<span style="color: #a31515">&quot;Value [{0}] found at index [{1}].&quot;</span>, Value, Index)
+    <span style="color: #0000ff">Else</span>
+        <span style="color: #008000">&#39; The value was not found. To determine where</span>
+        <span style="color: #008000">&#39; the value should have been found, use Not to</span>
+        <span style="color: #008000">&#39; negate the returned index value.</span>
+        Index = <span style="color: #0000ff">Not</span> Index
+        Debug.Print CorString.Format(<span style="color: #a31515">&quot;Value [{0}] should be at index [{1}].&quot;</span>, Value, Index)
+    <span style="color: #0000ff">End</span> <span style="color: #0000ff">If</span>
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
 
-'' This code produces the following output.
-''  Value [6] found at index [5].
-''  Value [7] should be at index [6].
-</pre>
+<span style="color: #008000">&#39; This code produces the following output.</span>
+<span style="color: #008000">&#39;  Value [6] found at index [5].</span>
+<span style="color: #008000">&#39;  Value [7] should be at index [6].</span>
+</pre></div>

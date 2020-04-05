@@ -12,31 +12,31 @@
 		<td><i>Arr</i> has more than one dimension.</td>
 	</tr>
 </table>
-@example The following code example checks two arrays for containing only ages 18 or older.
-<pre>
-Private Sub Main()
-    Dim Adults() As Long
-    Dim Mixed() As Long
+@examples The following code example checks two arrays for containing only ages 18 or older.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> Adults() <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
+    <span style="color: #0000ff">Dim</span> Mixed() <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
         
     Adults = NewLongs(22, 45, 37, 62, 18)
     Mixed = NewLongs(29, 33, 16, 49, 13)
     
-    Debug.Print "Adults array has only adults:"
-    Debug.Print CorArray.TrueForAll(Adults, AddressOf Age18OrOlder)
+    Debug.Print <span style="color: #a31515">&quot;Adults array has only adults:&quot;</span>
+    Debug.Print CorArray.TrueForAll(Adults, <span style="color: #0000ff">AddressOf</span> Age18OrOlder)
     
-    Debug.Print t("\nMixed array has only adults:")
-    Debug.Print CorArray.TrueForAll(Mixed, AddressOf Age18OrOlder)
-End Sub
+    Debug.Print t(<span style="color: #a31515">&quot;\nMixed array has only adults:&quot;</span>)
+    Debug.Print CorArray.TrueForAll(Mixed, <span style="color: #0000ff">AddressOf</span> Age18OrOlder)
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
 
-'' The method accepts a ByRef parameter of the array element type.
-Private Function Age18OrOlder(ByRef Age As Long) As Boolean
-    Age18OrOlder = Age >= 18
-End Function
+<span style="color: #008000">&#39; The method accepts a ByRef parameter of the array element type.</span>
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Function</span> Age18OrOlder(<span style="color: #0000ff">ByRef</span> Age <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>) <span style="color: #0000ff">As</span> <span style="color: #2b91af">Boolean</span>
+    Age18OrOlder = Age &gt;= 18
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Function</span>
 
-'' This code example produces the following output.
-''    Adults array has only adults:
-''    True
-''
-''    Mixed array has only adults:
-''    False
-</pre>
+<span style="color: #008000">&#39; This code example produces the following output.</span>
+<span style="color: #008000">&#39;    Adults array has only adults:</span>
+<span style="color: #008000">&#39;    True</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    Mixed array has only adults:</span>
+<span style="color: #008000">&#39;    False</span>
+</pre></div>
+

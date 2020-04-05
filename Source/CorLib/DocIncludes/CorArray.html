@@ -1,62 +1,61 @@
-@example The following code example uses <a href="CorArray.Copy.html">CorArray.Copy</a> and <a href="CorArray.CopyEx.html">CorArray.CopyEx</a>
+@examples The following code example uses <a href="CorArray.Copy.html">CorArray.Copy</a> and <a href="CorArray.CopyEx.html">CorArray.CopyEx</a>
 to copy elements between an <b>Integer</b> array and a <b>Variant</b> array.
-<pre>
-Public Sub Main()
-    Dim MyIntArray() As Integer
-    Dim MyVarArray() As Variant
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> MyIntArray() <span style="color: #0000ff">As</span> <span style="color: #2b91af">Integer</span>
+    <span style="color: #0000ff">Dim</span> MyVarArray() <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>
     
-    '' Creates and initializes a new Integer array and a new Variant array.
+    <span style="color: #008000">&#39; Creates and initializes a new Integer array and a new Variant array.</span>
     MyIntArray = NewIntegers(1, 2, 3, 4, 5)
     MyVarArray = NewVariants(26, 27, 28, 29, 30)
     
-    '' Prints the initial values of both arrays.
-    Debug.Print "Initially,"
-    Debug.Print "Integer Array: ";
+    <span style="color: #008000">&#39; Prints the initial values of both arrays.</span>
+    Debug.Print <span style="color: #a31515">&quot;Initially,&quot;</span>
+    Debug.Print <span style="color: #a31515">&quot;Integer Array: &quot;</span><span style="border: 1px solid #FF0000">;</span>
     PrintValues MyIntArray
-    Debug.Print "Variant Array: ";
+    Debug.Print <span style="color: #a31515">&quot;Variant Array: &quot;</span><span style="border: 1px solid #FF0000">;</span>
     PrintValues MyVarArray
     
-    '' Copies the first two elements from the Integer array to the Variant array.
+    <span style="color: #008000">&#39; Copies the first two elements from the Integer array to the Variant array.</span>
     CorArray.Copy MyIntArray, MyVarArray, 2
     
-    '' Prints the values of the modified arrays.
-    Debug.Print t("\nAfter copying the first two elements of the Integer array to the Variant array,")
-    Debug.Print "Integer Array: ";
+    <span style="color: #008000">&#39; Prints the values of the modified arrays.</span>
+    Debug.Print t(<span style="color: #a31515">&quot;\nAfter copying the first two elements of the Integer array to the Variant array,&quot;</span>)
+    Debug.Print <span style="color: #a31515">&quot;Integer Array: &quot;</span><span style="border: 1px solid #FF0000">;</span>
     PrintValues MyIntArray
-    Debug.Print "Variant Array: ";
+    Debug.Print <span style="color: #a31515">&quot;Variant Array: &quot;</span><span style="border: 1px solid #FF0000">;</span>
     PrintValues MyVarArray
     
-    '' Copies the last two elements from the Object array to the integer array.
+    <span style="color: #008000">&#39; Copies the last two elements from the Object array to the integer array.</span>
     CorArray.CopyEx MyVarArray, UBound(MyVarArray) - 1, MyIntArray, UBound(MyIntArray) - 1, 2
     
-    '' Prints the values of the modified arrays.
-    Debug.Print t("\nAfter copying the last two elements of the Object array to the integer array,")
-    Debug.Print "Integer Array: ";
+    <span style="color: #008000">&#39; Prints the values of the modified arrays.</span>
+    Debug.Print t(<span style="color: #a31515">&quot;\nAfter copying the last two elements of the Object array to the integer array,&quot;</span>)
+    Debug.Print <span style="color: #a31515">&quot;Integer Array: &quot;</span><span style="border: 1px solid #FF0000">;</span>
     PrintValues MyIntArray
-    Debug.Print "Variant Array: ";
+    Debug.Print <span style="color: #a31515">&quot;Variant Array: &quot;</span><span style="border: 1px solid #FF0000">;</span>
     PrintValues MyVarArray
-End Sub
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
 
-Private Sub PrintValues(ByRef MyArr As Variant)
-    Dim Value As Variant
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> PrintValues(<span style="color: #0000ff">ByRef</span> MyArr <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>)
+    <span style="color: #0000ff">Dim</span> Value <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>
     
-    For Each Value In MyArr
-        Debug.Print CorString.Format("{0,5}", Value);
-    Next
+    <span style="color: #0000ff">For</span> <span style="color: #0000ff">Each</span> Value <span style="color: #0000ff">In</span> MyArr
+        Debug.Print CorString.Format(<span style="color: #a31515">&quot;{0,5}&quot;</span>, Value)<span style="border: 1px solid #FF0000">;</span>
+    <span style="color: #0000ff">Next</span>
     
     Debug.Print
-End Sub
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
 
-'' The code example produces the following output.
-''    Initially,
-''    Integer Array:     1    2    3    4    5
-''    Variant Array:    26   27   28   29   30
-''
-''    After copying the first two elements of the Integer array to the Variant array,
-''    Integer Array:     1    2    3    4    5
-''    Variant Array:     1    2   28   29   30
-''
-''    After copying the last two elements of the Object array to the integer array,
-''    Integer Array:     1    2    3   29   30
-''    Variant Array:     1    2   28   29   30
-</pre>
+<span style="color: #008000">&#39; The code example produces the following output.</span>
+<span style="color: #008000">&#39;    Initially,</span>
+<span style="color: #008000">&#39;    Integer Array:     1    2    3    4    5</span>
+<span style="color: #008000">&#39;    Variant Array:    26   27   28   29   30</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    After copying the first two elements of the Integer array to the Variant array,</span>
+<span style="color: #008000">&#39;    Integer Array:     1    2    3    4    5</span>
+<span style="color: #008000">&#39;    Variant Array:     1    2   28   29   30</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    After copying the last two elements of the Object array to the integer array,</span>
+<span style="color: #008000">&#39;    Integer Array:     1    2    3   29   30</span>
+<span style="color: #008000">&#39;    Variant Array:     1    2   28   29   30</span>
+</pre></div>

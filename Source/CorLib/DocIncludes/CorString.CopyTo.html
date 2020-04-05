@@ -1,0 +1,52 @@
+@remarks This method copies <i>Count</i> characters from the <i>SourceIndex</i> position of <i>Source</i> to the <i>DestinationIndex</i> position of destination character array.
+This method does not resize the destination character array; it must have a sufficient number of elements to accommodate the copied characters or the method throws an <a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a>.
+<p><i>SourceIndex</i> is zero-based, and <i>DestinationIndex</i> is lower-bound based.</p>
+@exceptions
+<table style="width: auto">
+  <tr>
+      <th>Exception</th>
+      <th>Condition</th>
+  </tr>
+  <tr>
+       <td><a href="ArgumentNullException.html">ArgumentNullException</a></td><td><i>Destination</i> is <b>null</b>.</td>
+  </tr>
+   <tr>
+       <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+       <td>
+          <i>SourceIndex</i> or <i>Count</i> is negative.<br/>
+          -or-<br/>
+          <i>DestinationIndex</i> is less than the lower-bound of <i>Destination</i>.<br/>
+          -or-<br/>
+          <i>Count</i> is greater than the length of the substring from <i>StartIndex</i> to the end of the string.<br/>
+          -or-<br/>
+          <i>Count</i> is greater than the length of the subarray from <i>DestinationIndex</i> to the upper-bound of the <i>Destination</i> array.
+       </td>
+   </tr>
+</table>
+@examples The following example demonstrates the <b>CopyTo</b> method.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> StrSource       <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+    <span style="color: #0000ff">Dim</span> Destination()   <span style="color: #0000ff">As</span> <span style="color: #2b91af">Integer</span>
+    
+    StrSource = <span style="color: #a31515">&quot;changed&quot;</span>
+    Destination = NewChars(<span style="color: #a31515">&quot;T&quot;</span>, <span style="color: #a31515">&quot;h&quot;</span>, <span style="color: #a31515">&quot;e&quot;</span>, <span style="color: #a31515">&quot; &quot;</span>, <span style="color: #a31515">&quot;i&quot;</span>, <span style="color: #a31515">&quot;n&quot;</span>, <span style="color: #a31515">&quot;i&quot;</span>, <span style="color: #a31515">&quot;t&quot;</span>, <span style="color: #a31515">&quot;i&quot;</span>, <span style="color: #a31515">&quot;a&quot;</span>, <span style="color: #a31515">&quot;l&quot;</span>, <span style="color: #a31515">&quot; &quot;</span>, <span style="color: #a31515">&quot;a&quot;</span>, <span style="color: #a31515">&quot;r&quot;</span>, <span style="color: #a31515">&quot;r&quot;</span>, <span style="color: #a31515">&quot;a&quot;</span>, <span style="color: #a31515">&quot;y&quot;</span>)
+    
+    Debug.Print NewString(Destination)
+    
+    CorString.CopyTo StrSource, 0, Destination, 4, Len(StrSource)
+    
+    Debug.Print NewString(Destination)
+    
+    StrSource = <span style="color: #a31515">&quot;A different string&quot;</span>
+    
+    CorString.CopyTo StrSource, 2, Destination, 3, 9
+    
+    Debug.Print NewString(Destination)
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; This example produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    The initial array</span>
+<span style="color: #008000">&#39;    The changed array</span>
+<span style="color: #008000">&#39;    Thedifferentarray</span>
+</pre></div>

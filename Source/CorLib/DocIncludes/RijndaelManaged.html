@@ -1,42 +1,59 @@
-@remarks <p>This example shows a very simple method of encrypting then decrypting a String value.
-<pre>
-Private Sub Main()
-    '' Create a new Rijndael key.
-    Dim Key As New RijndaelManaged
-
-    '' Encrypt a string to a byte array.
-    Dim Buffer() As Byte
-    Buffer = Encrypt("This is some plaintext!", Key)
-
-    '' Decrypt the byte array back to a string.
-    Dim PlainText As String
+@examples This example shows a very simple method of encrypting then decrypting a <b>String</b> value.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> Key <span style="color: #0000ff">As</span> <span style="color: #0000ff">New</span> RijndaelManaged
+    <span style="color: #0000ff">Dim</span> Buffer() <span style="color: #0000ff">As</span> <span style="color: #2b91af">Byte</span>
+    <span style="color: #0000ff">Dim</span> PlainText <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+    
+    <span style="color: #008000">&#39; Encrypt a string to a byte array.</span>
+    Buffer = Encrypt(<span style="color: #a31515">&quot;This is some plaintext!&quot;</span>, Key)
+    
+    Debug.Print <span style="color: #a31515">&quot;Encrypted data&quot;</span>
+    PrintBytes Buffer
+    Debug.Print
+    
+    <span style="color: #008000">&#39; Decrypt the byte array back to a string.</span>
     PlainText = Decrypt(Buffer, Key)
 
-    '' Display the plaintext value to the console.
-    Console.WriteLine PlainText
-    Console.ReadKey
-End Sub 'Main
+    <span style="color: #008000">&#39; Display the plaintext value to the console.</span>
+    Debug.Print <span style="color: #a31515">&quot;Original data&quot;</span>
+    Debug.Print PlainText
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
 
-
-'' Encrypt the string.
-Private Function Encrypt(ByVal PlainText As String, ByVal Key As SymmetricAlgorithm) As Byte()
-    Dim Buffer() As Byte
-    Buffer = StrConv(PlainText, vbFromUnicode)
-
-    Dim Encryptor As ICryptoTransform
-    Set Encryptor = Key.CreateEncryptor
-    Encrypt = Encryptor.TransformFinalBlock(Buffer, 0, cArray.GetLength(Buffer))
-End Function
-
-
-'' Decrypt the byte array.
-Public Function Decrypt(ByRef CypherText() As Byte, ByVal Key As SymmetricAlgorithm) As String
-    Dim Decryptor As ICryptoTransform
-    Set Decryptor = Key.CreateDecryptor
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> PrintBytes(<span style="color: #0000ff">ByRef</span> Bytes() <span style="color: #0000ff">As</span> <span style="color: #2b91af">Byte</span>)
+    <span style="color: #0000ff">Dim</span> i <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
     
-    Dim Buffer() As Byte
-    Buffer = Decryptor.TransformFinalBlock(CypherText, 0, cArray.GetLength(CypherText))
-    Decrypt = StrConv(Buffer, vbUnicode)
-End Function
+    <span style="color: #0000ff">For</span> i = LBound(Bytes) <span style="color: #0000ff">To</span> UBound(Bytes)
+        Debug.Print <span style="color: #2b91af">Object</span>.ToString(Bytes(i), <span style="color: #a31515">&quot;X2&quot;</span>)<span style="border: 1px solid #FF0000">;</span> <span style="color: #a31515">&quot; &quot;</span><span style="border: 1px solid #FF0000">;</span>
+    <span style="color: #0000ff">Next</span>
+    
+    Debug.Print
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
 
-</pre></p>
+<span style="color: #008000">&#39; Encrypt the string.</span>
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Function</span> Encrypt(<span style="color: #0000ff">ByVal</span> PlainText <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>, <span style="color: #0000ff">ByVal</span> Key <span style="color: #0000ff">As</span> SymmetricAlgorithm) <span style="color: #0000ff">As</span> <span style="color: #2b91af">Byte</span>()
+    <span style="color: #0000ff">Dim</span> Encryptor <span style="color: #0000ff">As</span> ICryptoTransform
+    <span style="color: #0000ff">Dim</span> Buffer() <span style="color: #0000ff">As</span> <span style="color: #2b91af">Byte</span>
+    
+    Buffer = Encoding.UTF8.GetBytes(PlainText)
+    <span style="color: #0000ff">Set</span> Encryptor = Key.CreateEncryptor
+    Encrypt = Encryptor.TransformFinalBlock(Buffer, 0, CorArray.Length(Buffer))
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Function</span>
+
+<span style="color: #008000">&#39; Decrypt the byte array.</span>
+<span style="color: #0000ff">Public</span> <span style="color: #0000ff">Function</span> Decrypt(<span style="color: #0000ff">ByRef</span> CypherText() <span style="color: #0000ff">As</span> <span style="color: #2b91af">Byte</span>, <span style="color: #0000ff">ByVal</span> Key <span style="color: #0000ff">As</span> SymmetricAlgorithm) <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+    <span style="color: #0000ff">Dim</span> Decryptor <span style="color: #0000ff">As</span> ICryptoTransform
+    <span style="color: #0000ff">Dim</span> Buffer() <span style="color: #0000ff">As</span> <span style="color: #2b91af">Byte</span>
+    
+    <span style="color: #0000ff">Set</span> Decryptor = Key.CreateDecryptor
+    Buffer = Decryptor.TransformFinalBlock(CypherText, 0, CorArray.Length(CypherText))
+    Decrypt = Encoding.UTF8.GetString(Buffer)
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Function</span>
+
+<span style="color: #008000">&#39; This example produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    Encrypted Data (may be different because key is generated)</span>
+<span style="color: #008000">&#39;    FA 5B 69 FB 30 48 B6 08 C3 68 4C 63 45 BE F9 FA 17 DC 4D B9 EC FC E7 84 3A 35 CB 41 1C 5E 1D E5</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    Original Data</span>
+<span style="color: #008000">&#39;    This is some plaintext!</span>
+</pre></div>

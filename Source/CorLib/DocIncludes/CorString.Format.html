@@ -1,6 +1,73 @@
-@remarks Formatting is performed by inserting argument values into indexed locations within the supplied formatting string.
-To indicate the index for an argument to be inserted into the string, a pair of curly braces encloses the index value ''{n}'.
-The indexes begin at zero. So the first argument can be referenced with ''{0}' in the formatting string. The braces and index
-value will be replaced with the argument at index 0 in the list. 
-<p>Additional formatting information can be supplied along with the index to further customize how the argument is to be formatted as a string. A colon is used to indicate additional formatting information ''{0:n}'. In this case the 'n' indicates that value should be formatted as a numeric value.</p>
-<h4>Examples</h4>
+@remarks This method uses the composite formatting feature of VBCorLib to convert the value of an object to its text representation and embed that representation in a string.
+<p>The <i>FormatText</i> parameter consists of zero or more runs of text intermixed with zero or more indexed placeholders, called format items, that correspond to a value in the parameter list of this method. The formatting process replaces each format item with the string representation of the corresponding value.</p>
+<p>The syntax of a format item is as follows:</p>
+<p>{<i>index</i>[,<i>length</i>][:<i>formatString</i>]}</p>
+<p>Elements in square brackets are optional. The following table describes each element.</p>
+<table style="width: auto">
+	<tr>
+		<th>Element</th><th>Description</th>
+	</tr>
+	<tr>
+		<td><i>index</i></td>
+		<td>The zero-based position in the parameter list of the value to be formatted. If the value specified by <i>index</i> is <b>Nothing</b>, the format item is replaced by an empty string (""). If there is no parameter in the <i>index</i> position, a <a href="FormatException.html">FormatException</a> is thrown.</td>
+	</tr>
+	<tr>
+		<td><i>,length</i></td>
+		<td>The minimum number of characters in the string representation of the parameter. If positive, the parameter is right-aligned; if negative, it is left-aligned.</td>
+	</tr>
+	<tr>
+		<td><i>:formatString</i></td>
+		<td>A standard or custom format string that is supported by the value to be formatted. Possible values for <i>formatString</i> are the same as the values supported by the value's <b>ToString(</b><i>FormatText</i><b>)</b> method. If <i>formatString</i> is not specified and the value to be formatted implements the <a href="IFormattable.html">IFormattable</a> interface, <b>vbNullString</b> is passed as the value of the <i>Format</i> parameter that is used as the <a href="IFormattable.ToString.html">IFormattable.ToString</a> format string.</td>
+	</tr>
+</table>
+<p>The leading and trailing brace characters, "{" and "}", are required. To specify a single literal brace character in <i>FormatText</i>, specify two leading or trailing brace characters; that is, "{{" or "}}".</p>
+@exceptions
+<table style="width: auto">
+	<tr>
+		<th>Exception</th><th>Condition</th>
+	</tr>
+	<tr>
+		<td><a href="FormatException.html">FormatException</a></td>
+		<td>
+			<i>FormatText</i> is invalid.<br/>
+			-or-<br/>
+			The index of a format item is less than zero, or greater than or equal to the length of the <i>Args</i> array.
+ 		</td>
+ 	</tr>
+</table>
+@examples 
+The following example creates a string that contains data on the high and low temperature on a particular date. Two of the format items define the width of their corresponding value's string representation, and the first format item also includes a standard date and time format string.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> Date1 <span style="color: #0000ff">As</span> <span style="color: #2b91af">Date</span>
+    <span style="color: #0000ff">Dim</span> HiTime <span style="color: #0000ff">As</span> TimeSpan
+    <span style="color: #0000ff">Dim</span> HiTemp <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>
+    <span style="color: #0000ff">Dim</span> LowTime <span style="color: #0000ff">As</span> TimeSpan
+    <span style="color: #0000ff">Dim</span> LowTemp <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>
+    <span style="color: #0000ff">Dim</span> Result <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+    <span style="color: #0000ff">Dim</span> Values() <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>
+    
+    Date1 = #7/1/2009#
+    <span style="color: #0000ff">Set</span> HiTime = NewTime(#2:17:32 PM#)
+    HiTemp = <span style="color: #0000ff">CDec</span>(62.1)
+    <span style="color: #0000ff">Set</span> LowTime = NewTime(#3:16:10 AM#)
+    LowTemp = <span style="color: #0000ff">CDec</span>(54.8)
+    
+    Result = CorString.Format(<span style="color: #a31515">&quot;Temperature on {0:d}:{5}{1,11}: {2} degrees (hi){5}{3,11}: {4} degrees (lo)&quot;</span>, Date1, HiTime, HiTemp, LowTime, LowTemp, vbCrLf)
+    Debug.Print Result
+    Debug.Print
+    
+    Values = Array(Date1, HiTime, HiTemp, LowTime, LowTemp, vbCrLf)
+    Result = CorString.FormatArray(<span style="color: #a31515">&quot;Temperature on {0:d}:{5}{1,11}: {2} degrees (hi){5}{3,11}: {4} degrees (lo)&quot;</span>, Values)
+    Debug.Print Result
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; This code produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    Temperature on 7/1/2009:</span>
+<span style="color: #008000">&#39;       14:17:32: 62.1 degrees (hi)</span>
+<span style="color: #008000">&#39;       03:16:10: 54.8 degrees (lo)</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    Temperature on 7/1/2009:</span>
+<span style="color: #008000">&#39;       14:17:32: 62.1 degrees (hi)</span>
+<span style="color: #008000">&#39;       03:16:10: 54.8 degrees (lo)</span>
+</pre></div>

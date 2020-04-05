@@ -1,11 +1,11 @@
 @remarks <p>The <b>Equals</b> method is used to check for equality between two objects. It is up to each object to perform the equality check through the <b>Equals</b> so <b>VBCorLib</b> can function correctly when handling objects.</p>
 <p>The <b>Equals</b> method should be overridden to provide the type of equality checking that is appropriate for each class.  Most classes simply check to see if the value is the same object instance as this object, meaning, they are both the same object in memory. For example <a href="CorDateTime.html">CorDateTime</a> checks for equality by comparing the dates of the two objects. And <a href="TimeSpan.html">TimeSpan</a> checks to see if the value has the same number of milliseconds to determine equality.</p>
 <p>This method should not throw an exception. If a value passed in cannot be used for comparison then <b>False</b> should be returned.</p>
-<h4>Examples</h4>
+@examples
 <p>The following code example demonstrates an implementation of the <b>Equals</b> method that may be more appropriate than the default method.</p>
 <p>A Point class is created with the <a href="IObject.html">IObject</a> interface appropriate for the class.</p>
 <b>Point.cls</b>
-<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Option</span> Explicit
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Option</span> Explicit
 <span style="color: #0000ff">Implements</span> IObject
 
 <span style="color: #0000ff">Public</span> X <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>

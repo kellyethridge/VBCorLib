@@ -1,61 +1,54 @@
-@remarks
-' <p>This table is from the Microsoft Dot NET 1.1 MSDN.
-' <table>
-' <tr>
-' <th width="50%">Format Character</th><th>Description and Associated Properties</th>
-' </tr>
-' <tr>
-' <td>c, C</td>
-' <td>Currency format. CurrencyNegativePattern, CurrencyPositivePattern, CurrencySymbol, CurrencyGroupSizes, CurrencyGroupSeparator, CurrencyDecimalDigits, CurrencyDecimalSeparator.</td>
-' </tr>
-' <tr>
-' <td>d, D</td>
-' <td>Decimal format.</td>
-' </tr>
-' <td>e, E</td>
-' <td>Scientific (exponential) format.</td>
-' </tr>
-' <tr>
-' <td>f, F</td>
-' <td>Fixed-point format.</td>
-' </tr>
-' <tr>
-' <td>g, G</td>
-' <td>General format.</td>
-' </tr>
-' <tr>
-' <td>n, N</td>
-' <td>Number format. NumberNegativePattern, NumberGroupSizes, NumberGroupSeparator, NumberDecimalDigits, NumberDecimalSeparator.</td>
-' </tr>
-' <tr>
-' <td>x, X</td>
-' <td>Hexadecimal format.</td>
-' </tr>
-' </table>
-' </p>
-<pre>
-'' This example shows how to format a value as a currency using
-'' the default formatting setting and a custom setting.
-Private Sub Main()
-    Dim f As New NumberFormatInfo
+@remarks This table is from the Microsoft Dot NET 1.1 MSDN.
+<table>
+    <tr>
+        <th width="50%">Format Character</th><th>Description and Associated Properties</th>
+    </tr>
+    <tr>
+        <td>c, C</td>
+        <td>Currency format. CurrencyNegativePattern, CurrencyPositivePattern, CurrencySymbol, CurrencyGroupSizes, CurrencyGroupSeparator, CurrencyDecimalDigits, CurrencyDecimalSeparator.</td>
+    </tr>
+    <tr>
+        <td>d, D</td>
+        <td>Decimal format.</td>
+    </tr>
+    <td>e, E</td>
+    <td>Scientific (exponential) format.</td>
+</tr>
+<tr>
+    <td>f, F</td>
+    <td>Fixed-point format.</td>
+</tr>
+<tr>
+    <td>g, G</td>
+    <td>General format.</td>
+</tr>
+<tr>
+    <td>n, N</td>
+    <td>Number format. NumberNegativePattern, NumberGroupSizes, NumberGroupSeparator, NumberDecimalDigits, NumberDecimalSeparator.</td>
+</tr>
+<tr>
+    <td>x, X</td>
+    <td>Hexadecimal format.</td>
+</tr>
+</table>
+@examples This example shows how to format a value as a currency using the default formatting setting and a custom setting.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> Provider <span style="color: #0000ff">As</span> <span style="color: #0000ff">New</span> NumberFormatInfo
     
-    '' Display the value using the default currency formatting.
-    Console.WriteLine f.Format(123, "c")
+    <span style="color: #008000">&#39; Display the value using the default currency formatting.</span>
+    Debug.Print <span style="color: #2b91af">Object</span>.ToString(123, <span style="color: #a31515">&quot;c&quot;</span>, Provider)
     
-    '' Set a custom currency format.
-    f.CurrencySymbol = "$$"
-    f.CurrencyDecimalDigits = 4
-    f.CurrencyPositivePattern = [$ n]
+    <span style="color: #008000">&#39; Set a custom currency format.</span>
+    Provider.CurrencySymbol = <span style="color: #a31515">&quot;$$&quot;</span>
+    Provider.CurrencyDecimalDigits = 4
+    Provider.CurrencyPositivePattern = <span style="border: 1px solid #FF0000">[$</span> n<span style="border: 1px solid #FF0000">]</span>
     
-    '' Display the value using the custom currency formatting.
-    Console.WriteLine f.Format(123, "c")
-    
-    '' Wait for user to press enter
-    Console.ReadLine
-End Sub
+    <span style="color: #008000">&#39; Display the value using the custom currency formatting.</span>
+    Debug.Print <span style="color: #2b91af">Object</span>.ToString(123, <span style="color: #a31515">&quot;c&quot;</span>, Provider)
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
 
-'' This code produces the following output
-''
-'' ¤123.00
-'' $$ 123.0000
-</pre>
+<span style="color: #008000">&#39; This code produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39; ¤123.00</span>
+<span style="color: #008000">&#39; $$ 123.0000</span>
+</pre></div>

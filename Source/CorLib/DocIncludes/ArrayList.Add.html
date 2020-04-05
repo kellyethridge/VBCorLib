@@ -12,44 +12,34 @@
 		</td>
 	</tr>
 	</table>
-@example
-In the following example, several items are added to an <b>ArrayList</b> object and then iterated over, displaying the items in the list.
-<pre>
-Private Sub Main()
-    Dim list As New ArrayList
+@examples In the following example, several items are added to an <b>ArrayList</b> object and then iterated over, displaying the items in the list.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> List <span style="color: #0000ff">As</span> <span style="color: #0000ff">New</span> ArrayList
     
-    '' add several elements to the ArrayList
-    list.Add "Humpty"
-    list.Add "Dumpty"
-    list.Add "sat"
-    list.Add "on"
-    list.Add "a"
-    list.Add "wall."
+    <span style="color: #008000">&#39; add several elements to the ArrayList</span>
+    List.Add <span style="color: #a31515">&quot;Humpty&quot;</span>
+    List.Add <span style="color: #a31515">&quot;Dumpty&quot;</span>
+    List.Add <span style="color: #a31515">&quot;sat&quot;</span>
+    List.Add <span style="color: #a31515">&quot;on&quot;</span>
+    List.Add <span style="color: #a31515">&quot;a&quot;</span>
+    List.Add <span style="color: #a31515">&quot;wall.&quot;</span>
     
-    '' Display the contents of the ArrayList
-    PrintValues list
-    
-    '' Wait for user to press return key
-    Console.ReadLine
-    
-End Sub
+    <span style="color: #008000">&#39; Display the contents of the ArrayList</span>
+    PrintValues List
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
 
-Private Sub PrintValues(ByVal en As IEnumerable)
-    Const Space As String = " "
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> PrintValues(<span style="color: #0000ff">ByVal</span> Source <span style="color: #0000ff">As</span> IEnumerable)
+    <span style="color: #0000ff">Const</span> Space <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span> = <span style="color: #a31515">&quot; &quot;</span>
+    <span style="color: #0000ff">Dim</span> Value <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>
     
-    Dim value As Variant
-    
-    '' Iterate over the list
-    For Each value In en
-        '' Write each value onto the same line
-        Console.WriteValue value
-        Console.WriteValue Space
-    Next value
-End Sub
+    <span style="color: #008000">&#39; Iterate over the list</span>
+    <span style="color: #0000ff">For</span> <span style="color: #0000ff">Each</span> Value <span style="color: #0000ff">In</span> Source
+        <span style="color: #008000">&#39; Write each value onto the same line</span>
+        Debug.Print Value<span style="border: 1px solid #FF0000">;</span> <span style="color: #a31515">&quot; &quot;</span><span style="border: 1px solid #FF0000">;</span>
+    <span style="color: #0000ff">Next</span>
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
 
-'' This code produces the following output.
-''
-'' Humpty Dumpty sat on a wall.
-</pre>
-The items are added to the list, then a For..Each statement is used
-to iterate over the list, displaying the name in the Console window.
+<span style="color: #008000">&#39; This example produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    Humpty Dumpty sat on a wall.</span>
+</pre></div>

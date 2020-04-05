@@ -53,36 +53,35 @@
 		</td>
 	</tr>
 </table>
-@example The following code demonstrates the various types that can be converted.
-<pre>
-Public Sub Main()
-    ConvertValue "80278098"
-    ConvertValue "0xffff"
-    ConvertValue CLng(-223432)
-    ConvertValue CInt(23214)
-    ConvertValue CByte(255)
-    ConvertValue CDbl(1234.4323)
-    ConvertValue CSng(1234.43)
+@examples The following code demonstrates the various types that can be converted.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    ConvertValue <span style="color: #a31515">&quot;80278098&quot;</span>
+    ConvertValue <span style="color: #a31515">&quot;0xffff&quot;</span>
+    ConvertValue <span style="color: #0000ff">CLng</span>(-223432)
+    ConvertValue <span style="color: #0000ff">CInt</span>(23214)
+    ConvertValue <span style="color: #0000ff">CByte</span>(255)
+    ConvertValue <span style="color: #0000ff">CDbl</span>(1234.4323)
+    ConvertValue <span style="color: #0000ff">CSng</span>(1234.43)
     ConvertValue CCur(492398.724)
-    ConvertValue CDec(492398.724)
-End Sub
+    ConvertValue <span style="color: #0000ff">CDec</span>(492398.724)
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
 
-Private Sub ConvertValue(ByRef Value As Variant)
-    Dim x As Int64
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> ConvertValue(<span style="color: #0000ff">ByRef</span> Value <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>)
+    <span style="color: #0000ff">Dim</span> x <span style="color: #0000ff">As</span> Int64
     
     x = CInt64(Value)
     
-    Debug.Print CorString.Format("{0} of {1} = {2}", TypeName(Value), Value, x)
-End Sub
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;{0} of {1} = {2}&quot;</span>, TypeName(Value), Value, x)
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
 
-'' This code produces the following output.
-''    String of 80278098 = 80278098
-''    String of 0xffff = 65535
-''    Long of -223432 = -223432
-''    Integer of 23214 = 23214
-''    Byte of 255 = 255
-''    Double of 1234.4323 = 1234
-''    Single of 1234.43 = 1234
-''    Currency of 492398.724 = 492399
-''    Decimal of 492398.724 = 492399
-</pre>
+<span style="color: #008000">&#39; This code produces the following output.</span>
+<span style="color: #008000">&#39;    String of 80278098 = 80278098</span>
+<span style="color: #008000">&#39;    String of 0xffff = 65535</span>
+<span style="color: #008000">&#39;    Long of -223432 = -223432</span>
+<span style="color: #008000">&#39;    Integer of 23214 = 23214</span>
+<span style="color: #008000">&#39;    Byte of 255 = 255</span>
+<span style="color: #008000">&#39;    Double of 1234.4323 = 1234</span>
+<span style="color: #008000">&#39;    Single of 1234.43 = 1234</span>
+<span style="color: #008000">&#39;    Currency of 492398.724 = 492399</span>
+<span style="color: #008000">&#39;    Decimal of 492398.724 = 492399</span>
+</pre></div>

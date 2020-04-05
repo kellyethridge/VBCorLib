@@ -1,30 +1,24 @@
-@remarks
-<h4>Example</h4>
-This example shows how to read input from the console keyboard. 
-The Read function will block and wait for the return key to be
-pressed before returning. If there are characters already in the
-input stream, the function does not block and returns the next character.
-<pre>
-Private Sub Main()
-    Dim ch As Long
+@examples This example shows how to read input from the console keyboard. The Read function will block and wait for the return key to be pressed before returning. If there are characters already in the input stream, the function does not block and returns the next character.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> ch <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
     
-    '' reads from the console keyboard. The function
-    '' will block until the return key is pressed.
+    <span style="color: #008000">&#39; reads from the console keyboard. The function</span>
+    <span style="color: #008000">&#39; will block until the return key is pressed.</span>
     ch = Console.Read
     
-    '' we will loop through the characters typed into
-    '' the console and exit the loop when CTRL+Z followed
-    '' by Return is pressed.
-    Do While ch &lt&gt 26
-        Debug.Print Chr$(ch);
+    <span style="color: #008000">&#39; we will loop through the characters typed into</span>
+    <span style="color: #008000">&#39; the console and exit the loop when CTRL+Z followed</span>
+    <span style="color: #008000">&#39; by Return is pressed.</span>
+    <span style="color: #0000ff">Do</span> <span style="color: #0000ff">While</span> ch &amp;lt&amp;gt 26
+        Debug.Print Chr$(ch)<span style="border: 1px solid #FF0000">;</span>
         DoEvents
         
-        '' As long as there are characters remaining to be
-        '' from the console keyboard, this function won't block.
+        <span style="color: #008000">&#39; As long as there are characters remaining to be</span>
+        <span style="color: #008000">&#39; from the console keyboard, this function won&#39;t block.</span>
         ch = Console.Read
-    Loop
-End Sub
-</pre>
+    <span style="color: #0000ff">Loop</span>
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+</pre></div>
 As shown here, the loop just retrieves characters from the console
 keyboard one character at a time. If there are no more characters
 in the buffer, then the Read function will block and wait for the

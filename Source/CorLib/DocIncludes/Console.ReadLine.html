@@ -1,27 +1,23 @@
-@remarks
-<h4>Example</h4>
-This examples shows how to continually read a line of characters from the
-Console keyboard. The function will block and wait for a NewLine (Return Key)
-is reached. All characters are returned not including the the NewLine characters.
-<pre>
-    Dim s As String
+@examples This examples shows how to continually read a line of characters from the Console keyboard. The function will block and wait for a NewLine (Return Key) is reached. All characters are returned not including the the NewLine characters.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">    <span style="color: #0000ff">Dim</span> s <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
     
-    '' Reads all of the characters upto a NewLine break.
-    '' If there are no characters (including NewLine) in the
-    '' buffer, then the function will block and wait.
+    <span style="color: #008000">&#39; Reads all of the characters upto a NewLine break.</span>
+    <span style="color: #008000">&#39; If there are no characters (including NewLine) in the</span>
+    <span style="color: #008000">&#39; buffer, then the function will block and wait.</span>
     s = Console.ReadLine
     
-    '' Exit the loop if an empty line is returned.
-    Do While Len(s) > 0
+    <span style="color: #008000">&#39; Exit the loop if an empty line is returned.</span>
+    <span style="color: #0000ff">Do</span> <span style="color: #0000ff">While</span> Len(s) &gt; 0
         Debug.Print s
         DoEvents
         
-        '' Continue reading an entire line at once. If no
-        '' characters are available, then the function will
-        '' block until the return key is pressed.
+        <span style="color: #008000">&#39; Continue reading an entire line at once. If no</span>
+        <span style="color: #008000">&#39; characters are available, then the function will</span>
+        <span style="color: #008000">&#39; block until the return key is pressed.</span>
         s = Console.ReadLine
-    Loop
-</pre>
+    <span style="color: #0000ff">Loop</span>
+</pre></div>
+
 As shown here, the loop continually reads in an entire line of characters
 until an empty line is returned. The function blocks when no characters remain
 to be read in from the console input. The NewLine characters are not returned

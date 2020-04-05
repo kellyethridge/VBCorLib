@@ -1,36 +1,31 @@
-@remarks <h4>Example</h4>
-<pre>
-'' This example attempts to open a text file and
-'' read the lines and display them.
-Private Sub Main()
-    Dim sr As StreamReader
-    Dim line As String
+@examples This example attempts to open a text file and read the lines and display them.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> Reader <span style="color: #0000ff">As</span> StreamReader
+    <span style="color: #0000ff">Dim</span> Line <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
     
-    On Error GoTo errTrap
+    <span style="color: #0000ff">On</span> <span style="color: #0000ff">Error</span> <span style="color: #0000ff">GoTo</span> <span style="color: #0000ff">Catch</span>
     
-    '' Create a StreamReader to read in a file.
-    Set sr = NewStreamReader("TestFile.txt")
+    <span style="color: #008000">&#39; Create a StreamReader to read in a file.</span>
+    <span style="color: #0000ff">Set</span> Reader = NewStreamReader(<span style="color: #a31515">&quot;TestFile.txt&quot;</span>)
     
-    '' Read in each line and display it until
-    '' the end of the file is reached.
-    Do
-        '' Read in characters until a carriage-return is reached.
-        line = sr.ReadLine
-        Console.WriteLine line
-        
-    '' A null string is equal to StrPtr(line) = 0
-    Loop While Not cString.IsNull(line)
-    sr.CloseReader
+    <span style="color: #008000">&#39; Read in each line and display it until</span>
+    <span style="color: #008000">&#39; the end of the file is reached.</span>
+    <span style="color: #0000ff">Do</span>
+        <span style="color: #008000">&#39; Read in characters until a carriage-return is reached.</span>
+        Line = Reader.ReadLine
+        Debug.Print Line
+    <span style="color: #0000ff">Loop</span> <span style="color: #0000ff">While</span> <span style="color: #0000ff">Not</span> CorString.IsNull(Line) <span style="color: #008000">&#39; A null string is equal to StrPtr(Line) = 0</span>
     
-errTrap:
-    Dim ex As Exception
-    '' Check if an exception was thrown.
-    If Catch(ex) Then
-        Console.WriteLine "The file could not be opened."
-        Console.WriteLine ex.Message
-    End If
+    Reader.CloseReader
+    <span style="color: #0000ff">Exit</span> <span style="color: #0000ff">Sub</span>
     
-    '' Wait for the user to press enter.
-    Console.ReadLine
-End Sub
-</pre>
+Catch:
+    <span style="color: #0000ff">Dim</span> Ex <span style="color: #0000ff">As</span> Exception
+    <span style="color: #008000">&#39; Check if an exception was thrown.</span>
+    <span style="color: #0000ff">If</span> <span style="color: #0000ff">Catch</span>(Ex) <span style="color: #0000ff">Then</span>
+        Debug.Print <span style="color: #a31515">&quot;The file could not be opened.&quot;</span>
+        Debug.Print Ex.Message
+    <span style="color: #0000ff">End</span> <span style="color: #0000ff">If</span>
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+</pre></div>
+

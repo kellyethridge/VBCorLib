@@ -21,38 +21,37 @@
       </td>
    </tr>
 </table>
-@example The following code example shows how to add elements to a <a href="SortedList.html">SortedList</a> object.
-<pre>
-Public Sub Main()
-    Dim List As New SortedList
+@examples The following code example shows how to add elements to a <a href="SortedList.html">SortedList</a> object.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> List <span style="color: #0000ff">As</span> <span style="color: #0000ff">New</span> SortedList
     
-    List.Add "one", "The"
-    List.Add "two", "quick"
-    List.Add "three", "brown"
-    List.Add "four", "fox"
+    List.Add <span style="color: #a31515">&quot;one&quot;</span>, <span style="color: #a31515">&quot;The&quot;</span>
+    List.Add <span style="color: #a31515">&quot;two&quot;</span>, <span style="color: #a31515">&quot;quick&quot;</span>
+    List.Add <span style="color: #a31515">&quot;three&quot;</span>, <span style="color: #a31515">&quot;brown&quot;</span>
+    List.Add <span style="color: #a31515">&quot;four&quot;</span>, <span style="color: #a31515">&quot;fox&quot;</span>
     
-    Debug.Print "The SortedList contains the following sorted by key:"
+    Debug.Print <span style="color: #a31515">&quot;The SortedList contains the following sorted by key:&quot;</span>
     PrintKeysAndValues List
-End Sub
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
 
-Private Sub PrintKeysAndValues(ByVal List As SortedList)
-    Dim i As Long
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> PrintKeysAndValues(<span style="color: #0000ff">ByVal</span> List <span style="color: #0000ff">As</span> SortedList)
+    <span style="color: #0000ff">Dim</span> i <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
     
-    Debug.Print "-KEY-", "-VALUE-"
+    Debug.Print <span style="color: #a31515">&quot;-KEY-&quot;</span>, <span style="color: #a31515">&quot;-VALUE-&quot;</span>
     
-    For i = 0 To List.Count - 1
+    <span style="color: #0000ff">For</span> i = 0 <span style="color: #0000ff">To</span> List.Count - 1
         Debug.Print List.GetKey(i), List.GetByIndex(i)
-    Next
+    <span style="color: #0000ff">Next</span>
     
     Debug.Print
-End Sub
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
 
-'' This code produces the following output.
-''
-''    The SortedList contains the following:
-''    -KEY-         -VALUE-
-''    four          fox
-''    one           The
-''    three         brown
-''    two           quick
-</pre>
+<span style="color: #008000">&#39; This code produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    The SortedList contains the following:</span>
+<span style="color: #008000">&#39;    -KEY-         -VALUE-</span>
+<span style="color: #008000">&#39;    four          fox</span>
+<span style="color: #008000">&#39;    one           The</span>
+<span style="color: #008000">&#39;    three         brown</span>
+<span style="color: #008000">&#39;    two           quick</span>
+</pre></div>

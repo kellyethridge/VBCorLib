@@ -475,26 +475,11 @@ Public Property Get IsReadOnly() As Boolean
 End Property
 
 ''
-' Returns an item from the list.
+' Gets the element at the specified index.
 '
-' @param Index The zero-based index in the list from which to return the item.
-' @return The item as the specified index.
-' @remarks This property is set as the <b>Default</b> property for
-' this class. Items can be accessed parentheses:
-' <pre>
-' Private Sub Main()
-'     Dim List As New ArrayList
-'     Dim Item As Variant
-'
-'     List.AddRange Array(1, 2, 3)
-'     Item = List(1)
-'
-'     Console.WriteLine Item
-'     Console.ReadKey
-' End Sub
-'
-' '' The output is: 2
-' </pre>
+' @param Index The zero-based index of the element to get.
+' @return The element as the specified index.
+' @include "..\DocIncludes\ArrayList.Get.Item.html"
 Public Property Get Item(ByVal Index As Long) As Variant
 Attribute Item.VB_UserMemId = 0
     If Index < 0 Or Index >= mCount Then _
@@ -504,12 +489,10 @@ Attribute Item.VB_UserMemId = 0
 End Property
 
 ''
-' Sets an item in the list to a value.
+' Sets the element at the specified index.
 '
 ' @param Index The zero-based index in the list to set the value.
 ' @param Value The value to set in the list.
-' @remarks This property is set as the <b>Default</b> property for
-' this class. Items can be accessed using parentheses:
 ' @include "../DocIncludes/ArrayList.Let.Item.html"
 Public Property Let Item(ByVal Index As Long, ByRef Value As Variant)
     If Index < 0 Or Index >= mCount Then _
@@ -520,12 +503,10 @@ Public Property Let Item(ByVal Index As Long, ByRef Value As Variant)
 End Property
 
 ''
-' Sets an item in the list to a value.
+' Sets the element at the specified index.
 '
 ' @param Index The zero-based index in the list to set the value.
 ' @param Value The value to set in the list.
-' @remarks This property is set as the <b>Default</b> property for
-' this class. Items can be accessed parentheses:
 ' @include "../DocIncludes/ArrayList.Let.Item.html"
 Public Property Set Item(ByVal Index As Long, ByRef Value As Variant)
     If Index < 0 Or Index >= mCount Then _

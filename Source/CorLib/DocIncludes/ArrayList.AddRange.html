@@ -18,68 +18,30 @@ The <a href="ArrayList.html">ArrayList</a> is fixed size.</td>
 <td><a href="InvalidCastException.html">InvalidCastException</a></td><td><i>c</i> is not a <b>VBA.Collection</b>, <a href="ICollection.html">ICollection</a> object, or an <b>Array</b>.</td>
 </tr>
 </table>
-@example
-The following example shows how to add the elements from an existing
-collection to the <a href="ArrayList.html">ArrayList</a> using the AddRange method.
-<p>An <a href="ArrayList.html">ArrayList</a> is created and filled with an initial set of
-elements, then a <a href="Queue.html">Queue</a> is filled with additional elements that
-will be added to the <a href="ArrayList.html">ArrayList</a> using <b>AddRange</b>.
-<pre>
-Private Sub Main()
-    Dim List As New ArrayList
+@examples
+The following example demonstrates using the <b>AddRange</b> method to add a collection of items.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> List <span style="color: #0000ff">As</span> <span style="color: #0000ff">New</span> ArrayList
+    <span style="color: #0000ff">Dim</span> Words() <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
     
-    '' add several elements to the ArrayList
-    List.Add "Humpty"
-    List.Add "Dumpty"
-    List.Add "sat"
-    List.Add "on"
-    List.Add "a"
-    List.Add "wall."
+    Words = NewStrings(<span style="color: #a31515">&quot;The&quot;</span>, <span style="color: #a31515">&quot;fox&quot;</span>, <span style="color: #a31515">&quot;jumps&quot;</span>, <span style="color: #a31515">&quot;over&quot;</span>, <span style="color: #a31515">&quot;the&quot;</span>, <span style="color: #a31515">&quot;dog&quot;</span>)
     
-    '' Display the contents of the ArrayList
-    Console.WriteLine "The ArrayList initially contains:"
+    List.AddRange Words
+    
     PrintValues List
-    
-    Dim Que As New Queue
-    Que.Enqueue "Humpty"
-    Que.Enqueue "Dumpty"
-    Que.Enqueue "had"
-    Que.Enqueue "a"
-    Que.Enqueue "great"
-    Que.Enqueue "fall."
-    
-    '' Display the contents of the Queue
-    Console.WriteLine "The Queue initially contains:"
-    PrintValues Que
-    
-    '' Add the elements in the Queue to the ArrayList
-    List.AddRange Que
-    
-    '' Display the new contents of the ArrayList
-    Console.WriteLine "The ArrayList with the elements from the Queue:"
-    PrintValues List
-    
-    Console.ReadKey
-End Sub
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
 
-Private Sub PrintValues(ByVal Source As IEnumerable)
-    Dim Value As Variant
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> PrintValues(<span style="color: #0000ff">ByVal</span> Source <span style="color: #0000ff">As</span> IEnumerable)
+    <span style="color: #0000ff">Dim</span> Value <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>
     
     Console.WriteValue vbTab
     
-    For Each Value In Source
-        Console.WriteValue "{0} ", Value
-    Next Value
-    
-    Console.WriteLine
-End Sub
+    <span style="color: #0000ff">For</span> <span style="color: #0000ff">Each</span> Value <span style="color: #0000ff">In</span> Source
+        Debug.Print CorString.Format(<span style="color: #a31515">&quot;{0} &quot;</span>, Value)<span style="border: 1px solid #FF0000">;</span>
+    <span style="color: #0000ff">Next</span> Value
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
 
-'' This code produces the following output.
-''
-'' The ArrayList initially contains:
-''     Humpty Dumpty sat on a wall.
-'' The Queue initially contains:
-''     Humpty Dumpty had a great fall.
-'' The ArrayList with the elements from the Queue:
-''     Humpty Dumpty sat on a wall. Humpty Dumpty had a great fall.
-</pre>
+<span style="color: #008000">&#39; This example produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    The fox jumps over the dog</span>
+</pre></div>

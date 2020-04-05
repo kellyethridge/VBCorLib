@@ -1,5 +1,10 @@
 ** VBCorLib **
 
+version 3.x
+	* Fixed CorArray.Clear not releasing reference types correctly for Variant().
+	* Fixed BigInteger default output formatting was falling back to exponent when is should never.
+	* Fixed BigInteger default output formatting was not padding with leading zeros.
+
 version 3.0 (BREAKING CHANGES)
 	* Renamed cArray to CorArray.
 	* Renamed cString to CorString.

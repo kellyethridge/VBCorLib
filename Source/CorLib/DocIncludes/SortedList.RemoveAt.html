@@ -21,79 +21,78 @@
       </td>
   </tr>
 </table>
-@example The following code example shows how to remove elements from a <a href="SortedList.html">SortedList</a> object.
-<pre>
-Public Sub Main()
-    Dim List As New SortedList
+@examples The following code example shows how to remove elements from a <a href="SortedList.html">SortedList</a> object.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> List <span style="color: #0000ff">As</span> <span style="color: #0000ff">New</span> SortedList
 
-    List.Add "3c", "dog"
-    List.Add "2c", "over"
-    List.Add "1c", "brown"
-    List.Add "1a", "The"
-    List.Add "1b", "quick"
-    List.Add "3a", "the"
-    List.Add "3b", "lazy"
-    List.Add "2a", "fox"
-    List.Add "2b", "jumped"
+    List.Add <span style="color: #a31515">&quot;3c&quot;</span>, <span style="color: #a31515">&quot;dog&quot;</span>
+    List.Add <span style="color: #a31515">&quot;2c&quot;</span>, <span style="color: #a31515">&quot;over&quot;</span>
+    List.Add <span style="color: #a31515">&quot;1c&quot;</span>, <span style="color: #a31515">&quot;brown&quot;</span>
+    List.Add <span style="color: #a31515">&quot;1a&quot;</span>, <span style="color: #a31515">&quot;The&quot;</span>
+    List.Add <span style="color: #a31515">&quot;1b&quot;</span>, <span style="color: #a31515">&quot;quick&quot;</span>
+    List.Add <span style="color: #a31515">&quot;3a&quot;</span>, <span style="color: #a31515">&quot;the&quot;</span>
+    List.Add <span style="color: #a31515">&quot;3b&quot;</span>, <span style="color: #a31515">&quot;lazy&quot;</span>
+    List.Add <span style="color: #a31515">&quot;2a&quot;</span>, <span style="color: #a31515">&quot;fox&quot;</span>
+    List.Add <span style="color: #a31515">&quot;2b&quot;</span>, <span style="color: #a31515">&quot;jumped&quot;</span>
     
-    Debug.Print "The SortedList initially contains the following:"
+    Debug.Print <span style="color: #a31515">&quot;The SortedList initially contains the following:&quot;</span>
     PrintKeysAndValues List
     
-    List.Remove "3b"
+    List.Remove <span style="color: #a31515">&quot;3b&quot;</span>
     
-    Debug.Print "After removing ""lazy"":"
+    Debug.Print <span style="color: #a31515">&quot;After removing &quot;&quot;lazy&quot;&quot;:&quot;</span>
     PrintKeysAndValues List
     
     List.RemoveAt 5
     
-    Debug.Print "After removing the element at index 5:"
+    Debug.Print <span style="color: #a31515">&quot;After removing the element at index 5:&quot;</span>
     PrintKeysAndValues List
-End Sub
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
 
-Private Sub PrintKeysAndValues(ByVal List As SortedList)
-    Dim i As Long
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> PrintKeysAndValues(<span style="color: #0000ff">ByVal</span> List <span style="color: #0000ff">As</span> SortedList)
+    <span style="color: #0000ff">Dim</span> i <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
     
-    Debug.Print t("\t-KEY-\t-VALUE-")
+    Debug.Print t(<span style="color: #a31515">&quot;\t-KEY-\t-VALUE-&quot;</span>)
     
-    For i = 0 To List.Count - 1
-        Debug.Print CorString.Format(t("\t{0}:\t{1}"), List.GetKey(i), List.GetByIndex(i))
-    Next
+    <span style="color: #0000ff">For</span> i = 0 <span style="color: #0000ff">To</span> List.Count - 1
+        Debug.Print CorString.Format(t(<span style="color: #a31515">&quot;\t{0}:\t{1}&quot;</span>), List.GetKey(i), List.GetByIndex(i))
+    <span style="color: #0000ff">Next</span>
     
     Debug.Print
-End Sub
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
 
-'' The following code produces the following output.
-''
-''    The SortedList initially contains the following:
-''        -KEY-   -VALUE-
-''    		1a:    the
-''    		1b:    quick
-''    		1c:    brown
-''    		2a:    fox
-''    		2b:    jumped
-''    		2c:    over
-''    		3a:    the
-''    		3b:    lazy
-''    		3c:    dog
-''    		
-''    		After removing "lazy":
-''    		    -KEY-   -VALUE-
-''    		1a:    the
-''    		1b:    quick
-''    		1c:    brown
-''    		2a:    fox
-''    		2b:    jumped
-''    		2c:    over
-''    		3a:    the
-''    		3c:    dog
-''    		
-''    		After removing the element at index 5:
-''    		    -KEY-   -VALUE-
-''    		1a:    the
-''    		1b:    quick
-''    		1c:    brown
-''    		2a:    fox
-''    		2b:    jumped
-''    		3a:    the
-''    		3c:    dog
-</pre>
+<span style="color: #008000">&#39; The following code produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    The SortedList initially contains the following:</span>
+<span style="color: #008000">&#39;        -KEY-   -VALUE-</span>
+<span style="color: #008000">&#39;        1a:    the</span>
+<span style="color: #008000">&#39;        1b:    quick</span>
+<span style="color: #008000">&#39;        1c:    brown</span>
+<span style="color: #008000">&#39;        2a:    fox</span>
+<span style="color: #008000">&#39;        2b:    jumped</span>
+<span style="color: #008000">&#39;        2c:    over</span>
+<span style="color: #008000">&#39;        3a:    the</span>
+<span style="color: #008000">&#39;        3b:    lazy</span>
+<span style="color: #008000">&#39;        3c:    dog</span>
+<span style="color: #008000">&#39;        </span>
+<span style="color: #008000">&#39;        After removing &quot;lazy&quot;:</span>
+<span style="color: #008000">&#39;            -KEY-   -VALUE-</span>
+<span style="color: #008000">&#39;        1a:    the</span>
+<span style="color: #008000">&#39;        1b:    quick</span>
+<span style="color: #008000">&#39;        1c:    brown</span>
+<span style="color: #008000">&#39;        2a:    fox</span>
+<span style="color: #008000">&#39;        2b:    jumped</span>
+<span style="color: #008000">&#39;        2c:    over</span>
+<span style="color: #008000">&#39;        3a:    the</span>
+<span style="color: #008000">&#39;        3c:    dog</span>
+<span style="color: #008000">&#39;        </span>
+<span style="color: #008000">&#39;        After removing the element at index 5:</span>
+<span style="color: #008000">&#39;            -KEY-   -VALUE-</span>
+<span style="color: #008000">&#39;        1a:    the</span>
+<span style="color: #008000">&#39;        1b:    quick</span>
+<span style="color: #008000">&#39;        1c:    brown</span>
+<span style="color: #008000">&#39;        2a:    fox</span>
+<span style="color: #008000">&#39;        2b:    jumped</span>
+<span style="color: #008000">&#39;        3a:    the</span>
+<span style="color: #008000">&#39;        3c:    dog</span>
+</pre></div>

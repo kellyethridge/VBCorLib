@@ -1,0 +1,39 @@
+@remarks <i>TrimChars</i> can be either a <b>String</b> or an <b>Integer()</b>. If a <b>String</b> is passed in it will be treated as an <b>Integer()</b> and each character will be used separately.
+<p>The <b>Trim</b> method removes from <i>s</i> all leading and trailing characters that are in the <i>TrimChars</i> parameter. The trim operation stops when a character that is not in <i>TrimChars</i> is encountered. For example, if <i>s</i> is "123abc456xyz789" and <i>TrimChars</i> contains the digits from "1" through "9", the <b>Trim</b> method returns "abc456xyz".</p>
+<table style="width: auto">
+	<tr>
+		<th>Note</th>
+	</tr>
+	<tr>
+		<td>This method does not modify the <i>s</i> parameter. Instead, it returns a new string in which all leading and trailing white-space characters found in <i>s</i> are removed.
+		</td>
+	</tr>
+</table>
+@exceptions
+<table style="width: auto">
+  <tr>
+      <th>Exception</th>
+      <th>Condition</th>
+  </tr>
+  <tr>
+       <td><a href="ArgumentException.html">ArgumentException</a></td><td><i>TrimChars</i> was not a <b>String</b> or <b>Integer()</b>.</td>
+  </tr>
+</table>
+@examples
+The following example demonstrates trimming the trailing characters defined by a <b>String</b> and an <b>Integer()</b>.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Const</span> Digits <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span> = <span style="color: #a31515">&quot;0123456789&quot;</span>
+    <span style="color: #0000ff">Const</span> Str <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span> = <span style="color: #a31515">&quot;324357abcx987234&quot;</span>
+    <span style="color: #0000ff">Dim</span> DigitChars() <span style="color: #0000ff">As</span> <span style="color: #2b91af">Integer</span>
+    
+    DigitChars = CorString.ToCharArray(Digits)
+    
+    Debug.Print CorString.Trim(Str, Digits)
+    Debug.Print CorString.Trim(Str, DigitChars)
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; The previous code outputs the following.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    abcx</span>
+<span style="color: #008000">&#39;    abcx</span>
+</pre></div>

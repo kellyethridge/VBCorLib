@@ -12,22 +12,21 @@
 		<td><i>Arr</i> has more than one dimension.</td>
 	</tr>
 </table>
-@example The following example shows how to use <b>ForEach</b> to display the squares of each element in an integer array.
-<pre>
-Private Sub Main()
-    Dim IntArray() As Integer
+@examples The following example shows how to use <b>ForEach</b> to display the squares of each element in an integer array.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> IntArray() <span style="color: #0000ff">As</span> <span style="color: #2b91af">Integer</span>
     
     IntArray = NewIntegers(2, 3, 4)
     
-    CorArray.ForEach IntArray, AddressOf ShowSquares
-End Sub
+    CorArray.ForEach IntArray, <span style="color: #0000ff">AddressOf</span> ShowSquares
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
 
-Private Sub ShowSquares(ByRef Value As Integer)
-    Debug.Print CorString.Format("{0} squared = {1}", Value, Value * Value)
-End Sub
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> ShowSquares(<span style="color: #0000ff">ByRef</span> Value <span style="color: #0000ff">As</span> <span style="color: #2b91af">Integer</span>)
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;{0} squared = {1}&quot;</span>, Value, Value * Value)
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
 
-'' This code example produces the following output.
-''   2 squared = 4
-''   3 squared = 9
-''   4 squared = 16
-</pre>
+<span style="color: #008000">&#39; This code example produces the following output.</span>
+<span style="color: #008000">&#39;   2 squared = 4</span>
+<span style="color: #008000">&#39;   3 squared = 9</span>
+<span style="color: #008000">&#39;   4 squared = 16</span>
+</pre></div>

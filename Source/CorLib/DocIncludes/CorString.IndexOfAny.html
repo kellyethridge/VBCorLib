@@ -1,0 +1,59 @@
+@remarks The search begins at <i>StartIndex</i> and continues to <i>StartIndex</i> + <i>Count</i> - 1. The character at <i>StartIndex</i> + <i>Count</i> is not included in the search.
+<p>Index numbering starts from zero. The <i>StartIndex</i> parameter can range from 0 to one less than the length of <i>s</i>.</p>
+<p>The search for <i>AnyOf</i> is case-sensitive.</p>
+@exceptions
+<table style="width: auto">
+	<tr>
+		<th>Exception</th><th>Condition</th>
+	</tr>
+	<tr>
+		<td><a href="ArgumentNullException.html">ArgumentNullException</a></td>
+		<td><i>AnyOf</i> is uninitialized.</td>
+	</tr>
+	<tr>
+		<td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+		<td>
+			<i>Count</i> or <i>StartIndex</i> is negative.<br/>
+			-or-<br/>
+			<i>Count</i> + <i>StartIndex</i> is greater than the number of characters in <i>s</i>.
+		</td>
+	</tr>
+</table>
+@examples
+The following example finds the index of the occurrence of any character of the string "aid" within a substring of another string.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Const</span> Br1 <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span> = <span style="color: #a31515">&quot;0----+----1----+----2----+----3----+----4----+----5----+----6----+-&quot;</span>
+    <span style="color: #0000ff">Const</span> Br2 <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span> = <span style="color: #a31515">&quot;0123456789012345678901234567890123456789012345678901234567890123456&quot;</span>
+    <span style="color: #0000ff">Const</span> Str <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span> = <span style="color: #a31515">&quot;Now is the time for all good men to come to the aid of their party.&quot;</span>
+    <span style="color: #0000ff">Const</span> Target <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span> = <span style="color: #a31515">&quot;aid&quot;</span>
+
+    <span style="color: #0000ff">Dim</span> Start   <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
+    <span style="color: #0000ff">Dim</span> At      <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
+    <span style="color: #0000ff">Dim</span> Count   <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
+    
+    Start = (Len(Str) - 1) \ 3
+    Count = (Len(Str) - 1) \ 4
+    
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;The first character occurrence from position {0} for {1} characters.&quot;</span>, Start, Count)
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;{0}{1}{0}{2}{0}{3}{0}&quot;</span>, Environment.NewLine, Br1, Br2, Str)
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;A character in &#39;{0}&#39; occurs at position: &quot;</span>, Target)<span style="border: 1px solid #FF0000">;</span>
+    
+    At = CorString.IndexOfAny(Str, Target, Start, Count)
+    
+    <span style="color: #0000ff">If</span> At &gt; -1 <span style="color: #0000ff">Then</span>
+        Debug.Print At
+    <span style="color: #0000ff">Else</span>
+        Debug.Print <span style="color: #a31515">&quot;(not found)&quot;</span>
+    <span style="color: #0000ff">End</span> <span style="color: #0000ff">If</span>
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; This example produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    The first character occurrence from position 22 for 16 characters.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    0----+----1----+----2----+----3----+----4----+----5----+----6----+-</span>
+<span style="color: #008000">&#39;    0123456789012345678901234567890123456789012345678901234567890123456</span>
+<span style="color: #008000">&#39;    Now is the time for all good men to come to the aid of their party.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    A character in &#39;aid&#39; occurs at position:  27</span>
+</pre></div>
