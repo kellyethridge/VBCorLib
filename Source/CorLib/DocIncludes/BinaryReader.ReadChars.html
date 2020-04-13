@@ -1,0 +1,60 @@
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'    <tr>
+'        <td><a href="ArgumentException.html">ArgumentException</a></td><td>The number of decoded characters to read is greater than <i>Count</i>. This can happen if a Unicode decoder returns fallback characters or a surrogate pair.</td>
+'    </tr>
+'    <tr>
+'        <td><a href="ObjectDisposedException.html">ObjectDisposedException</a></td><td>The stream is closed.</td>
+'    </tr>
+'    <tr>
+'        <td><a href="IOException.html">IOException</a></td><td>An I/O error occurs.</td>
+'    </tr>
+'   <tr>
+'        <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td><td><i>Count</i> is less than zero.</td>
+'   </tr>
+' </table>
+@examples The following example writes five characters to a stream then reads them all back at once using <b>ReadChars</b>.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> Source <span style="color: #0000ff">As</span> <span style="color: #0000ff">New</span> MemoryStream
+    <span style="color: #0000ff">Dim</span> Reader <span style="color: #0000ff">As</span> BinaryReader
+    <span style="color: #0000ff">Dim</span> Writer <span style="color: #0000ff">As</span> BinaryWriter
+    
+    <span style="color: #0000ff">Set</span> Writer = NewBinaryWriter(Source)
+    Writer.WriteValue NewChars(<span style="color: #a31515">&quot;H&quot;</span>, <span style="color: #a31515">&quot;e&quot;</span>, <span style="color: #a31515">&quot;l&quot;</span>, <span style="color: #a31515">&quot;l&quot;</span>, <span style="color: #a31515">&quot;o&quot;</span>)
+    
+    Source.Position = 0
+    
+    <span style="color: #0000ff">Set</span> Reader = NewBinaryReader(Source)
+    
+    <span style="color: #0000ff">Dim</span> Chars() <span style="color: #0000ff">As</span> <span style="color: #2b91af">Integer</span>
+    <span style="color: #0000ff">Dim</span> <span style="color: #2b91af">Char</span> <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>
+    
+    Chars = Reader.ReadChars(5)
+    
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;Read {0} characters.&quot;</span>, CorArray.Length(Chars))
+    
+    <span style="color: #0000ff">For</span> <span style="color: #0000ff">Each</span> <span style="color: #2b91af">Char</span> <span style="color: #0000ff">In</span> Chars
+        PrintChar <span style="color: #2b91af">Char</span>
+    <span style="color: #0000ff">Next</span>
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> PrintChar(<span style="color: #0000ff">ByVal</span> <span style="color: #2b91af">Char</span> <span style="color: #0000ff">As</span> <span style="color: #2b91af">Integer</span>)
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;{0,3} = &quot;&quot;{0:$}&quot;&quot;&quot;</span>, <span style="color: #2b91af">Char</span>)
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; This example code produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    Read 5 characters.</span>
+<span style="color: #008000">&#39;     72 = &quot;H&quot;</span>
+<span style="color: #008000">&#39;    101 = &quot;e&quot;</span>
+<span style="color: #008000">&#39;    108 = &quot;l&quot;</span>
+<span style="color: #008000">&#39;    108 = &quot;l&quot;</span>
+<span style="color: #008000">&#39;    111 = &quot;o&quot;</span>
+</pre></div>
+@see CorString
+@see CorArray
+@see Constructors

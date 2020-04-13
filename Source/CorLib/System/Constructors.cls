@@ -769,14 +769,14 @@ Public Function NewEndOfStreamException(ByRef Message As String, Optional ByVal 
 End Function
 
 ''
-' Returns a new <a href="BinaryReader.html">BinaryReader</a> that can read from the specified stream usind the specified Encoding.
+' Returns a new <a href="BinaryReader.html">BinaryReader</a> that can read from the specified stream usind the specified encoding.
 '
 ' @param InputStream The stream to read the data from.
 ' @param Encoding The encoding system to be used to decode the bytes from the stream.
 ' @param LeaveOpen The stream can optionally be left open after the reader has been closed.
 ' @return The new <a href="BinaryReader.html">BinaryReader</a> with the specified stream and encoding.
-' @remarks If <i>Encoding</i> is not specified, then the reader uses an encoding of New UTF8Encoding.
-' <h4>Exceptions</h4>
+' @remarks If <i>Encoding</i> is not specified, then the reader is created using <a href="UTF8Encoding.html">UTF8Encoding</a>.
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
 '       <th>Exception</th>
@@ -789,6 +789,7 @@ End Function
 '        <td><a href="ArgumentException.html">ArgumentException</a></td><td>The stream does not support reading, or is already closed.</td>
 '    </tr>
 ' </table>
+' @include "..\DocIncludes\Constructors.NewBinaryReader.html"
 Public Function NewBinaryReader(ByVal InputStream As Stream, Optional ByVal Encoding As Encoding, Optional ByVal LeaveOpen As Boolean) As BinaryReader
     Set NewBinaryReader = New BinaryReader
     NewBinaryReader.Init InputStream, Encoding, LeaveOpen
@@ -1296,11 +1297,16 @@ Public Function NewIntegers(ParamArray Values() As Variant) As Integer()
 End Function
 
 ''
-' Returns an array of type <b>Integer</b> representing the ASCII values of the strings or char passed in.
+' Initializes an <b>Integer</b> array representing Unicode characters.
 '
-' @param Values A series of string or char values to be converted to ASCII values.
-' @remarks The values must be strings.
-'
+' @param Values A series of characters or their Unicode code points.
+' @return An <b>Integer</b> array containing a set of Unicode characters.
+' @remarks This is a convenience method to easily create an <b>Integer</b> array representing Unicode characters.
+' <p>If a string with more than one character is processed, only the first character will be recognized.
+' To convert an entire string to a character array use <a href="CorString.ToCharArray.html">CorString.ToCharArray</a>.</p>
+' @see #NewString
+' @see CorString
+' @include "..\DocIncludes\Constructors.NewChars.html"
 Public Function NewChars(ParamArray Values() As Variant) As Integer()
     Dim Result() As Integer
     Dim i As Long
@@ -1319,7 +1325,7 @@ Public Function NewChars(ParamArray Values() As Variant) As Integer()
 End Function
 
 ''
-' Returns an array of type <b>String</b> generated from the values passed in.
+' Initializes <b>String</b> array generated from the values passed in.
 '
 ' @param Values The values to create the array from.
 ' @remarks The values need to be convertable to a <b>String</b> or an exception will occur.

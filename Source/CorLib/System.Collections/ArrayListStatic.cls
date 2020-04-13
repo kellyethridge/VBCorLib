@@ -53,8 +53,7 @@ Option Explicit
 ' @return The read-only <a href="ArrayList.html">ArrayList</a> wrapper around <i>List</i>.
 ' @remarks <p>Passing the object around provides access to the underlying
 ' <a href="ArrayList.html">ArrayList</a>, however, the list cannot be changed in size or content.</p>
-' <h4>Example</h4>
-' Call using the following syntax:
+' @examples The following example gets a read-only version of an <a href="ArrayList.html">ArrayList</a>.
 ' <pre>
 ' Set ReadOnlyList = ArrayList.ReadOnly(OriginalList)
 ' </pre>
@@ -75,8 +74,7 @@ End Function
 ' @remarks <p>Passing this object around provides access to the underlying
 ' <a href="ArrayList.html">ArrayList</a>, however, prevents the list from changing size. The current
 ' values in the list can be modified, but the size of the list cannot change.</p>
-' <h4>Example</h4>
-' Call using the following syntax:
+' @examples The following example gets a fixes size version of an <a href="ArrayList.html">ArrayList</a>.
 ' <pre>
 ' Set FixedSizeList = ArrayList.FixedSize(OriginalList)
 ' </pre>
@@ -95,9 +93,7 @@ End Function
 ' @param Value The value to fill the <a href="ArrayList.html">ArrayList</a> with.
 ' @param Count The number of times the value is to be added to the list.
 ' @return An <a href="ArrayList.html">ArrayList</a> with <i>Count</i> elements, all of which are copies of <i>Value</i>.
-' @remarks
-' <h4>Example</h4>
-' The following example creates an <a href="ArrayList.html">ArrayList</a> containing 20 strings with the letter "a".
+' @examples The following example creates an <a href="ArrayList.html">ArrayList</a> containing 20 strings with the letter "a".
 ' <pre>
 ' Set List = ArrayList.Repeat("a", 20)
 ' </pre>
@@ -121,7 +117,7 @@ End Function
 ' @return An <a href="IList.html">IList</a> object that can be used like an <a href="ArrayList.html">ArrayList</a>.
 ' @remarks <p>The adapter gives all <a href="IList.html">IList</a> objects the ability to be used anywhere an
 ' <a href="ArrayList.html">ArrayList</a> instance would be used instead.</p>
-' <h4>Example</h4>
+' @examples The following example creates a wrapper around an <a href="IList.html">IList</a> object to be treated as an <a href="ArrayList.html">ArrayList</a>.
 ' Call using the following syntax:
 ' <pre>
 ' Set List = ArrayList.Adapter(OriginalList)

@@ -45,7 +45,7 @@ Attribute VB_Exposed = True
 ' <p>The return value is a 16-bit signed Integer. This means that
 ' characters above &h7fff (32767) with be negative. To change this to the
 ' corrisponding positive value, add &h10000 (65536) to the value.</p>
-' <h4>Example</h4>
+' @examples
 ' <PRE>
 ' Dim n As Variant
 ' Dim s As String

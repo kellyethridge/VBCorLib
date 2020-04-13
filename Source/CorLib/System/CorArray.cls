@@ -68,7 +68,7 @@ End Type
 ' @param AddressOfPredicate The <b>AddressOf</b> a callback method used to determine if an element matches the specified criteria.
 ' @return <b>True</b> if <i>Arr</i> contains one or more elements that match the conditions defined by the specified predicate callback; otherwise, <b>False</b>.
 ' @remarks The <i>AddressOfPredicate</i> is an address to a method that returns <b>True</b> if the value passed to it matches the conditions defined in the callback method.
-' The elements of <i>Arr</i> are individually passed to the callback method, and processing is stopped when the method returns <b>False</b> for any element.
+' The elements of <i>Arr</i> are individually passed to the callback method, and processing is stopped when a match is found.
 ' <p>The callback method should have a signature resembling the following:</p>
 ' <pre>
 ' Public Function CallbackMethod(ByRef Value As &lt;Type&gt;) As Boolean
@@ -94,7 +94,7 @@ End Function
 ' @param AddressOfPredicate The callback method address used to determine if an element matches the specified criteria.
 ' @return The element value if a match is found, otherwise a default for that element type.
 ' @remarks The <i>AddressOfPredicate</i> is an address to a method that returns <b>True</b> if the value passed to it matches the conditions defined in the callback method.
-' The elements of <i>Arr</i> are individually passed to the callback method, and processing is stopped when the method returns <b>False</b> for any element.
+' The elements of <i>Arr</i> are individually passed to the callback method, and processing is stopped when a match is found.
 ' <p>The callback method should have a signature resembling the following:</p>
 ' <pre>
 ' Public Function CallbackMethod(ByRef Value As &lt;Type&gt;) As Boolean
@@ -132,7 +132,7 @@ End Function
 ' @return The index of the first occurrence of an element that matches the conditions
 ' defined in the callback method, if found; otherwise the lower-bound of the array minus one.
 ' @remarks The <i>AddressOfPredicate</i> is an address to a method that returns <b>True</b> if the value passed to it matches the conditions defined in the callback method.
-' The elements of <i>Arr</i> are individually passed to the callback method, and processing is stopped when the method returns <b>False</b> for any element.
+' The elements of <i>Arr</i> are individually passed to the callback method, and processing is stopped when a match is found.
 ' <p>The callback method should have a signature resembling the following:</p>
 ' <pre>
 ' Public Function CallbackMethod(ByRef Value As &lt;Type&gt;) As Boolean
@@ -190,7 +190,7 @@ End Function
 ' @param AddressOfPredicate The callback address of the matching criteria method.
 ' @return An array of all matched elements.
 ' @remarks The <i>AddressOfPredicate</i> is an address to a method that returns <b>True</b> if the value passed to it matches the conditions defined in the callback method.
-' The elements of <i>Arr</i> are individually passed to the callback method, and processing is stopped when the method returns <b>False</b> for any element.
+' All elements of <i>Arr</i> are individually passed to the callback method and includes in the result if they match the criteria.
 ' <p>The callback method should have a signature resembling the following:</p>
 ' <pre>
 ' Public Function CallbackMethod(ByRef Value As &lt;Type&gt;) As Boolean
@@ -306,7 +306,7 @@ End Sub
 ' @param AddressOfPredicate A callback address of the matching criteria method.
 ' @return The last element in the array to match the criteria, or the default for the array type if no elements matched.
 ' @remarks The <i>AddressOfPredicate</i> is an address to a method that returns <b>True</b> if the value passed to it matches the conditions defined in the callback method.
-' The elements of <i>Arr</i> are individually passed to the callback method, and processing is stopped when the method returns <b>False</b> for any element.
+' The elements of <i>Arr</i> are individually passed to the callback method, and processing is stopped when a match is found.
 ' <p>The callback method should have a signature resembling the following:</p>
 ' <pre>
 ' Public Function CallbackMethod(ByRef Value As &lt;Type&gt;) As Boolean
@@ -341,7 +341,7 @@ End Function
 ' @param Count The number of elements to search.
 ' @return The index of the last occurence of the matched element.
 ' @remarks The <i>AddressOfPredicate</i> is an address to a method that returns <b>True</b> if the value passed to it matches the conditions defined in the callback method.
-' The elements of <i>Arr</i> are individually passed to the callback method, and processing is stopped when the method returns <b>False</b> for any element.
+' The elements of <i>Arr</i> are individually passed to the callback method, and processing is stopped when a match is found.
 ' <p>The callback method should have a signature resembling the following:</p>
 ' <pre>
 ' Public Function CallbackMethod(ByRef Value As &lt;Type&gt;) As Boolean

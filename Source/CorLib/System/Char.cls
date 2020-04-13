@@ -84,11 +84,10 @@ End Property
 '        <td>Greater than zero</td><td><i>a</i> follows <i>b</i> in the sort order.</td>
 '    </tr>
 ' </table>
-' @remarks This method handles the discrepancy between integers and longs particularly when
-' dealing with negative integer values that should map to positive long values.
+' @include "..\DocIncludes\Char.Compare.html"
 Public Function Compare(ByVal a As Long, ByVal b As Long) As Long
     If (Not IsValidChar(a)) Or (Not IsValidChar(b)) Then _
-        Throw Cor.NewArgumentOutOfRangeException(IIf(IsValidChar(a), "b", "a"), Environment.GetResourceString(ArgumentOutOfRange_Range))
+        ThrowInvalidChar IIf(IsValidChar(a), "b", "a")
             
     a = a And &HFFFF&
     b = b And &HFFFF&
@@ -105,9 +104,8 @@ End Function
 '
 ' @param a A character to compare with.
 ' @param b A character to compare with.
-' @return <b>true</b> if parameter <i>a</i> is equal to parameter <i>b</i>; otherwise <b>false</b>.
-' @remarks This method handles the discrepancy between integers and longs particularly when
-' dealing with negative integer values that should map to positive long values.
+' @return <b>True</b> if <i>a</i> equals <i>b</i>; otherwise <b>False</b>.
+' @include "..\DocIncludes\Char.Equals.html"
 Public Function Equals(ByVal a As Long, ByVal b As Long) As Boolean
     If Not IsValidChar(a) Or Not IsValidChar(b) Then _
         ThrowInvalidChar IIf(IsValidChar(a), "b", "a")

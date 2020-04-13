@@ -323,7 +323,7 @@ Private Sub WriteCurrency(ByVal Value As Currency)
 End Sub
 
 Private Sub WriteDecimal(ByRef Value As Variant)
-    mOutStream.WriteBlock BitConverter.GetBytes(CDec(Value)), 0, vbSizeOfDecimal
+    mOutStream.WriteBlock BitConverter.GetBytes(Value), 0, vbSizeOfDecimal
 End Sub
 
 Private Sub WriteString(ByRef Value As String)

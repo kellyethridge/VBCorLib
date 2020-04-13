@@ -38,24 +38,16 @@ Attribute VB_Exposed = True
 ''
 ' Provides a set of methods to read typed information from a Stream.
 '
-' @remarks
-' <p>The bytes from a stream can be read and cast to a specific datatype. Each
-' datatype will determine the number of bytes to be read from the stream. Once
+' @remarks The bytes from a stream can be read and cast to a specific data type. Each
+' data type will determine the number of bytes to be read from the stream. Once
 ' the number of bytes have been read, they are assembled into the requested
-' datatype, advancing the position in the stream the required number of bytes.</p>
-' <p>Characters can be read from the Stream using the provided Encoding system.
-' The default encoding system is equal to New <a href="UTF8Encoding.html">UTF8Encoding</a>.</p>
-' <p>To create a new <b>BinaryReader</b> use the public constructor.
-' <pre>
-' Set reader = Cor.NewBinaryReader(MyFileStream)
-'
-' - or -
-'
-' Set reader = NewBinaryReader(MyFileStream)
-' </pre></p>
+' data type, advancing the position in the stream the required number of bytes.
+' <p>Characters can be read from the stream using the specified <a href="Encoding.html">Encoding</a>.
+' If <i>Encoding</i> is not specified then the <b>BinaryReader</b> is created using <a href="UTF8Encoding.html">UTF8Encoding</a>.</p>
 ' @see Constructors
 ' @see BinaryWriter
-'
+' @see Stream
+' @include "..\DocIncludes\BinaryReader.html"
 Option Explicit
 Implements IObject
 
@@ -70,9 +62,9 @@ Private mSingleChar(0)  As Integer
 
 
 ''
-' Returns the underlying <a href="Stream.html">Stream</a> being read by the Reader.
+' Returns the underlying <a href="Stream.html">Stream</a> being read by the <a href="BinaryReader.html">BinaryReader</a>.
 '
-' @return The underlying <a href="Stream.html">Stream</a>.
+' @return The underlying <a href="Stream.html">Stream</a> associated with the <a href="BinaryReader.html">BinaryReader</a>.
 '
 Public Property Get BaseStream() As Stream
     Set BaseStream = mStream
@@ -100,7 +92,10 @@ End Sub
 ' @param Buffer The array to write the data to.
 ' @param Index The first index in <i>Buffer</i> to start writing data.
 ' @param Count The number of elements to be written to the array.
-' @return The actual number of elements written to the array. This could be less than the requested amount.
+' @return If an array is specified, this returns the actual number of elements written to <i>Buffer</i>. This could be less than the requested amount.
+' If no parameters are specified then the next character is returned.
+' @see #ReadChars
+' @see #ReadBytes
 ' @include "..\DocIncludes\BinaryReader.Read.html"
 Public Function Read(Optional ByRef Buffer As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Long
     If IsMissing(Buffer) Then
@@ -112,13 +107,27 @@ Public Function Read(Optional ByRef Buffer As Variant, Optional ByRef Index As V
 End Function
 
 ''
-' Returns the next character to be decoded from the byte stream. The position
-' in the stream is not advanced after the read.
+' Returns the next character to be decoded from the byte stream. The position in the stream is not advanced after the read.
 '
 ' @return The next character to be Read, or -1 if no more characters are in the stream.
-' @remarks This function requires the stream to support Seeking. If it does not,
-' then -1 will always be returned.
-'
+' @remarks This function requires the stream to support Seeking. If it does not, then -1 will always be returned.
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="EndOfStreamException.html">EndOfStreamException</a></td><td>The end of the stream is reached.</td>
+'   </tr>
+'    <tr>
+'        <td><a href="ObjectDisposedException.html">ObjectDisposedException</a></td><td>The stream is closed.</td>
+'    </tr>
+'    <tr>
+'        <td><a href="IOException.html">IOException</a></td><td>An I/O error occurs.</td>
+'    </tr>
+' </table>
+' @see #ReadChar
 Public Function PeekChar() As Long
     VerifyIsOpen
     
@@ -136,6 +145,10 @@ End Function
 ' Reads the next byte in the stream, and advances the position one byte.
 '
 ' @return The next byte in the stream.
+' @remarks <a href="BinaryReader.html">BinaryReader</a> does not restore the file position after an unsuccessful read.
+' @see #Read
+' @see #ReadBytes
+' @include "..\DocIncludes\BinaryReader.ReadByte.html"
 Public Function ReadByte() As Byte
     FillBuffer vbSizeOfByte
     ReadByte = mBuffer(0)
@@ -147,7 +160,10 @@ End Function
 '
 ' @return The next character in the stream.
 ' @remarks If no characters are left in the stream, and EndOfStreamException is thrown.
-'
+' @see #Read
+' @see #ReadChars
+' @see #PeekChar
+' @include "..\DocIncludes\BinaryReader.ReadChar.html"
 Public Function ReadChar() As Long
     ReadChar = Read
     If ReadChar = NoChars Then _
@@ -159,10 +175,11 @@ End Function
 '
 ' @param Count The number of bytes to read from the stream.
 ' @return A byte array containing the bytes read from the stream.
-' @remarks If not enough bytes are in the stream, then the remaining
-' bytes are returned. If there are no bytes in the stream, then a
-' zero-length array is returned, not a null array.
-'
+' @remarks If not enough bytes are in the stream, then the remaining bytes are returned.
+' If there are no bytes in the stream, then a zero-length array is returned, not a null array.
+' @see #Read
+' @see #ReadByte
+' @include "..\DocIncludes\BinaryReader.ReadBytes.html"
 Public Function ReadBytes(ByVal Count As Long) As Byte()
     Dim Bytes()             As Byte
     Dim NumberOfBytesRead   As Long
@@ -190,14 +207,14 @@ Public Function ReadBytes(ByVal Count As Long) As Byte()
 End Function
 
 ''
-' Returns a specified number of characters decoded from the stream.
+' Reads the specified number of characters from the current stream, returns the data in a character array, and advances the current position in accordance with the <b>Encoding</b> used and the specific character being read from the stream.
 '
-' @param Count The number of characters to decode from the stream.
-' @return The array of characters decoded from the stream.
-' @remarks If not enough characters could be decoded from the stream,
-' then only the remaining characters are returned. If no characters
-' could be decoded, then a zero-length array is returned, not a null array.
-'
+' @param Count The number of characters to read.
+' @return A character array containing data read from the underlying stream. This might be less than the number of characters requested if the end of the stream is reached.
+' @remarks <a href="BinaryReader.html">BinaryReader</a> does not restore the file position after an unsuccessful read operation.
+' @see #Read
+' @see #ReadChar'
+' @include "..\DocIncludes\BinaryReader.ReadChars.html"
 Public Function ReadChars(ByVal Count As Long) As Integer()
     Dim Chars()             As Integer
     Dim NumberOfCharsRead   As Long
@@ -225,12 +242,26 @@ Public Function ReadChars(ByVal Count As Long) As Integer()
 End Function
 
 ''
-' Returns a boolean from the stream.
+' Reads a <b>Boolean</b> value from the current stream and advances the current position of the stream by one byte.
 '
-' @return A boolean value.
-' @remarks A single byte is read from the stream. If the byte
-' is non-zero, then True is returned, otherwise False.
-'
+' @return <b>True</b> if the byte is nonzero; otherwise, <b>False</b>.
+' @remarks <a href="BinaryReader.html">BinaryReader</a> does not restore the file position after an unsuccessful read.
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="EndOfStreamException.html">EndOfStreamException</a></td><td>The end of the stream is reached.</td>
+'   </tr>
+'    <tr>
+'        <td><a href="ObjectDisposedException.html">ObjectDisposedException</a></td><td>The stream is closed.</td>
+'    </tr>
+'    <tr>
+'        <td><a href="IOException.html">IOException</a></td><td>An I/O error occurs.</td>
+'    </tr>
+' </table>
 Public Function ReadBoolean() As Boolean
     ReadBoolean = (ReadByte <> 0)
 End Function
@@ -241,7 +272,7 @@ End Function
 ' @return An 8-byte signed integer read from the current stream.
 ' @remarks <a href="BinaryReader.html">BinaryReader</a> does not restore the file position after an unsuccessful read.
 ' <p><a href="BinaryReader.html">BinaryReader</a> reads this data type in little-endian format.</p>
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
 '       <th>Exception</th>
@@ -268,7 +299,7 @@ End Function
 ' @return A 4-byte signed integer read from the current stream.
 ' @remarks <a href="BinaryReader.html">BinaryReader</a> does not restore the file position after an unsuccessful read.
 ' <p><a href="BinaryReader.html">BinaryReader</a> reads this data type in little-endian format.</p>
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
 '       <th>Exception</th>
@@ -295,7 +326,7 @@ End Function
 ' @return An 2-byte signed integer read from the current stream.
 ' @remarks <a href="BinaryReader.html">BinaryReader</a> does not restore the file position after an unsuccessful read.
 ' <p><a href="BinaryReader.html">BinaryReader</a> reads this data type in little-endian format.</p>
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
 '       <th>Exception</th>
@@ -322,7 +353,7 @@ End Function
 ' @return An 8-byte floating point value read from the current stream.
 ' @remarks <a href="BinaryReader.html">BinaryReader</a> does not restore the file position after an unsuccessful read.
 ' <p><a href="BinaryReader.html">BinaryReader</a> reads this data type in little-endian format.</p>
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
 '       <th>Exception</th>
@@ -344,22 +375,43 @@ Public Function ReadDouble() As Double
 End Function
 
 ''
-' Reads 8 bytes from the stream and returns them as a Date datatype.
+' Reads eight bytes from the stream and returns them as a <b>Date</b> type.
 '
-' @return A Date datatype read from the stream.
-' @remarks It is possible to read a combination of 8 bytes that
-' convert into an invalid Date. This will cause an <a href="OverflowException.html">OverflowException</a>.
+' @return A <b>Date</b> type read from the stream.
+' @remarks A <b>Visual Basic</b> <b>Date</b> type is represented as a <b>Double</b> type. However, this method reads in
+' a 64 bit integer value as the <b>Tick</b>s of a <a href="CorDateTime.html">CorDateTime</a> type and converts it to <b>Date</b>.
+' <p>If there is a need to read in a standard <b>Date</b> represeted as <b>Double</b> use the <a href="BinaryReader.ReadDouble.html">ReadDouble</a> method.</p>
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="EndOfStreamException.html">EndOfStreamException</a></td><td>The end of the stream is reached.</td>
+'   </tr>
+'    <tr>
+'        <td><a href="ObjectDisposedException.html">ObjectDisposedException</a></td><td>The stream is closed.</td>
+'    </tr>
+'    <tr>
+'        <td><a href="IOException.html">IOException</a></td><td>An I/O error occurs.</td>
+'    </tr>
+'   <tr>
+'        <td><a href="OverflowException.html">OverflowException</a></td><td>The sequence of eight bytes represented an invalid date.</td>
+'   </tr>
+' </table>
+' @see #ReadDouble
 Public Function ReadDate() As Date
     ReadDate = CorDateTime.GetOADate(ReadCurrency)
 End Function
 
 ''
-' Reads an 8-byte Currency value from the current stream and advances the current position of the stream by eight bytes.
+' Reads an 8-byte <b>Currency</b> value from the current stream and advances the current position of the stream by eight bytes.
 '
-' @return An 8-byte Currency value read from the current stream.
+' @return An 8-byte <b>Currency</b> value read from the current stream.
 ' @remarks <a href="BinaryReader.html">BinaryReader</a> does not restore the file position after an unsuccessful read.
 ' <p><a href="BinaryReader.html">BinaryReader</a> reads this data type in little-endian format.</p>
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
 '       <th>Exception</th>
@@ -386,7 +438,7 @@ End Function
 ' @return A 4-byte floating point value read from the current stream.
 ' @remarks <a href="BinaryReader.html">BinaryReader</a> does not restore the file position after an unsuccessful read.
 ' <p><a href="BinaryReader.html">BinaryReader</a> reads this data type in little-endian format.</p>
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
 '       <th>Exception</th>
@@ -408,58 +460,107 @@ Public Function ReadSingle() As Single
 End Function
 
 ''
-' Reads 16 bytes from the stream and returns them as a Variant Decimal datatype.
+' Reads a decimal value from the current stream and advances the current position of the stream by sixteen bytes.
 '
-' @return A Variant Decimal datatype.
-' @remarks <p>The Decimal datatype is created from 16 bytes with the same
-' layout as used in .NET. The layout is different than that of VB.<br><br>
-' VB Decimal layout<br>
-' bytes 0-1: Variant datatype information<br>
-' bytes 2: precision<br>
-' bytes 3: sign (&h80 is negative)<br>
-' bytes 4-7: the 32 highest bits in the 96bit value<br>
-' bytes 8-11: the 32 lowest bits in the 96bit value<br>
-' bytes 12-15: the 32 middle bits in the 96bit value<br>
-' <br>
-' .NET Decimal layout<br>
-' bytes 0-3: the 32 lowest bits in the 96bit value<br>
-' bytes 4-7: the 32 middle bits in the 96bit value<br>
-' bytes 8-11: the 32 highest bits in the 96bit value<br>
-' bytes 12-13: unused (zero)<br>
-' bytes 14: precision<br>
-' bytes 15: sign (&h80 is negative)<br><br>
-' If the sign byte is non-zero, then the Decimal will be set as negative.<br>
-'
+' @return A decimal value read from the current stream.
+' @remarks <a href="BinaryReader.html">BinaryReader</a> does not restore the file position after an unsuccessful read.
+' <p><a href="BinaryReader.html">BinaryReader</a> reads this data type in little-endian format.</p>
+' <p>The decimal type is created from sixteen bytes using the same layout as the .NET decimal type.
+' The layout is different than that of Visual Basic as shown in the following table.</p>
+' <table style="width: auto">
+'   <tr>
+'       <th>Framework</th>
+'       <th>Layout</th>
+'   </tr>
+'   <tr>
+'        <td>Visual Basic</td>
+'        <td>
+'            bytes 0-1: Variant sub-type information (vbDecimal)<br/>
+'            bytes 2: precision (0 to 28)<br/>
+'            bytes 3: sign (&h80 is negative)<br/>
+'            bytes 4-7: high 32 bits in the 96-bit value<br>
+'            bytes 8-11: low 32 bits in the 96-bit value<br>
+'            bytes 12-15: middle 32 bits in the 96-bit value
+'        </td>
+'   </tr>
+'   <tr>
+'        <td>.NET Framework</td>
+'        <td>
+'            bytes 0-3: low 32 bits in the 96-bit value<br/>
+'            bytes 4-7: middle 32 bits in the 96-bit value<br/>
+'            bytes 8-11: high 32 bits in the 96-bit value<br/>
+'            bytes 12-13: unused (zero)<br/>
+'            bytes 14: precision (0 to 28)<br/>
+'            bytes 15: sign (&h80 is negative)<br/><br/>
+'        </td>
+'   </tr>
+' </table>
+' <p>If the sign byte is non-zero, then the Decimal will be set as negative.</p>
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="EndOfStreamException.html">EndOfStreamException</a></td><td>The end of the stream is reached.</td>
+'   </tr>
+'    <tr>
+'        <td><a href="ObjectDisposedException.html">ObjectDisposedException</a></td><td>The stream is closed.</td>
+'    </tr>
+'    <tr>
+'        <td><a href="IOException.html">IOException</a></td><td>An I/O error occurs.</td>
+'    </tr>
+'    <tr>
+'        <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+'        <td>The decimal precision is greater than 28.</td>
+'    </tr>
+' </table>
 Public Function ReadDecimal() As Variant
     FillBuffer vbSizeOfDecimal
     ReadDecimal = BitConverter.ToDecimal(mBuffer, 0)
 End Function
 
 ''
-' Reads a String from the stream.
+' Reads a string from the current stream. The string is prefixed with the length, encoded as an integer seven bits at a time.
 '
 ' @return The string datatype.
-' @remarks The string is stored in the stream with the number of encoded bytes preceding
-' the actual string data. The bytes are not the typical 4 bytes as is used by VB when
+' @remarks <a href="BinaryReader.html">BinaryReader</a> does not restore the file position after an unsuccessful read.
+' <p>The string is stored in the stream with the number of encoded bytes preceding
+' the actual string data. The bytes are not the typical 4 bytes as is used by Visual Basci when
 ' representing the length of the string. The bytes represent a value encoded as
-' 7bits per byte. While the next read byte has the high bit set (&h80), then the
+' 7 bits per byte. While the next read byte has the high bit set (&h80), then the
 ' following byte is also part of the length value. For each byte read, first 7 bits of
 ' that byte is pushed out 7 bits multiplied by the current byte number - 1 in the sequence.
 ' This is not the normal shifting of the current sum of the values. Each read byte
 ' must be shifted left individually, as each byte represents a higher set of bits
-' in the resulting number.<br><br>
-' We AND the byte with &h3f because we only want the lower 7 bits.<br>
+' in the resulting number.</p>
+' <p>We AND the byte with &h3f because we only want the lower 7 bits.<br>
 ' byte 1: (byte and &h3f) << shifted 0 bits added to the sum<br>
 ' byte 2: (byte and &h3f) << shifted 7 bits added to the sum<br>
 ' byte 3: (byte and &H3f) << shifted 14 bits added to the sum<br><br>
-' .. this continues until a byte is less than 128. At which point, it is shifted and summed like the
+' this continues until a byte with a value less than 128 is encountered. At which point, it is shifted and summed like the
 ' rest, but no more bytes are to be read in. The sum now contains the number of bytes to
-' be read in and decoded into the string. The same Encoding type must be used to retrieve
-' the correct string value. Using a different Encoding method will create the wrong string.
-'
-' <p>Once the length is determined, then enough bytes are read in that can be decoded
-' to the string using the current Encoding system.</p>
-'
+' be read in and decoded into the string. The <a href="Encoding.html">Encoding</a> used to write the original string should
+' be used to retrieve the string. Using a different <a href="Encoding.html">Encoding</a> may return a corrupt string.</p>
+' <p>Once the length is determined then enough bytes are read in that can be decoded
+' to the string using the specified <a href="Encoding.html">Encoding</a>.</p>
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="EndOfStreamException.html">EndOfStreamException</a></td><td>The end of the stream is reached.</td>
+'   </tr>
+'    <tr>
+'        <td><a href="ObjectDisposedException.html">ObjectDisposedException</a></td><td>The stream is closed.</td>
+'    </tr>
+'    <tr>
+'        <td><a href="IOException.html">IOException</a></td><td>An I/O error occurs.</td>
+'    </tr>
+' </table>
 Public Function ReadString() As String
     Dim EncodedStringLength As Long
     Dim EncodedBytes()      As Byte
@@ -476,7 +577,7 @@ Public Function ReadString() As String
         
         If NumberOfBytesRead < EncodedStringLength Then _
             Throw New EndOfStreamException
-            
+        
         CharCount = mDecoder.GetCharCount(EncodedBytes, 0, NumberOfBytesRead, True)
         ReadString = SysAllocStringLen(0, CharCount)
         Chars = AllocChars(ReadString)

@@ -694,7 +694,7 @@ Friend Sub Init(ByRef Buffer() As Byte, ByRef Index As Variant, ByRef Count As V
             SAPtr(mBuffer) = SAPtr(Buffer)
             SAPtr(Buffer) = vbNullPtr
         Case Else
-            Throw Cor.NewArgumentException("Invalid buffer mode.")
+            Error.ArgumentOutOfRange ArgumentOutOfRange_Enum, "Mode"
     End Select
     
     mBufferSet = True
