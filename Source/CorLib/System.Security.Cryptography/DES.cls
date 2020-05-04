@@ -38,12 +38,10 @@ Attribute VB_Exposed = True
 ''
 ' Represents a base interface that all DES algorithms should implement.
 '
-' @remarks Data Encryption Standard (DES) is a block cipher that uses a 56bit key
-' encryption mechanism.
+' @remarks Data Encryption Standard (DES) is a block cipher that uses a 56-bit key encryption mechanism.
 '
 ' @see DESCryptoServiceProvider
 ' @see SymmetricAlgorithm
-'
 Option Explicit
 
 ' Inherited from SymmetricAlgorithm

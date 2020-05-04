@@ -38,54 +38,29 @@ Attribute VB_Exposed = True
 ''
 ' Functions used to create fully inititalized objects.
 '
-' @remarks
-' This class is defined as Global-Multiuse. All of the functions can be called
+' @remarks This class is defined as <b>Global-Multiuse</b>. All of the functions can be called
 ' directly without needing to create a <b>Constructors</b> object.
-' <p>The <a href="StaticClasses.Get.Cor.html">Cor</a> static object can be used to easily find and select the
-' desired object to create. By using the <b>Cor.NewXxx</b> method, the
-' IntelliSense will show all of the available constructors, making object
-' creation easier.</p>
-' <p><h4>Example</h4>
-' <pre>
-' '' This calls the constructor function directly.
-' Set fs = NewFileStream("data.txt", FileMode.OpenOrCreate)
-'
-' '' This calls the constructor through the Cor.NewXxx method.
-' Set fs = Cor.NewFileStream("data.txt", FileMode.OpenOrCreate)
-' </pre>
-' Both methods perform the same task, however, using the Cor.Newxxx method
-' will provide IntelliSense showing all of the available constructors.
-'
+' <p>The <a href="StaticClasses.Get.Cor.html">Cor</a> accessor can be used to easily find and select the
+' desired object to create. Using the <a href="StaticClasses.Get.Cor.html">Cor</a> accessor provides
+' IntelliSense to the available constructors, making object creation easier.</p>
+' @include "..\DocIncludes\Constructors.html"
 Option Explicit
 
 ''
-' Creates a For..Each compatible wrapper around an <a href="IEnumerator.html">IEnumerator</i> interface.
+' Creates a <i>For..Each</i> compatible wrapper around an <a href="IEnumerator.html">IEnumerator</a> interface.
 '
-' @param obj The <a href="IEnumerator.html">IEnumerator</i> object that is to be called during For..Each.
-' @return A For..Each compatible enumerator.
-' @remarks <p><b>VBCorLib</b> allows for the building of custom enumerators to be used
-' in a For..Each loop context.</p>
-' <p>To create a custom enumerator please refer to the <a href="IEnumerator.html">IEnumerator</i> interface.</p>
-' <p>In order for VB to utilize your custom <a href="IEnumerator.html">IEnumerator</i> object, it must be
-' wrapped in an object that implements the IEnumVariant interface. This is the
-' only interface that VB can use in a For..Each context. By passing in the
+' @param obj The <a href="IEnumerator.html">IEnumerator</a> object that is to be called during For..Each.
+' @return A <i>For..Each</i> compatible enumerator.
+' @remarks VBCorLib allows for the building of custom enumerators to be used
+' in a <i>For..Each</i> loop context.
+' <p>To create a custom enumerator please refer to the <a href="IEnumerator.html">IEnumerator</a> interface.</p>
+' <p>In order for Visual Basic to utilize a custom <a href="IEnumerator.html">IEnumerator</a> object, it must be
+' wrapped in an object that implements the <b>IEnumVariant</b> interface. This is the
+' only interface that Visual Basic can use in a <i>For..Each</i> context. By passing in the
 ' custom enumerator into the <b>CreateEnumerator</b> function, a wrapper is applied and returned that
-' is then returned in the typical NewEnum function of a class.
-' <h4>Example</h4>
-' <pre>
-' Public Function NewEnum() As IUnknown
-'     Dim en As New MyEnumerator
-'     en.Init Me
-'     Set NewEnum = CreateEnumerator(en)
-' End Sub
-' </pre>
-' This example creates a custom enumerator object and initializes it with
-' the object that is to be enumerated using the custom enumerator. The
-' custom enumerator is then passed into the CreateEnumerator function and the
-' returned value is then passed back to the calling function.
-'
+' is then returned in the typical <b>NewEnum</b> function of a class.
 ' @see IEnumerator
-'
+' @include "..\DocIncludes\Constructors.CreateEnumerator.html"
 Public Function CreateEnumerator(ByVal Obj As IEnumerator) As IUnknown
     Set CreateEnumerator = Enumeration.CreateEnumerator(Obj)
 End Function
@@ -148,22 +123,8 @@ End Function
 ' @return A fully created <a href="ArgumentException.html">ArgumentException</a> object.
 ' @remarks <p>When throwing an <a href="ArgumentException.html">ArgumentException</a> a meaningful error message describing the invalid argument, the name
 ' of the argument, as well as the expected range of values for the argument should be defined.</p>
-' <h4>Example</h4>
-' <p><pre>
-' '' Throws a default ArgumentException object
-' Throw New ArgumentException
-'
-' '' Throws an ArgumentException with a custom message and parameter name
-' Throw Cor.NewArgumentException("Your argument is wrong.", "MyParam")
-'
-' '' Throws an ArgumentException with a custom message and error code and parameter name
-' Dim ex As ArgumentException
-' Set ex = Cor.NewArgumentException("Your argument is wrong.", "MyParam")
-' ex.HResult = 123
-' Throw ex
-' </pre></p>
-' This example shows how to throw three different variations of the same <a href="ArgumentException.html">ArgumentException</a> object.
 ' @see ArgumentException
+' @include "..\DocIncludes\Constructors.NewArgumentException.html"
 Public Function NewArgumentException(ByRef Message As String, Optional ByRef ParamName As String, Optional ByVal InnerException As Exception) As ArgumentException
     Set NewArgumentException = New ArgumentException
     NewArgumentException.Init Message, ParamName, InnerException
@@ -178,7 +139,7 @@ End Function
 ' @return A fully created <a href="ArgumentNullException.html">ArgumentNullException</a> object.
 ' @remarks <p>When throwing an <a href="ArgumentNullException.html">ArgumentNullException</a> a meaningful error message describing the invalid argument
 ' and the name of the argument should be defined.</p>
-' <h4>Example</h4>
+' @examples
 ' <p><pre>
 ' '' Throws a default ArgumentNullException object
 ' Throw New ArgumentNullException
@@ -305,11 +266,20 @@ Public Function NewSerializationException(ByRef Message As String, Optional ByVa
 End Function
 
 ''
-' Creates a new <a href="Stack.html">Stack</a> object initialized with data in <i>Source</i>.
+' Initializes a new instance of the <a href="Stack.html">Stack</a> class that contains elements copied from the specified collection.
 '
-' @param Source A collection of items to initalize the <a href="Stack.html">Stack</a> object with.
+' @param Source A collection of items copy elements from.
 ' @return A new <a href="Stack.html">Stack</a> object containing the collection of values.
-' @remarks <i>Source</i> can be a VBA.Collection, an object implementing <a href="ICollection.html">ICollection</a>, or an Array.
+' @remarks <i>Source</i> can be a <b>VBA.Collection</b>, an object implementing <a href="ICollection.html">ICollection</a>, or an array.
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th><th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ArgumentNullException.html">ArgumentNullException</a></td><td><i>Source</i> is <b>Nothing</b> or an uninitialized array.</td>
+'   </tr>
+' </table>
 Public Function NewStack(ByRef Source As Variant) As Stack
     Set NewStack = New Stack
     NewStack.Init Source
@@ -550,14 +520,32 @@ Public Function NewObjectDisposedException(ByRef ObjectName As String, Optional 
 End Function
 
 ''
-' Returns a new <a href="MemoryStream.html">MemoryStream</a> object which uses a supplied byte array.
+' Initializes a new instance of the <a href="MemoryStream.html">MemoryStream</a> class based on the specified region of a byte array, with the CanWrite property set as specified.
 '
 ' @param Buffer The array of bytes from which to create this stream.
-' @param Index The starting index in the array to begin usage (default is lower bound of <i>Buffer</i>).
-' @param Count The total bytes that can be used by the stream (default is size of <i>Buffer</i>).
-' @param Writable Whether or not to allow the stream to be written to.
-' @param Mode Describes how the <a href="MemoryStream.html">MemoryStream</a> will manage the Buffer.
+' @param Index The index in <i>Buffer</i> at which the stream begins. The default is lower bound of <i>Buffer</i>.
+' @param Count The length of the stream in bytes. The default is <i>Buffer</i> length.
+' @param Writable The setting of the <a href="MemoryStream.Get.CanWrite.html">CanWrite</a> property, which determines whether the stream supports writing.
+' @param Mode A <a href="MemoryStream.BufferMode.html">BufferMode</a> value specifying how <i>Buffer</i> is handled internally.
 ' @return The newly created <a href="MemoryStream.html">MemoryStream</a> containing the supplied byte buffer.
+' @remarks The <a href="MemoryStream.Get.CanRead.html">CanRead</a> and <a href="MemoryStream.GetCanSeek.html">CanSeek</a> properties
+' are both set to <b>True</b>. <a href="MemoryStream.Let.Capacity.html">Capacity</a> is set to <i>Count</i>.
+' <p>The length of the stream cannot be set to a value greater than the initial length of the specified byte array; however, the stream can be truncated (see <a href="MemoryStream.SetLength.html">SetLength</a>).</p>
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th><th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ArgumentNullException.html">ArgumentNullException</a></td><td><i>Buffer</i> is uninitialized.</td>
+'   </tr>
+'    <tr>
+'        <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td><td><i>Index</i> or <i>Count</i> are negative.</td>
+'    </tr>
+'    <tr>
+'        <td><a href="ArgumentException.html">ArgumentException</a></td><td>The buffer length minus <i>Index</i> is less than <i>Count</i>.</td>
+'    </tr>
+' </table>
 Public Function NewMemoryStream(ByRef Buffer() As Byte, Optional ByRef Index As Variant, Optional ByRef Count As Variant, Optional ByVal Writable As Boolean = True, Optional ByVal Mode As BufferMode = ShareMode) As MemoryStream
     Set NewMemoryStream = New MemoryStream
     NewMemoryStream.Init Buffer, Index, Count, Writable, Mode
@@ -718,10 +706,21 @@ End Function
 ' initialization of <a href="Constructors.NewFileStream.html">Cor.NewFileStream(Source, FileMode.OpenExisting, FileAccess.ReadAccess, FileShare.ReadShare)</a>.</p>
 ' <p>If <i>DetermineEncodingFromByteOrderMarks</i> is <b>True</b>, then up to 3 bytes are read from the stream
 ' upon the first attempt to read any data from the stream. The bytes are used to determine if a specific
-' encoding has been used. There are 3 encoding signatures that are looked for.<br>
-' &HFE, &HFF - <a href="UnicodeEncoding.html">UnicodeEncoding</a> with little-endian byte ordering<br>
-' &HFF, &HFE - <a href="UnicodeEncoding.html">UnicodeEncoding</a> with big-endian byte ordering<br>
-' &HEF, &HBB, &HBF - <a href="UTF8Encoding.html">UTF8Encoding</a><br>
+' encoding has been used. There are 3 encoding signatures that are looked for.
+' <table style="width: auto">
+'   <tr>
+'       <th>BOM</th><th>Encoding</th>
+'   </tr>
+'   <tr>
+'        <td>&HFE, &HFF</td><td><a href="UnicodeEncoding.html">UnicodeEncoding</a> with little-endian byte ordering is used.</td>
+'   </tr>
+'    <tr>
+'        <td>&HFF, &HFE</td><td><a href="UnicodeEncoding.html">UnicodeEncoding</a> with big-endian byte ordering is used.</td>
+'    </tr>
+'    <tr>
+'        <td>&HEF, &HBB, &HBF</td><td><a href="UTF8Encoding.html">UTF8Encoding</a> is used.</td>
+'    </tr>
+' </table>
 ' If no encoding is identified, then <a href="EncodingStatic.Get.UTF8.html">Encoding.UTF8</a> is used.
 Public Function NewStreamReader(ByRef Source As Variant, Optional ByVal Encoding As Encoding, Optional ByVal DetermineEncodingFromByteOrderMarks As Boolean = True, Optional ByVal BufferSize As Long = 1024, Optional ByVal LeaveOpen As Boolean) As StreamReader
     Set NewStreamReader = New StreamReader
@@ -745,11 +744,21 @@ End Function
 ''
 ' Returns a new <a href="BinaryWriter.html">BinaryWriter</a> used to write to a Stream object.
 '
-' @param Stream The stream to be written to by the writer.
-' @param Encoding The encoding to be used when converting chars to bytes.
+' @param Stream The supplied stream.
+' @param Encoding The character encoding.
 ' @return The new <a href="BinaryWriter.html">BinaryWriter</a> object.
-' @remarks The <i>Stream</i> parameter must support writing.<br>
-' <p>If <i>Encoding</i> is not supplied, then an encoding of <a href="Constructors.NewUTF8Encoding.html">Cor.NewUTF8Encoding(False, True)</a> is used.</p>
+' @remarks If <i>Encoding</i> is not supplied, then an encoding of <a href="Constructors.NewUTF8Encoding.html">Cor.NewUTF8Encoding(False, True)</a> is used.
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th><th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ArgumentException.html">ArgumentException</a></td><td>The stream does not support writing, or the stream is already closed.</td>
+'   </tr>
+'    <tr>
+'        <td><a href="ArgumentNullException.html">ArgumentNullException</a></td><td><i>Stream</i> is <b>Nothing</b>.</td>
+'    </tr>
+' </table>
 Public Function NewBinaryWriter(ByVal Stream As Stream, Optional ByVal Encoding As Encoding) As BinaryWriter
     Set NewBinaryWriter = New BinaryWriter
     NewBinaryWriter.Init Stream, Encoding
@@ -779,8 +788,7 @@ End Function
 ' @exceptions
 ' <table style="width: auto">
 '   <tr>
-'       <th>Exception</th>
-'       <th>Condition</th>
+'       <th>Exception</th><th>Condition</th>
 '   </tr>
 '   <tr>
 '        <td><a href="ArgumentNullException.html">ArgumentNullException</a></td><td><i>InputStream</i> is <b>Nothing</b>.</td>
@@ -829,12 +837,10 @@ End Function
 '
 ' @param CalendarType The language type the calendar is set to.
 ' @return A new instance of a <a href="GregorianCalendar.html">GregorianCalendar</a> class.
-' @remarks
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
-'       <th>Exception</th>
-'       <th>Condition</th>
+'       <th>Exception</th><th>Condition</th>
 '   </tr>
 '   <tr>
 '        <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td><td><i>CalendarType</i> is not a member of the <a href="GregorianCalendar.GregorianCalendarTypes.html">GregorianCalendarTypes</a> enumeration.</td>
@@ -1087,7 +1093,7 @@ End Function
 '
 ' @param Source The elements to place in the queue upon creation.
 ' @return A <a href="Queue.html">Queue</a> object with the elements placed in it.
-' @remarks The <i>Source</i> parameter can be a <b>VBA.Collection</b>, <a href="ICollection.html">ICollection</a> object, or an <b>array</b>.
+' @remarks The <i>Source</i> parameter can be a <b>VBA.Collection</b>, <a href="ICollection.html">ICollection</a> object, or an array.
 Public Function NewQueue(ByRef Source As Variant) As Queue
     Set NewQueue = New Queue
     NewQueue.Init Source
@@ -1204,18 +1210,42 @@ End Function
 ''
 ' Creates a new <a href="CryptoStream.html">CryptoStream</a> object used to read or write transformed data to or from an underlying stream.
 '
-' @param Stream The underlying stream to read or write the transformed data.
-' @param Transform The object used to transfrom data to or from plain text.
-' @param Mode Sets the <a href="CryptoStream.html">CryptoStream</a> to be either in read mode or write mode.
-' @return A new <a href="CryptoStream.html">CryptoStream</a> object.
+' @param Stream The stream on which to perform the cryptographic transformation.
+' @param Transform The cryptographic transformation that is to be performed on the stream.
+' @param Mode One of the <a href="CryptoStream.CryptoStreamMode.html">CryptoStreamMode</a> values.
+' @return Initializes a <a href="CryptoStream.html">CryptoStream</a> object.
 ' @see CryptoStream
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th><th>Condition</th>
+'   </tr>
+'   <tr>
+'       <td><a href="ArgumentNullException.html">ArgumentNullException</a></td>
+'       <td>
+'           <i>Stream</i> is <b>Nothing</b><br/>
+'           -or-<br/>
+'           <i>Transform</i> is <b>Nothing</b>
+'       </td>
+'   </tr>
+'   <tr>
+'       <td><a href="ArgumentException.html">ArgumentException</a></td>
+'       <td>
+'           <i>Mode</i> is <a href="CryptoStream.CryptoStreamModel.html">ReadMode</a> and <i>Stream</i> is not readable.<br/>
+'           -or-
+'           <i>Mode</i> is <a href="CryptoStream.CryptoStreamModel.html">WriteMode</a> and <i>Stream</i> is not writable.<br/>
+'           -or-<br/>
+'           <i>Mode</i> is invalid.
+'       </td>
+'   </tr>
+' </table>
 Public Function NewCryptoStream(ByVal Stream As Stream, ByVal Transform As ICryptoTransform, ByVal Mode As CryptoStreamMode) As CryptoStream
     Set NewCryptoStream = New CryptoStream
     NewCryptoStream.Init Stream, Transform, Mode
 End Function
 
 ''
-' Returns an array of <b>Longs</b> generated from the values passed in.
+' Initializes a <b>Long</b> array with elements copied from <i>Values</i>.
 '
 ' @param Values The values to create the array from.
 ' @remarks The values need to be convertable to a <b>Long</b> or an exception will occur.
@@ -1235,7 +1265,7 @@ Public Function NewLongs(ParamArray Values() As Variant) As Long()
 End Function
 
 ''
-' Returns an array of <a href="Int64Static.Int64.html">Int64</a> generated from the values passed in.
+' Initializes an <a href="Int64Static.Int64.html">Int64</a> array with elements copied from <i>Values</i>.
 '
 ' @param Values The values to create the array from.
 ' @remarks The values need to be convertable to a <a href="Int64Static.Int64.html">Int64</a> or an exception will occur.
@@ -1257,7 +1287,7 @@ Public Function NewInt64s(ParamArray Values() As Variant) As Int64()
 End Function
 
 ''
-' Returns an array of <b>Bytes</b> generated from the values passed in.
+' Initializes a <b>Byte</b> array with elements copied from <i>Values</i>.
 '
 ' @param Values The values to create the array from.
 ' @remarks The values need to be convertable to a <b>Byte</b> or an exception will occur.
@@ -1277,7 +1307,7 @@ Public Function NewBytes(ParamArray Values() As Variant) As Byte()
 End Function
 
 ''
-' Returns an array of <b>Integers</b> generated from the values passed in.
+' Initializes an <b>Integer</b> array with elements copied from <i>Values</i>.
 '
 ' @param Values The values to create the array from.
 ' @remarks The values need to be convertable to an <b>Integer</b> or an exception will occur.
@@ -1297,7 +1327,7 @@ Public Function NewIntegers(ParamArray Values() As Variant) As Integer()
 End Function
 
 ''
-' Initializes an <b>Integer</b> array representing Unicode characters.
+' Initializes an <b>Integer</b> array representing Unicode characters with elements copied from <i>Values</i>.
 '
 ' @param Values A series of characters or their Unicode code points.
 ' @return An <b>Integer</b> array containing a set of Unicode characters.
@@ -1325,7 +1355,7 @@ Public Function NewChars(ParamArray Values() As Variant) As Integer()
 End Function
 
 ''
-' Initializes <b>String</b> array generated from the values passed in.
+' Initializes a <b>String</b> array with elements copied from <i>Values</i>.
 '
 ' @param Values The values to create the array from.
 ' @remarks The values need to be convertable to a <b>String</b> or an exception will occur.
@@ -1345,7 +1375,7 @@ Public Function NewStrings(ParamArray Values() As Variant) As String()
 End Function
 
 ''
-' Returns an array of type <b>Single</b> generated from the values passed in.
+' Initializes a <b>Single</b> array with elements copied from <i>Values</i>.
 '
 ' @param Values The values to create the array from.
 ' @remarks The values need to be convertable to a <b>Single</b> or an exception will occur.
@@ -1365,7 +1395,7 @@ Public Function NewSingles(ParamArray Values() As Variant) As Single()
 End Function
 
 ''
-' Returns an array of type <b>Double</b> generated from the values passed in.
+' Initializes a <b>Double</b> array with elements copied from <i>Values</i>.
 '
 ' @param Values The values to create the array from.
 ' @remarks The values need to be convertable to a <b>Double</b> or an exception will occur.
@@ -1385,7 +1415,7 @@ Public Function NewDoubles(ParamArray Values() As Variant) As Double()
 End Function
 
 ''
-' Returns an array of type <b>Decimal</b> generated from the values passed in.
+' Initializes a <b>Decimal</b> array with elements copied from <i>Values</i>.
 '
 ' @param Values The values to create the array from.
 ' @remarks The values need to be convertable to a <b>Decimal</b> or an exception will occur.
@@ -1409,7 +1439,7 @@ Public Function NewDecimals(ParamArray Values() As Variant) As Variant()
 End Function
 
 ''
-' Returns an array of type <b>Date</b> generated from the values passed in.
+' Initializes a <b>Date</b> array with elements copied from <i>Values</i>.
 '
 ' @param Values The values to create the array from.
 ' @remarks The values need to be convertable to <b>Date</b> or an exception will occur.
@@ -1429,7 +1459,7 @@ Public Function NewDates(ParamArray Values() As Variant) As Date()
 End Function
 
 ''
-' Returns an array of type <b>Currency</b> generated from the values passed in.
+' Initializes a <b>Currency</b> array with elements copied from <i>Values</i>.
 '
 ' @param Values The values to create the array from.
 ' @remarks The values need to be convertable to <b>Currency</b> or an exception will occur.
@@ -1449,7 +1479,7 @@ Public Function NewCurrencies(ParamArray Values() As Variant) As Currency()
 End Function
 
 ''
-' Returns an array of type <b>Boolean</b> generated from the values passed in.
+' Initializes a <b>Boolean</b> array with elements copied from <i>Values</i>.
 '
 ' @param Values The values to create the array from.
 ' @remarks The values need to be convertable to a <b>Boolean</b> or an exception will occur.
@@ -1469,7 +1499,7 @@ Public Function NewBooleans(ParamArray Values() As Variant) As Boolean()
 End Function
 
 ''
-' Returns an array of type <b>Variant</b> containing the values passed in.
+' Initializes a <b>Variant</b> array with elements copied from <i>Values</i>.
 '
 ' @param Values The values to create the array from.
 ' @remarks This is the same as using the <b>Array</b> function.
@@ -1486,6 +1516,16 @@ End Function
 ' @return A new <a href="CspKeyContainerInfo.html">CspKeyContainerInfo</a> object.
 ' @remarks This object is usually created by crypto service provider. Instantiating an
 ' object directly may result in property throwing an exception when accessed.
+' @see CspKeyContainerInfo
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th><th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ArgumentNullException.html">ArgumentNullException</a></td><td><i>Parameters</i> is <b>Nothing</b>.</td>
+'   </tr>
+' </table>
 Public Function NewCspKeyContainerInfo(ByVal Parameters As CspParameters) As CspKeyContainerInfo
     Set NewCspKeyContainerInfo = New CspKeyContainerInfo
     NewCspKeyContainerInfo.Init Parameters
@@ -1686,23 +1726,25 @@ End Function
 '
 ' @param value The value to intialize a new instance of <a href="BigInteger.html">BigInteger</a> to.
 ' @return A new <a href="BigInteger.html">BigInteger</a> instance containing the specified value.
-' @remarks The follow datatypes are supported:<br>
-' vbLong<br>
-' vbInteger<br>
-' vbByte<br>
-' vbDoube<br>
-' vbSingle<br>
-' vbCurrency<br>
-' vbDecimal<br>
-' vbByte Array<br>
-' <a href="Int64Static.Int64.html">Int64</a>
+' @remarks The follow datatypes are supported.
+' <ul>
+'   <li>vbLong</li>
+'   <li>vbInteger</li>
+'   <li>vbByte</li>
+'   <li>vbDoube</li>
+'   <li>vbSingle</li>
+'   <li>vbCurrency</li>
+'   <li>vbDecimal</li>
+'   <li>vbByte Array</li>
+'   <li><a href="Int64Static.Int64.html">Int64</a></li>
+' </ul>
 Public Function NewBigInteger(ByRef Value As Variant) As BigInteger
     Set NewBigInteger = New BigInteger
     NewBigInteger.Init Value
 End Function
 
 ''
-' Initializes a new instance of a <b>Collection</b> with items.
+' Initializes a <b>Collection</b> with elements copied from <i>Values</i>.
 '
 ' @param Values The values to initialize the collection with.
 ' @return Returns a collection containing items in <i>Values</i> parameter.
@@ -1724,8 +1766,7 @@ End Function
 ' @remarks <p>A new <a href="Guid.html">Guid</a> can be initialized from a specified array of bytes, string, or memory pointer.</p>
 ' <table style="width: auto">
 '   <tr>
-'       <th>Data Type</th>
-'       <th>Description</th>
+'       <th>Data Type</th><th>Description</th>
 '   </tr>
 '   <tr>
 '        <td>String</td>
@@ -1753,11 +1794,10 @@ End Function
 '        <td>Long</td><td>A pointer to a memory location to read 16 consecutive bytes with which to initialize the GUID.</td>
 '    </tr>
 ' </table>
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
-'       <th>Exception</th>
-'       <th>Condition</th>
+'       <th>Exception</th><th>Condition</th>
 '   </tr>
 '   <tr>
 '        <td><a href="ArgumentNullException.html">ArgumentNullException</a></td><td>byte array is <b>null</b>.</td>
@@ -1826,11 +1866,10 @@ End Function
 ' @param Replacement A string that is emitted in a decoding operation in place of an input byte sequence that cannot be decoded.
 ' @return An initialized <a href="DecoderReplacementFallback.html">DecoderReplacementFallback</a> object.
 ' @remarks The <i>Replacement</i> parameter initializes the replacement string that is the value of the <a href="DecoderReplacementFallback.html">DecoderReplacementFallback</a> object. A commonly used value is the Unicode "Replacement Character" (U+FFFD), which is specifically intended to replace an incoming character having a value that is unknown or unrepresentable in Unicode.
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
-'       <th>Exception</th>
-'       <th>Condition</th>
+'       <th>Exception</th><th>Condition</th>
 '   </tr>
 '   <tr>
 '        <td><a href="ArgumentException.html">ArgumentException</a></td><td><i>Replacement</i> contains an invalid surrogate pair. In other words, the surrogate pair does not consist of one high surrogate component followed by one low surrogate component.</td>
@@ -1883,11 +1922,10 @@ End Function
 ' Otherwise, a recursive fallback results, causing an <a href="ArgumentException.html">ArgumentException</a>ArgumentException. For example, the fallback provided for an <a href="ASCIIEncoding.html">ASCIIEncoding</a> object
 ' cannot include the character "¿" (U+00BF) because that character is itself not a valid ASCII character.</p>
 ' <p>As a result of this, U+FFFD, which is a good choice for a fallback string for <a href="DecoderExceptionFallback.html">DecoderExceptionFallback</a>, is not generally a good choice for this class. Also, the null character (U+0000) cannot be used in the fallback string.</p>
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
-'       <th>Exception</th>
-'       <th>Condition</th>
+'       <th>Exception</th><th>Condition</th>
 '   </tr>
 '   <tr>
 '        <td><a href="ArgumentException.html">ArgumentException</a></td><td><i>Replacement</i> contains an invalid surrogate pair. In other words, the surrogate does not consist of one high surrogate component followed by one low surrogate component.</td>
@@ -2007,12 +2045,10 @@ End Function
 ' @param StartIndex The starting position within <i>Value</i>. Defaults to start of <i>Value</i>.
 ' @param Length The number of characters within <i>Value</i> to use. Defaults to using from <i>StartIndex</i> to end of array.
 ' @return A <b>String</b> initialized from the characters in <i>Value</i>.
-' @remarks
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
-'       <th>Exception</th>
-'       <th>Condition</th>
+'       <th>Exception</th><th>Condition</th>
 '   </tr>
 '   <tr>
 '        <td><a href="ArgumentNullException.html">ArgumentNullException</a></td><td><i>Value</i> is <b>Nothing</b>.</td>
@@ -2046,11 +2082,10 @@ End Function
 '
 ' @param Culture The <a href="CultureInfo.html">CultureInfo</a> to use for the new <a href="CaseInsensitiveComparer.html">CaseInsensitiveComparer</a>.
 ' @return A new instance of the <a href="CaseInsensitiveComparer.html">CaseInsensitiveComparer</a> class.
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
-'       <th>Exception</th>
-'       <th>Condition</th>
+'       <th>Exception</th><th>Condition</th>
 '   </tr>
 '   <tr>
 '        <td><a href="ArgumentNullException.html">ArgumentNullException</a></td><td><i>Culture</i> is <b>Nothing</b>.</td>

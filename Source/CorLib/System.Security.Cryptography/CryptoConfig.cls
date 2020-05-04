@@ -36,8 +36,9 @@ Attribute VB_Exposed = True
 '
 
 ''
-' Used to access cryptography information.
-
+' Accesses the cryptography configuration information.
+'
+' @include "..\DocIncludes\CryptoConfig.html"
 Option Explicit
 
 Private mDefaultAlgos   As Hashtable
@@ -49,36 +50,10 @@ Private mDefaultOids    As Hashtable
 ' Creates a cryptography object based on the name.
 '
 ' @param AlgName The name of the cryptography object to be created.
-' @return An instance of the object or <b>Nothing</i> if an empty name is provided.
-' @remarks The supported names are:
-' <pre>
-' DES
-' 3DES
-' TripleDES
-' Triple DES
-' RC2
-' Rijndael
-' SHA
-' SHA1
-' HashAlgorithm
-' SHA256
-' SHA-256
-' SHA384
-' SHA-384
-' SHA512
-' SHA-512
-' MD5
-' HMACSHA1
-' HMACSHA256
-' HMACSHA384
-' HMACSHA512
-' HMACMD5
-' HMACRIPEMD160
-' MACTripleDES
-' RSA
-' DSA
-' </pre>
-' If a custom object is required, then the standard <Server>.<Class> format can be used.
+' @return An instance of the specified cryptographic object or <b>Nothing</b> if not found.
+' @remarks If the algorithm name is not found, then an attempt to create the object using <b>CreateObject(</b><i>Server</i>.<i>Class</i><b>)</b> is used.
+' If no cryptographic object can be created then <b>Nothing</b> is returned.
+' <p>For a list of simple names recognized by this class, see <a href="CryptoConfig.html">CryptoConfig</a>.</p>
 Public Function CreateFromName(ByRef AlgName As String) As Object
     Dim Result As Object
     
@@ -103,7 +78,7 @@ End Function
 ' @param Algorithm The algorithm to map to.
 ' @param Names An array of names to map to the algorithm.
 ' @remarks The specified mappings take precedence over the built-in mappings.
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
 '       <th>Exception</th>
@@ -149,7 +124,7 @@ End Sub
 '
 ' @param Str The object identifier as described in the X.690 standard.
 ' @return An encoded version of the object identifier as described in the X.690 standard.
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
 '       <th>Exception</th>

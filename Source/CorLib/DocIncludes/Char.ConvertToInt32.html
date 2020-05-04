@@ -1,0 +1,23 @@
+@examples This example demonstrates converting a character represented as a 16-bit signed integer to a positive 32-bit signed integer using the <b>ConvertToInt32</b> method.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    Convert 65
+    Convert -1
+    Convert -32768
+    Convert 32767
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> Convert(<span style="color: #0000ff">ByVal</span> c <span style="color: #0000ff">As</span> <span style="color: #2b91af">Integer</span>)
+    <span style="color: #0000ff">Dim</span> Ch <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
+    
+    Ch = <span style="color: #2b91af">Char</span>.ConvertToInt32(c)
+    
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;{0,6}(&amp;h{0:X4}) converts to {1,6}(&amp;h{1:X8})&quot;</span>, c, Ch)
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; The example code produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;        65(&amp;h0041) converts to     65(&amp;h00000041)</span>
+<span style="color: #008000">&#39;        -1(&amp;hFFFF) converts to  65535(&amp;h0000FFFF)</span>
+<span style="color: #008000">&#39;    -32768(&amp;h8000) converts to  32768(&amp;h00008000)</span>
+<span style="color: #008000">&#39;     32767(&amp;h7FFF) converts to  32767(&amp;h00007FFF)</span>
+</pre></div>

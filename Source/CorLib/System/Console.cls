@@ -46,9 +46,8 @@ Attribute VB_Exposed = True
 ' window from which is it run, the EXE needs to be converted to a console application.
 ' This can be accomplished by hand using the <i>Link</i> program that is included with
 ' Visual Basic 6. In a console window use the following command:
-' <p>link /edit /subsystem:console <i>EXE Name</i></p>
-' <p>Replace <EXE> with the path and executable to be flagged as a console application.
-' Be sure the <i>Link</i> and application are both in paths the console window can find.
+' <p>link /edit /subsystem:console <i>Application Name</i></p>
+' <p>Be sure the <i>Link</i> and application are both in paths the console window can find.
 ' Once the command has been executed, the VB6 application will run inside the console
 ' window from which it was run. If no window existed, then a new one will be created.</p>
 ' <p>The Console can be used to display text on the screen, and retrieve

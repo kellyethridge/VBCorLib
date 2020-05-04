@@ -38,7 +38,7 @@ Attribute VB_Exposed = True
 ''
 ' Utilizes the Windows CryptoAPI cryptography services to perform data transformations.
 '
-' @remarks This class is used to support 3 cryptographic service providers within the
+' @remarks This class is used to support three cryptographic service providers within the
 ' CryptoAPI: DES, TripleDES, and RC2.
 '
 ' @see DESCryptoServiceProvider

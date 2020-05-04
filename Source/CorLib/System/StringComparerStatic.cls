@@ -197,7 +197,7 @@ End Property
 ' @param Culture A culture whose linguistic rules are used to perform a string comparison.
 ' @param IgnoreCase <b>True</b> to specify that comparison operations be case-insensitive; <b>False</b> to specify that comparison operations be case-sensitive.
 ' @return A new <a href="StringComparer.html">StringComparer</a> object that performs string comparisons according to the comparison rules used by the culture parameter and the case rule specified by the <i>IgnoreCase</i> parameter.
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
 '       <th>Exception</th>

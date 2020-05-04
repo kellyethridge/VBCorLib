@@ -41,23 +41,20 @@ Attribute VB_Exposed = True
 ' @remarks A <b>CryptoStream</b> can be written to or read from in the same manner
 ' as other stream objects. A <b>CryptoStream</b> is designed to be used in a daisy-chain
 ' fashion, allowing for multiple transformations to be applied as a single process.
-' <p>By supplying another <b>Stream</b> object to the <b>Cor.NewCryptoStream</b> function,
-' an automatic daisy-chaining of the two streams is created. The <b>Stream</b> does not
-' have to be another <b>CryptoStream</b> object. It can be any object implementing the
-' <b>Stream</b> interface.
+' <p>By supplying another <a href="Stream.html">Stream</a> object to the <a href="Constructors.NewCryptoStream.html">NewCryptoStream</a> constructor,
+' an automatic daisy-chaining of the two streams is created. The <a href="Stream.html">Stream</a> does not
+' have to be another <b>CryptoStream</b> object. It can be any object implementing the <a href="Stream.html">Stream</a> interface.</p>
 '
 ' @see Constructors
-'
 Option Explicit
 Implements IObject
 Implements Stream
 
 ''
-' Specifies modes for a CryptoStream.
+' Specifies mode of a cryptographic stream.
 '
-' @param ReadMode Sets the CryptoStream to a reading mode.
-' @param WriteMode Sets the CryptoStream to a writing mode.
-'
+' @param ReadMode Read access to a cryptographic stream.
+' @param WriteMode Write access to a cryptographic stream.
 Public Enum CryptoStreamMode
     ReadMode = 0
     WriteMode = 1
@@ -77,100 +74,136 @@ Private mInputBlockSize     As Long
 
 
 ''
-' Returns if the Stream can be read from.
+' Gets if the stream can be read from.
 '
-' @return Returns True if the Stream supports reading, False otherwise.
-' @remarks A CryptoStream object supports only reading or writing, not both simultaneously.
-'
+' @return <b>True</b> if the stream supports reading, <b>False</b> otherwise.
+' @remarks A <a href="CryptoStream.html">CryptoStream</a> object supports only reading or writing, not both simultaneously.
 Public Property Get CanRead() As Boolean
     CanRead = (mMode = ReadMode)
 End Property
 
 ''
-' Returns if the Stream can seek.
+' Gets if the stream can seek.
 '
-' @return Always returns False.
-'
+' @return Always returns <b>False</b>.
 Public Property Get CanSeek() As Boolean
     CanSeek = False
 End Property
 
 ''
-' Returns if the Stream can be written to.
+' Gets if the stream can be written to.
 '
-' @return Returns True if the Stream supports writing, False otherwise.
-' @remarks A CryptoStream object supports only ready or writing, not both simultaneously.
-'
+' @return <b>True</b> if the Stream supports writing, <b>False</b> otherwise.
+' @remarks A <a href="CryptoStream.html">CryptoStream</a> object supports only reading or writing, not both simultaneously.
 Public Property Get CanWrite() As Boolean
     CanWrite = (mMode = WriteMode)
 End Property
 
 ''
-' Returns the current position withing the Stream.
+' Gets the current position within the stream.
 '
-' @return The current position.
-' @remarks Always throws a NotSupportedException exception.
-'
+' @return This property is not supported.
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="NotSupportedException.html">NotSupportedException</a></td><td>This property is not supported.</td>
+'   </tr>
+' </table>
 Public Property Get Position() As Currency
     Error.NotSupported NotSupported_UnseekableStream
 End Property
 
 ''
-' Sets the current position within the Stream.
+' Gets the current position within the stream.
 '
-' @param Value The new position.
-' @remarks Always throws a NotSupportedException exception.
-'
+' @param Value This property is not supported.
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="NotSupportedException.html">NotSupportedException</a></td><td>This property is not supported.</td>
+'   </tr>
+' </table>
 Public Property Let Position(ByVal Value As Currency)
     Error.NotSupported NotSupported_UnseekableStream
 End Property
 
 ''
-' Returns the length of the current Stream.
+' Gets the length of the current stream.
 '
-' @return The length of the Stream.
-' @remarks Always throws a NotSupportedException exception.
-'
+' @return This property is not supported.
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="NotSupportedException.html">NotSupportedException</a></td><td>This property is not supported.</td>
+'   </tr>
+' </table>
 Public Property Get Length() As Currency
     Error.NotSupported NotSupported_UnseekableStream
 End Property
 
 ''
-' Sets the length of the current Stream.
+' Sets the length of the current stream.
 '
-' @param Value The new length of the Stream.
-' @remarks Always throws a NotSupportedException exception.
-'
+' @param Value The new length of the stream.
+' @return This method is not supported.
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="NotSupportedException.html">NotSupportedException</a></td><td>This method is not supported.</td>
+'   </tr>
+' </table>
 Public Sub SetLength(ByVal Value As Currency)
     Error.NotSupported NotSupported_UnseekableStream
 End Sub
 
 ''
-' Seeks a new position within the Stream.
+' Seeks a new position within the stream.
 '
-' @param Offset The number of bytes to move.
-' @param Origin The starting position in the stream to move from.
-' @return The new position in the Stream.
-' @remarks Always throws a NotSupportedException exception.
-'
+' @param Offset A byte offset relative to the <i>Origin</i> parameter.
+' @param Origin A <a href="Stream.SeekOrigin.html">SeekOrigin</a> value indicating the reference point used to obtain the new position.
+' @return This method is not supported.
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="NotSupportedException.html">NotSupportedException</a></td><td>This method is not supported.</td>
+'   </tr>
+' </table>
 Public Function SeekPosition(ByVal Offset As Currency, ByVal Origin As SeekOrigin) As Currency
     Error.NotSupported NotSupported_UnseekableStream
 End Function
 
 ''
-' Returns if the Stream can timeout.
+' Gets if the Stream can timeout.
 '
-' @returns Returns True if the Stream can timeout, False otherwise.
-'
+' @returns <b>True</b> if the stream can timeout, <b>False</b> otherwise.
 Public Property Get CanTimeout() As Boolean
     CanTimeout = mStream.CanTimeout
 End Property
 
 ''
-' Returns the amount of time must pass before a Read timeout occurs.
+' Gets the amount of time must pass before a Read timeout occurs.
 '
 ' @return Returns the timeout period in milliseconds.
-'
 Public Property Get ReadTimeout() As Long
     ReadTimeout = mStream.ReadTimeout
 End Property
@@ -179,25 +212,22 @@ End Property
 ' Sets the timeout period for Read operations.
 '
 ' @param Value The timeout period in milliseconds.
-'
 Public Property Let ReadTimeout(ByVal Value As Long)
     mStream.ReadTimeout = Value
 End Property
 
 ''
-' Returns the timeout period for a write operation.
+' Gets the timeout period for a Write operation.
 '
 ' @return The timeout period in milliseconds.
-'
 Public Property Get WriteTimeout() As Long
     WriteTimeout = mStream.WriteTimeout
 End Property
 
 ''
-' Sets the timeout period for a write operation.
+' Sets the timeout period for a Write operation.
 '
 ' @param Value The timeout period in milliseconds.
-'
 Public Property Let WriteTimeout(ByVal Value As Long)
     mStream.WriteTimeout = Value
 End Property
@@ -219,11 +249,10 @@ Public Sub CloseStream()
 End Sub
 
 ''
-' Flushes the buffers of the underlying Stream.
+' Flushes the buffers of the underlying stream.
 '
-' @remarks This does not flush the buffers within the CryptoStream. Call FlushFinalBlock
-' to flush the remaining data to the underlying stream.
-'
+' @remarks This does not flush the buffers within the <a href="CryptoStream.html">CryptoStream</a>.
+' Call <a href="CryptoStream.FlushFinalBlock.html">FlushFinalBlock</a> to flush the remaining data to the underlying stream.
 Public Sub Flush()
     mStream.Flush
 End Sub
@@ -232,7 +261,21 @@ End Sub
 ' Flushes the remaining data to the underlying stream.
 '
 ' @remarks This can only be called once.
-'
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="NotSupportedException.html">NotSupportedException</a></td>
+'        <td>
+'           The current stream is not writable.<br/>
+'           -or-<br/>
+'           The final block has already been transformed.
+'        </td>
+'   </tr>
+' </table>
 Public Sub FlushFinalBlock()
     If Not CanWrite Then _
         Error.NotSupported NotSupported_UnwritableStream
@@ -254,14 +297,35 @@ Public Sub FlushFinalBlock()
 End Sub
 
 ''
-' Reads a requested amount of data from the stream.
+' Reads a sequence of bytes from the current <a href="CryptoStream.html">CryptoStream</a> and advances the position within the stream by the number of bytes read.
 '
-' @param Buffer The byte array that will receive the requested data.
-' @param Offset The starting index within <i>Buffer</i> to begin writing data.
-' @param Count The number of bytes to read.
-' @return The actual number of bytes read.
-' @remarks The number of bytes read may be less than the actual number of bytes requested.
-'
+' @param Buffer An array of bytes. A maximum of <i>Count</i> bytes are read from the current stream and stored in <i>Buffer</i>.
+' @param Offset The byte offset in <i>Buffer</i> at which to begin storing the data read from the current stream.
+' @param Count The maximum number of bytes to be read from the current stream.
+' @return The total number of bytes read into the buffer. This can be less than the number of bytes requested if that
+' many bytes are not currently available, or zero if the end of the stream has been reached.
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="NotSupportedException.html">NotSupportedException</a></td>
+'        <td>The <a href="CryptoStream.CryptoStreamMode.html">CryptoStreamMode</a> associated with current <a href="CryptoStream.html">CryptoStream</a> object does not match the underlying stream.
+'            For example, this exception is thrown when using <a href="CryptoStream.CryptoStreamMode.html">ReadMode</a> with an underlying stream that is write only.</td>
+'   </tr>
+'    <tr>
+'        <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+'        <td>
+'           The <i>Offset</i> parameter is less than zero.<br/>
+'           -or-<br/>
+'           The <i>Count</i> parameter is less than zero.
+'        </td>
+'    </tr>
+'    <tr>
+'        <td><a href="ArgumentException.html">ArgumentException</a></td><td>The sum of the <i>Count</i> and <i>Offset</i> parameters is longer than the length of the <i>Buffer</i>.</td>
+'    </tr>
+' </table>
 Public Function ReadBlock(ByRef Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long) As Long
     If Not CanRead Then _
         Error.NotSupported NotSupported_UnreadableStream
@@ -290,10 +354,23 @@ Public Function ReadBlock(ByRef Buffer() As Byte, ByVal Offset As Long, ByVal Co
 End Function
 
 ''
-' Reads a single byte from the Stream.
+' Reads a byte from the stream and advances the position within the stream by one byte, or returns -1 if at the end of the stream.
 '
-' @return Returns the byte data or -1 if the end of the stream was reached.
-'
+' @return The unsigned byte cast to a <b>Long</b>, or -1 if at the end of the stream.
+' @remarks Use the <a href="CryptoStream.Get.CanRead.html">CanRead</a> property to determine whether the current instance supports reading.
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="NotSupportedException.html">NotSupportedException</a></td><td>The stream does not support reading.</td>
+'   </tr>
+'    <tr>
+'        <td><a href="ObjectDisposedException.html">ObjectDisposedException</a></td><td>Methods were called after the stream was closed.</td>
+'    </tr>
+' </table>
 Public Function ReadByte() As Long
     If Not CanRead Then _
         Error.NotSupported NotSupported_UnreadableStream
@@ -374,14 +451,34 @@ Public Function EndRead(ByVal AsyncResult As IAsyncResult) As Long
 End Function
 
 ''
-' Writes an array of bytes to the Stream.
+' Writes a sequence of bytes to the current <a href="CryptoStream.html">CryptoStream</a> and advances the current position within this stream by the number of bytes written.
 '
-' @param Buffer The array of bytes to be written to the Stream.
-' @param Offset The index within <i>Buffer</i> to begin writing from.
-' @param Count The number of bytes to be written.
-' @param The bytes are transformed using the supplied ICryptoTransform before
-' being written to the underlying stream.
-'
+' @param Buffer An array of bytes. This method copies <i>Count</i> bytes from <i>Buffer</i> to the current stream.
+' @param Offset The byte offset in <i>Buffer</i> at which to begin copying bytes to the current stream.
+' @param Count The number of bytes to be written to the current stream.
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="NotSupportedException.html">NotSupportedException</a></td>
+'        <td>The <a href="CryptoStream.CryptoStreamMode.html">CryptoStreamMode</a> associated with current <a href="CryptoStream.html">CryptoStream</a> object does not match the underlying stream.
+'            For example, this exception is thrown when using <a href="CryptoStream.CryptoStreamMode.html">WriteMode</a> with an underlying stream that is read only.</td>
+'   </tr>
+'    <tr>
+'        <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+'        <td>
+'           The <i>Offset</i> parameter is less than zero.<br/>
+'           -or-<br/>
+'           The <i>Count</i> parameter is less than zero.
+'        </td>
+'    </tr>
+'    <tr>
+'        <td><a href="ArgumentException.html">ArgumentException</a></td><td>The sum of the <i>Count</i> and <i>Offset</i> parameters is longer than the length of the <i>Buffer</i>.</td>
+'    </tr>
+' </table>
 Public Sub WriteBlock(ByRef Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long)
     If Not CanWrite Then _
         Error.NotSupported NotSupported_UnwritableStream
@@ -480,7 +577,7 @@ End Sub
 ' @param Destination The stream to which the contents of the current stream will be copied.
 ' @param BufferSize The size of the buffer. This value must be greater than zero. The default size is 81920.
 ' @remarks Copying begins at the current position in the current stream, and does not reset the position of the destination stream after the copy operation is complete.
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
 '       <th>Exception</th>

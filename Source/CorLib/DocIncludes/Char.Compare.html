@@ -1,4 +1,4 @@
-@remarks The range of Unicode code points that represent a character in Visual Basic is U+0000 to U+FFFF (0 to 65535). <b>VBCorLib</b> internally represents characters using the <b>Integer</b> type which has a range from -32768 to 32767. This usually does not present an issue, however, when the need to compare two characters occurs the characters must be converted to correctly handle the 16 bit representation. For instance an <b>Integer</b> value of -1 is Unicode code point U+FFFF which should be the largest code point value during a comparison. In order to correctly compare two characters they are converted to a <b>Long</b> type then ANDed with 0x0000FFFF in order to get a correct ordered representation. The result has an identical 16 bit representation that can be compared correctly.
+@remarks The range of Unicode code points that represent a character in Visual Basic is U+0000 to U+FFFF (0 to 65535). VBCorLib internally represents characters using the <b>Integer</b> type which has a range from -32768 to 32767. This usually does not present an issue, however, when the need to compare two characters occurs the characters must be converted to correctly handle the 16 bit representation. For instance an <b>Integer</b> value of -1 is Unicode code point U+FFFF which should be the largest code point value during a comparison. In order to correctly compare two characters they are converted to a <b>Long</b> type then ANDed with 0x0000FFFF in order to get a correct ordered representation. The result has an identical 16 bit representation that can be compared correctly.
 <p>This method handles character code range -32768 to 65535. A bitwise AND is performed to convert the negative values to their corrisponding positive values. For example -1 is converted to 65535 (U+FFFF) using the bitwise AND operation with a <b>Long</b> type using <code>value = value And &H0000FFFF&</code>.</p>
 @exceptions
 <table style="width: auto">
@@ -8,9 +8,9 @@
 	<tr>
 		<td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
 		<td>
-			<i>a</i> is out of the valid range -32768 to 65535.<br/>
+			<i>a</i> is outside of the valid range -32768 to 65535.<br/>
 			-or-<br/>
-			<i>b</i> is out of the valid range -32768 to 65535.
+			<i>b</i> is outside of the valid range -32768 to 65535.
 		</td>
 	</tr>
 </table>

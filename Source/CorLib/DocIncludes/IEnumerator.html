@@ -1,0 +1,33 @@
+@examples The following example shows an implementation of the <b>IEnumerator</b> interface.
+<p>This example is part of a larger complete example for <a href="IEnumerable.html">IEnumerable</a>.</p>
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Option</span> Explicit
+<span style="color: #0000ff">Implements</span> IEnumerator
+
+<span style="color: #0000ff">Private</span> mBase <span style="color: #0000ff">As</span> EnumeratorBase
+<span style="color: #0000ff">Private</span> mContainer <span style="color: #0000ff">As</span> Container
+
+
+<span style="color: #008000">&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;</span>
+<span style="color: #008000">&#39;   Constructors</span>
+<span style="color: #008000">&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;</span>
+<span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Init(<span style="color: #0000ff">ByVal</span> Container <span style="color: #0000ff">As</span> Container)
+    <span style="color: #0000ff">Set</span> mBase = NewEnumeratorBase(0, Container.Count)
+    <span style="color: #0000ff">Set</span> mContainer = Container
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+
+<span style="color: #008000">&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;</span>
+<span style="color: #008000">&#39;   IEnumerator</span>
+<span style="color: #008000">&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;</span>
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Property</span> Get IEnumerator_Current() <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>
+    MoveVariant IEnumerator_Current, mContainer.Item(mBase.Index)
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Property</span>
+
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Function</span> IEnumerator_MoveNext() <span style="color: #0000ff">As</span> <span style="color: #2b91af">Boolean</span>
+    IEnumerator_MoveNext = mBase.MoveNext
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Function</span>
+
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> IEnumerator_Reset()
+    mBase.Reset
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+</pre></div>

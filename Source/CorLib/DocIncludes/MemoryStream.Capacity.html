@@ -1,0 +1,16 @@
+@remarks <b>Capacity</b> is the buffer length for system-provided byte arrays. <b>Capacity</b> cannot be set to a value less than the current length of the stream.
+@exceptions
+<table style="width: auto">
+  <tr>
+      <th>Exception</th><th>Condition</th>
+  </tr>
+  <tr>
+       <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td><td>A capacity is set that is negative or less than the current length of the stream.</td>
+  </tr>
+   <tr>
+       <td><a href="ObjectDisposedException.html">ObjectDisposedException</a></td><td>The current stream is closed.</td>
+   </tr>
+   <tr>
+       <td><a href="NotSupportedException.html">NotSupportedException</a></td><td><b>Let</b> is invoked on a stream whose capacity cannot be modified.</td>
+   </tr>
+</table>

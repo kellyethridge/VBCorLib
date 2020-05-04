@@ -36,15 +36,9 @@ Attribute VB_Exposed = True
 '
 
 ''
-' Provides a means to convert value data-types to and from arrays of bytes.
+' Converts base data types to an array of bytes, and an array of bytes to base data types.
 '
-' @remarks The <b>BitConverter</b> class cannot be instantiated. The methods
-' are available through the class name itself.
-' <pre>
-' Dim b() As Byte
-' b = BitConverter.GetBytes(&H12345678)
-' </pre>
-'
+' @include "..\DocIncludes\BitConverter.html"
 Option Explicit
 
 
@@ -119,29 +113,50 @@ End Function
 '
 ' @param value The datatype to be converted to a byte array.
 ' @return An array of bytes converted from the bits of the original datatype.
-' @remarks <p>A type boolean is converted to one byte. If the boolean
-' value is True, then the byte is 1, otherwise, it is 0.</p>
-' <p>The byte array contains as many bytes as the length of the
-' datatype being converted. A Long returns a 4-byte array, where as
-' a Double will return an 8-byte array.</p>
-' <p>The Decimal datatype is converted to 16 bytes with the same
-' layout as used in .NET. The layout is different than that of VB.<br><br>
-' VB Decimal layout<br>
-' bytes 0-1: Variant datatype information<br>
-' bytes 2: precision<br>
-' bytes 3: sign (&h80 is negative)<br>
-' bytes 4-7: the 32 highest bits in the 96bit value<br>
-' bytes 8-11: the 32 lowest bits in the 96bit value<br>
-' bytes 12-15: the 32 middle bits in the 96bit value<br>
-' <br>
-' .NET Decimal layout<br>
-' bytes 0-3: the 32 lowest bits in the 96bit value<br>
-' bytes 4-7: the 32 middle bits in the 96bit value<br>
-' bytes 8-11: the 32 highest bits in the 96bit value<br>
-' bytes 12-13: unused (zero)<br>
-' bytes 14: precision<br>
-' bytes 15: sign (&h80 is negative)<br>
-'
+' @remarks <p>A type boolean is converted to one byte. If the boolean value is True, then the byte is 1, otherwise, it is 0.</p>
+' <p>The byte array contains as many bytes as the length of the datatype being converted. A Long returns a 4-byte array, where as a Double will return an 8-byte array.</p>
+' <p>The following is a list of types that are supported.</p>
+' <ul>
+'   <li>Boolean</li>
+'   <li>Byte</li>
+'   <li>Integer</li>
+'   <li>Long</li>
+'   <li><a href="Int64Static.Int64.html">Int64</a></li>
+'   <li>Single</li>
+'   <li>Double</li>
+'   <li>Currency</li>
+'   <li>Date</li>
+'   <li>Decimal</li>
+' </ul>
+' <p>The <b>Decimal</b> type is converted to 16 bytes with the same layout as used in .NET. The layout is different than that of Visual Basic.</p>
+' <p>The differing layouts is shown in the following table.</p>
+' <table style="width: auto">
+'   <tr>
+'       <th>Framework</th><th>Layout</th>
+'   </tr>
+'   <tr>
+'        <td>Visual Basic</td>
+'        <td>
+'           bytes 0-1: Variant type information (Decimal has value 14)<br/>
+'           bytes 2: precision<br/>
+'           bytes 3: sign (&h80 is negative)<br/>
+'           bytes 4-7: the 32 highest bits in the 96bit value<br/>
+'           bytes 8-11: the 32 lowest bits in the 96bit value<br/>
+'           bytes 12-15: the 32 middle bits in the 96bit value
+'        </td>
+'   </tr>
+'    <tr>
+'        <td>.NET</td>
+'        <td>
+'           bytes 0-3: the 32 lowest bits in the 96bit value<br/>
+'           bytes 4-7: the 32 middle bits in the 96bit value<br/>
+'           bytes 8-11: the 32 highest bits in the 96bit value<br/>
+'           bytes 12-13: unused (zero)<br/>
+'           bytes 14: precision<br/>
+'           bytes 15: sign (&h80 is negative)
+'        </td>
+'    </tr>
+' </table>
 Public Function GetBytes(ByRef Value As Variant) As Byte()
     Dim Result() As Byte
 
@@ -233,8 +248,19 @@ End Function
 ' @param StartIndex The byte in the array to create the boolean from.
 ' @return Boolean representation of the byte used in the array.
 ' @remarks The boolean value is created from one byte. If the byte is
-' a non-zero value, True is returned, otherwise, False is returned.
-'
+' a non-zero value, <b>True</b> is returned, otherwise, <b>False</b> is returned.
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th><th>Condition</th>
+'   </tr>
+'    <tr>
+'        <td><a href="ArgumentNullException.html">ArgumentNullException</a></td><td><i>Value</i> is uninitialized.</td>
+'    </tr>
+'    <tr>
+'        <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td><td><i>StartIndex</i> is less than zero or greater than the length of <i>Value</i> minus 1.</td>
+'    </tr>
+' </table>
 Public Function ToBoolean(ByRef Value() As Byte, ByVal StartIndex As Long) As Boolean
     ValidateArrayArguments Value, StartIndex, vbSizeOfByte
     ToBoolean = (Value(StartIndex) > 0)
@@ -246,7 +272,22 @@ End Function
 ' @param Value The array of bytes to create a double from.
 ' @param StartIndex The starting byte in the array to create a double from.
 ' @return Double data-type representation of the 8 bytes used in the array.
-'
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th><th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ArgumentException.html">ArgumentException</a></td><td><i>StartIndex</i> is greater than or equal to the length of <i>Value</i> minus 7,
+'            and is less than or equal to the length of <i>Value</i> minus 1.</td>
+'   </tr>
+'    <tr>
+'        <td><a href="ArgumentNullException.html">ArgumentNullException</a></td><td><i>Value</i> is uninitialized.</td>
+'    </tr>
+'    <tr>
+'        <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td><td><i>StartIndex</i> is less than zero or greater than the length of <i>Value</i> minus 1.</td>
+'    </tr>
+' </table>
 Public Function ToDouble(ByRef Value() As Byte, ByVal StartIndex As Long) As Double
     ValidateArrayArguments Value, StartIndex, vbSizeOfDouble
     ToDouble = AsDouble(Value(StartIndex))
@@ -258,10 +299,26 @@ End Function
 ' @param Value The array of bytes to create a date from.
 ' @param StartIndex The starting byte in the array to create a date from.
 ' @return Date datatype representation of the 8 bytes used in the array.
-' @remarks The date data-type is stored as a 64-bit signed integer. Visual Basic's
-' Date data-type cannot represent the entire range storable in 64-bits. If the value
-' is outside a legal Date value an <a href="OverflowException.html">OverflowException</a> will be thrown.
-'
+' @remarks The date type is stored as ticks in a 64-bit signed integer. The Visual Basic Date type cannot represent the entire range storable in 64-bits.
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th><th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ArgumentException.html">ArgumentException</a></td><td><i>StartIndex</i> is greater than or equal to the length of <i>Value</i> minus 7,
+'            and is less than or equal to the length of <i>Value</i> minus 1.</td>
+'   </tr>
+'    <tr>
+'        <td><a href="ArgumentNullException.html">ArgumentNullException</a></td><td><i>Value</i> is uninitialized.</td>
+'    </tr>
+'    <tr>
+'        <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td><td><i>StartIndex</i> is less than zero or greater than the length of <i>Value</i> minus 1.</td>
+'    </tr>
+'   <tr>
+'        <td><a href="OverflowException.html">OverflowException</a></td><td>The 64-bit value is outside the valid range of the Visual Basic Date type.</td>
+'   </tr>
+' </table>
 Public Function ToDate(ByRef Value() As Byte, ByVal StartIndex As Long) As Date
     Dim Milliseconds As Currency
     
@@ -275,7 +332,22 @@ End Function
 ' @param Value The array of bytes used to create an integer from.
 ' @param StartIndex The starting byte in the array to create an integer from.
 ' @return Integer data-type representation of the 2 bytes used in the array.
-'
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th><th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ArgumentException.html">ArgumentException</a></td><td><i>StartIndex</i> is greater than or equal to the length of <i>Value</i> minus 1,
+'            and is less than or equal to the length of <i>Value</i> minus 1.</td>
+'   </tr>
+'    <tr>
+'        <td><a href="ArgumentNullException.html">ArgumentNullException</a></td><td><i>Value</i> is uninitialized.</td>
+'    </tr>
+'    <tr>
+'        <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td><td><i>StartIndex</i> is less than zero or greater than the length of <i>Value</i> minus 1.</td>
+'    </tr>
+' </table>
 Public Function ToInt16(ByRef Value() As Byte, ByVal StartIndex As Long) As Integer
     ValidateArrayArguments Value, StartIndex, vbSizeOfInteger
     ToInt16 = AsWord(Value(StartIndex))
@@ -287,6 +359,22 @@ End Function
 ' @param Value The array of bytes used to create a Long from.
 ' @param StartIndex The starting byte in the array to create a Long from.
 ' @return Long data-type representation of the 4 bytes used in the array.
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th><th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ArgumentException.html">ArgumentException</a></td><td><i>StartIndex</i> is greater than or equal to the length of <i>Value</i> minus 3,
+'            and is less than or equal to the length of <i>Value</i> minus 1.</td>
+'   </tr>
+'    <tr>
+'        <td><a href="ArgumentNullException.html">ArgumentNullException</a></td><td><i>Value</i> is uninitialized.</td>
+'    </tr>
+'    <tr>
+'        <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td><td><i>StartIndex</i> is less than zero or greater than the length of <i>Value</i> minus 1.</td>
+'    </tr>
+' </table>
 Public Function ToInt32(ByRef Value() As Byte, ByVal StartIndex As Long) As Long
     ValidateArrayArguments Value, StartIndex, vbSizeOfLong
     ToInt32 = AsLong(Value(StartIndex))
@@ -299,6 +387,22 @@ End Function
 ' @param StartIndex The starting position within <i>Value</i>.
 ' @return A 64-bit signed integer formed by eight bytes beginning at <i>StartIndex</i>.
 ' @remarks The <b>ToInt64</b> method converts the bytes from index <i>StartIndex</i> to <i>StartIndex</i> + 7 to a <a href="Int64Static.Int64.html">Int64</a> value. The order of bytes in the array must be little-endian.
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th><th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ArgumentException.html">ArgumentException</a></td><td><i>StartIndex</i> is greater than or equal to the length of <i>Value</i> minus 7,
+'            and is less than or equal to the length of <i>Value</i> minus 1.</td>
+'   </tr>
+'    <tr>
+'        <td><a href="ArgumentNullException.html">ArgumentNullException</a></td><td><i>Value</i> is uninitialized.</td>
+'    </tr>
+'    <tr>
+'        <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td><td><i>StartIndex</i> is less than zero or greater than the length of <i>Value</i> minus 1.</td>
+'    </tr>
+' </table>
 Public Function ToInt64(ByRef Value() As Byte, ByVal StartIndex As Long) As Int64
     ValidateArrayArguments Value, StartIndex, vbSizeOfInt64
     AssignQWord Value(StartIndex), ToInt64
@@ -310,7 +414,22 @@ End Function
 ' @param Value The array of bytes used to create a Single from.
 ' @param StartIndex The starting byte in the array to create a Single from.
 ' @return Single data-type representation of the 4 bytes used in the array.
-'
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th><th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ArgumentException.html">ArgumentException</a></td><td><i>StartIndex</i> is greater than or equal to the length of <i>Value</i> minus 3,
+'            and is less than or equal to the length of <i>Value</i> minus 1.</td>
+'   </tr>
+'    <tr>
+'        <td><a href="ArgumentNullException.html">ArgumentNullException</a></td><td><i>Value</i> is uninitialized.</td>
+'    </tr>
+'    <tr>
+'        <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td><td><i>StartIndex</i> is less than zero or greater than the length of <i>Value</i> minus 1.</td>
+'    </tr>
+' </table>
 Public Function ToSingle(ByRef Value() As Byte, ByVal StartIndex As Long) As Single
     ValidateArrayArguments Value, StartIndex, vbSizeOfSingle
     ToSingle = AsSingle(Value(StartIndex))
@@ -322,7 +441,22 @@ End Function
 ' @param Value The array of bytes used to create a Currency from.
 ' @param StartIndex The starting byte in the array to create a Currency from.
 ' @return Currency data-type representation of the 8 bytes used in the array.
-'
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th><th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ArgumentException.html">ArgumentException</a></td><td><i>StartIndex</i> is greater than or equal to the length of <i>Value</i> minus 7,
+'            and is less than or equal to the length of <i>Value</i> minus 1.</td>
+'   </tr>
+'    <tr>
+'        <td><a href="ArgumentNullException.html">ArgumentNullException</a></td><td><i>Value</i> is uninitialized.</td>
+'    </tr>
+'    <tr>
+'        <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td><td><i>StartIndex</i> is less than zero or greater than the length of <i>Value</i> minus 1.</td>
+'    </tr>
+' </table>
 Public Function ToCurrency(ByRef Value() As Byte, ByVal StartIndex As Long) As Currency
     ValidateArrayArguments Value, StartIndex, vbSizeOfCurrency
     ToCurrency = AsCurr(Value(StartIndex))
@@ -334,25 +468,56 @@ End Function
 ' @param Value The array of bytes used to create a Decimal value. Must be atleast 16 bytes in length.
 ' @param StartIndex The starting index within the array to be converting to a Decimal value.
 ' @return The converted Decimal value.
-' @remarks <p>The Decimal data-type is created from 16 bytes with the same
-' layout as used in .NET. The layout is different than that of VB.<br><br>
-' VB Decimal layout<br>
-' bytes 0-1: Variant datatype information<br>
-' bytes 2: precision<br>
-' bytes 3: sign (&h80 is negative)<br>
-' bytes 4-7: the 32 highest bits in the 96bit value<br>
-' bytes 8-11: the 32 lowest bits in the 96bit value<br>
-' bytes 12-15: the 32 middle bits in the 96bit value<br>
-' <br>
-' .NET Decimal layout<br>
-' bytes 0-3: the 32 lowest bits in the 96bit value<br>
-' bytes 4-7: the 32 middle bits in the 96bit value<br>
-' bytes 8-11: the 32 highest bits in the 96bit value<br>
-' bytes 12-13: unused (zero)<br>
-' bytes 14: precision<br>
-' bytes 15: sign (&h80 is negative)<br><br>
-' If the sign byte is non-zero, then the Decimal will be set as negative.<br>
-'
+' @remarks The Decimal type is created from 16 bytes with the same layout as used in .NET. The layout is different than that of Visual Basic.
+' <p>The differing layouts is shown in the following table.</p>
+' <table style="width: auto">
+'   <tr>
+'       <th>Framework</th><th>Layout</th>
+'   </tr>
+'   <tr>
+'        <td>Visual Basic</td>
+'        <td>
+'           bytes 0-1: Variant type information (Decimal has value 14)<br/>
+'           bytes 2: precision<br/>
+'           bytes 3: sign (&h80 is negative)<br/>
+'           bytes 4-7: the 32 highest bits in the 96bit value<br/>
+'           bytes 8-11: the 32 lowest bits in the 96bit value<br/>
+'           bytes 12-15: the 32 middle bits in the 96bit value
+'        </td>
+'   </tr>
+'    <tr>
+'        <td>.NET</td>
+'        <td>
+'           bytes 0-3: the 32 lowest bits in the 96bit value<br/>
+'           bytes 4-7: the 32 middle bits in the 96bit value<br/>
+'           bytes 8-11: the 32 highest bits in the 96bit value<br/>
+'           bytes 12-13: unused (zero)<br/>
+'           bytes 14: precision<br/>
+'           bytes 15: sign (&h80 is negative)
+'        </td>
+'    </tr>
+' </table>
+' If the sign byte is non-zero, then the Decimal will be set as negative.
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th><th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ArgumentException.html">ArgumentException</a></td><td><i>StartIndex</i> is greater than or equal to the length of <i>Value</i> minus 15,
+'            and is less than or equal to the length of <i>Value</i> minus 1.</td>
+'   </tr>
+'    <tr>
+'        <td><a href="ArgumentNullException.html">ArgumentNullException</a></td><td><i>Value</i> is uninitialized.</td>
+'    </tr>
+'    <tr>
+'        <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+'        <td><i>StartIndex</i> is less than zero or greater than the length of <i>Value</i> minus 1.<br/>
+'            -or-<br/>
+'            The precision is greater than 28.
+'        </td>
+'    </tr>
+' </table>
 Public Function ToDecimal(ByRef Value() As Byte, ByVal StartIndex As Long) As Variant
     ValidateArrayArguments Value, StartIndex, vbSizeOfDecimal
     VariantType(ToDecimal) = vbDecimal

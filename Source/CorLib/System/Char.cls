@@ -38,27 +38,46 @@ Attribute VB_Exposed = True
 ''
 ' Provides methods for inspecting and manipulating Unicode characters.
 '
-' @remarks A character in <i>VisualBasic</i> is represented as a UTF-16 code unit.
-'
+' @remarks A character is represented as a Unicode code point as a UTF-16 code unit from U+0000 to U+FFFF.
+' Because Visual Basic does not contain an unsigned 16-bit integer type, VBCorLib utilizes the <b>Integer</b> type. The two
+' types have the same binary representation, but have different numeric ranges. This leads to some difficulties when
+' needing to compare characters for sort order.
+' <p>If characters with the high bit set need to be compared then use the
+' <a href="Char.Equals.html">Char.Equals</a> and <a href="Char.Compare.html">Char.Compare</a> methods to ensure correct results.</p>
+' @see #Equals
+' @see #Compare
+' @see #ConvertToInt32
+' @see #ConvertFromInt32
 Option Explicit
 
 ''
-' Returns minimum character value.
+' Represents the smallest possible value of a <b>Char</b>.
 '
-' @remarks This return the value &H0000.
-'
+' @return The constant value zero (&h0000).
+' @remarks A character is represented as a Unicode code point as a UTF-16 code unit from U+0000 to U+FFFF.
+' @see #Equals
+' @see #Compare
+' @see #ConvertToInt32
+' @see #ConvertFromInt32
 Public Property Get MinValue() As Integer
     MinValue = 0
 End Property
 
 ''
-' Returns the maximum character value.
+' Represents the largest possible value of a <b>Char</b>.
 '
-' @remarks This returns the value &HFFFF.
-' <p>Because characters are represented using the <b>Integer</b> datatype the max
-' value will be a negative value. To correctly compare character values use the
-' <a href="Char.Equals.html">Char.Equals</a> and <a href="Char.Compare.html">Char.Compare</a> methods.
-'
+' @return The constant value -1 (&hFFFF)
+' @remarks A character is represented as a Unicode code point as a UTF-16 code unit from U+0000 to U+FFFF.
+' Because Visual Basic does not contain an unsigned 16-bit integer type, VBCorLib utilizes the <b>Integer</b> type. The two
+' types have the same binary representation, but have different numeric ranges. This leads to some difficulties when
+' needing to compare characters for sort order.
+' <p>The maximum character value would normally be U+FFFF(65535), however, when using the <b>Integer</b> type, the maximum character value becomes U+FFFF(-1).
+' Even though they are the same with their binary representation, they cannot be directly compared for sort order.</p>
+' <p>If characters with the high bit set need to be compared then use the <a href="Char.Equals.html">Char.Equals</a> and <a href="Char.Compare.html">Char.Compare</a> methods to ensure correct results.</p>
+' @see #Equals
+' @see #Compare
+' @see #ConvertToInt32
+' @see #ConvertFromInt32
 Public Property Get MaxValue() As Integer
     MaxValue = &HFFFF
 End Property
@@ -84,6 +103,8 @@ End Property
 '        <td>Greater than zero</td><td><i>a</i> follows <i>b</i> in the sort order.</td>
 '    </tr>
 ' </table>
+' @see #ConvertToInt32
+' @see #ConvertFromInt32
 ' @include "..\DocIncludes\Char.Compare.html"
 Public Function Compare(ByVal a As Long, ByVal b As Long) As Long
     If (Not IsValidChar(a)) Or (Not IsValidChar(b)) Then _
@@ -105,6 +126,8 @@ End Function
 ' @param a A character to compare with.
 ' @param b A character to compare with.
 ' @return <b>True</b> if <i>a</i> equals <i>b</i>; otherwise <b>False</b>.
+' @see #ConvertToInt32
+' @see #ConvertFromInt32
 ' @include "..\DocIncludes\Char.Equals.html"
 Public Function Equals(ByVal a As Long, ByVal b As Long) As Boolean
     If Not IsValidChar(a) Or Not IsValidChar(b) Then _
@@ -128,6 +151,18 @@ End Function
 '   <li>The characters CHARACTER TABULATION (U+0009), LINE FEED (U+000A), LINE TABULATION (U+000B), FORM FEED (U+000C), CARRIAGE RETURN (U+000D), and NEXT LINE (U+0085).</li>
 ' </ul>
 ' </p>
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+'        <td><i>Index</i> is less than zero or greater than or equal to the length of <i>s</i>.</td>
+'   </tr>
+' </table>
+' @see #IsWhiteSpace
 Public Function IsWhiteSpaceStr(ByRef s As String, ByVal Index As Long) As Boolean
     Dim Ptr As Long
     
@@ -142,7 +177,7 @@ End Function
 ' Indicates if a character is white space.
 '
 ' @param c An integer to check if is white space.
-' @return <b>true</b> if the character is considered white space; otherwise <b>false</b>.
+' @return <b>True</b> if the character is considered white space; otherwise <b>False</b>.
 ' @remarks White space characters are the following Unicode characters:
 ' <ul>
 '   <li>Members of the SpaceSeparator category, which includes the characters SPACE (U+0020), NO-BREAK SPACE (U+00A0), OGHAM SPACE MARK (U+1680), EN QUAD (U+2000), EM QUAD (U+2001), EN SPACE (U+2002), EM SPACE (U+2003), THREE-PER-EM SPACE (U+2004), FOUR-PER-EM SPACE (U+2005), SIX-PER-EM SPACE (U+2006), FIGURE SPACE (U+2007), PUNCTUATION SPACE (U+2008), THIN SPACE (U+2009), HAIR SPACE (U+200A), NARROW NO-BREAK SPACE (U+202F), MEDIUM MATHEMATICAL SPACE (U+205F), and IDEOGRAPHIC SPACE (U+3000).</li>
@@ -152,6 +187,17 @@ End Function
 ' </ul>
 ' <p>This method handles the discrepancy between integers and longs particularly when
 ' dealing with negative integer values that should map to positive long values.</p>
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td><td><i>c</i> is outside of the valid range -32768 to 65535.</td>
+'   </tr>
+' </table>
+' @see #IsWhiteSpaceStr
 Public Function IsWhiteSpace(ByVal c As Long) As Boolean
     If Not IsValidChar(c) Then _
         ThrowInvalidChar "c"
@@ -164,7 +210,7 @@ End Function
 '
 ' @param s A string.
 ' @param Index The position of the character to evaluate in <i>s</i>.
-' @return <b>true</b> if the value of <i>c</i> parameter ranges from U+D800 to U+DBFF; otherwise, <b>false</b>.
+' @return <b>True</b> if the value of <i>c</i> parameter ranges from U+D800 to U+DBFF; otherwise, <b>False</b>.
 ' @exceptions
 ' <table style="width:auto">
 '   <tr>
@@ -175,6 +221,11 @@ End Function
 '       <td><i>index</i> is not a position within <i>s</i>.</td>
 '   </tr>
 ' </table>
+' @see #IsHighSurrogate
+' @see #IsLowSurrogate
+' @see #IsLowSurrogateStr
+' @see #IsSurrogate
+' @see #IsSurrogateStr
 Public Function IsHighSurrogateStr(ByRef s As String, ByVal Index As Long) As Boolean
     Dim Ptr As Long
 
@@ -189,9 +240,24 @@ End Function
 ' Indicates whether the specified character has a high surrogate code unit.
 '
 ' @param c The Unicode character to evaluate.
-' @return <b>true</b> if the value of <i>c</i> parameter ranges from U+D800 to U+DBFF; otherwise, <b>false</b>.
+' @return <b>True</b> if the value of <i>c</i> parameter ranges from U+D800 to U+DBFF; otherwise, <b>False</b>.
 ' @remarks <p>This method handles the discrepancy between integers and longs particularly when
 ' dealing with negative integer values that should map to positive long values.</p>
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td><td><i>c</i> is outside of the valid range -32768 to 65535.</td>
+'   </tr>
+' </table>
+' @see #IsHighSurrogateStr
+' @see #IsLowSurrogate
+' @see #IsLowSurrogateStr
+' @see #IsSurrogate
+' @see #IsSurrogateStr
 Public Function IsHighSurrogate(ByVal c As Long) As Boolean
     If Not IsValidChar(c) Then _
         ThrowInvalidChar "c"
@@ -215,6 +281,11 @@ End Function
 '       <td><i>Index</i> is not a position within <i>s</i>.</td>
 '   </tr>
 ' </table>
+' @see #IsLowSurrogate
+' @see #IsHighSurrogate
+' @see #IsHighSurrogateStr
+' @see #IsSurrogate
+' @see #IsSurrogateStr
 Public Function IsLowSurrogateStr(ByRef s As String, ByVal Index As Long) As Boolean
     Dim Ptr As Long
     
@@ -229,10 +300,24 @@ End Function
 ' Indicates whether the specified character has a low surrogate code unit.
 '
 ' @param c The Unicode character to evaluate.
-' @return <b>true</b> if the value of <i>c</i> parameter ranges from U+DC00 to U+DFFF; otherwise, <b>false</b>.
+' @return <b>True</b> if the value of <i>c</i> parameter ranges from U+DC00 to U+DFFF; otherwise, <b>False</b>.
 ' @remarks <p>This method handles the discrepancy between integers and longs particularly when
 ' dealing with negative integer values that should map to positive long values.</p>
-'
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td><td><i>c</i> is outside of the valid range -32768 to 65535.</td>
+'   </tr>
+' </table>
+' @see #IsLowSurrogateStr
+' @see #IsHighSurrogate
+' @see #IsHighSurrogateStr
+' @see #IsSurrogate
+' @see #IsSurrogateStr
 Public Function IsLowSurrogate(ByVal c As Long) As Boolean
     If Not IsValidChar(c) Then _
         ThrowInvalidChar "c"
@@ -245,15 +330,25 @@ End Function
 '
 ' @param s A string.
 ' @param Index The position of the character to evaluate in <i>s</i>.
-' @return <b>true</b> if <i>c</i> is either a high surrogate or a low surrogate; otherwise, <b>false</b>.
+' @return <b>True</b> if <i>c</i> is either a high surrogate or a low surrogate; otherwise, <b>False</b>.
 ' @remarks <p>The <i>Index</i> parameter is zero-based where as <i>VisualBasic</i> is one-based.
 ' <p>A surrogate is a Char object with a UTF-16 code unit in the range from U+D800 to U+DFFF. The individual surrogate code unit has no interpretation of its own, but has meaning only when used as part of a surrogate pair.</p>
 ' <p>For more information about surrogate pairs, see the Unicode Standard at the <a href="http://www.unicode.org">OnlineUnicode home page</a>.</p>
-' @see IsSurrogate
-' @see IsHighSurrogate
-' @see IsHighSurrogateStr
-' @see IsLowSurrogate
-' @see IsLowSurrogateStr
+' @exceptions
+' <table style="width:auto">
+'   <tr>
+'       <th>Exception</th><th>Condition</th>
+'   </tr>
+'   <tr>
+'       <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+'       <td><i>Index</i> is not a position within <i>s</i>.</td>
+'   </tr>
+' </table>
+' @see #IsSurrogate
+' @see #IsHighSurrogate
+' @see #IsHighSurrogateStr
+' @see #IsLowSurrogate
+' @see #IsLowSurrogateStr
 Public Function IsSurrogateStr(ByRef s As String, ByVal Index As Long) As Boolean
     Dim Ptr As Long
     
@@ -268,16 +363,26 @@ End Function
 ' Indicates whether the specified character has a surrogate code unit.
 '
 ' @param c The Unicode character to evaluate.
-' @return <b>true</b> if <i>c</i> is either a high surrogate or a low surrogate; otherwise, <b>false</b>.
+' @return <b>True</b> if <i>c</i> is either a high surrogate or a low surrogate; otherwise, <b>False</b>.
 ' @remarks <p>A surrogate is a Char with a UTF-16 code unit in the range from U+D800 to U+DFFF. The individual surrogate code unit has no interpretation of its own, but has meaning only when used as part of a surrogate pair.</p>
 ' <p>For more information about surrogate pairs, see the Unicode Standard at the <a href="http://www.unicode.org">OnlineUnicode home page</a>.</p>
 ' <p>This method handles the discrepancy between integers and longs particularly when
 ' dealing with negative integer values that should map to positive long values.</p>
-' @see IsSurrogateStr
-' @see IsHighSurrogate
-' @see IsHighSurrogateStr
-' @see IsLowSurrogate
-' @see IsLowSurrogateStr
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td><td><i>c</i> is outside of the valid range -32768 to 65535.</td>
+'   </tr>
+' </table>
+' @see #IsSurrogateStr
+' @see #IsHighSurrogate
+' @see #IsHighSurrogateStr
+' @see #IsLowSurrogate
+' @see #IsLowSurrogateStr
 Public Function IsSurrogate(ByVal c As Long) As Boolean
     If Not IsValidChar(c) Then _
         ThrowInvalidChar "c"
@@ -299,6 +404,8 @@ End Function
 '       <td><i>HighSurrogate</i> is not in the range U+D800 through U+DBFF, or <i>LowSurrogate</i> is not in the range U+DC00 through U+DFFF.</td>
 '   </tr>
 ' </table>
+' @see #ConvertToUtf32Str
+' @see #ConvertFromUtf32
 Public Function ConvertToUtf32(ByVal HighSurrogate As Long, ByVal LowSurrogate As Long) As Long
     If Not IsValidChar(HighSurrogate) Or Not IsValidChar(LowSurrogate) Then _
         ThrowInvalidChar IIf(IsValidChar(HighSurrogate), "LowSurrogate", "HighSurrogate")
@@ -328,6 +435,8 @@ End Function
 '       <td>The specified index position contains a surrogate pair, and either the first character in the pair is not a valid high surrogate or the second character in the pair is not a valid low surrogate.</td>
 '   </tr>
 ' </table>
+' @see #ConvertToUtf32
+' @see #ConvertFromUtf32
 Public Function ConvertToUtf32Str(ByRef s As String, ByVal Index As Long) As Long
     Dim Char1   As Long
     Dim Char2   As Long
@@ -370,6 +479,8 @@ End Function
 '        <td><i>Utf32</i> is not a valid 21-bit Unicode code point ranging from U+0 through U+10FFFF, excluding the surrogate pair range from U+D800 through U+DFFF.</td>
 '   </tr>
 ' </table>
+' @see #ConvertToUtf32
+' @see #ConvertToUtf32Str
 Public Function ConvertFromUtf32(ByVal UTF32 As Long) As String
     Dim High As Long
     Dim Low As Long
@@ -396,6 +507,12 @@ End Function
 ' to represent all characters, the numeric value may be represented with a negative value.
 ' <p>If the numeric value is negative, converted positive value will have the same 16-bit binary representation.</p>
 ' <p>A character value of -1(&hFFFF) is converted to 65535(&hFFFF&). Both values have the same 16-bit binary representation.</p>
+' <p>The converted value will represent a value that can be correctly used for sort order. If characters need to be compared
+' for sorting, consider using <a href="Char.Compare.html">Char.Compare</a> to make comparisons.</p>
+' @see #ConvertFromInt32
+' @see #Compare
+' @see #Equals
+' @include "..\DocIncludes\Char.ConvertToInt32.html"
 Public Function ConvertToInt32(ByVal c As Integer) As Long
     ConvertToInt32 = c And &HFFFF&
 End Function
@@ -406,17 +523,8 @@ End Function
 ' @param Value The 32-bit signed integer value to be converted to a corrisponding 16-bit integer character.
 ' @return A 16-bit signed integer character.
 ' @remarks The 16-bit result will be a binary equivalent of the first 16 bits of the <i>Value</i> parameter.
-' @exceptions
-' <table style="width: auto">
-'   <tr>
-'       <th>Exception</th>
-'       <th>Condition</th>
-'   </tr>
-'   <tr>
-'        <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
-'        <td><i>Value</i> is less than -32768 or greater than 65535.</td>
-'   </tr>
-' </table>
+' @see #ConvertToInt32
+' @include "..\DocIncludes\Char.ConvertFromInt32.html"
 Public Function ConvertFromInt32(ByVal Value As Long) As Integer
     If Not IsValidChar(Value) Then _
         ThrowInvalidChar "Value"

@@ -1,0 +1,71 @@
+@remarks The <b>BitConverter</b> class helps manipulate value types in their fundamental form, as a series of bytes. A byte is defined as an 8-bit unsigned integer. The <b>BitConverter</b> class includes static methods to convert each of the primitive types to and from an array of bytes, as the following table illustrates.
+<table style="width: auto">
+  <tr>
+      <th>Type</th><th>To byte conversion</th><th>From byte conversion</th>
+  </tr>
+  <tr>
+       <td>Boolean</td><td><a href="BitConverter.GetBytes.html">GetBytes(Boolean)</a></td><td><a href="BitConverter.ToBoolean.html">ToBoolean</a></td>
+  </tr>
+  <tr>
+  		<td>Double</td>
+  		<td><a href="BitConverter.GetBytes.html">GetBytes(Double)</a><br/>-or-<br/><a href="BitConverter.DoubleToInt64Bits.html">DoubleToInt64Bits(Double)</a></td>
+  		<td><a href="BitConverter.ToDouble.html">ToDouble</a><br/>-or-<br/><a href="BitConverter.Int64BitsToDouble.html">Int64BitsToDouble</a></td>
+  </tr>
+  <tr>
+       <td>Int16</td><td><a href="BitConverter.GetBytes.html">GetBytes(Int16)</a></td><td><a href="BitConverter.ToInt16.html">ToInt16</a></td>
+  </tr>
+  <tr>
+       <td>Int32</td><td><a href="BitConverter.GetBytes.html">GetBytes(Int32)</a></td><td><a href="BitConverter.ToInt32.html">ToInt32</a></td>
+  </tr>
+  <tr>
+       <td>Int64</td><td><a href="BitConverter.GetBytes.html">GetBytes(Int64)</a></td><td><a href="BitConverter.ToInt64.html">ToInt64</a></td>
+  </tr>
+  <tr>
+       <td>Single</td><td><a href="BitConverter.GetBytes.html">GetBytes(Single)</a></td><td><a href="BitConverter.ToSingle.html">ToSingle</a></td>
+  </tr>
+  <tr>
+       <td>Single</td><td><a href="BitConverter.GetBytes.html">GetBytes(Date)</a></td><td><a href="BitConverter.ToDate.html">ToDate</a></td>
+  </tr>
+  <tr>
+       <td>Single</td><td><a href="BitConverter.GetBytes.html">GetBytes(Decimal)</a></td><td><a href="BitConverter.ToDecimal.html">ToDecimal</a></td>
+  </tr>
+</table>
+@examples The following code example illustrates the use of several <b>BitConverter</b> class methods.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Const</span> Formatter <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span> = <span style="color: #a31515">&quot;{0,25}{1,30}&quot;</span>
+    <span style="color: #0000ff">Const</span> ADouble   <span style="color: #0000ff">As</span> <span style="color: #2b91af">Double</span> = 0.111111111111111
+    <span style="color: #0000ff">Const</span> ASingle   <span style="color: #0000ff">As</span> <span style="color: #0000ff">Single</span> = 0.1111111!
+    <span style="color: #0000ff">Const</span> ALong     <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span> = 1111111111
+    <span style="color: #0000ff">Const</span> AnInt     <span style="color: #0000ff">As</span> <span style="color: #2b91af">Integer</span> = 11111
+    <span style="color: #0000ff">Const</span> ABool     <span style="color: #0000ff">As</span> <span style="color: #2b91af">Boolean</span> = <span style="color: #0000ff">True</span>
+    <span style="color: #0000ff">Dim</span> AnInt64     <span style="color: #0000ff">As</span> Int64
+    
+    AnInt64 = CInt64(<span style="color: #a31515">&quot;1111111111111111111&quot;</span>)
+    
+    Debug.Print t(<span style="color: #a31515">&quot;This example of methods of the BitConverter class&quot;</span> &amp; _
+        <span style="color: #a31515">&quot;\ngenerates the following output.\n&quot;</span>)
+    Debug.Print CorString.Format(Formatter, <span style="color: #a31515">&quot;Argument&quot;</span>, <span style="color: #a31515">&quot;Byte array&quot;</span>)
+    Debug.Print CorString.Format(Formatter, <span style="color: #a31515">&quot;--------&quot;</span>, <span style="color: #a31515">&quot;----------&quot;</span>)
+    
+    Debug.Print CorString.Format(Formatter, ADouble, BitConverter.ToString(BitConverter.GetBytes(ADouble)))
+    Debug.Print CorString.Format(Formatter, ASingle, BitConverter.ToString(BitConverter.GetBytes(ASingle)))
+    Debug.Print CorString.Format(Formatter, AnInt64, BitConverter.ToString(BitConverter.GetBytes(AnInt64)))
+    Debug.Print CorString.Format(Formatter, ALong, BitConverter.ToString(BitConverter.GetBytes(ALong)))
+    Debug.Print CorString.Format(Formatter, AnInt, BitConverter.ToString(BitConverter.GetBytes(AnInt)))
+    Debug.Print CorString.Format(Formatter, ABool, BitConverter.ToString(BitConverter.GetBytes(ABool)))
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; This code produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    This example of methods of the BitConverter class</span>
+<span style="color: #008000">&#39;    generates the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;                     Argument                    Byte array</span>
+<span style="color: #008000">&#39;                     --------                    ----------</span>
+<span style="color: #008000">&#39;            0.111111111111111       14-C7-71-1C-C7-71-BC-3F</span>
+<span style="color: #008000">&#39;                    0.1111111                   37-8E-E3-3D</span>
+<span style="color: #008000">&#39;          1111111111111111111       C7-71-C4-2B-AB-75-6B-0F</span>
+<span style="color: #008000">&#39;                   1111111111                   C7-35-3A-42</span>
+<span style="color: #008000">&#39;                        11111                         67-2B</span>
+<span style="color: #008000">&#39;                         True                            01</span>
+</pre></div>

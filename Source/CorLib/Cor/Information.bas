@@ -120,7 +120,7 @@ End Function
 ' to be invoked like VarType does. This method will also return
 ' the datatype of an array.
 Public Function CorVarType(ByRef Value As Variant) As VbVarType
-    CorVarType = VariantType(Value) And &HFF ' strip of the vbArray and BY_REF (&h4000) flag if it exists.
+    CorVarType = VariantType(Value) And &HFF ' strip off the vbArray and BY_REF (&h4000) flag if it exists.
 End Function
 
 ' Dereferences the 32-bits within a variant that represent

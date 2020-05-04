@@ -1,0 +1,46 @@
+@examples The following code example shows how to read and write data using memory as a backing store.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> FirstString()   <span style="color: #0000ff">As</span> <span style="color: #2b91af">Byte</span>
+    <span style="color: #0000ff">Dim</span> SecondString()  <span style="color: #0000ff">As</span> <span style="color: #2b91af">Byte</span>
+    <span style="color: #0000ff">Dim</span> ByteArray()     <span style="color: #0000ff">As</span> <span style="color: #2b91af">Byte</span>
+    <span style="color: #0000ff">Dim</span> CharArray()     <span style="color: #0000ff">As</span> <span style="color: #2b91af">Integer</span>
+    <span style="color: #0000ff">Dim</span> UniEncoding     <span style="color: #0000ff">As</span> <span style="color: #0000ff">New</span> UnicodeEncoding
+    <span style="color: #0000ff">Dim</span> MemStream       <span style="color: #0000ff">As</span> <span style="color: #0000ff">New</span> MemoryStream
+    <span style="color: #0000ff">Dim</span> Count <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
+    <span style="color: #0000ff">Dim</span> i <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
+    
+    FirstString = UniEncoding.GetBytes(<span style="color: #a31515">&quot;Invalid file path characters are:&quot;</span>)
+    SecondString = UniEncoding.GetBytes(Path.GetInvalidPathChars)
+    
+    MemStream.WriteBlock FirstString, 0, CorArray.Length(FirstString)
+    
+    <span style="color: #0000ff">For</span> i = LBound(SecondString) <span style="color: #0000ff">To</span> UBound(SecondString)
+        MemStream.WriteByte SecondString(i)
+    <span style="color: #0000ff">Next</span>
+    
+    Debug.Print CorString.Format(t(<span style="color: #a31515">&quot;Capacity = {0}, Length = {1}, Position = {2}\n&quot;</span>), MemStream.Capacity, MemStream.Length, MemStream.Position)
+    
+    MemStream.SeekPosition 0, SeekOrigin.FromBeginning
+    
+    <span style="color: #0000ff">ReDim</span> ByteArray(0 <span style="color: #0000ff">To</span> MemStream.Length - 1)
+    Count = MemStream.ReadBlock(ByteArray, 0, 20)
+    
+    <span style="color: #0000ff">Do</span> <span style="color: #0000ff">While</span> Count &lt; MemStream.Length
+        ByteArray(Count) = MemStream.ReadByte
+        Count = Count + 1
+    <span style="color: #0000ff">Loop</span>
+    
+    <span style="color: #0000ff">ReDim</span> CharArray(0 <span style="color: #0000ff">To</span> UniEncoding.GetCharCount(ByteArray, 0, Count) - 1)
+    UniEncoding.GetDecoder.GetChars ByteArray, 0, Count, CharArray, 0
+    
+    Debug.Print NewString(CharArray)
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; The example code produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    Capacity = 256, Length = 138, Position = 138</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    Invalid file path characters are:&quot;&lt;&gt;| </span>
+<span style="color: #008000">&#39;    </span>
+<span style="color: #008000">&#39;    </span>
+</pre></div>

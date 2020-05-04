@@ -1,0 +1,63 @@
+@examples The following code example illustrates the use of several <b>Buffer</b> class methods.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> Arr() <span style="color: #0000ff">As</span> <span style="color: #2b91af">Integer</span>
+    
+    Arr = NewIntegers(258, 259, 260, 261, 262, 263, 264, 265, 266, 267, 268, 269, 270, 271)
+    
+    Debug.Print t(<span style="color: #a31515">&quot;This example of the Buffer class &quot;</span> &amp; _
+        <span style="color: #a31515">&quot;methods generates the following output.\n&quot;</span> &amp; _
+        <span style="color: #a31515">&quot;Note: The array is displayed from right to left.\n&quot;</span>)
+    Debug.Print t(<span style="color: #a31515">&quot;Initial values of array:\n&quot;</span>)
+    
+    <span style="color: #008000">&#39; Display the initial array values and ByteLength.</span>
+    DisplayArray Arr
+    Debug.Print t(<span style="color: #a31515">&quot;\nBuffer.ByteLength(Arr): &quot;</span>) &amp; Buffer.ByteLength(Arr)
+    
+    <span style="color: #008000">&#39; Copy a region of the array; set a byte within the array.</span>
+    Debug.Print t(<span style="color: #a31515">&quot;\nCall these methods: \n&quot;</span> &amp; _
+        <span style="color: #a31515">&quot;  Buffer.BlockCopy(Arr, 5, Arr, 16, 9),\n&quot;</span> &amp; _
+        <span style="color: #a31515">&quot;  Buffer.SetByte(Arr, 7, 170).\n&quot;</span>)
+    
+    Buffer.BlockCopy Arr, 5, Arr, 16, 9
+    Buffer.SetByte Arr, 7, 170
+    
+    <span style="color: #008000">&#39; Display the array and a byte within the array.</span>
+    Debug.Print t(<span style="color: #a31515">&quot;Final values of array:\n&quot;</span>)
+    DisplayArray Arr
+    Debug.Print t(<span style="color: #a31515">&quot;\nBuffer.GetByte(Arr, 26): &quot;</span>) &amp; Buffer.GetByte(Arr, 26)
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; Display the array elements from right to left in hexadecimal.</span>
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> DisplayArray(<span style="color: #0000ff">ByRef</span> Arr() <span style="color: #0000ff">As</span> <span style="color: #2b91af">Integer</span>)
+    <span style="color: #0000ff">Dim</span> i <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
+    
+    Debug.Print <span style="color: #a31515">&quot;  Arr:&quot;</span>;
+    
+    <span style="color: #0000ff">For</span> i = UBound(Arr) <span style="color: #0000ff">To</span> LBound(Arr) <span style="color: #0000ff">Step</span> -1
+        Debug.Print CorString.Format(<span style="color: #a31515">&quot; {0:X4}&quot;</span>, Arr(i));
+    <span style="color: #0000ff">Next</span>
+    
+    Debug.Print
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; This code produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    This example of the Buffer class methods generates the following output.</span>
+<span style="color: #008000">&#39;    Note: The array is displayed from right to left.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    Initial values of array:</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;      Arr: 010F 010E 010D 010C 010B 010A 0109 0108 0107 0106 0105 0104 0103 0102</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    Buffer.ByteLength(Arr): 28</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    Call these methods:</span>
+<span style="color: #008000">&#39;      Buffer.BlockCopy(Arr, 5, Arr, 16, 9),</span>
+<span style="color: #008000">&#39;      Buffer.SetByte(Arr, 7, 170).</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    Final values of array:</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;      Arr: 010F 0101 0801 0701 0601 0501 0109 0108 0107 0106 AA05 0104 0103 0102</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    Buffer.GetByte(Arr, 26): 15</span>
+</pre></div>

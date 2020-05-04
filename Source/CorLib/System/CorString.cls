@@ -39,19 +39,13 @@ Attribute VB_Exposed = True
 ' Provides static functions to format and manipulate string values.
 '
 ' @remarks This class cannot be directly instantiated. The methods are accessed through the class name itself.
-' @example
+' @examples
 ' <pre>
 ' s = CorString.Trim(s, "\")
 ' </pre>
 '
 Option Explicit
 
-''
-' Enum flag to indicate how strings should be compared.
-'
-' @remarks The values assigned to each enum is equal to the .NET version of the enum.
-'
-    
 ''
 ' Specifies the culture, case, and sort rules to be used with certain implementations of the
 ' <a href="CorString.Compare.html">CorString.Compare</a> and <a href="CorString.Equals.html">CorString.Equals</a> methods.

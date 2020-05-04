@@ -1,0 +1,15 @@
+@examples The following example creates and displays the values of two <a href="Guid.html">Guid</a> objects.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> g <span style="color: #0000ff">As</span> Guid
+    
+    <span style="color: #0000ff">Set</span> g = Guid.NewGuid
+    
+    Debug.Print g.ToString
+    Debug.Print Guid.NewGuid.ToString
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; This code produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    c35cb7df-7deb-4959-b40a-e9c67dad4131</span>
+<span style="color: #008000">&#39;    91cf364c-d276-4068-b47d-d47b52872c83</span>
+</pre></div>

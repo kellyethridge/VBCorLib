@@ -1,0 +1,24 @@
+@examples The code parses a guid string then displays the guid in various formats.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> g <span style="color: #0000ff">As</span> Guid
+    
+    <span style="color: #0000ff">Set</span> g = Guid.Parse(<span style="color: #a31515">&quot;{533217B3-CDEC-40A2-B01C-1EA8593B850F}&quot;</span>)
+    
+    Debug.Print <span style="color: #a31515">&quot;Display guid with various formats.&quot;</span>
+    
+    Debug.Print <span style="color: #a31515">&quot; D = &quot;</span> &amp; g.ToString(<span style="color: #a31515">&quot;D&quot;</span>)
+    Debug.Print <span style="color: #a31515">&quot; B = &quot;</span> &amp; g.ToString(<span style="color: #a31515">&quot;B&quot;</span>)
+    Debug.Print <span style="color: #a31515">&quot; P = &quot;</span> &amp; g.ToString(<span style="color: #a31515">&quot;P&quot;</span>)
+    Debug.Print <span style="color: #a31515">&quot; N = &quot;</span> &amp; g.ToString(<span style="color: #a31515">&quot;N&quot;</span>)
+    Debug.Print <span style="color: #a31515">&quot; X = &quot;</span> &amp; g.ToString(<span style="color: #a31515">&quot;X&quot;</span>)
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; This code produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    Display guid with various formats.</span>
+<span style="color: #008000">&#39;     D = 533217b3-cdec-40a2-b01c-1ea8593b850f</span>
+<span style="color: #008000">&#39;     B = {533217b3-cdec-40a2-b01c-1ea8593b850f}</span>
+<span style="color: #008000">&#39;     P = (533217b3-cdec-40a2-b01c-1ea8593b850f)</span>
+<span style="color: #008000">&#39;     N = 533217b3cdec40a2b01c1ea8593b850f</span>
+<span style="color: #008000">&#39;     X = {0x533217b3,0xcdec,0x40a2,{0xb0,0x1c,0x1e,0xa8,0x59,0x3b,0x85,0x0f}}</span>
+</pre></div>

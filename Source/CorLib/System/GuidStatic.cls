@@ -36,21 +36,20 @@ Attribute VB_Exposed = True
 '
 
 ''
-' Provides static methods used to create and manipulate <b>Guid</b> objects.
+' Provides static methods used to create and manipulate <a href="Guid.html">Guid</a> objects.
 '
-' @remarks The name Guid conflicts with a hidden type in VB. In order to
-' specific the VBCorLib version of Guid, a variable must be defined as
-' VBCorLib.Guid instead of just Guid.
-' </p>This class cannot be directly created. To access the methods, use
-' the variable name directly.
-' <pre>
-' Dim g As VBCorLib.Guid
-' Set g = Guid.Parse("{533217B3-CDEC-40A2-B01C-1EA8593B850F}")
-' </pre>
-' </p>
-'
+' @remarks A GUID is a 128-bit integer (16 bytes) that can be used across all computers and
+' networks wherever a unique identifier is required. Such an identifier has a very low probability of being duplicated.
+' <table>
+'   <tr><th>Note</th></tr>
+'   <tr>
+'       <td>The VBCorLib Guid conflicts with a hidden type in Visual Basic. In order to specific the VBCorLib version of Guid,
+'           a variable can be defined as CorLib.Guid instead of just Guid. Alternatively, moving the reference priority for the
+'           VBCorLib library above OLE Automation will give CorLib.Guid priority when a variable is declared.</td>
+'   </tr>
+' </table>
 ' @see Guid
-'
+' @include "..\DocIncludes\Guid.html"
 Option Explicit
 
 Private mParser         As New GuidParser
@@ -86,11 +85,15 @@ Public Property Get IDispatchGuid() As Guid
 End Property
 
 ''
-' Returns a new <b>Guid</b> object with a random guid generated.
+' Initializes a new instance of the <a href="Guid.html">Guid</a> object.
 '
-' @return A new <b>Guid</b> object.
+' @return A new <a href="Guid.html">Guid</a> object.
+' @remarks This is a convenient <b>static</b> method that you can call to get a new <a href="Guid.html">Guid</a>.
+' <p>The chance that the value of the new <a href="Guid.html">Guid</a> will be all zeros or equal to any other <a href="Guid.html">Guid</a> is very low.
+' You can determine whether a GUID consists of all zeros by comparing it to <a href="GuidStatic.Get.EmptyGuid.html">Guid.EmptyGuid</a>.</p>
+' @see #EmptyGuid
 ' @see Guid
-'
+' @include "..\DocIncludes\Guid.NewGuid.html"
 Public Function NewGuid() As Guid
     Set NewGuid = New Guid
     NewGuid.InitReadOnly CoCreateGuid

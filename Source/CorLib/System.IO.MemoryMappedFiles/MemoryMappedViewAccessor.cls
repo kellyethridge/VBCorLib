@@ -90,7 +90,7 @@ End Property
 '
 ' @param Position The number of bytes into the accessor at which to begin reading.
 ' @return The value that was read.
-' <h4>Exceptions</h4>
+' @exceptions
 ' @remarks <table style="width: auto">
 '   <tr>
 '       <th>Exception</th>
@@ -102,6 +102,9 @@ End Property
 '   <tr>
 '       <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td><td><i>Position</i> is less than zero or greater than the capacity of the accessor.</td>
 '   </tr>
+'    <tr>
+'        <td><a href="NotSupportedException.html">NotSupportedException</a></td><td>The accessor does not support reading.</td>
+'    </tr>
 ' </table>
 Public Function ReadByte(ByVal Position As Long) As Byte
     If Not CanRead Then _
@@ -116,8 +119,7 @@ End Function
 '
 ' @param Position The number of bytes into the accessor at which to begin reading.
 ' @return The value that was read.
-' @remarks
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
 '       <th>Exception</th>
@@ -129,6 +131,9 @@ End Function
 '   <tr>
 '       <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td><td><i>Position</i> is less than zero or greater than the capacity of the accessor.</td>
 '   </tr>
+'    <tr>
+'        <td><a href="NotSupportedException.html">NotSupportedException</a></td><td>The accessor does not support reading.</td>
+'    </tr>
 ' </table>
 Public Function ReadBoolean(ByVal Position As Long) As Boolean
     If Not CanRead Then _
@@ -144,7 +149,7 @@ End Function
 ' @return The value that was read.
 ' @remarks <p>The <b>ReadChar</b> method does not attempt to apply any encoding. It will simply read two consecutive bytes as a character.</p>
 ' <p>This method will return the same value as <a href="MemoryMappedViewAccessor.ReadInt16.html">MemoryMappedViewAccessor.ReadInt16</a>.</p>
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
 '       <th>Exception</th>
@@ -156,6 +161,9 @@ End Function
 '   <tr>
 '       <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td><td><i>Position</i> is less than zero or greater than the capacity of the accessor.</td>
 '   </tr>
+'    <tr>
+'        <td><a href="NotSupportedException.html">NotSupportedException</a></td><td>The accessor does not support reading.</td>
+'    </tr>
 ' </table>
 Public Function ReadChar(ByVal Position As Long) As Integer
     If Not CanRead Then _
@@ -169,8 +177,7 @@ End Function
 '
 ' @param Position The number of bytes into the accessor at which to begin reading.
 ' @return The value that was read.
-' @remarks
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
 '       <th>Exception</th>
@@ -182,8 +189,10 @@ End Function
 '   <tr>
 '       <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td><td><i>Position</i> is less than zero or greater than the capacity of the accessor.</td>
 '   </tr>
+'    <tr>
+'        <td><a href="NotSupportedException.html">NotSupportedException</a></td><td>The accessor does not support reading.</td>
+'    </tr>
 ' </table>
-
 Public Function ReadInt16(ByVal Position As Long) As Integer
     If Not CanRead Then _
         Error.NotSupported NotSupported_Reading
@@ -197,8 +206,7 @@ End Function
 '
 ' @param Position The number of bytes into the accessor at which to begin reading.
 ' @return The value that was read.
-' @remarks
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
 '       <th>Exception</th>
@@ -210,6 +218,9 @@ End Function
 '   <tr>
 '       <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td><td><i>Position</i> is less than zero or greater than the capacity of the accessor.</td>
 '   </tr>
+'    <tr>
+'        <td><a href="NotSupportedException.html">NotSupportedException</a></td><td>The accessor does not support reading.</td>
+'    </tr>
 ' </table>
 Public Function ReadInt32(ByVal Position As Long) As Long
     If Not CanRead Then _
@@ -224,8 +235,7 @@ End Function
 '
 ' @param Position The number of bytes into the accessor at which to begin reading.
 ' @return The value that was read.
-' @remarks
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
 '       <th>Exception</th>
@@ -237,6 +247,9 @@ End Function
 '   <tr>
 '       <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td><td><i>Position</i> is less than zero or greater than the capacity of the accessor.</td>
 '   </tr>
+'    <tr>
+'        <td><a href="NotSupportedException.html">NotSupportedException</a></td><td>The accessor does not support reading.</td>
+'    </tr>
 ' </table>
 Public Function ReadInt64(ByVal Position As Long) As Int64
     If Not CanRead Then _
@@ -253,7 +266,7 @@ End Function
 ' @return The value to be read.
 ' @remarks <p>The <b>ReadDate</b> method reads 64-bits as <b>Ticks</b> to represent the <b>Date</b>. This
 ' means that there is a possible invalid date value read. This would cause an <a href="OverflowException.html">OverflowException</a> to be thrown.</p>
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
 '       <th>Exception</th>
@@ -267,6 +280,9 @@ End Function
 '   </tr>
 '    <tr>
 '        <td><a href="OverflowException.html">OverflowException</a></td><td>A value was read that cannot be represented as a valid OLE Automation Date.</td>
+'    </tr>
+'    <tr>
+'        <td><a href="NotSupportedException.html">NotSupportedException</a></td><td>The accessor does not support reading.</td>
 '    </tr>
 ' </table>
 Public Function ReadDate(ByVal Position As Long) As Date
@@ -284,7 +300,7 @@ End Function
 ' @remarks <p>The <b>ReadCurrency</b> method reads 64-bits but does not scale the value
 ' to create a <b>Currency</b> without a fractional part. For example if the 64-bits read
 ' is equal to 1 then the returned currency value would be 0.0001.</p>
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
 '       <th>Exception</th>
@@ -296,6 +312,9 @@ End Function
 '   <tr>
 '       <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td><td><i>Position</i> is less than zero or greater than the capacity of the accessor.</td>
 '   </tr>
+'    <tr>
+'        <td><a href="NotSupportedException.html">NotSupportedException</a></td><td>The accessor does not support reading.</td>
+'    </tr>
 ' </table>
 Public Function ReadCurrency(ByVal Position As Long) As Currency
     If Not CanRead Then _
@@ -310,8 +329,7 @@ End Function
 '
 ' @param Position The number of bytes into the accessor at which to begin reading.
 ' @return The value that was read.
-' @remarks
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
 '       <th>Exception</th>
@@ -323,6 +341,9 @@ End Function
 '   <tr>
 '       <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td><td><i>Position</i> is less than zero or greater than the capacity of the accessor.</td>
 '   </tr>
+'    <tr>
+'        <td><a href="NotSupportedException.html">NotSupportedException</a></td><td>The accessor does not support reading.</td>
+'    </tr>
 ' </table>
 Public Function ReadDouble(ByVal Position As Long) As Double
     If Not CanRead Then _
@@ -337,8 +358,7 @@ End Function
 '
 ' @param Position The number of bytes into the accessor at which to begin reading.
 ' @return The value that was read.
-' @remarks
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
 '       <th>Exception</th>
@@ -350,6 +370,9 @@ End Function
 '   <tr>
 '       <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td><td><i>Position</i> is less than zero or greater than the capacity of the accessor.</td>
 '   </tr>
+'    <tr>
+'        <td><a href="NotSupportedException.html">NotSupportedException</a></td><td>The accessor does not support reading.</td>
+'    </tr>
 ' </table>
 Public Function ReadSingle(ByVal Position As Long) As Single
     If Not CanRead Then _
@@ -364,8 +387,7 @@ End Function
 '
 ' @param Position The number of bytes into the accessor at which to begin reading.
 ' @return The value that was read.
-' @remarks
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
 '       <th>Exception</th>
@@ -377,6 +399,9 @@ End Function
 '   <tr>
 '       <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td><td><i>Position</i> is less than zero or greater than the capacity of the accessor.</td>
 '   </tr>
+'    <tr>
+'        <td><a href="NotSupportedException.html">NotSupportedException</a></td><td>The accessor does not support reading.</td>
+'    </tr>
 ' </table>
 Public Function ReadDecimal(ByVal Position As Long) As Variant
     If Not CanRead Then _
@@ -391,8 +416,7 @@ End Function
 '
 ' @param Position The number of bytes into the accessor at which to begin reading.
 ' @param Structure The structure to contain the read data.
-' @remarks
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
 '       <th>Exception</th>
@@ -409,6 +433,9 @@ End Function
 '   <tr>
 '       <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td><td><i>Position</i> is less than zero or greater than the capacity of the accessor.</td>
 '   </tr>
+'    <tr>
+'        <td><a href="NotSupportedException.html">NotSupportedException</a></td><td>The accessor does not support reading.</td>
+'    </tr>
 ' </table>
 Public Sub Read(ByVal Position As Long, ByRef Structure As Variant)
     If Not CanRead Then _
@@ -456,8 +483,7 @@ End Sub
 ' @param Offset The index in array in which to place the first copied structure.
 ' @param Count The number of structures of the type passed in to read from the accessor.
 ' @return The number of structures read into <i>Arr</i>. This value can be less than <i>Count</i> if there are fewer structures available, or zero if the end of the accessor is reached.
-' @remarks
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
 '       <th>Exception</th>
@@ -472,6 +498,9 @@ End Sub
 '   <tr>
 '       <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a><td><i>Position</i> is less than zero or greater than the capacity of the accessor.</td>
 '   </tr>
+'    <tr>
+'        <td><a href="NotSupportedException.html">NotSupportedException</a></td><td>The accessor does not support reading.</td>
+'    </tr>
 ' </table>
 Public Function ReadArray(ByVal Position As Long, ByRef Arr As Variant, ByVal Offset As Long, ByVal Count As Long) As Long
     Dim DataType    As VbVarType
@@ -557,8 +586,7 @@ End Function
 '
 ' @param Position The number of bytes into the accessor at which to begin writing.
 ' @param Value The value to write.
-' @remarks
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
 '       <th>Exception</th>
@@ -636,8 +664,7 @@ End Sub
 ' @param Arr The array to write into the accessor.
 ' @param Offset The index in <i>Arr</i> to start writing from.
 ' @param Count The number of structures in <i>Arr</i> to write.
-' @remarks
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
 '       <th>Exception</th>
@@ -846,7 +873,7 @@ Private Sub InitViewData()
         .cbElements = 1
         .cDims = 1
         .cElements = mCapacity
-        .pvData = mViewAddress
+        .PVData = mViewAddress
     End With
     
     SAPtr(mViewData) = VarPtr(mViewDataSA)

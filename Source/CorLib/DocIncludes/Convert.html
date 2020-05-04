@@ -1,0 +1,52 @@
+@examples This example takes a byte array containing 10 elements with values 1 to 10 and encodes it into a Base-64 string encoding. The encoded string is then decoded back into the original byte array and displayed for view.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> Original() <span style="color: #0000ff">As</span> <span style="color: #2b91af">Byte</span>
+    <span style="color: #0000ff">Dim</span> Decoded() <span style="color: #0000ff">As</span> <span style="color: #2b91af">Byte</span>
+    <span style="color: #0000ff">Dim</span> s <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+
+    <span style="color: #008000">&#39; Create a byte array containing values 1 to 10.</span>
+    Original = NewBytes(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+
+    <span style="color: #008000">&#39; Display the original byte array values</span>
+    Debug.Print <span style="color: #a31515">&quot;Original Bytes&quot;</span>
+    DisplayBytes Original
+
+    <span style="color: #008000">&#39; Encode the byte array into a Base-64 Encoded string.</span>
+    s = Convert.ToBase64String(Original)
+
+    <span style="color: #008000">&#39; Display Base-64 Encoded string.</span>
+    Debug.Print t(<span style="color: #a31515">&quot;\nBase-64 Encoded String&quot;</span>)
+    Debug.Print <span style="color: #a31515">&quot;  &quot;</span> &amp; s
+
+    <span style="color: #008000">&#39; Decode Base-64 string into byte array.</span>
+    Decoded = Convert.FromBase64String(s)
+
+    <span style="color: #008000">&#39; Display decoded byte array.</span>
+    Debug.Print t(<span style="color: #a31515">&quot;\nBytes After Decoding&quot;</span>)
+    DisplayBytes Decoded
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39;Displays the contents of a byte array.</span>
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> DisplayBytes(<span style="color: #0000ff">ByRef</span> Bytes() <span style="color: #0000ff">As</span> <span style="color: #2b91af">Byte</span>)
+    <span style="color: #0000ff">Dim</span> i <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
+
+    Debug.Print <span style="color: #a31515">&quot;  &quot;</span>;
+
+    <span style="color: #0000ff">For</span> i = LBound(Bytes) <span style="color: #0000ff">To</span> UBound(Bytes)
+        Debug.Print Bytes(i) &amp; <span style="color: #a31515">&quot; &quot;</span>;
+    <span style="color: #0000ff">Next</span> i
+    
+    Debug.Print
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; This code produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    Original Bytes</span>
+<span style="color: #008000">&#39;      1 2 3 4 5 6 7 8 9 10</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    Base-64 Encoded String</span>
+<span style="color: #008000">&#39;      AQIDBAUGBwgJCg==</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    Bytes After Decoding</span>
+<span style="color: #008000">&#39;      1 2 3 4 5 6 7 8 9 10</span>
+</pre></div>

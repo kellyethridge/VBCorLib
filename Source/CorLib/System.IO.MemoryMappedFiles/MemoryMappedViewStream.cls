@@ -107,8 +107,7 @@ End Property
 ' Gets the current position in a stream.
 '
 ' @return The current position in the stream.
-' @remarks
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
 '       <th>Exception</th>
@@ -126,8 +125,7 @@ End Property
 ' Sets the current position in a stream.
 '
 ' @param Value The current position in the stream.
-' @remarks
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
 '       <th>Exception</th>
@@ -158,8 +156,7 @@ End Sub
 ' Gets a value, in miliseconds, that determines how long the stream will attempt to read before timing out.
 '
 ' @return A value, in miliseconds, that determines how long the stream will attempt to read before timing out.
-' @remarks
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
 '       <th>Exception</th>
@@ -177,8 +174,7 @@ End Property
 ' Sets a value, in miliseconds, that determines how long the stream will attempt to read before timing out.
 '
 ' @param Value A value, in miliseconds, that determines how long the stream will attempt to read before timing out.
-' @remarks
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
 '       <th>Exception</th>
@@ -196,8 +192,7 @@ End Property
 ' Gets a value, in miliseconds, that determines how long the stream will attempt to write before timing out.
 '
 ' @return A value, in miliseconds, that determines how long the stream will attempt to write before timing out.
-' @remarks
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
 '       <th>Exception</th>
@@ -215,8 +210,7 @@ End Property
 ' Sets a value, in miliseconds, that determines how long the stream will attempt to write before timing out.
 '
 ' @param Value A value, in miliseconds, that determines how long the stream will attempt to write before timing out.
-' @remarks
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
 '       <th>Exception</th>
@@ -240,7 +234,7 @@ End Property
 ' @param State A user-provided object that distinguishes this particular asynchronous read request from other requests.
 ' @return An <a href="IAsyncResult.html">IAsyncResult</a> that represents the asynchronous read, which could still be pending.
 ' @remarks <p>The default implementation of <b>BeginRead</b> on a stream calls the <a href="Stream.ReadBlock.html">ReadBlock</a> method synchronously.</p>
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
 '       <th>Exception</th>
@@ -273,7 +267,7 @@ End Function
 ' @param State A user-provided object that distinguishes this particular asynchronous write request from other requests.
 ' @return An <a href="IAsyncResult.html">IAsyncResult</a> that represents the asynchronous write, which could still be pending.
 ' @remarks The default implementation of <b>BeginWrite</b> on a stream calls the Write method synchronously.
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
 '       <th>Exception</th>
@@ -304,7 +298,7 @@ End Function
 ' @remarks <p>Call <b>EndRead</b> to determine how many bytes were read from the stream.</p>
 ' <p><b>EndRead</b> can be called once on every <a href="IAsyncResult.html">IAsyncResult</a> from <a href="MemoryMappedViewStream.BeginRead.html">BeginRead</a>.</p>
 ' <p>This method blocks until the I/O operation has completed.</p>
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
 '       <th>Exception</th>
@@ -337,7 +331,7 @@ End Function
 '
 ' @param AsyncResult A reference to the outstanding asynchronous I/O request.
 ' @remarks <b>EndWrite</b> must be called exactly once on every <a href="IAsyncResult.html">IAsyncResult</a> from <a href="MemoryMappedViewStream.BeginWrite.html">BeginWrite</a>.
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
 '       <th>Exception</th>
@@ -372,7 +366,7 @@ End Sub
 ' @return The number of bytes actually read from the stream.
 ' @return The total number of bytes read into the buffer. This can be less than the number of bytes requested if that many bytes are not currently available, or zero (0) if the end of the stream has been reached.
 ' @remarks The offset parameter gives the offset of the byte in the array parameter (the buffer index) at which to begin reading, and the count parameter gives the maximum number of bytes to be read from this stream. The returned value is the actual number of bytes read, or zero if the end of the stream is reached.
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
 '       <th>Exception</th>
@@ -411,7 +405,7 @@ End Function
 '
 ' @return The unsigned byte cast to an Int32 object, or -1 if at the end of the stream.
 ' @remarks Use this method to return integer values from the stream.
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
 '       <th>Exception</th>
@@ -437,8 +431,7 @@ End Function
 ' @param Offset The point relative to <i>Origin</i> to begin seeking from.
 ' @param Origin Specifies the beginning, the end, or the current position as a reference point for origin, using a value of type <a href="Stream.SeekOrigin.html">SeekOrigin</a>.
 ' @return The new position in the stream.
-' @remarks
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
 '       <th>Exception</th>
@@ -466,7 +459,7 @@ End Function
 '
 ' @param Value The desired length of the current stream in bytes.
 ' @remarks This method is internal only, because a stream that represents a view is not considered to have a length.
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
 '       <th>Exception</th>
@@ -487,7 +480,7 @@ End Sub
 ' @param Offset The offset in the buffer at which to begin copying bytes to the current stream.
 ' @param Count The number of bytes to write to the current stream.
 ' @remarks Writing occurs at the current position in the stream.
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
 '       <th>Exception</th>
@@ -537,8 +530,7 @@ End Sub
 ' Writes a byte to the current position in the file stream.
 '
 ' @param Value A byte value written to the stream.
-' @remarks
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
 '       <th>Exception</th>
@@ -574,7 +566,7 @@ End Sub
 ' @param Destination The stream to which the contents of the current stream will be copied.
 ' @param BufferSize The size of the buffer. This value must be greater than zero. The default size is 81920.
 ' @remarks Copying begins at the current position in the current stream, and does not reset the position of the destination stream after the copy operation is complete.
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
 '       <th>Exception</th>
@@ -702,7 +694,7 @@ Private Sub InitViewData(ByVal StartIndex As Long)
         .cbElements = 1
         .cDims = 1
         .cElements = mCapacity
-        .pvData = mViewAddress
+        .PVData = mViewAddress
     End With
     
     SAPtr(mViewData) = VarPtr(mViewDataSA)

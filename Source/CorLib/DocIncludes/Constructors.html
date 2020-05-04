@@ -1,0 +1,11 @@
+@examples The example demonstrates instantiating a <a href="FileStream.html">FileStream</a> object using two methods.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> FS <span style="color: #0000ff">As</span> FileStream
+    
+    <span style="color: #008000">&#39; open file using global method.</span>
+    <span style="color: #0000ff">Set</span> FS = NewFileStream(<span style="color: #a31515">&quot;MyFile.txt&quot;</span>, FileMode.OpenExisting)
+    
+    <span style="color: #008000">&#39; open file using global Cor accessor.</span>
+    <span style="color: #0000ff">Set</span> FS = Cor.NewFileStream(<span style="color: #a31515">&quot;MyFile.txt&quot;</span>, FileMode.OpenExisting)
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+</pre></div>

@@ -1,0 +1,144 @@
+@examples The following example demonstrates an implementation of the <b>IEnumerable</b> and <a href="IEnumerator.html">IEnumerator</a> interfaces by creating a simple container class with an associated enumerator.
+<p>The example consists of three files. Two of the files are classes named <b>Container</b> and <b>ContainerEnumerator</b>. There is also one BAS file that contains the <b>Main</b> method.</p>
+<br/>The <b>Container</b> class implementation.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Option</span> Explicit
+<span style="color: #0000ff">Implements</span> IEnumerable
+
+<span style="color: #0000ff">Private</span> mItems() <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>
+<span style="color: #0000ff">Private</span> mCount <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
+
+
+<span style="color: #0000ff">Public</span> <span style="color: #0000ff">Property</span> Get Count() <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
+    Count = mCount
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Property</span>
+
+<span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Add(<span style="color: #0000ff">ByRef</span> Value <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>)
+    <span style="color: #0000ff">If</span> mCount &gt; UBound(mItems) <span style="color: #0000ff">Then</span>
+        <span style="color: #0000ff">ReDim</span> Preserve mItems(0 <span style="color: #0000ff">To</span> UBound(mItems) * 2)
+    <span style="color: #0000ff">End</span> <span style="color: #0000ff">If</span>
+    
+    CopyVariant mItems(mCount), Value
+    mCount = mCount + 1
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #0000ff">Public</span> <span style="color: #0000ff">Property</span> Get Item(<span style="color: #0000ff">ByVal</span> Index <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>) <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>
+    CopyVariant Item, mItems(Index)
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Property</span>
+
+<span style="color: #0000ff">Public</span> <span style="color: #0000ff">Function</span> GetEnumerator() <span style="color: #0000ff">As</span> IEnumerator
+    <span style="color: #0000ff">Dim</span> En <span style="color: #0000ff">As</span> <span style="color: #0000ff">New</span> ContainerEnumerator
+    
+    En.Init <span style="color: #0000ff">Me</span>
+    <span style="color: #0000ff">Set</span> GetEnumerator = En
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Function</span>
+
+<span style="color: #0000ff">Public</span> <span style="color: #0000ff">Function</span> NewEnum() <span style="color: #0000ff">As</span> IUnknown
+    <span style="color: #0000ff">Set</span> NewEnum = CreateEnumerator(GetEnumerator)
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Function</span>
+
+
+<span style="color: #008000">&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;</span>
+<span style="color: #008000">&#39;   Constructors</span>
+<span style="color: #008000">&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;</span>
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> Class_Initialize()
+    <span style="color: #0000ff">ReDim</span> mItems(4)
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+
+<span style="color: #008000">&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;</span>
+<span style="color: #008000">&#39;   IEnumerable</span>
+<span style="color: #008000">&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;</span>
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Function</span> IEnumerable_GetEnumerator() <span style="color: #0000ff">As</span> CorLib.IEnumerator
+    <span style="color: #0000ff">Set</span> IEnumerable_GetEnumerator = GetEnumerator
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Function</span>
+
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Function</span> IEnumerable_NewEnum() <span style="color: #0000ff">As</span> stdole.IUnknown
+    <span style="color: #0000ff">Set</span> IEnumerable_NewEnum = NewEnum
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Function</span>
+</pre></div>
+<br/>The <b>ContainerEnumerator</b> class implementation.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Option</span> Explicit
+<span style="color: #0000ff">Implements</span> IEnumerator
+
+<span style="color: #0000ff">Private</span> mBase <span style="color: #0000ff">As</span> EnumeratorBase
+<span style="color: #0000ff">Private</span> mContainer <span style="color: #0000ff">As</span> Container
+
+
+<span style="color: #008000">&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;</span>
+<span style="color: #008000">&#39;   Constructors</span>
+<span style="color: #008000">&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;</span>
+<span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Init(<span style="color: #0000ff">ByVal</span> Container <span style="color: #0000ff">As</span> Container)
+    <span style="color: #0000ff">Set</span> mBase = NewEnumeratorBase(0, Container.Count)
+    <span style="color: #0000ff">Set</span> mContainer = Container
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+
+<span style="color: #008000">&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;</span>
+<span style="color: #008000">&#39;   IEnumerator</span>
+<span style="color: #008000">&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;</span>
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Property</span> Get IEnumerator_Current() <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>
+    MoveVariant IEnumerator_Current, mContainer.Item(mBase.Index)
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Property</span>
+
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Function</span> IEnumerator_MoveNext() <span style="color: #0000ff">As</span> <span style="color: #2b91af">Boolean</span>
+    IEnumerator_MoveNext = mBase.MoveNext
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Function</span>
+
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> IEnumerator_Reset()
+    mBase.Reset
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+</pre></div>
+<br/>The <b>Main</b> method implemented in a BAS module.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> Items <span style="color: #0000ff">As</span> <span style="color: #0000ff">New</span> Container
+    
+    Items.Add <span style="color: #a31515">&quot;The&quot;</span>
+    Items.Add <span style="color: #a31515">&quot;fox&quot;</span>
+    Items.Add <span style="color: #a31515">&quot;jumps&quot;</span>
+    Items.Add <span style="color: #a31515">&quot;over&quot;</span>
+    Items.Add <span style="color: #a31515">&quot;the&quot;</span>
+    Items.Add <span style="color: #a31515">&quot;lazy&quot;</span>
+    Items.Add <span style="color: #a31515">&quot;dog.&quot;</span>
+    
+    Debug.Print <span style="color: #a31515">&quot;Enumerate using &#39;For Each&#39;.&quot;</span>
+    EnumerateWithForEach Items
+    
+    Debug.Print t(<span style="color: #a31515">&quot;\nEnumerate using &#39;IEnumerator&#39; interface.&quot;</span>)
+    EnumerateWithEnumerator Items
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> EnumerateWithForEach(<span style="color: #0000ff">ByVal</span> Source <span style="color: #0000ff">As</span> IEnumerable)
+    <span style="color: #0000ff">Dim</span> Value <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>
+    
+    Debug.Print <span style="color: #a31515">&quot;   &quot;</span>;
+    
+    <span style="color: #0000ff">For</span> <span style="color: #0000ff">Each</span> Value <span style="color: #0000ff">In</span> Source
+        Debug.Print Value &amp; <span style="color: #a31515">&quot; &quot;</span>;
+    <span style="color: #0000ff">Next</span>
+    
+    Debug.Print
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> EnumerateWithEnumerator(<span style="color: #0000ff">ByVal</span> Source <span style="color: #0000ff">As</span> IEnumerable)
+    <span style="color: #0000ff">Dim</span> En <span style="color: #0000ff">As</span> IEnumerator
+    
+    Debug.Print <span style="color: #a31515">&quot;   &quot;</span>;
+    
+    <span style="color: #0000ff">Set</span> En = Source.GetEnumerator
+    
+    <span style="color: #0000ff">Do</span> <span style="color: #0000ff">While</span> En.MoveNext
+        Debug.Print En.Current &amp; <span style="color: #a31515">&quot; &quot;</span>;
+    <span style="color: #0000ff">Loop</span>
+    
+    Debug.Print
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; The example code produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    Enumerate using &#39;For Each&#39;.</span>
+<span style="color: #008000">&#39;       The fox jumps over the lazy dog.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    Enumerate using &#39;IEnumerator&#39; interface.</span>
+<span style="color: #008000">&#39;       The fox jumps over the lazy dog.</span>
+</pre></div>
+

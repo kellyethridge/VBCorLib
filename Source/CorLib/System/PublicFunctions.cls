@@ -64,7 +64,7 @@ Private mTextOut As New StringBuilder
 ' <li>\\ - \</li>
 ' </ul>
 ' </p>
-' <h4>Example</h4>
+' @examples The following example replaces escaped characters in a string with their literal values.
 ' <pre>
 ' Debug.Print t("This\tis\r\na\ttest")
 '

@@ -36,8 +36,20 @@ Attribute VB_Exposed = True
 '
 
 ''
-' Creates a memory-mapped file that has the specified access mode, name, capacity, and access type from a file on disk.
+' Represents a simple file-to-memory mapping.
+'
+' @remarks A memory-mapped file maps the contents of a file to an application’s logical address space. Memory-mapped files enable programmers to
+' work with extremely large files because memory can be managed concurrently, and they allow complete, random access to a file without the need
+' for seeking. Memory-mapped files can also be shared across multiple processes.
+' <p>The <a href="MemoryMappedFileStatic.CreateFromFile.html">CreateFromFile</a> and <a href="MemoryMappedFileStatic.CreateFromFileStream.html">CreateFromFileStream</a>
+' methods create a memory-mapped file from a specified path or a <a href="FileStream.html">FileStream</a> of an existing file on disk. Changes are automatically propagated to disk when the file is unmapped.</p>
+' <p>The <a href="MemoryMappedFileStatic.CreateNew.html">CreateNew</a> method creates a memory-mapped file that is not mapped to an existing file on disk; and are suitable for creating shared memory for interprocess communication (IPC).</p>
+' <p>A memory-mapped file is associated with a name.</p>
+' <p>You can create multiple views of the memory-mapped file, including views of parts of the file. You can map the same part of a file to more than one
+' address to create concurrent memory. For two views to remain concurrent, they have to be created from the same memory-mapped file. Creating two file
+' mappings of the same file with two views does not provide concurrency.</p>
 ' @see MemoryMappedFile
+' @include "..\DocIncludes\MemoryMappedFile.html"
 Option Explicit
 
 
@@ -50,13 +62,12 @@ Option Explicit
 ' @param Capacity The maximum size, in bytes, to allocate to the memory-mapped file. Specify 0 to set the capacity to the size of the file on disk.
 ' @param Access One of the enumeration values that specifies the type of access allowed to the memory-mapped file.
 ' @return A memory-mapped file that has the specified characteristics.
-' @remarks <p>The <i>mode</i> parameter pertains to the source file on disk.</p>
+' @remarks <p>The <i>Mode</i> parameter pertains to the source file on disk.</p>
 ' <p>If <i>Capacity</i> is larger than the size of the file on disk, the file on disk is increased to match the specified capacity even if no data is written to the memory-mapped file. To prevent this from occurring, specify 0 (zero) for the default capacity, which will internally set capacity to the size of the file on disk.</p>
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
-'       <th>Exception</th>
-'       <th>Condition</th>
+'       <th>Exception</th><th>Condition</th>
 '   </tr>
 '   <tr>
 '       <td><a href="ArgumentException.html">ArgumentException</a></td>
@@ -142,11 +153,10 @@ End Function
 ' @param LeaveOpen <b>True</b> to not dispose fileStream after the <a href="MemoryMappedFile.html">MemoryMappedFile</a> is closed; <b>False</b> to dispose <i>FileStream</i>.
 ' @return A memory-mapped file that has the specified characteristics.
 ' @remarks If <i>Capacity</i> is larger than the size of the file on disk, the file on disk is increased to match the specified capacity even if no data is written to the memory-mapped file. To prevent this from occurring, specify 0 (zero) for the default capacity, which will internally set <i>Capacity</i> to the size of the file on disk.
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
-'       <th>Exception</th>
-'       <th>Condition</th>
+'       <th>Exception</th><th>Condition</th>
 '   </tr>
 '   <tr>
 '       <td><a href="ArgumentException.html">ArgumentException</a></td>
@@ -222,11 +232,10 @@ End Function
 ' @param Access One of the enumeration values that specifies the type of access allowed to the memory-mapped file. The default is <a href="MemoryMappedFile.MemoryMappedFileAccess.html">ReadWrite</a>.
 ' @return A memory-mapped file that has the specified characteristics.
 ' @remarks Use this method to create a memory-mapped file that is not persisted (that is, not associated with a file on disk), which you can use to share data between processes.
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
-'       <th>Exception</th>
-'       <th>Condition</th>
+'       <th>Exception</th><th>Condition</th>
 '   </tr>
 '   <tr>
 '       <td><a href="ArgumentException.html">ArgumentException</a></td>
@@ -271,11 +280,10 @@ End Function
 ' @param DesiredAccessRights One of the enumeration values that specifies the access rights to apply to the memory-mapped file.
 ' @return A memory-mapped file that has the specified name.
 ' @remarks The memory-mapped file can be either a persisted memory-mapped file (associated with a file on disk) or non persisted.
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
-'       <th>Exception</th>
-'       <th>Condition</th>
+'       <th>Exception</th><th>Condition</th>
 '   </tr>
 '   <tr>
 '       <td><a href="ArgumentException.html">ArgumentException</a></td><td><i>MapName</i> is an empty string.</td>
@@ -312,11 +320,10 @@ End Function
 ' @param Access One of the enumeration values that specifies the type of access allowed to the memory-mapped file. The default is <a href="MemoryMappedFile.MemoryMappedFileAccess.html">ReadWrite</a>.
 ' @return A memory-mapped file that has the specified characteristics.
 ' @remarks Use this method to create or open a memory-mapped file that is not persisted (that is, not associated with a file on disk), which you can use to share data between processes.
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
-'       <th>Exception</th>
-'       <th>Condition</th>
+'       <th>Exception</th><th>Condition</th>
 '   </tr>
 '   <tr>
 '       <td><a href="ArgumentException.html">ArgumentException</a></td><td><i>MapName</i> is an empty string.</td>

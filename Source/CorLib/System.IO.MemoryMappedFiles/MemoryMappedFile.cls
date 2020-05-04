@@ -38,15 +38,18 @@ Attribute VB_Exposed = True
 ''
 ' Represents a simple file-to-memory mapping.
 '
-' @remarks Though this class is not part of .NET it is included
-' to allow for easy access to mapping a file into memory.
-' <p>A new <b>MemoryMappedFile</b> can be created using the <b>NewMemoryMappedFile</b>
-' function.
-' <pre>
-'     Dim map As MemoryMappedFile
-'     Set map = NewMemoryMappedFile("MyFile.txt")
-' </pre>
+' @remarks A memory-mapped file maps the contents of a file to an application’s logical address space. Memory-mapped files enable programmers to
+' work with extremely large files because memory can be managed concurrently, and they allow complete, random access to a file without the need
+' for seeking. Memory-mapped files can also be shared across multiple processes.
+' <p>The <a href="MemoryMappedFileStatic.CreateFromFile.html">CreateFromFile</a> and <a href="MemoryMappedFileStatic.CreateFromFileStream.html">CreateFromFileStream</a>
+' methods create a memory-mapped file from a specified path or a <a href="FileStream.html">FileStream</a> of an existing file on disk. Changes are automatically propagated to disk when the file is unmapped.</p>
+' <p>The <a href="MemoryMappedFileStatic.CreateNew.html">CreateNew</a> method creates a memory-mapped file that is not mapped to an existing file on disk; and are suitable for creating shared memory for interprocess communication (IPC).</p>
+' <p>A memory-mapped file is associated with a name.</p>
+' <p>You can create multiple views of the memory-mapped file, including views of parts of the file. You can map the same part of a file to more than one
+' address to create concurrent memory. For two views to remain concurrent, they have to be created from the same memory-mapped file. Creating two file
+' mappings of the same file with two views does not provide concurrency.</p>
 ' @see MemoryMappedFileStatic
+' @include "..\DocIncludes\MemoryMappedFile.html"
 Option Explicit
 Implements IObject
 
@@ -122,16 +125,21 @@ End Property
 ' @return A randomly accessible block of memory.
 ' @remarks <p>You can use the view returned by this method for random access to a memory-mapped file.</p>
 ' <p>To create a complete view of the memory-mapped file, specify 0 (zero) for the <i>Size</i> parameter. If you do this, the size of the view might be smaller or larger than the size of the source file on disk. This is because views are provided in units of system pages, and the size of the view is rounded up to the next system page size.</p>
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
-'       <th>Exception</th>
-'       <th>Condition</th>
+'       <th>Exception</th><th>Condition</th>
 '   </tr>
 '   <tr>
-'       <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
-'       <td><i>Offset</i> or <i>Size</i> is a negative value.</td>
+'       <td>
+'           <i>Offset</i> or <i>Size</i> is a negative value.<br/>
+'           -or-<br/>
+'           <i>Access</i> is not a valid <a href="MemoryMappedFile.MemoryMappedFileAccess.html">MemoryMappedFileAccess</a> enumeration value.
+'       </td>
 '   </tr>
+'    <tr>
+'       <td><a href="UnauthorizedAccessException.html">UnauthorizedAccessException</a></td><td><i>Access</i> is invalid for the memory-mapped file.</td>
+'    </tr>
 ' </table>
 Public Function CreateViewAccessor(Optional ByVal Offset As Currency, Optional ByVal Size As Long, Optional ByVal Access As MemoryMappedFileAccess = MemoryMappedFileAccess.ReadWrite) As MemoryMappedViewAccessor
     If Offset < 0 Then _
@@ -154,12 +162,10 @@ End Function
 ' @return A stream of memory that has the specified characteristics.
 ' @remarks <p>You can use the stream returned by this method for sequential access to a memory-mapped file, such as for inter-process communications.</p>
 ' <p>To create a complete view of the memory-mapped file, specify 0 (zero) for the <i>Size</i> parameter. If you do this, the size of the view might be smaller or larger than the size of the source file on disk. This is because views are provided in units of system pages, and the size of the view is rounded up to the next system page size.</p>
-' <h4>Exceptions</h4>
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
-'       <th>Exception</th>
-'       <th>Condition</th>
+'       <th>Exception</th><th>Condition</th>
 '   </tr>
 '   <tr>
 '       <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
@@ -168,8 +174,10 @@ End Function
 '           -or-<br/>
 '           <i>Access</i> is not a valid <a href="MemoryMappedFile.MemoryMappedFileAccess.html">MemoryMappedFileAccess</a> enumeration value.
 '       </td>
-'       <td><a href="UnauthorizedAccessException.html">UnauthorizedAccessException</a></td><td><i>Access</i> is invalid for the memory-mapped file.</td>
 '   </tr>
+'    <tr>
+'       <td><a href="UnauthorizedAccessException.html">UnauthorizedAccessException</a></td><td><i>Access</i> is invalid for the memory-mapped file.</td>
+'    </tr>
 ' </table>
 Public Function CreateViewStream(Optional ByVal Offset As Currency, Optional ByVal Size As Long, Optional ByVal Access As MemoryMappedFileAccess = MemoryMappedFileAccess.ReadWrite) As MemoryMappedViewStream
     If Offset < 0 Then _

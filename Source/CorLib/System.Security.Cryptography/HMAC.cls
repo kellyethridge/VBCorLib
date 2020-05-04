@@ -48,7 +48,6 @@ Attribute VB_Exposed = True
 ' @see HMACSHA384
 ' @see HMACSHA512
 ' @see HMACRIPEMD160
-'
 Option Explicit
 
 
@@ -142,10 +141,9 @@ Public Sub Clear(): End Sub
 ' @param Index The starting index in a byte array source. If the source is not a byte array, this argument is ignored.
 ' @param Count The number of bytes to compute the hash on. If the source is not a byte array, this argument is ignored.
 ' @return The hash value computed from the source provided.
-' @remarks If the source is a Stream based object, then the stream is read from and the hash continuously computed until
-' the stream no longer returns data.
-' <p>If data has already been processed using TransformBlock, then that data will be included in the hashing process.</p>
-'
+' @remarks If <i>Source</i> is a <a href="Stream.html">Stream</a>, then the stream is read from and the hash continuously computed until the stream no longer returns data.
+' <p>If data has already been processed using <a href="HMAC.TransformBlock.html">TransformBlock</a>, then that data will be included in the hashing process.</p>
+' @see #TransformBlock
 Public Function ComputeHash(ByRef Source As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Byte(): End Function
 
 ''
@@ -186,12 +184,11 @@ Public Function ToString() As String: End Function
 ' @param OutputBuffer The data after it has been processed. This will be the same as the input data, no changes are made.
 ' @param OutputOffset The starting index in the output buffer to place the processed data.
 ' @return The number of bytes that were processed.
-' @remarks The OutputBuffer will contain the same plain text data as the input buffer. No transformation of the data
-' is applied. The OutputBuffer array can be a Null array or the same array as the InputBuffer. If the InputBuffer is
-' used as the OutputBuffer and the InputOffset equals the OutputOffset, no data is copied.
-' <p>Once this method is called, the Hash property cannot be called until the TransformFinalBlock is called, finishing
-' the hash computation.
-'
+' @remarks The <i>OutputBuffer</i> will contain the same plain text data as the input buffer. No transformation of the data
+' is applied. The <i>OutputBuffer</i> array can be an uninitialized array or the same array as the <i>InputBuffer</i>. If <i>InputBuffer</i> and
+' <i>OutputBuffer</i> are the same array and <i>InputOffset</i> equals <i>OutputOffset</i>, no data is copied.
+' <p>Once this method is called, <a href="HMAC.Get.Hash.html">Hash</a> cannot be called until the <a href="HMAC.TransformFinalBlock.html">TransformFinalBlock</a> is called, finishing the hash computation.</p>
+' @see #Hash
 Public Function TransformBlock(ByRef InputBuffer() As Byte, ByVal InputOffset As Long, ByVal InputCount As Long, ByRef OutputBuffer() As Byte, ByVal OutputOffset As Long) As Long: End Function
 
 ''
@@ -201,13 +198,11 @@ Public Function TransformBlock(ByRef InputBuffer() As Byte, ByVal InputOffset As
 ' @param InputOffset The index into the byte array to begin hash computations.
 ' @param InputCount The number of bytes to be included in the final hash computation.
 ' @return A copy of the portion of the InputBuffer that was processed.
-' @remarks The hash value is not returned by this method. To retrieve the final
-' hash value, call the Hash property.
-' <p>The Hash property can only be called after this method is called. If the Hash property
+' @remarks The hash value is not returned by this method. To retrieve the final hash value, call the <a href="HMAC.Get.Hash.html">Hash</a> property.
+' <p>The <a href="HMAC.Get.Hash.html">Hash</a> property can only be called after this method is called. If the <a href="HMAC.Get.Hash.html">Hash</a> property
 ' is called before this method, then an exception is thrown.</p>
-' <p>If the implementation can be reused (CanReuseTransform) then the implemntation is reset
-' to allow computing of a new hash value.</p>
-'
+' <p>If the implementation can be reused (CanReuseTransform) then the implemntation is reset to allow computing of a new hash value.</p>
+' @see #Hash
 Public Function TransformFinalBlock(ByRef InputBuffer() As Byte, ByVal InputOffset As Long, ByVal InputCount As Long) As Byte(): End Function
 
 

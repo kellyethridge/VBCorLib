@@ -46,7 +46,7 @@ Attribute VB_Exposed = True
 ' @see Constructors
 ' @see StreamReader
 ' @see TextWriter
-'
+' @include "..\DocIncludes\StreamWriter.html"
 Option Explicit
 Implements IObject
 Implements TextWriter
@@ -169,10 +169,26 @@ End Sub
 '
 ' @param value The value to be written to the stream.
 ' @param args The arguments to be used in formatting the Value.
-' @remarks The <i>args</i> are used when argument indexes are supplied
-' in the value to be written. Indexes are indicate by enclosing the
+' @remarks The <i>Args</i> are used when argument indexes are supplied
+' in the value to be written. Indexes are indicated by enclosing the
 ' specific index in curly braces {}. The indexes start at 0.
-'
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th><th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ObjectDisposedException.html">ObjectDisposedException</a></td><td>The writer is closed.</td>
+'   </tr>
+'    <tr>
+'        <td><a href="FormatException.html">FormatException</a></td>
+'        <td>
+'           The format specification in format is invalid.<br/>
+'           -or-<br/>
+'           The number indicating an argument to be formatted is less than zero, or larger than or equal to the number of provided objects to be formatted.
+'        </td>
+'    </tr>
+' </table>
 Public Sub WriteValue(ByRef Value As Variant, ParamArray Args() As Variant)
     VerifyIsOpen
 
@@ -195,6 +211,18 @@ End Sub
 ' @param Buffer A character array containing the data to write.
 ' @param Index The character position in <i>Buffer</i> at which to start reading data.
 ' @param Count The maximum number of characters to write.
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th><th>Condition</th>
+'   </tr>
+'    <tr>
+'        <td><a href="ArgumentNullException.html">ArgumentNullException</a></td><td><i>Buffer</i> is uninitialized.</td>
+'    </tr>
+'   <tr>
+'        <td><a href="ObjectDisposedException.html">ObjectDisposedException</a></td><td>The writer is closed.</td>
+'   </tr>
+' </table>
 Public Sub WriteChars(ByRef Buffer() As Integer, Optional ByRef Index As Variant, Optional ByRef Count As Variant)
     Dim Output As String
     
@@ -220,6 +248,23 @@ End Sub
 ' An argument can be refered to through formatting indexes. A
 ' formatting index is an integer enclosed in curly braces {}. The
 ' indexes start at 0.
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th><th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ObjectDisposedException.html">ObjectDisposedException</a></td><td>The writer is closed.</td>
+'   </tr>
+'    <tr>
+'        <td><a href="FormatException.html">FormatException</a></td>
+'        <td>
+'           The format specification in format is invalid.<br/>
+'           -or-<br/>
+'           The number indicating an argument to be formatted is less than zero, or larger than or equal to the number of provided objects to be formatted.
+'        </td>
+'    </tr>
+' </table>
 Public Sub WriteLine(ParamArray Value() As Variant)
     VerifyIsOpen
     
@@ -242,6 +287,15 @@ End Sub
 ' @param Buffer The character array from which data is read.
 ' @param Index The character position in <i>Buffer</i> at which to start reading data.
 ' @param Count The maximum number of characters to write.
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th><th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ObjectDisposedException.html">ObjectDisposedException</a></td><td>The writer is closed.</td>
+'   </tr>
+' </table>
 Public Sub WriteLineChars(ByRef Buffer() As Integer, Optional ByRef Index As Variant, Optional ByRef Count As Variant)
     VerifyIsOpen
     

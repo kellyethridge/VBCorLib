@@ -44,6 +44,7 @@ Attribute VB_Exposed = True
 ' the enumeration has finished.</p>
 ' <p>To create a new instance use the <a href="Constructors.NewEnumeratorBase.html">NewEnumeratorBase</a> method.</p>
 ' @see Constructors
+' @include "..\DocIncludes\IEnumerable.html"
 Option Explicit
 Implements ICloneable
 
@@ -62,14 +63,18 @@ Private mVersion        As Long
 ' initially finishes. If additional calls are made to <b>MoveNext</b> an
 ' <a href="InvalidOperationException.html">InvalidOperationException</a>
 ' will be thrown.
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
-'       <th>Exception</th>
-'       <th>Condition</th>
+'       <th>Exception</th><th>Condition</th>
 '   </tr>
 '   <tr>
-'        <td><a href="InvalidOperationException.html">InvalidOperationException</a></td><td>The enumeration has already finished.</td>
+'       <td><a href="InvalidOperationException.html">InvalidOperationException</a></td>
+'       <td>
+'           The enumeration has already finished.<br/>
+'           -or-<br/>
+'           The collection was modified after the enumerator was created.
+'       </td>
 '   </tr>
 ' </table>
 Public Function MoveNext() As Boolean
@@ -90,11 +95,10 @@ End Sub
 ' Gets the current index.
 '
 ' @return The current index.
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
-'       <th>Exception</th>
-'       <th>Condition</th>
+'       <th>Exception</th><th>Condition</th>
 '   </tr>
 '   <tr>
 '        <td><a href="InvalidOperationException.html">InvalidOperationException</a></td>

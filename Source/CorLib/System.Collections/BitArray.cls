@@ -39,17 +39,9 @@ Attribute VB_Exposed = True
 ' Manages a compact array of bit values. Each bit represents a boolean, where True = 1, and False = 0.
 '
 ' @remarks The default <b>BitArray</b> size is 32 bits unless a constructor is used to define a custom size.
-' <p>The following are some of the available methods to create a <b>BitArray</b>.
-' <pre>
-' Set Bits = New BitArray()
-'
-' Set Bits = NewBitArray(128)
-'
-' Set Bits = <b>BitArray</b>.FromBooleans(BooleanArray)
-' </pre></p>
 ' @see Constructors
 ' @see BitArrayStatic
-'
+' @include "..\DocIncludes\BitArray.html"
 Option Explicit
 Implements IObject
 Implements IEnumerable

@@ -38,17 +38,9 @@ Attribute VB_Exposed = True
 ''
 ' This class provides methods for copying manipulating arrays as byte arrays.
 '
-' @remarks<br>
-' Any array that is used in these methods are treated as byte arrays. No attention
+' @remarks Any array that is used in these methods are treated as byte arrays. No attention
 ' is paid to the type of the original array. They are manipulated as bytes.
-'
-' <br><H4>Usage:</H4><br>
-' This class cannot be instantiated. It represents a set of static methods that
-' are accessed through the name of the class; Buffer.*<br><br>
-' <pre>
-' Buffer.BlockCopy <i>SrcArray</i>, <i>SourceIndex</i>, <i>DstArray</i>, <i>DestinationIndex</i>, <i>Count</i><br>
-' </pre>
-'
+' @include "..\DocIncludes\Buffer.html"
 Option Explicit
 
 ''
@@ -60,8 +52,30 @@ Option Explicit
 ' @param DestinationOffset The starting byte position to begin setting bytes.
 ' @param Count The number of bytes to be copied.
 ' @remarks <p>The arrays are treated as byte arrays, so no data-type conversion
-' takes place. All indexes are in bytes, not in the datatype of the specific array.</p>
+' takes place. All indexes are in bytes, not in the type of the specific array.</p>
 ' <p>The lower-bound of the arrays is ignored. The first byte is at index 0.</p>
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th><th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ArgumentNullException.html">ArgumentNullException</a></td><td><i>Source</i> or <i>Destination</i> is uninitialized.</td>
+'   </tr>
+'    <tr>
+'        <td><a href="ArgumentException.html">ArgumentException</a></td>
+'        <td>
+'           <i>Source</i> or <i>Destination</i> is not an array.<br/>
+'           -or-<br/>
+'           The number of bytes in <i>Source</i> is less than <i>SourceOffset</i> plus <i>Count</i>.<br/>
+'           -or-<br/>
+'           The number of bytes in <i>Destination</i> is less than <i>DestinationOffset</i> plus <i>Count</i>.<br/>
+'        </td>
+'    </tr>
+'    <tr>
+'        <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td><td><i>Source</i>, <i>Destination</i>, or <i>Count</i> is less than zero.</td>
+'    </tr>
+' </table>
 Public Sub BlockCopy(ByRef Source As Variant, ByVal SourceOffset As Long, ByRef Destination As Variant, ByVal DestinationOffset As Long, ByVal Count As Long)
     Dim SourcePtr           As Long
     Dim DestinationPtr      As Long
@@ -96,6 +110,18 @@ End Sub
 ' @return The size of the array in bytes.
 ' @remarks The size is calculated by taking the number of elements
 ' in the array and multiply it by the number of bytes each element is in length.
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th><th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ArgumentNullException.html">ArgumentNullException</a></td><td><i>Arr</i> is unintialized.</td>
+'   </tr>
+'    <tr>
+'        <td><a href="ArgumentException.html">ArgumentException</a></td><td><i>Arr</i> is not an array.</td>
+'    </tr>
+' </table>
 Public Function ByteLength(ByRef Arr As Variant) As Long
     Dim ArrayPtr As Long
     
@@ -113,6 +139,21 @@ End Function
 ' elements. For example: if getting the byte from a Long array at index
 ' 3, then the upper 8-bits of the first element will be returned.
 ' <p>The lower-bound of the array is ignored. <i>Index</i> begins at 0.</p>
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th><th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ArgumentNullException.html">ArgumentNullException</a></td><td><i>Arr</i> is unintialized.</td>
+'   </tr>
+'    <tr>
+'        <td><a href="ArgumentException.html">ArgumentException</a></td><td><i>Arr</i> is not an array.</td>
+'    </tr>
+'    <tr>
+'        <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td><td><i>Index</i> is negative or greater than the length of <i>Arr</i>.</td>
+'    </tr>
+' </table>
 Public Function GetByte(ByRef Arr As Variant, ByVal Index As Long) As Byte
     Dim ArrayPtr As Long
     
@@ -134,6 +175,21 @@ End Function
 ' elements. For example: if setting the byte of a Long array at index 3
 ' , then the upper 8-bits of the first element will be set.
 ' <p>The lower-bound of the array is ignored. <i>Index</i> begins at 0.</p>
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th><th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ArgumentNullException.html">ArgumentNullException</a></td><td><i>Arr</i> is unintialized.</td>
+'   </tr>
+'    <tr>
+'        <td><a href="ArgumentException.html">ArgumentException</a></td><td><i>Arr</i> is not an array.</td>
+'    </tr>
+'    <tr>
+'        <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td><td><i>Index</i> is negative or greater than the length of <i>Arr</i>.</td>
+'    </tr>
+' </table>
 Public Sub SetByte(ByRef Arr As Variant, ByVal Index As Long, ByVal Value As Byte)
     Dim ArrayPtr As Long
     

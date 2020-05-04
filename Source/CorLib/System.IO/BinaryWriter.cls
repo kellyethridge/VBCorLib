@@ -38,15 +38,12 @@ Attribute VB_Exposed = True
 ''
 ' Provides methods to write typed information to a stream.
 '
-' @remarks
-' <p>The datatypes that are written to the stream are written in their binary
-' form. The value are written as they are represented in memory. For example, as datatype
-' of vbLong is written as 4 bytes, regardless of the actual value of the vbLong
-' variable.</p>
+' @remarks The data types that are written to the stream are written in their binary
+' form. The values are written as they are represented in memory. For example, as data type
+' of vbLong is written as 4 bytes, regardless of the actual value of the vbLong variable.
 '
 ' @see Constructors
 ' @see BinaryReader
-'
 Option Explicit
 Implements IObject
 
@@ -99,7 +96,7 @@ End Function
 ' @param Count The number of elements or characters to be written to the stream.
 ' @remarks <i>Index</i> and <i>vCount</i> are only valid when writing Byte arrays,
 ' Integer array, and Strings. For all other types, these parameters are ignored.
-'<p>Simple datatypes such as vbLong and vbDouble are written out exactly as they
+' <p>Simple datatypes such as vbLong and vbDouble are written out exactly as they
 ' appear in memory. Each individual byte of that datatype is written. For example, a vbLong
 ' is 4 bytes in memory, even if its value is 0. The 4 bytes are written to the stream, not
 ' one byte with a value of 0. A vbDouble is 8 bytes, so all 8 bytes are written as is to

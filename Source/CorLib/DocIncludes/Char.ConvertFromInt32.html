@@ -1,0 +1,36 @@
+@exceptions
+<table style="width: auto">
+  <tr>
+      <th>Exception</th>
+      <th>Condition</th>
+  </tr>
+  <tr>
+       <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+       <td><i>Value</i> is outside the valid range of -32768 to 65535.</td>
+  </tr>
+</table>
+@examples The following example demonstrates converting a range of 32-bit signed integer values to their corrisponding character represented by a 16-bit signed integer using <b>ConvertFromInt32</b>.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    Convert 65
+    Convert -1
+    Convert 65535
+    Convert -32768
+    Convert 32768
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> Convert(<span style="color: #0000ff">ByVal</span> c <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>)
+    <span style="color: #0000ff">Dim</span> Ch <span style="color: #0000ff">As</span> <span style="color: #2b91af">Integer</span>
+    
+    Ch = <span style="color: #2b91af">Char</span>.ConvertFromInt32(c)
+    
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;{0,6}(&amp;h{0:X8}) converts to {1,6}(&amp;h{1:X4})&quot;</span>, c, Ch)
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; The example code produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;        65(&amp;h00000041) converts to     65(&amp;h0041)</span>
+<span style="color: #008000">&#39;        -1(&amp;hFFFFFFFF) converts to     -1(&amp;hFFFF)</span>
+<span style="color: #008000">&#39;     65535(&amp;h0000FFFF) converts to     -1(&amp;hFFFF)</span>
+<span style="color: #008000">&#39;    -32768(&amp;hFFFF8000) converts to -32768(&amp;h8000)</span>
+<span style="color: #008000">&#39;     32768(&amp;h00008000) converts to -32768(&amp;h8000)</span>
+</pre></div>

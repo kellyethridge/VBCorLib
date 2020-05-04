@@ -51,9 +51,7 @@ Implements IObject
 ' @param UseExistingKey Use the key information from the current key.
 ' @param UseMachineKeyStore Use the key information from the computer's key store.
 ' @param UseNonExportableKey Use key information that cannot be exported.
-' @param UseUserProtectedKey Notify the user through a dialog box or another method
-' when certain actions are attempting to use a key. This flag is not compatible with the NoPrompt flag.
-'
+' @param UseUserProtectedKey Notify the user through a dialog box or another method when certain actions are attempting to use a key. This flag is not compatible with the NoPrompt flag.
 Public Enum CspProviderFlags
     NoFlags = 0
     NoPrompt = 64
@@ -135,79 +133,176 @@ Public Property Let ProviderName(ByVal Value As String)
 End Property
 
 ''
-' Returns the provider type code.
+' Gets the provider type code for <a href="CspParameters.html">CspParameters</a>.
 '
-' @return The code of the provider.
-' @remarks Some provider type codes are:
-' <pre>
-' PROV_RSA_FULL         = 1
-' PROV_RSA_SIG          = 2
-' PROV_DSS              = 3
-' PROV_FORTEZZA         = 4
-' PROV_MS_EXCHANGE      = 5
-' PROV_SSL              = 6
-' PROV_RSA_SCHANNEL     = 12
-' PROV_DSS_DH           = 13
-' PROV_EC_ECDSA_SIG     = 14
-' PROV_EC_ECNRA_SIG     = 15
-' PROV_EC_ECDSA_FULL    = 16
-' PROV_EC_ECNRA_FULL    = 17
-' PROV_DH_SCHANNEL      = 18
-' PROV_SPYRUS_LYNKS     = 20
-' PROV_RNG              = 21
-' PROV_INTEL_SEC        = 22
-' PROV_REPLACE_OWF      = 23
-' PROV_RSA_AES          = 24
-'</pre>
-'
+' @return The numeric code of the provider.
+' @remarks Use the <b>ProviderType</b> property to specify a provider type by passing a numeric value that represents that provider.
+' The numeric values that represent the default provider types are defined in the WinCrypt.h header file:
+' <ul>
+'   <li>To specify a provider compatible with the <a href="RSA.html">RSA</a> class, pass a value of 1.</li>
+'   <li>To specify a provider compatible with the <a href="DSA.html">DSA</a> class, pass a value of 13.</li>
+' </ul>
+' The following table lists the provider types and their corresponding numeric values defined in the WinCrypt.h header file.
+' <table style="width: auto">
+'   <tr>
+'       <th>Provider Type</th><th>Numeric Value</th>
+'   </tr>
+'   <tr>
+'        <td>PROV_RSA_RULL</td><td>1</td>
+'   </tr>
+'    <tr>
+'        <td>PROV_RSA_SIG</td><td>2</td>
+'    </tr>
+'    <tr>
+'        <td>PROV_DSS</td><td>3</td>
+'    </tr>
+'    <tr>
+'        <td>PROV_FORTEZZA</td><td>4</td>
+'    </tr>
+'    <tr>
+'        <td>PROV_MS_EXCHANGE</td><td>5</td>
+'    </tr>
+'    <tr>
+'        <td>PROV_SSL</td><td>6</td>
+'    </tr>
+'    <tr>
+'        <td>PROV_RSA_SCHANNEL</td><td>12</td>
+'    </tr>
+'    <tr>
+'        <td>PROV_DSS_DH</td><td>13</td>
+'    </tr>
+'    <tr>
+'        <td>PROV_EC_ECDSA_SIG</td><td>14</td>
+'    </tr>
+'    <tr>
+'        <td>PROV_EC_ECNRA_SIG</td><td>15</td>
+'    </tr>
+'    <tr>
+'        <td>PROV_EC_ECDSA_FULL</td><td>16</td>
+'    </tr>
+'    <tr>
+'        <td>PROV_EC_ECNRA_FULL</td><td>17</td>
+'    </tr>
+'    <tr>
+'        <td>PROV_DH_SCHANNEL</td><td>18</td>
+'    </tr>
+'    <tr>
+'        <td>PROV_SPYRUS_LYNKS</td><td>20</td>
+'    </tr>
+'    <tr>
+'        <td>PROV_RNG</td><td>21</td>
+'    </tr>
+'    <tr>
+'        <td>PROV_INTEL_SEC</td><td>22</td>
+'    </tr>
+'    <tr>
+'        <td>PROV_REPLACE_OWF</td><td>23</td>
+'    </tr>
+'    <tr>
+'        <td>PROV_RSA_AES</td><td>24</td>
+'    </tr>
+' </table>
+' For more information about the default provider types and their behaviors, see the Microsoft Cryptography API (CAPI) documentation in the MSDN library.
 Public Property Get ProviderType() As Long
     ProviderType = mProviderType
 End Property
 
 ''
-' Sets the provider type code.
+' Sets the provider type code for <a href="CspParameters.html">CspParameters</a>.
 '
-' @param Value The provider type code.
-' @remarks Some provider type codes are:
-' <pre>
-' PROV_RSA_FULL         = 1
-' PROV_RSA_SIG          = 2
-' PROV_DSS              = 3
-' PROV_FORTEZZA         = 4
-' PROV_MS_EXCHANGE      = 5
-' PROV_SSL              = 6
-' PROV_RSA_SCHANNEL     = 12
-' PROV_DSS_DH           = 13
-' PROV_EC_ECDSA_SIG     = 14
-' PROV_EC_ECNRA_SIG     = 15
-' PROV_EC_ECDSA_FULL    = 16
-' PROV_EC_ECNRA_FULL    = 17
-' PROV_DH_SCHANNEL      = 18
-' PROV_SPYRUS_LYNKS     = 20
-' PROV_RNG              = 21
-' PROV_INTEL_SEC        = 22
-' PROV_REPLACE_OWF      = 23
-' PROV_RSA_AES          = 24
-'</pre>
-'
+' @param Value The numeric code of the provider.
+' @remarks Use the <b>ProviderType</b> property to specify a provider type by passing a numeric value that represents that provider.
+' The numeric values that represent the default provider types are defined in the WinCrypt.h header file:
+' <ul>
+'   <li>To specify a provider compatible with the <a href="RSA.html">RSA</a> class, pass a value of 1.</li>
+'   <li>To specify a provider compatible with the <a href="DSA.html">DSA</a> class, pass a value of 13.</li>
+' </ul>
+' The following table lists the provider types and their corresponding numeric values defined in the WinCrypt.h header file.
+' <table style="width: auto">
+'   <tr>
+'       <th>Provider Type</th><th>Numeric Value</th>
+'   </tr>
+'   <tr>
+'        <td>PROV_RSA_RULL</td><td>1</td>
+'   </tr>
+'    <tr>
+'        <td>PROV_RSA_SIG</td><td>2</td>
+'    </tr>
+'    <tr>
+'        <td>PROV_DSS</td><td>3</td>
+'    </tr>
+'    <tr>
+'        <td>PROV_FORTEZZA</td><td>4</td>
+'    </tr>
+'    <tr>
+'        <td>PROV_MS_EXCHANGE</td><td>5</td>
+'    </tr>
+'    <tr>
+'        <td>PROV_SSL</td><td>6</td>
+'    </tr>
+'    <tr>
+'        <td>PROV_RSA_SCHANNEL</td><td>12</td>
+'    </tr>
+'    <tr>
+'        <td>PROV_DSS_DH</td><td>13</td>
+'    </tr>
+'    <tr>
+'        <td>PROV_EC_ECDSA_SIG</td><td>14</td>
+'    </tr>
+'    <tr>
+'        <td>PROV_EC_ECNRA_SIG</td><td>15</td>
+'    </tr>
+'    <tr>
+'        <td>PROV_EC_ECDSA_FULL</td><td>16</td>
+'    </tr>
+'    <tr>
+'        <td>PROV_EC_ECNRA_FULL</td><td>17</td>
+'    </tr>
+'    <tr>
+'        <td>PROV_DH_SCHANNEL</td><td>18</td>
+'    </tr>
+'    <tr>
+'        <td>PROV_SPYRUS_LYNKS</td><td>20</td>
+'    </tr>
+'    <tr>
+'        <td>PROV_RNG</td><td>21</td>
+'    </tr>
+'    <tr>
+'        <td>PROV_INTEL_SEC</td><td>22</td>
+'    </tr>
+'    <tr>
+'        <td>PROV_REPLACE_OWF</td><td>23</td>
+'    </tr>
+'    <tr>
+'        <td>PROV_RSA_AES</td><td>24</td>
+'    </tr>
+' </table>
+' For more information about the default provider types and their behaviors, see the Microsoft Cryptography API (CAPI) documentation in the MSDN library.
 Public Property Let ProviderType(ByVal Value As Long)
     mProviderType = Value
 End Property
 
 ''
-' Returns flags used to modify the behavior of cryptographic providers.
+' Gets the flags for <a href="CspParameters.html">CspParameters</a> that modify the behavior of the cryptographic service provider (CSP).
 '
-' @return The flags set for cryptographic providers.
-'
+' @return An enumeration value, or a bitwise combination of enumeration values.
 Public Property Get Flags() As CspProviderFlags
     Flags = mFlags
 End Property
 
 ''
-' Sets flags used to modify the behavior of cryptographic providers.
+' Sets the flags for <a href="CspParameters.html">CspParameters</a> that modify the behavior of the cryptographic service provider (CSP).
 '
-' @param Value The flags set for cryptographic providers.
-'
+' @param Value An enumeration value, or a bitwise combination of enumeration values.
+' @exceptions
+'' <table style="width: auto">
+ '   <tr>
+ '       <th>Exception</th><th>Condition</th>
+ '   </tr>
+ '   <tr>
+ '        <td><a href="ArgumentException.html">ArgumentException</a></td><td><i>Value</i> is not a valid enumeration value.</td>
+ '   </tr>
+ ' </table>
 Public Property Let Flags(ByVal Value As CspProviderFlags)
     If (Value And &HFFFFFF80) <> 0 Then _
         Throw Cor.NewArgumentException("Invalid CspParameter flag value.", "Value")

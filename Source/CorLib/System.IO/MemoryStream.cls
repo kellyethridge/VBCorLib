@@ -37,36 +37,43 @@ Attribute VB_Exposed = True
 
 ''
 ' Provides an in-memory stream of data that can be read/written and modified
-' using Stream methods.
+' using <a href="Stream.html">Stream</a> methods.
 '
-' @remarks <p>The MemoryStream uses an array of bytes to back the data
+' @remarks <p>The <b>MemoryStream</b> uses an array of bytes to back the data
 ' in memory. When the object is first created, no array is allocated until the
 ' first time the data must be accessed. The default capacity of the array is 4096 bytes.
 ' The capacity will grow by doubling the size of the current capacity.
-' If The capacity needs to be larger, consider setting the Capacity directly to prevent
+' If The capacity needs to be larger, consider setting the <a href="MemoryStream.Let.Capacity.html">Capacity</a> directly to prevent
 ' the array from having to be resized as new data is written to the stream.</p>
-' <p>If the MemoryStream is created using a supplied Byte array, then no internal array
-' will be allocated. The MemoryStream will access the supplied Byte array as if it
-' were created by the MemoryStream object. As the underlying array is modified, the
+' <p>If the <b>MemoryStream</b> is created using a supplied <b>Byte</b> array, then no internal array
+' will be allocated. The <b>MemoryStream</b> will access the supplied <b>Byte</b> array as if it
+' were created by the <b>MemoryStream</b> object. As the underlying array is modified, the
 ' changes can be seen by directly accessing the array. Also, by modifying the array
 ' directly, the underlying stream will reflect the new data.</p>
-' <p><b>CAUTION:</b> If a Byte array is being supplied to the MemoryStream, then the
-' array must outlive the MemoryStream object. It is the responsibility of the user to
-' destroy the array after the stream has been destroyed. The MemoryStream object
+' <p>The <b>Currency</b> type is used for consistency across all stream objects.
+' Internally, the <b>MemoryStream</b> only supports 2 ^ 31 bytes. Other streams may support more.</p>
+' @caution
+' If a <b>Byte</b> array is being supplied to the <b>MemoryStream</b> and <i>Mode</i> is <a href="MemoryStream.BufferMode.html">ShareMode</a>,
+' then the array must out-live the <b>MemoryStream</b> object. It is the responsibility of the user to
+' destroy the array after the stream has been destroyed. The <b>MemoryStream</b> object
 ' maintains a reference to the same array in memory, but does not deallocate the
 ' array when finished. While the object is alive, the array is locked to prevent
 ' it from being ReDimed or Erased. Closing the stream will release the lock and
-' reference to the array, at which point the user has full control of the array.</p>
-' <p>The Currency datatypes used are there for consistency across all stream objects.
-' Internally, the MemoryStream only supports 2 ^ 31 bytes. Other streams may support more.</p>
-'
+' reference to the array, at which point the user has full control of the array.
 ' @see Constructors
 ' @see Stream
-'
+' @include "..\DocIncludes\MemoryStream.html"
 Option Explicit
 Implements IObject
 Implements Stream
 
+''
+' The method a specified byte array should be referenced.
+'
+' @param ShareMode The <a href="MemoryStream.html">MemoryStream</a> points to the original array. This prevents a copy of the
+' array from occurring. Thid mode requires the specified array to out-live the <a href="MemoryStream.html">MemoryStream</a> object instance.
+' @param CopyMode A new array will be allocated with the contents of the specified array leaving the original array intact.
+' @param AcquireMode An internal array will point to the original array and set the original array variable to null. This effectively steals the specified array.
 Public Enum BufferMode
     ShareMode
     CopyMode
@@ -90,9 +97,9 @@ Private mAsyncPtr       As Long
 
 
 ''
-' Returns if the MemoryStream object supports timeout events.
+' Gets if the <a href="MemoryStream.html">MemoryStream</a> object supports timeout events.
 '
-' @return Always returns False.
+' @return Always returns <b>False</b>.
 Public Property Get CanTimeout() As Boolean
     CanTimeout = False
 End Property
@@ -101,7 +108,7 @@ End Property
 ' Gets the timeout duration for a read operation.
 '
 ' @return The timeout duration in milliseconds.
-' @remarks This always throws an InvalidOperationException.
+' @remarks This always throws an <a href="InvalidOperationException.html">InvalidOperationException</a>.
 Public Property Get ReadTimeout() As Long
     Error.InvalidOperation InvalidOperation_Timeouts
 End Property
@@ -110,7 +117,7 @@ End Property
 ' Sets the timeout duration for a read operation.
 '
 ' @param Value The new duration in milliseconds
-' @remarks This always throws an InvalidOperationException.
+' @remarks This always throws an <a href="InvalidOperationException.html">InvalidOperationException</a>.
 Public Property Let ReadTimeout(ByVal Value As Long)
     Error.InvalidOperation InvalidOperation_Timeouts
 End Property
@@ -119,7 +126,7 @@ End Property
 ' Gets the timeout duration of a write operation.
 '
 ' @return The timeout duration in milliseconds.
-' @remarks This always throws an InvalidOperationException.
+' @remarks This always throws an <a href="InvalidOperationException.html">InvalidOperationException</a>.
 Public Property Get WriteTimeout() As Long
     Error.InvalidOperation InvalidOperation_Timeouts
 End Property
@@ -128,29 +135,29 @@ End Property
 ' Sets the timeout duration for a write operation.
 '
 ' @param Value The new timeout duration in milliseconds.
-' @remarks This always throws an InvalidOperationException.
+' @remarks This always throws an <a href="InvalidOperationException.html">InvalidOperationException</a>.
 Public Property Let WriteTimeout(ByVal Value As Long)
     Error.InvalidOperation InvalidOperation_Timeouts
 End Property
 
 ''
-' Begins an asynchronous buffer read. For a MemoryStream, calling an asynchronous buffer
-' read is identical to calling ReadBlock.
+' Begins an asynchronous buffer read. For a <a href="MemoryStream.html">MemoryStream</a>, calling an asynchronous buffer
+' read is identical to calling <a href="MemoryStream.ReadBlock.html">ReadBlock</a>.
 '
 ' @param Buffer The destination array to copy the bytes into.
-' @param Offset The index in Buffer to begin copying to.
+' @param Offset The index in <i>Buffer</i> to begin copying to.
 ' @param Count The maximum number of bytes to copy.
 ' @param Callback A listening object to be notified that the read is finished.
-' @param State User data that can be carried within the IAsyncResult object returned.
-' @return An IAsyncResult object used to identify the corrisponding Endread and report
+' @param State User data that can be carried within the <a href="IAsyncResult.html">IAsyncResult</a> object returned.
+' @return An <a href="IAyncResult.html">IAsyncResult</a> object used to identify the corrisponding <a href="MemoryStream.EndRead.html">Endread</a> and report
 ' information about the buffer read.
 ' @remarks <p>Since the stream is directly stored and accessed in memory, there is no
-' waiting for reads to occur. The BeginRead method works identical to the Read method
+' waiting for reads to occur. The <b>BeginRead</b> method works identical to the <a href="MemoryStream.ReadBlock.html">ReadBlock</a> method
 ' in terms of immediately reading stream data into the <i>Buffer</i>.</p>
 ' <p>When defining the Count for the number of maximum bytes to be read, if the
 ' stream does not have enough bytes, the read will copy less bytes than Count.</p>
 ' <p>If an exception has occurred during the read, it will not be thrown until the
-' EndRead is executed.
+' EndRead is executed.</p>
 Public Function BeginRead(ByRef Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long, Optional ByVal Callback As AsyncCallback, Optional ByRef State As Variant) As IAsyncResult
     Dim Result As StreamAsyncResult
     
@@ -179,23 +186,21 @@ Catch:
 End Function
 
 ''
-' Begins an asynchronous buffer write. For a MemoryStream, having an asynchronous buffer
-' write is of no use.
+' Begins an asynchronous buffer write. For a <a href="MemoryStream.html">MemoryStream</a>, having an asynchronous buffer write is of no use.
 '
 ' @param Buffer The source array to copy the bytes from into the stream.
 ' @param Offset The starting index in the source <i>Buffer</i> to begin copying from.
 ' @param Count The maximum number of bytes to be copied into the stream.
 ' @param Callback A user supplied object to be notified of the finish of the writing.
-' @param State User data that can be carried within the IAsyncResult object return.
-' @return An IAsyncResult object used to identify the corrisponding EndBread and report
+' @param State User data that can be carried within the <a href="IAsyncResult.html">IAsyncResult</a> object return.
+' @return An <a href="IAsyncResult.html">IAsyncResult</a> object used to identify the corrisponding <a href="MemoryStream.EndRead.html">EndBread<a/> and report
 ' information about the buffer read.
 ' @remarks <p>Since the stream is directly stored and accessed in memory, there is no
-' waiting for reads to occur. The BeginWrite method works identical to the WriteBlock method
+' waiting for reads to occur. The <b>BeginWrite</b> method works identical to the <a href="MemoryStream.WriteBlock.html">WriteBlock</a> method
 ' in terms of reading immediately writing stream data to the stream.</p>
-' <p>When defining the Count for the number of maximum bytes to be written, if the
-' <i>Buffer</i> does not have enough bytes, an exception will be thrown in the EndWrite method.</p>
-' <p>If an exception has occurred during the read, it will not be thrown until the
-' EndRead is executed.
+' <p>When defining the <i>Count</i> for the number of maximum bytes to be written, if the
+' <i>Buffer</i> does not have enough bytes, an exception will be thrown in the <a href="MemoryStream.EndWrite.html">EndWrite</a> method.</p>
+' <p>If an exception has occurred during the read, it will not be thrown until the <a href="MemoryStream.EndRead.html">EndRead</a> is executed.</p>
 Public Function BeginWrite(ByRef Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long, Optional ByVal Callback As AsyncCallback, Optional ByRef State As Variant) As IAsyncResult
     Dim Result As StreamAsyncResult
     
@@ -226,14 +231,13 @@ End Function
 ''
 ' Signifies the end of an asynchronous read from the stream.
 '
-' @param AsyncResult The IAsyncResult object returned from the BeginRead function.
+' @param AsyncResult The <a href="IAsyncResult.html">IAsyncResult</a> object returned from the <a href="MemoryStream.BeginRead.html">BeginRead</a> function.
 ' @return The number of bytes read from the stream in to <i>Buffer</i> in the BeginRead method.
-' @remarks <p>This method is generally called anytime after BeginRead for a MemoryStream.
-' Since the MemoryStream uses memory for the data store, there is no need to wait for
-' the data to arrive. The BeginRead/EndRead calls are redundant and should not be
-' used with the MemoryStream. Instead use the Read Method.</p>
-' <p>If any exceptions were caused during the reading then they will be thrown
-' during the call to EndRead.</p>
+' @remarks <p>This method is generally called anytime after <a href="MemoryStream.BeginRead.html">BeginRead</a> for a <a href="MemoryStream.html">MemoryStream</a>.
+' Since the <a href="MemoryStream.html">MemoryStream</a> uses memory for the data store, there is no need to wait for
+' the data to arrive. The <a href="MemoryStream.BeginRead.html">BeginRead</a>/<a href="MemoryStream.EndRead.html">EndRead</a> calls are redundant and should not be
+' used with the <a href="MemoryStream.html">MemoryStream</a>. Instead use the <a href="MemoryStream.ReadBlock.html">ReadBlock</a> Method.</p>
+' <p>If any exceptions were caused during the reading then they will be thrown during the call to <a href="MemoryStream.EndRead.html">EndRead</a>.</p>
 Public Function EndRead(ByVal AsyncResult As IAsyncResult) As Long
     If AsyncResult Is Nothing Then _
         Error.ArgumentNull "AsyncResult"
@@ -258,13 +262,12 @@ End Function
 ''
 ' Signifies the end of an asynchronous write to the stream.
 '
-' @param AsyncResult The IAsyncResult returned from the BeginWrite function.
-' @remarks <p>This method is generally called anytime after BeginWrite for a MemoryStream.
-' Since the MemoryStream uses memory for the data store, there is no need to wait for
-' the data to be written. The BeginWrite/EndWrite calls are redundant and should not be
-' used with the MemoryStream. Instead use the WriteBlock Method.</p>
-' <p>If any exceptions were caused during the reading then they will be thrown
-' during the call to EndRead.</p>
+' @param AsyncResult The <a href="IAsyncResult.html">IAsyncResult<a/> returned from the <a href="MemoryStream.BeginWrite.html">BeginWrite</a> function.
+' @remarks <p>This method is generally called anytime after <a href="MemoryStream.BeginWrite.html">BeginWrite</a> for a <a href="MemoryStream.html">MemoryStream</a>.
+' Since the <a href="MemoryStream.html">MemoryStream</a> uses memory for the data store, there is no need to wait for
+' the data to be written. The <a href="MemoryStream.BeginWrite.html">BeginWrite</a>/<a href="MemoryStream.EndWrite.html">EndWrite</a> calls are redundant and should not be
+' used with the <a href="MemoryStream.html">MemoryStream</a>. Instead use the <a href="MemoryStream.WriteBlock.html">WriteBlock</a> Method.</p>
+' <p>If any exceptions were caused during the reading then they will be thrown during the call to <a href="MemoryStream.EndRead.html">EndRead</a>.</p>
 Public Sub EndWrite(ByVal AsyncResult As IAsyncResult)
     If AsyncResult Is Nothing Then _
         Throw Cor.NewArgumentNullException("AsyncResult")
@@ -285,52 +288,48 @@ Public Sub EndWrite(ByVal AsyncResult As IAsyncResult)
 End Sub
 
 ''
-' Determines if the current MemoryStream can be read.
+' Gets value indicating whether the current stream supports reading.
 '
-' @return The status of the ability to read the stream.
-' @remarks If the MemoryStream is open, then it can be read. If it is closed, it cannot be read.
+' @return <b>True</b> if the stream supports reading; otherwise, <b>False</b>.
+' @remarks If the stream is closed, this property return <b>False</b>.
 Public Property Get CanRead() As Boolean
     CanRead = Not mIsClosed
 End Property
 
 ''
-' Determines if the current MemoryStream can be written to.
+' Gets value indicating whether the current stream supports writing.
 '
-' @return The status of the ability to write to the stream.
-' @remarks If the stream was created from a user-supplied array, then the user
-' will determine if the stream is allowed to be written to. Otherwise, the stream
-' is always writable while it is open.
+' @return <b>True</b> if the stream supports writing; otherwise, <b>False</b>.
+' @remarks If the <a href="MemoryStream.html">MemoryStream</a> object was created with the <i>Writable</i>
+' parameter specified as <b>True</b> or the object was created with no parameters, then the stream supports writing.
+' <p>If the stream is closed, this property return <b>False</b>.</p>
 Public Property Get CanWrite() As Boolean
     CanWrite = mCanWrite And (Not mIsClosed)
 End Property
 
 ''
-' Determines if the current MemoryStream can seek positions within the stream.
+' Gets value indicating whether the current stream supports seeking.
 '
-' @return The status of the ability to seek a position within the stream.
-' @remarks If the MemoryStream is open, then it is seekable, otherwise it is not.
+' @return <b>True</b> if the stream supports seeking; otherwise, <b>False</b>.
+' @remarks If the stream is closed, this property return <b>False</b>.
 Public Property Get CanSeek() As Boolean
     CanSeek = Not mIsClosed
 End Property
 
 ''
-' Returns the current capacity of the internal stream buffer.
+' Gets the number of bytes allocated for this stream.
 '
-' @return The number of bytes the internal array contains.
-' @remarks If the the capacity is reached while writing, then the capacity
-' will be expanded, unless the underlying byte array is user-supplied. In
-' this case, an exception will be thrown if the capacity is changed.
+' @return The length of the usable portion of the buffer for the stream.
+' @include "..\DocIncludes\MemoryStream.Capacity.html"
 Public Property Get Capacity() As Long
     Capacity = mCapacity
 End Property
 
 ''
-' Sets the current capacity for the internal stream buffer.
+' Sets the number of bytes allocated for this stream.
 '
-' @param Value The number of bytes to allocate for the internal array.
-' @remarks The capacity cannot be set less than the current length of
-' the stream. If the underlying byte array is user-supplied, then an
-' exception will be thrown if the capacity is modified.
+' @param Value The length of the usable portion of the buffer for the stream.
+' @include "..\DocIncludes\MemoryStream.Capacity.html"
 Public Property Let Capacity(ByVal Value As Long)
     If Not mExpandable Then _
         Error.NotSupported NotSupported_MemoryStreamNotExpandable
@@ -353,12 +352,20 @@ Public Property Let Capacity(ByVal Value As Long)
 End Property
 
 ''
-' Returns the current length of the stream.
+' Gets the length of the stream in bytes.
 '
-' @return The number of bytes the current stream is.
-' @remarks The length of the stream differs from the capacity in that the
-' capacity is the amount of allocated memory used to store the stream, and the
-' length is the number of bytes used from within the allocated memory.
+' @return The length of the stream in bytes.
+' @remarks The length of the stream differs from the capacity in that the capacity is the amount of allocated
+' memory used to store the stream, and the length is the number of bytes used from within the allocated memory.
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th><th>Condition</th>
+'   </tr>
+'    <tr>
+'        <td><a href="ObjectDisposedException.html">ObjectDisposedException</a></td><td>The stream is closed.</td>
+'    </tr>
+' </table>
 Public Property Get Length() As Currency
     Length = mLength
 End Property
@@ -367,9 +374,16 @@ End Property
 ' Returns the current position within the stream.
 '
 ' @return The byte index within the stream.
-' @remarks The position is the index at which the next read or write
-' will occur. Position is alway zero based, even if a user-supplied
-' array is not.
+' @remarks The position is the index at which the next read or write will occur. Position is alway zero based, even if a user-supplied array is not.
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th><th>Condition</th>
+'   </tr>
+'    <tr>
+'        <td><a href="ObjectDisposedException.html">ObjectDisposedException</a></td><td>The stream is closed.</td>
+'    </tr>
+' </table>
 Public Property Get Position() As Currency
     EnsureOpen
     Position = mPosition
@@ -378,10 +392,21 @@ End Property
 ''
 ' Sets the current position within the stream.
 '
-' @param Value The absolution position within the stream.
-' @remarks The position is the index at which the next read or write
-' will occur. Position is always zero based, even if a user-supplied
-' array is not.
+' @param Value The current position within the stream.
+' @remarks The position is the index at which the next read or write will occur. Position is always zero based, even if a user-supplied array is not.
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th><th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+'        <td>The position is set to a negative value or a value greater than 32bit integer max value.</td>
+'   </tr>
+'    <tr>
+'        <td><a href="ObjectDisposedException.html">ObjectDisposedException</a></td><td>The stream is closed.</td>
+'    </tr>
+' </table>
 Public Property Let Position(ByVal Value As Currency)
     Value = Int(Value)
     If Value < 0 Then _
@@ -415,12 +440,38 @@ End Sub
 ' Writes an array of bytes to the underlying stream.
 '
 ' @param Buffer The bytes to be written to the stream.
-' @param Offset The startind index in <i>Buffer</i> to begin writing from.
-' @param Count The number of bytes to be written to the stream.
-' @remarks <p>If the position in the stream is closer to the end than Count bytes, then
-' the stream will expand if possible. If the underlying stream is a user-supplied
-' byte array, then an exception will occur if the capacity is reached.</p>
-' <p>The stream must be open to write to it, otherwise an exception will be thrown.</p>
+' @param Offset The starting index in <i>Buffer</i> to begin writing from.
+' @param Count The maximum number of bytes to be written to the stream.
+' @remarks The <i>Offset</i> parameter gives the offset of the first byte in <i>Buffer</i> to write from, and the <i>Count</i> parameter gives
+' the number of bytes to write. If the write operation is successful, the current position within the stream is advanced
+' by the number of bytes written. If an exception occurs, the current position within the stream is unchanged.
+' <p>Except for a <a href="MemoryStream.html">MemoryStream</a> constructed with a Byte() parameter, write operations at the end of a <a href="MemoryStream.html">MemoryStream</a> expand the <a href="MemoryStream.html">MemoryStream</a>.</p>
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th><th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ArgumentNullException.html">ArgumentNullException</a></td><td><i>Buffer</i> is uninitialized.</td>
+'   </tr>
+'    <tr>
+'        <td><a href="NotSupportedException.html">NotSupportedException</a></td>
+'        <td>
+'           The stream does not support writing. For additional information see <a href="MemoryStream.Get.CanWrite.html">CanWriter</a>.<br/>
+'           -or-<br/>
+'           The current position is closer than <i>Count</i> bytes to the end of the stream, and the capacity cannot be modified.
+'        </td>
+'    </tr>
+'    <tr>
+'        <td><a href="ArgumentException.html">ArgumentException</a></td><td><i>Offset</i> subtracted from the <i>Buffer</i> length is less than <i>Count</i>.</td>
+'    </tr>
+'    <tr>
+'        <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td><td><i>Offset</i> or <i>Count</i> is negative.</td>
+'    </tr>
+'    <tr>
+'        <td><a href="ObjectDisposedException.html">ObjectDisposedException</a></td><td>The current stream instance is closed.</td>
+'    </tr>
+' </table>
 Public Sub WriteBlock(ByRef Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long)
     ValidateArrayRange Buffer, Offset, Count, NameOfBuffer, NameOfOffset
     EnsureWritable
@@ -444,11 +495,25 @@ End Sub
 ' Writes a single byte to the underlying stream.
 '
 ' @param value The byte to be written to the stream.
-' @remarks <p>If the position to be written exceeds the current capacity, then
-' the stream will be expanded if possible. If the underlying stream is a
-' user-supply byte array, then the capacity cannot be modified and an
-' exception will be thrown.</p>
-' <p>The stream must be open to write to it, otherwise an exception will be thrown.</p>
+' @remarks Except for a <a href="MemoryStream.html">MemoryStream</a> constructed with a Byte() parameter,
+' write operations at the end of a <a href="MemoryStream.html">MemoryStream</a> expand the <a href="MemoryStream.html">MemoryStream</a>.
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th><th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="NotSupportedException.html">NotSupportedException</a></td>
+'        <td>
+'           The stream does not support writing. For additional information see <a href="MemoryStream.Get.CanWrite.html">CanWriter</a>.<br/>
+'           -or-<br/>
+'           The current position is at the end of the stream, and the capacity cannot be modified.
+'        </td>
+'   </tr>
+'    <tr>
+'        <td><a href="ObjectDisposedException.html">ObjectDisposedException</a></td><td>The current stream instance is closed.</td>
+'    </tr>
+' </table>
 Public Sub WriteByte(ByVal Value As Byte)
     EnsureWritable
     EnsureOpen
@@ -470,10 +535,27 @@ End Sub
 ' @param Count The maximum number of bytes to be read from the stream.
 ' @return The total number of bytes read from the stream.
 ' @remarks <p>If Offset plus Count exceeds the end of <i>Buffer</i> then an exception will be thrown.
-' If the current position in the stream is closer to the end than Count bytes, then only the
-' remaining bytes will be read.</p>
+' If the current position in the stream is closer to the end than <i>Count</i> bytes, then only the remaining bytes will be read.</p>
 ' <p>The stream must be open to read from it, otherwise an exception will be thrown.</p>
 ' <p>After reading from the stream, the current position will advance the number of byte as returend.</p>
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th><th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ArgumentNullException.html">ArgumentNullException</a></td><td><i>Buffer</i> is uninitialized.</td>
+'   </tr>
+'    <tr>
+'        <td><a href="ArgumentException.html">ArgumentException</a></td><td><i>Offset</i> subtracted from the <i>Buffer</i> length is less than <i>Count</i>.</td>
+'    </tr>
+'    <tr>
+'        <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td><td><i>Offset</i> or <i>Count</i> is negative.</td>
+'    </tr>
+'    <tr>
+'        <td><a href="ObjectDisposedException.html">ObjectDisposedException</a></td><td>The current stream instance is closed.</td>
+'    </tr>
+' </table>
 Public Function ReadBlock(ByRef Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long) As Long
     ValidateArrayRange Buffer, Offset, Count, NameOfBuffer, NameOfOffset
     EnsureOpen
@@ -492,10 +574,18 @@ End Function
 ''
 ' Reads a single byte from the stream.
 '
-' @return The byte value from the current position in the stream.
-' @remarks <p>The stream must be open for read from it, otherwise an exception will be thrown.</p>
-' <p>If the end of the stream is reached during a read, then a value of -1 is returned.</p>
-' <p>Each read from the stream will advance the position one byte.</p>
+' @return The byte cast to a <b>Long</b>, or -1 if the end of the stream has been reached.
+' @remarks If the read operation is successful, the current position within the stream is advanced by one byte.
+' If an exception occurs, the current position within the stream is unchanged.
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th><th>Condition</th>
+'   </tr>
+'    <tr>
+'        <td><a href="ObjectDisposedException.html">ObjectDisposedException</a></td><td>The current stream instance is closed.</td>
+'    </tr>
+' </table>
 Public Function ReadByte() As Long
     If mPosition >= mLength Then
         ReadByte = -1
@@ -507,17 +597,30 @@ Public Function ReadByte() As Long
 End Function
 
 ''
-' Changes the position within the stream.
+' Sets the position within the current stream to the specified value.
 '
-' @param Offset The number of bytes to move.
-' @param Loc The starting position in the stream to move from.
-' @return The actual position moved to.
-' @param <p>The offset is applied to a starting position refered to by <i>Loc</i>.
-' the <i>Offset</i> can be negative to move the position backwards.</p>
-' <p>If the position ends up being before the start of the stream an exception will be thrown.
-' The position can be set passed the end of the stream. This will cause the stream to be
-' expanded on the next access. If the stream expansion is not supported an exception
-' will be thrown. This may be the case when using a user-supplied byte array.</p>
+' @param Offset The new position within the stream. This is relative to the <i>Loc</i> parameter, and can be positive or negative.
+' @param Loc A value of type <a href="Stream.SeekOrigin.html">SeekOrigin</a>, which acts as the seek reference point.
+' @return The new position within the stream, calculated by combining the initial reference point and the offset.
+' @remarks Seeking to any location beyond the length of the stream is supported.
+' <p>Do not use the <b>SeekPosition</b> method to determine the new position in the stream if the <a href="MemoryStream.html">MemoryStream</a> was initialized with
+' a non-zero offset. If you do, <b>SeekPosition</b> will return an inaccurate value. Instead, use the <a href="MemoryStream.Get.Position.html">Position</a> property to get the new position of the stream.
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th><th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td><td><i>Offset</i> is greater than max 32-bit value.</td>
+'   </tr>
+'    <tr>
+'        <td><a href="ArgumentException.html">ArgumentException</a></td>
+'        <td>There is an invalid <a href="Stream.SeekOrigin.html">SeekOrigin</a>.</td>
+'    </tr>
+'    <tr>
+'        <td><a href="ObjectDisposedException.html">ObjectDisposedException</a></td><td>The current stream instance is closed.</td>
+'    </tr>
+' </table>
 Public Function SeekPosition(ByVal Offset As Currency, ByVal Loc As SeekOrigin) As Currency
     Offset = Int(Offset)
     Select Case Loc
@@ -543,6 +646,25 @@ End Function
 ' The size of the stream can be changed to withing the origin size of the user-supplied
 ' byte array. If a length greater than the original array size is set, then an exception
 ' is thrown.</p>
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th><th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="NotSupportedException.html">NotSupportedException</a></td>
+'        <td>
+'           The current stream is not resizable and <i>Value</i> is larger than the current capacity.<br/>
+'           -or-<br/>
+'           The current stream does not support writing.
+'        </td>
+'   </tr>
+'    <tr>
+'        <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+'        <td>value is negative or is greater than the maximum length of the MemoryStream, where the maximum
+'            length is( MaxValue - origin), and origin is the index into the underlying buffer at which the stream starts.</td>
+'    </tr>
+' </table>
 Public Sub SetLength(ByVal Value As Currency)
     EnsureWritable
     
@@ -563,12 +685,21 @@ Public Sub SetLength(ByVal Value As Currency)
 End Sub
 
 ''
-' Returns a byte array copy of the underlying byte stream.
+' Writes the stream contents to a byte array, regardless of the <a href="MemoryStream.Get.Position.html">Position</a> property.
 '
-' @return The byte array copy of the underlying stream.
-' @remarks If the underlying stream is a user-supplied byte array, then only
-' that portion determined by Count when the stream was created is returned, not
-' the entire array.
+' @return A new byte array.
+' @remarks This method omits unused bytes in <a href="MemoryStream.html">MemoryStream</a> from the array.
+' <p>This method returns a copy of the contents of the <a href="MemoryStream.html">MemoryStream</a> as a byte array.
+' If the current instance was constructed on a provided byte array, a copy of the section of the array to which
+' this instance has access is returned. See the <a href="MemoryStream.html">MemoryStream</a> constructor <a href="Constructors.NewMemoryStream.html">NewMemoryStream</a> for details.
+' <table style="width: auto">
+'   <tr>
+'       <th>Note</td>
+'   </tr>
+'   <tr>
+'       <td>The method works when the <a href="MemoryStream.html">MemoryStream</a> is closed.</td>
+'   </tr>
+' </table>
 Public Function ToArray() As Byte()
     EnsureBuffer
     
@@ -589,9 +720,21 @@ Public Sub Flush()
 End Sub
 
 ''
-' Writes the underlying stream to another stream.
+' Writes the entire contents of this memory stream to another stream.
 '
-' @param Stream The stream to write the underlying stream to.
+' @param Stream The stream to write this memory stream to.
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th><th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ArgumentNullException.html">ArgumentNullException</a></td><td><i>Stream</i> is <b>Nothing</b>.</td>
+'   </tr>
+'    <tr>
+'        <td><a href="ObjectDisposedException.html">ObjectDisposedException</a></td><td>The current or target stream is closed.</td>
+'    </tr>
+' </table>
 Public Sub WriteTo(ByVal Stream As Stream)
     If Stream Is Nothing Then _
         Error.ArgumentNull "Stream", ArgumentNull_Stream
@@ -607,7 +750,7 @@ End Sub
 ' @param Destination The stream to which the contents of the current stream will be copied.
 ' @param BufferSize The size of the buffer. This value must be greater than zero. The default size is 81920.
 ' @remarks Copying begins at the current position in the current stream, and does not reset the position of the destination stream after the copy operation is complete.
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
 '       <th>Exception</th>

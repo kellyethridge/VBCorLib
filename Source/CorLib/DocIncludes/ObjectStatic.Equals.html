@@ -1,0 +1,40 @@
+@examples This example compare various values using the <b>Equals</b> method.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> List1 <span style="color: #0000ff">As</span> ArrayList
+    <span style="color: #0000ff">Dim</span> List2 <span style="color: #0000ff">As</span> ArrayList
+
+    <span style="color: #008000">&#39; Show how numeric values compare differently.</span>
+    PrintEquality 1, 1
+    PrintEquality <span style="color: #0000ff">CLng</span>(1), <span style="color: #0000ff">CInt</span>(1)
+    PrintEquality <span style="color: #a31515">&quot;1&quot;</span>, 1
+    
+    <span style="color: #008000">&#39; Set lists to two different instances.</span>
+    <span style="color: #0000ff">Set</span> List1 = <span style="color: #0000ff">New</span> ArrayList
+    <span style="color: #0000ff">Set</span> List2 = <span style="color: #0000ff">New</span> ArrayList
+    
+    PrintEquality List1, List2
+    
+    <span style="color: #008000">&#39; Set lists to same instance.</span>
+    <span style="color: #0000ff">Set</span> List2 = List1
+    
+    PrintEquality List1, List2
+    PrintEquality <span style="color: #0000ff">Nothing</span>, <span style="color: #0000ff">Nothing</span>
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> PrintEquality(<span style="color: #0000ff">ByRef</span> a <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>, <span style="color: #0000ff">ByRef</span> b <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>)
+    <span style="color: #0000ff">Dim</span> Relationship <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+    
+    Relationship = IIf(<span style="color: #2b91af">Object</span>.Equals(a, b), <span style="color: #a31515">&quot;=&quot;</span>, <span style="color: #a31515">&quot;&lt;&gt;&quot;</span>)
+    
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;{0} &#39;{1}&#39; {2} {3} &#39;{4}&#39;&quot;</span>, TypeName(a), a, Relationship, TypeName(b), b)
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; This example code produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    Integer &#39;1&#39; = Integer &#39;1&#39;</span>
+<span style="color: #008000">&#39;    Long &#39;1&#39; &lt;&gt; Integer &#39;1&#39;</span>
+<span style="color: #008000">&#39;    String &#39;1&#39; &lt;&gt; Integer &#39;1&#39;</span>
+<span style="color: #008000">&#39;    ArrayList &#39;CorLib.ArrayList&#39; &lt;&gt; ArrayList &#39;CorLib.ArrayList&#39;</span>
+<span style="color: #008000">&#39;    ArrayList &#39;CorLib.ArrayList&#39; = ArrayList &#39;CorLib.ArrayList&#39;</span>
+<span style="color: #008000">&#39;    Nothing &#39;&#39; = Nothing &#39;&#39;</span>
+</pre></div>

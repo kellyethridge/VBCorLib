@@ -46,34 +46,40 @@ Attribute VB_Exposed = True
 Option Explicit
 
 ''
-' Returns the encoding being used by this reader instance.
+' When implemented in a derived class, returns the <a href="Encoding.html">Encoding</a> in which the output is written.
 '
-' @return An encoding type used to convert characters to bytes.
-' @remarks All characters need to be converted to byte arrays in order
-' to be written to a stream. Encodings perform this conversion.
-'
+' @return The <a href="Encoding.html">Encoding</a> in which the output is written.
+' @remarks This property is necessary for some XML scenarios where a header must be written containing the encoding used by the <a href="TextWriter.html">TextWriter</a>.
+' This allows the XML code to consume an arbitrary <a href="TextWriter.html">TextWriter</a> and generate the correct XML header.
 Public Property Get Encoding() As Encoding: End Property
 
 ''
-' Returns the format provider used by this read instance.
+' Gets an object that controls formatting.
 '
-' @return The format provider used to format values to text.
-'
+' @return An <a href="IFormatProvider.html">IFormatProvider</a> object for a specific culture, or the formatting of the current culture if no other culture is specified.
+' @remarks The value of the <b>FormatProvider</b> property specifies the culture-specific formatting that is used
+' when you call the <a href="TextWriter.WriteValue.html">WriteValue</a> and <a href="TextWriter.WriteLine.html">WriteLine</a> methods.
 Public Property Get FormatProvider() As IFormatProvider: End Property
 
 ''
-' Returns the NewLine character used by this reader.
+' Gets the line terminator string used by the current <a href="TextWriter.html">TextWriter</a>.
 '
-' @return Returns the current newline character.
-'
+' @return The line terminator string for the current <a href="TextWriter.html">TextWriter</a>.
+' @remarks The default line terminator string is a carriage return followed by a line feed (<b>vbCrLf</b>).
+' <p>The line terminator string is written to the text stream whenever one of the WriteLine methods is called.
+' In order for text written by the <a href="TextWriter.html">TextWriter</a> to be readable by a <a href="TextReader.html">TextReader</a>,
+' only "\n" or "\r\n" should be used as terminator strings. If <b>NewLine</b> is set to <b>vbNullString</b>, the default newline character is used instead.</p>
 Public Property Get NewLine() As String: End Property
 
 ''
-' Sets the NewLine character used by this writer.
+' Sets the line terminator string used by the current <a href="TextWriter.html">TextWriter</a>.
 '
-' @param RHS The newline characters to be used.
-'
-Public Property Let NewLine(ByVal RHS As String): End Property
+' @param Value The line terminator string for the current <a href="TextWriter.html">TextWriter</a>.
+' @remarks The default line terminator string is a carriage return followed by a line feed (<b>vbCrLf</b>).
+' <p>The line terminator string is written to the text stream whenever one of the WriteLine methods is called.
+' In order for text written by the <a href="TextWriter.html">TextWriter</a> to be readable by a <a href="TextReader.html">TextReader</a>,
+' only "\n" or "\r\n" should be used as terminator strings. If <b>NewLine</b> is set to <b>vbNullString</b>, the default newline character is used instead.</p>
+Public Property Let NewLine(ByVal Value As String): End Property
 
 ''
 ' Closes this writer instance.
@@ -92,6 +98,7 @@ Public Function Equals(ByRef Value As Variant) As Boolean: End Function
 ' Forces any data being cached to be written to the stream immediately.
 '
 Public Sub Flush(): End Sub
+
 ''
 ' Returns a pseudo-unique number that identifies this object instance.
 '

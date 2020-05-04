@@ -38,6 +38,8 @@ Attribute VB_Exposed = True
 ''
 ' Represents information about a Crypto Service Provider's Key Container.
 '
+' @remarks To create an instance of <b>CspKeyContainerInfo</b> use the <a href="Constructors.NewCspKeyContainerInfo.html">NewCspKeyContainerInfo</a> constructor.
+' @see Constructors
 Option Explicit
 Implements IObject
 

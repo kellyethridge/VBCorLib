@@ -38,16 +38,15 @@ Attribute VB_Exposed = True
 ''
 ' Provides functionality to format the value of an object into a string representation.
 '
+' @remarks The <b>IFormattable</b> interface converts an object to its string representation based on a format string and a format provider.
 Option Explicit
 
 ''
 ' Returns the string representation of the object.
 '
-' @param Format The format string that describes the requested formatting of the value. <br>- or -<br><b>vbNullString</b> to use the default formatting for the type.
-' @param provider A provider that can format the value.<br>- or -<br><b>Nothing</b> to use the default formatter for the current locale.
+' @param Format The format string that describes the requested formatting of the value.<br/>-or-<br/><b>vbNullString</b> to use the default formatting for the type.
+' @param provider A provider that can format the value.<br/>-or-<br/><b>Nothing</b> to use the default formatter for the current locale.
 ' @return A string representation of the object with formatting applied.
-'
 ' @see IFormatProvider
-'
 Public Function ToString(ByRef Format As String, ByVal Provider As IFormatProvider) As String: End Function
 

@@ -1,0 +1,30 @@
+@examples The following example shows how to use a <b>StreamWriter</b> object to write a file that lists the directories on the C drive, and then uses a <a href="StreamReader.html">StreamReader</a> object to read and display each directory name.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> Dirs() <span style="color: #0000ff">As</span> DirectoryInfo
+    <span style="color: #0000ff">Dim</span> Line <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+    <span style="color: #0000ff">Dim</span> i <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
+    
+    <span style="color: #008000">&#39; Get the directories currently on the C drive.</span>
+    Dirs = NewDirectoryInfo(<span style="color: #a31515">&quot;c:\&quot;</span>).GetDirectories
+
+    <span style="color: #008000">&#39; Write each directory name to a file.</span>
+    <span style="color: #0000ff">With</span> NewStreamWriter(<span style="color: #a31515">&quot;CDriveDirs.txt&quot;</span>)
+        <span style="color: #0000ff">For</span> i = LBound(Dirs) <span style="color: #0000ff">To</span> UBound(Dirs)
+            .WriteLine Dirs(i).Name
+        <span style="color: #0000ff">Next</span>
+    <span style="color: #0000ff">End</span> <span style="color: #0000ff">With</span>
+    
+    <span style="color: #008000">&#39; Read and show each line from the file.</span>
+    <span style="color: #0000ff">With</span> NewStreamReader(<span style="color: #a31515">&quot;CDriveDirs.txt&quot;</span>)
+        <span style="color: #0000ff">Do</span>
+            Line = .ReadLine
+    
+            <span style="color: #0000ff">If</span> CorString.IsNull(Line) <span style="color: #0000ff">Then</span>
+                <span style="color: #0000ff">Exit</span> <span style="color: #0000ff">Do</span>
+            <span style="color: #0000ff">End</span> <span style="color: #0000ff">If</span>
+            
+            Debug.Print Line
+        <span style="color: #0000ff">Loop</span>
+    <span style="color: #0000ff">End</span> <span style="color: #0000ff">With</span>
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+</pre></div>

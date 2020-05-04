@@ -45,18 +45,15 @@ Private mChars()    As Integer
 
 
 ''
-' Returns a default hashcode for the specific value.
+' Generates a hashcode for a specified value.
 '
 ' @param Value The value to generate the hashcode for.
-' @return The hashcode value.
-' @remarks An object should never pass itself into this
-' function. Instead, the object should implement the default
-' hashcode by using MyBase.
-' <pre>
-' Public Function GetHashCode As Long
-'     GetHashCode = MyBase.GetHashCode(Me)
-' End Function
-' </pre>
+' @return A 32-bit integer hashcode value.
+' @remarks A hash code is a numeric value that is used to identify an object during equality testing. It can also serve as an index for an object in a collection.
+' <p>The <b>GetHashCode</b> method is suitable for use in hashing algorithms and data structures such as a hash table.</p>
+' <p>The default implementation of the <b>GetHashCode</b> method does not guarantee unique return values for different values. Furthermore, VBCorLib
+' does not guarantee the default implementation of the <b>GetHashCode</b> method, and the value it returns will be the same between different versions of VBCorLib.
+' Consequently, the default implementation of this method must not be used as a unique object identifier for hashing purposes.</p>
 Public Function GetHashCode(ByRef Value As Variant) As Long
     Select Case VarType(Value)
         Case vbLong, vbInteger, vbByte, vbBoolean
@@ -107,8 +104,12 @@ End Function
 ' @param ObjA The first value to compare with.
 ' @param ObjB The second value to compare.
 ' @return <b>True</b> if the value and the object are the same instance; <b>False</b> otherwise.
-' @remarks The two values must be of the same data-type to successfully be compared. For example
+' @remarks The two values must be of the same type to successfully be compared. For example
 ' a <b>vbLong</b> value of 1 will not be considered equal to a <b>vbInteger</b> value of 1.
+' <p>If objects are passed in, an attempt to access the <a href="IObject.html">IObject</a> interface is
+' made to allow objects perform their own equality check. If the object does not implement the
+' <a href="IObject.html">IObject</a> interface, object references are compared.</p>
+' @include "..\DocIncludes\ObjectStatic.Equals.html"
 Public Function Equals(ByRef ObjA As Variant, ByRef ObjB As Variant) As Boolean
     Dim Obj As IObject
     
@@ -161,6 +162,7 @@ End Function
 ' @return A string representation of the value.
 ' @see IFormattable
 ' @see IFormatProvider
+' @include "..\DocIncludes\ObjectStatic.ToString.html"
 Public Function ToString(ByRef Value As Variant, Optional ByRef Format As String, Optional ByVal Provider As IFormatProvider) As String
     Select Case VarType(Value)
         Case vbVariant

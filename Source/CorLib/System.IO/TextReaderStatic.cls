@@ -36,27 +36,25 @@ Attribute VB_Exposed = True
 '
 
 ''
-' Provides static functions to be accesses using TextReader.* calling convention.
+' Provides static methods and properties for the <a href="TextReader.html">TextReader</a> class.
 '
 ' @see TextReader
-'
 Option Explicit
 
 Private mNullReader As New NullTextReader
 
 ''
-' Returns a TextReader that performs no action.
+' Returns a <a href="TextReader.html">TextReader</a> with no data to read from.
 '
-' @return The Null TextReader.
-' @remarks The reader performs as if reading from past the end
-' of the underlying stream. The default behaviour sets the return
-' values to the values used to indicate that nothing has been done.<br>
-' <b>Read</b> returns -1.<br>
-' <b>Peek</b> returns -1.<br>
-' <b>ReadBlock</b> returns 0.<br>
-' <b>ReadLine</b> returns Null.<br>
-' <b>ReadToEnd</b> returns Null.<br>
-'
+' @return The <b>Null</b> text reader.
+' @remarks Reader from the <b>NullReader</b> text reader is similar to reading from the end of a stream:
+' <ul>
+'   <li>The <a href="TextReader.Read.html">Read</a> and <a href="TextReader.Peek.html">Peek</a> methods return -1.</li>
+'   <li>The <a href="TextReader.ReadBlock.html">ReadBlock</a> method returns zero.</li>
+'   <li>The <a href="TextReader.ReadLine.html">ReadLine</a> method returns <b>vbNullString</b>.</li>
+'   <li>The <a href="TextReader.ReadToEnd.html">ReadToEnd</a> method returns <b>vbNullString</b>.</li>
+' </ul>
+' <p>Access this property using <code>TextReader.NullReader</code>.</p>
 Public Property Get NullReader() As TextReader
     Set NullReader = mNullReader
 End Property

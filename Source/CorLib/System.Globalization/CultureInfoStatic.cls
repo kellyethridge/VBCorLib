@@ -36,27 +36,23 @@ Attribute VB_Exposed = True
 '
 
 ''
-' Provides a set of static methods retrieve CultureInfo objects.
+' Provides a set of static methods retrieve <a href="CultureInfo.html">CultureInfo</a> objects.
 '
-' @remarks This class cannot be instantiated. In order to access the methods
-' use the variable name directly.
+' @remarks This class cannot be instantiated. In order to access the methods use the variable name directly.
 ' <pre>
 ' Dim Cultures() As CultureInfo
-' Cultures = Culture.GetCultures(AllCultures)
+' Cultures = CultureInfo.GetCultures(AllCultures)
 ' </pre>
-'
 ' @see CultureInfo
-'
 Option Explicit
 
 ''
-' A list of culture type filters used in <b>GetCultures</b>.
+' A list of culture type filters used in <a href="CultureInfoStatic.GetCultures.html">GetCultures</a>.
 '
 ' @param NeutralCultures 1) Refers to cultures that are associated with a language but are not specific to a country/region. The names of these cultures consist of the lowercase two-letter code derived from ISO 639-1. For example: "en" (English) is a neutral culture. The invariant culture is included in the array of cultures returned by CultureInfo.GetCultures with this value.
 ' @param SpecificCultures 2) Refers to cultures that are specific to a country/region. The names of these cultures follow the RFC 1766 standard in the format "<languagecode2>-<country/regioncode2>", where <languagecode2> is a lowercase two-letter code derived from ISO 639-1 and <country/regioncode2> is an uppercase two-letter code derived from ISO 3166. For example, "en-US" (English - United States) is a specific culture.
 ' @param InstalledWin32Cultures 4) Refers to all cultures that are installed in the Windows system. Note that not all cultures supported by the .NET Framework are installed in the Windows system.
 ' @param AllCultures 7) Refers to all cultures.
-'
 Public Enum CultureTypes
     NeutralCultures = 1
     SpecificCultures = 2
@@ -70,11 +66,10 @@ Private mInstalledUICulture As CultureInfo
 
 
 ''
-' Returns a ReadOnly wrapped CultureInfo object.
+' Returns a read-only wrapper around the specified <a href="CultureInfo.html">CultureInfo</a>.
 '
-' @param Culture The culture to create a ReadOnly wrapper for.
+' @param Culture The <a href="CultureInfo.html">CultureInfo</a> to wrap.
 ' @return The wrapped ReadOnly culture.
-'
 Public Function ReadOnly(ByVal Culture As CultureInfo) As CultureInfo
     If Culture.IsReadOnly Then
         Set ReadOnly = Culture
