@@ -11,30 +11,34 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
-'    CopyRight (c) 2004 Kelly Ethridge
+'The MIT License (MIT)
+'Copyright (c) 2020 Kelly Ethridge
 '
-'    This file is part of VBCorLib.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    VBCorLib is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Public License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    VBCorLib is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Public License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Public License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: Queue
+' Module: Queue
 '
 
 ''
-' Provides a collections that maintains a list of items in a First-in-First-Out sequence.
+' Represents a first-in, first-out collection of values.
 '
+' @include "..\DocIncludes\Queue.html"
 Option Explicit
 Implements IObject
 Implements ICloneable
@@ -58,10 +62,11 @@ Private mVersion    As Long
 
 
 ''
-' Clears the contents of the queue
+' Removes all items from the <a href="Queue.html">Queue</a>.
 '
-' @remarks Even though the contents are cleared, the capacity of the queue is unchanged.
-'
+' @remarks <a href="Queue.Get.Count.html">Count</a> is set to zero, and references to other objects from elements of the collection are also released.
+' @see #TrimToSize
+' @include "..\DocIncludes\Queue.Clear.html"
 Public Sub Clear()
     mCount = 0
     mHead = 0
@@ -71,23 +76,25 @@ Public Sub Clear()
 End Sub
 
 ''
-' Returns a clone of the queue.
+' Creates a shallow copy of the <a href="Queue.html">Queue</a>.
 '
+' @return A shallow copy of the <a href="Queue.html">Queue</a>.
 ' @remarks Returns a second queue with the same contents as the original.
-'
+' <p>A shallow copy of a collection copies only the elements of the collection, whether they are reference types or value types,
+' but it does not copy the objects that the references refer to. The references in the new collection point to the same objects
+' that the references in the original collection point to.</p>
 Public Function Clone() As Queue
     Set Clone = New Queue
     Clone.InitClone mItems, mCount, mHead, mTail
 End Function
 
 ''
-' Determines if the queue contains a specific value.
+' Determines whether an element is in the <a href="Queue.html">Queue</a>.
 '
-' @param value The value to search for in the queue.
-' @return Value indicating if the value was found.
-' @remarks If more than one instance of the same value exists in the
-' queue, this will stop once it finds the first instance.
-'
+' @param Value The value to locate in the <a href="Queue.html">Queue</a>.
+' @return <b>True</b> if <i>Value</i> is found in the <a href="Queue.html">Queue</a>; otherwise <b>False</b>.
+' @remarks This method determines equality by calling <a href="ObjectStatic.Equals.html">Object.Equals</a>.
+' <p>This method performs a linear search; therefore, this method is an O(n) operation, where n is <a href="Queue.Get.Count.html">Count</a>.</p>
 Public Function Contains(ByRef Value As Variant) As Boolean
     Dim i As Long
     Dim j As Long
@@ -103,12 +110,12 @@ Public Function Contains(ByRef Value As Variant) As Boolean
 End Function
 
 ''
-' Copy the contents of the queue to an array.
+' Copies the <a href="Queue.html">Queue</a> elements to an existing one-dimensional array, starting at the specified array index.
 '
-' @param Arr The array to copy the contents to.
-' @param Index The starting index in the dstArray to copy the contents to.
-' @remarks The values in the queue will be cast to the array datatype if possible.
-'
+' @param Arr The one-dimensional array that is the destination of the elements copied from <a href="Queue.html">Queue</a>.
+' @param Index The lowerbound-based index in <i>Arr</i> at which copying begins.
+' @see #ToArray
+' @include "..\DocIncludes\Queue.CopyTo.html"
 Public Sub CopyTo(ByRef Arr As Variant, ByVal Index As Long)
     ValidateArrayRange Arr, Index, mCount
         
@@ -121,19 +128,25 @@ Public Sub CopyTo(ByRef Arr As Variant, ByVal Index As Long)
 End Sub
 
 ''
-' Returns the number of items in the queue.
+' Gets the number of elements contained in the <a href="Queue.html">Queue</a>.
 '
-' @return The number of items in the queue.
-'
+' @return The number of elements contained in the <a href="Queue.html">Queue</a>.
+' @remarks The capacity of a <a href="Queue.html">Queue</a> is the number of elements that the <a href="Queue.html">Queue</a> can store.
+' <b>Count</b> is the number of elements that are actually in the <a href="Queue.html">Queue</a>.
+' <p>The capacity of a <a href="Queue.html">Queue</a> is always greater than or equal to <b>Count</b>. If <b>Count</b> exceeds the capacity while adding elements,
+' the capacity is automatically increased by reallocating the internal array before copying the old elements and adding the new elements.</p>
+' <p>The capacity can be decreased by calling <a href="Queue.TrimToSize.html">TrimToSize</a>.</p>
 Public Property Get Count() As Long
     Count = mCount
 End Property
 
 ''
-' Returns the item at the head of the queue and removes that item from the queue.
+' Removes and returns the item at the beginning of the <a href="Queue.html">Queue</a>.
 '
-' @return The item at the head of the queue.
-'
+' @return The object that is removed from the beginning of the <a href="Queue.html">Queue</a>.
+' @see #Enqueue
+' @see #Peek
+' @include "..\DocIncludes\Queue.Dequeue.html"
 Public Function Dequeue() As Variant
     If mCount = 0 Then _
         Error.InvalidOperation InvalidOperation_EmptyQueue
@@ -145,10 +158,12 @@ Public Function Dequeue() As Variant
 End Function
 
 ''
-' Adds an item to the tail of the queue, expanding the queue as necessary.
+' Adds an item to the tail of the <a href="Queue.html">Queue</a>, expanding the queue as necessary.
 '
-' @param value The item to be placed at the tail of the queue.
-'
+' @param Value The item to be placed at the tail of the <a href="Queue.html">Queue</a>.
+' @see #Dequeue
+' @see #Peek
+' @include "..\DocIncludes\Queue.Enqueue.html"
 Public Sub Enqueue(ByRef Value As Variant)
     EnsureCapacity mCount + 1
     VariantCopyInd mItems(mTail), Value
@@ -200,11 +215,12 @@ Attribute NewEnum.VB_MemberFlags = "40"
 End Function
 
 ''
-' Returns the next value to be removed from the queue without
-' removing the value from the queue.
+' Returns the item at the beginning of the <a href="Queue.html">Queue</a> without removing it.
 '
-' @return The next value in the queue.
-'
+' @return The item at the beginning of the <a href="Queue.html">Queue</a>.
+' @see #Enqueue
+' @see #Dequeue
+' @include "..\DocIncludes\Queue.Peek.html"
 Public Function Peek() As Variant
     If mCount = 0 Then _
         Error.InvalidOperation InvalidOperation_EmptyQueue
@@ -213,10 +229,11 @@ Public Function Peek() As Variant
 End Function
 
 ''
-' Returns the contents of the queue in a variant array.
+' Copies the <a href="Queue.html">Queue</a> elements to a new array.
 '
-' @return An array of variants containing the queue contents.
-'
+' @return A new array containing elements copied from the <a href="Queue.html">Queue</a>.
+' @see #CopyTo
+' @include "..\DocIncludes\Queue.ToArray.html"
 Public Function ToArray() As Variant()
     Dim Result() As Variant
     
@@ -238,8 +255,14 @@ Public Function ToString() As String
 End Function
 
 ''
-' Resizes the internal capacity to match the number of items in the queue.
+' Sets the capacity to the actual number of elements in the <a href="Queue.html">Queue</a>.
 '
+' @remarks This method can be used to minimize a queue's memory overhead if no new elements will be added to the queue.
+' <p>To reset a <a href="Queue.html">Queue</a> to its initial state, call the <a href="Queue.Clear.html">Clear</a> method before calling <b>TrimToSize</b>.
+' Trimming an empty <a href="Queue.html">Queue</a> sets the capacity of the <a href="Queue.html">Queue</a> to the default capacity.</p>
+' <p>This method is an O(<i>n</i>) operation, where <i>n</i> is <a href="Queue.Get.Count.html">Count</a>.</p>
+' @see #Clear
+' @see #Count
 Public Sub TrimToSize()
     If mCount = 0 Then
         ReDim mItems(0 To DefaultCapacity - 1)

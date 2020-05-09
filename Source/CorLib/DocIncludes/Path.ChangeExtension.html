@@ -1,0 +1,39 @@
+@remarks If neither <i>Path</i> nor <i>Extension</i> contains a period (.), <b>ChangeExtension</b> adds the period.
+<p>The <i>Extension</i> parameter can contain multiple periods and any valid path characters, and can be any length. If <i>Extension</i> is <b>vbNullString</b>, the returned string contains the contents of <i>Path</i> with the last period and all characters following it removed.</p>
+<p>If <i>Extension</i> is an empty string, the returned path string contains the contents of <i>Path</i> with any characters following the last period removed.</p>
+<p>If <i>Path</i> does not have an extension and <i>Extension</i> is not <b>vbNullString</b>, the returned string contains <i>Path</i> followed by <i>Extension</i>.</p>
+<p>If <i>Extension</i> is not <b>vbNullString</b> and does not contain a leading period, the period is added.</p>
+<p>If <i>Path</i> contains a multiple extension separated by multiple periods, the returned string contains the contents of <i>Path</i> with the last period and all characters following it replaced by <i>Extension</i>. For example, if <i>Path</i> is "\Dir1\examples\pathtests.csx.txt" and <i>Extension</i> is "cs", the modified path is "\Dir1\examples\pathtests.csx.cs".</p>
+@exceptions
+<table style="width: auto">
+	<tr>
+		<th>Exception</th><th>Condition</th>
+	</tr>
+	<tr>
+		<td><a href="ArgumentException.html">ArgumentException</a></td>
+		<td><i>Path</i> contains one or more of the invalid characters defined in <a href="Path.GetInvalidPathChars.html">GetInvalidPathChars</a>.</td>
+	</tr>
+</table>
+@examples The following code example demonstrates a use of the <b>ChangeExtension</b> method.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Const</span> GoodFileName <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span> = <span style="color: #a31515">&quot;c:\MyDir\MyFile.Com.Extension&quot;</span>
+    <span style="color: #0000ff">Const</span> BadFileName <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span> = <span style="color: #a31515">&quot;c:\MyDir\&quot;</span>
+    
+    <span style="color: #0000ff">Dim</span> Result <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+    
+    Result = Path.ChangeExtension(GoodFileName, <span style="color: #a31515">&quot;.old&quot;</span>)
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;ChangeExtension({0}, &#39;.old&#39;) return &#39;{1}&#39;&quot;</span>, GoodFileName, Result)
+    
+    Result = Path.ChangeExtension(GoodFileName, <span style="color: #a31515">&quot;&quot;</span>)
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;ChangeExtension({0}, &#39;&#39;) return &#39;{1}&#39;)&quot;</span>, GoodFileName, Result)
+    
+    Result = Path.ChangeExtension(BadFileName, <span style="color: #a31515">&quot;.old&quot;</span>)
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;ChangeExtension({0}, &#39;.old&#39;) returns &#39;{1}&#39;&quot;</span>, BadFileName, Result)
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; This example code produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    ChangeExtension(c:\MyDir\MyFile.Com.Extension, &#39;.old&#39;) return &#39;c:\MyDir\MyFile.Com.old&#39;</span>
+<span style="color: #008000">&#39;    ChangeExtension(c:\MyDir\MyFile.Com.Extension, &#39;&#39;) return &#39;c:\MyDir\MyFile.Com.&#39;)</span>
+<span style="color: #008000">&#39;    ChangeExtension(c:\MyDir\, &#39;.old&#39;) returns &#39;c:\MyDir\.old&#39;</span>
+</pre></div>

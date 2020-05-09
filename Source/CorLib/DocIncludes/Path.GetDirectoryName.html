@@ -1,0 +1,39 @@
+@remarks In most cases, the string returned by this method consists of all characters in the path up to but not including the last <a href="Path.Get.DirectorySeparatorChar.html">DirectorySeparatorChar</a> or <a href="Path.Get.AltDirectorySeparatorChar.html">AltDirectorySeparatorChar</a>. If the path consists of a root directory, such as "c:\", empty string is returned. Note that this method does not support paths using "file:". Because the returned path does not include the <a href="Path.Get.DirectorySeparatorChar.html">DirectorySeparatorChar</a> or <a href="Path.Get.AltDirectorySeparatorChar.html">AltDirectorySeparatorChar</a>, passing the returned path back into the <b>GetDirectoryName</b> method will result in the truncation of one folder level per subsequent call on the result string. For example, passing the path "C:\Directory\SubDirectory\test.txt" into the <b>GetDirectoryName</b> method will return "C:\Directory\SubDirectory". Passing that string, "C:\Directory\SubDirectory", into <b>GetDirectoryName</b> will result in "C:\Directory".
+<table style="width: auto">
+	<tr>
+		<th>Exception</th><th>Condition</th>
+	</tr>
+	<tr>
+		<td><a href="ArgumentException.html">ArgumentException</a></td>
+		<td>The <i>Path</i> parameter contains invalid characters, is empty, or contains only white spaces.</td>
+	</tr>
+</table>
+@examples The following code example demonstrates using the <b>GetDirectoryName</b> method.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> FilePath <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+    <span style="color: #0000ff">Dim</span> DirectoryName <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+    <span style="color: #0000ff">Dim</span> i <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
+    
+    FilePath = <span style="color: #a31515">&quot;C:\MyDir\MySubDir\MyFile.txt&quot;</span>
+    
+    <span style="color: #0000ff">Do</span> <span style="color: #0000ff">While</span> Len(FilePath) &gt; 0
+        DirectoryName = Path.GetDirectoryName(FilePath)
+        Debug.Print CorString.Format(<span style="color: #a31515">&quot;GetDirectoryName(&#39;{0}&#39;) returns &#39;{1}&#39;&quot;</span>, FilePath, DirectoryName)
+        FilePath = DirectoryName
+        
+        <span style="color: #0000ff">If</span> i = 1 <span style="color: #0000ff">Then</span>
+            FilePath = DirectoryName &amp; <span style="color: #a31515">&quot;\&quot;</span> <span style="color: #008000">&#39; this will preserve the previous path</span>
+        <span style="color: #0000ff">End</span> <span style="color: #0000ff">If</span>
+        
+        i = i + 1
+    <span style="color: #0000ff">Loop</span>
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; This example code produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    GetDirectoryName(&#39;C:\MyDir\MySubDir\MyFile.txt&#39;) returns &#39;C:\MyDir\MySubDir&#39;</span>
+<span style="color: #008000">&#39;    GetDirectoryName(&#39;C:\MyDir\MySubDir&#39;) returns &#39;C:\MyDir&#39;</span>
+<span style="color: #008000">&#39;    GetDirectoryName(&#39;C:\MyDir\&#39;) returns &#39;C:\MyDir&#39;</span>
+<span style="color: #008000">&#39;    GetDirectoryName(&#39;C:\MyDir&#39;) returns &#39;C:\&#39;</span>
+<span style="color: #008000">&#39;    GetDirectoryName(&#39;C:\&#39;) returns &#39;&#39;</span>
+</pre></div>

@@ -1,0 +1,31 @@
+@remarks The returned value is an empty string if the file path is an empty string.
+<p>The separator characters used to determine the start of the file name are <a href="Path.Get.DirectorySeparatorChar.html">DirectorySeparatorChar</a> and <a href="Path.Get.AltDirectorySeparatorChar.html">AltDirectorySeparatorChar</a>.</p>
+@exceptions
+<table style="width: auto">
+	<tr>
+		<th>Exception</th><th>Condition</th>
+	</tr>
+	<tr>
+		<td><a href="ArgumentException.html">ArgumentException</a></td>
+		<td><i>Path</i> contains one or more of the invalid characters defined in <a href="Path.GetInvalidPathChars.html">GetInvalidPathChars</a>.</td>
+	</tr>
+</table>
+@examples The following code example demonstrates the behavior of the <b>GetFileName</b> method.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Const</span> FileName <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span> = <span style="color: #a31515">&quot;C:\MyDir\MyFile.Ext&quot;</span>
+    <span style="color: #0000ff">Const</span> PathName <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span> = <span style="color: #a31515">&quot;C:\MyDir\&quot;</span>
+    
+    <span style="color: #0000ff">Dim</span> Result <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+    
+    Result = Path.GetFileName(FileName)
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;GetFileName(&#39;{0}&#39;) returns &#39;{1}&#39;&quot;</span>, FileName, Result)
+    
+    Result = Path.GetFileName(PathName)
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;GetFileName(&#39;{0}&#39;) returns &#39;{1}&#39;&quot;</span>, PathName, Result)
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; This example code produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    GetFileName(&#39;C:\MyDir\MyFile.Ext&#39;) returns &#39;MyFile.Ext&#39;</span>
+<span style="color: #008000">&#39;    GetFileName(&#39;C:\MyDir\&#39;) returns &#39;&#39;</span>
+</pre></div>

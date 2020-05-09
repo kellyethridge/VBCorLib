@@ -1,0 +1,54 @@
+@remarks A path can contain absolute or relative location information. Absolute paths fully specify a location: the file or directory can be uniquely identified regardless of the current location. Relative paths specify a partial location: the current location is used as the starting point when locating a file specified with a relative path. To determine the current directory, call <a href="Directory.GetCurrentDirectory.html">Directory.GetCurrentDirectory</a>.
+<p>Most members of the <b>Path</b> class do not interact with the file system and do not verify the existence of the file specified by a path
+string. <b>Path</b> class members that modify a path string, such as <a href="Path.ChangeExtension.html">ChangeExtension</a>, have no effect on names of files in the file system. <b>Path</b> members do, however, validate the contents of a specified path string, and throw an <a href="ArgumentException.html">ArgumentException</a> if the string contains characters that are not valid in path strings, as defined in <a href="Path.Get.InvalidPathChars.html">InvalidPathChars</a>.</p>
+<p>The members of the <b>Path</b> class enable you to quickly and easily perform common operations such as determining whether a file name extension is part of a path, and combining two strings into one path name.</p>
+<table>
+  <tr>
+      <th>Note</th>
+  </tr>
+  <tr>
+   	<td>
+       In members that accept a path as an input string, that path must be well-formed or an exception is raised. For example, if a path is fully qualified but begins with a space, the path is not trimmed in methods of the class. Therefore, the path is malformed and an exception is raised. Similarly, a path or a combination of paths cannot be fully qualified twice. For example, "c:\temp c:\windows" also raises an exception in most cases. Ensure that your paths are well-formed when using methods that accept a path string.
+   	</td>
+  </tr>
+</table>
+<p>In members that accept a path, the path can refer to a file or just a directory. The specified path can also refer to a relative path or a Universal Naming Convention (UNC) path for a server and share name. For example, all the following are acceptable paths:</p>
+<ul>
+  <li>"c:\MyDir\MyFile.txt"</li>
+  <li>"c:\MyDir"</li>
+  <li>"MyDir\MySubDir"</li>
+  <li>"\\MyServer\MyShare"</li>
+</ul>
+<p>Because all these operations are performed on strings, it is impossible to verify that the results are valid in all scenarios. For example, the <a href="Path.GetExtension.html">GetExtension</a> method parses a string that you pass to it and returns the extension from that string. However, this does not mean that a file with that extension exists on the disk.</p>
+@examples The following code example demonstrates some of the main members of the <b>Path</b> class.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Const</span> Path1 <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span> = <span style="color: #a31515">&quot;c:\temp\MyTest.txt&quot;</span>
+    <span style="color: #0000ff">Const</span> Path2 <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span> = <span style="color: #a31515">&quot;c:\temp\MyTest&quot;</span>
+    <span style="color: #0000ff">Const</span> Path3 <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span> = <span style="color: #a31515">&quot;temp&quot;</span>
+    
+    <span style="color: #0000ff">If</span> Path.HasExtension(Path1) <span style="color: #0000ff">Then</span>
+        Debug.Print CorString.Format(<span style="color: #a31515">&quot;{0} has an extension.&quot;</span>, Path1)
+    <span style="color: #0000ff">End</span> <span style="color: #0000ff">If</span>
+    
+    <span style="color: #0000ff">If</span> <span style="color: #0000ff">Not</span> Path.HasExtension(Path2) <span style="color: #0000ff">Then</span>
+        Debug.Print CorString.Format(<span style="color: #a31515">&quot;{0} has no extension.&quot;</span>, Path2)
+    <span style="color: #0000ff">End</span> <span style="color: #0000ff">If</span>
+    
+    <span style="color: #0000ff">If</span> <span style="color: #0000ff">Not</span> Path.IsPathRooted(Path3) <span style="color: #0000ff">Then</span>
+        Debug.Print CorString.Format(<span style="color: #a31515">&quot;The string {0} contains no root information.&quot;</span>, Path3)
+    <span style="color: #0000ff">End</span> <span style="color: #0000ff">If</span>
+    
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;The full path of {0} is {1}.&quot;</span>, Path3, Path.GetFullPath(Path3))
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;{0} is the location of temporary files.&quot;</span>, Path.GetTempPath)
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;{0} is a file available for use.&quot;</span>, Path.GetTempFileName)
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; This example code produces output similar to the following.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    c:\temp\MyTest.txt has an extension.</span>
+<span style="color: #008000">&#39;    c:\temp\MyTest has no extension.</span>
+<span style="color: #008000">&#39;    The string temp contains no root information.</span>
+<span style="color: #008000">&#39;    The full path of temp is C:\Program Files (x86)\Microsoft Visual Studio\VB98\temp.</span>
+<span style="color: #008000">&#39;    C:\Users\kelly\AppData\Local\Temp\ is the location of temporary files.</span>
+<span style="color: #008000">&#39;    C:\Users\kelly\AppData\Local\Temp\tmp6B81.tmp is a file available for use.</span>
+</pre></div>

@@ -1,0 +1,47 @@
+@remarks <a href="Queue.Get.Count.html">Count</a> is set to zero, and references to other objects from elements of the collection are also released.
+<p>The capacity remains unchanged. To reset the capacity of the <a href="Queue.html">Queue</a>, call <a href="Queue.TrimToSize.html">TrimToSize</a>. Trimming an empty <a href="Queue.html">Queue</a> sets the capacity of the <a href="Queue.html">Queue</a> to the default capacity.</p>
+@examples The following example shows how to clear the values of the <a href="Queue.html">Queue</a>.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> MyQ <span style="color: #0000ff">As</span> <span style="color: #0000ff">New</span> Queue
+    
+    MyQ.Enqueue <span style="color: #a31515">&quot;The&quot;</span>
+    MyQ.Enqueue <span style="color: #a31515">&quot;quick&quot;</span>
+    MyQ.Enqueue <span style="color: #a31515">&quot;brown&quot;</span>
+    MyQ.Enqueue <span style="color: #a31515">&quot;fox&quot;</span>
+    MyQ.Enqueue <span style="color: #a31515">&quot;jumped&quot;</span>
+    
+    <span style="color: #008000">&#39; Displays the count and values of the queue.</span>
+    Debug.Print <span style="color: #a31515">&quot;Initially,&quot;</span>
+    Debug.Print <span style="color: #a31515">&quot;   Count    : &quot;</span> &amp; MyQ.Count
+    Debug.Print <span style="color: #a31515">&quot;   Values:&quot;</span>;
+    PrintValues MyQ
+    
+    <span style="color: #008000">&#39; Clears the queue.</span>
+    MyQ.Clear
+       
+    <span style="color: #008000">&#39; Displays the count and values of the queue.</span>
+    Debug.Print <span style="color: #a31515">&quot;After Clear,&quot;</span>
+    Debug.Print <span style="color: #a31515">&quot;   Count    : &quot;</span> &amp; MyQ.Count
+    Debug.Print <span style="color: #a31515">&quot;   Values:&quot;</span>;
+    PrintValues MyQ
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> PrintValues(<span style="color: #0000ff">ByVal</span> MyQ <span style="color: #0000ff">As</span> Queue)
+    <span style="color: #0000ff">Dim</span> Item <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>
+    
+    <span style="color: #0000ff">For</span> <span style="color: #0000ff">Each</span> Item <span style="color: #0000ff">In</span> MyQ
+        Debug.Print <span style="color: #a31515">&quot;    &quot;</span> &amp; Item;
+    <span style="color: #0000ff">Next</span>
+    
+    Debug.Print
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; This example code produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    Initially,</span>
+<span style="color: #008000">&#39;       Count    : 5</span>
+<span style="color: #008000">&#39;       Values:    The    quick    brown    fox    jumped</span>
+<span style="color: #008000">&#39;    After Clear,</span>
+<span style="color: #008000">&#39;       Count    : 0</span>
+<span style="color: #008000">&#39;       Values:</span>
+</pre></div>

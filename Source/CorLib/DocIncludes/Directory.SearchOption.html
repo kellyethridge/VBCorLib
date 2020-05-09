@@ -1,0 +1,32 @@
+@examples The following code example lists all of the directories and files that begin with the letter "s" in "c:\". In this example, the <b>SearchOption</b> is used to specify not to search all subdirectories.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Const</span> Path <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span> = <span style="color: #a31515">&quot;c:\&quot;</span>
+    <span style="color: #0000ff">Const</span> SearchPattern <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span> = <span style="color: #a31515">&quot;s*&quot;</span>
+    
+    <span style="color: #0000ff">Dim</span> di <span style="color: #0000ff">As</span> DirectoryInfo
+    <span style="color: #0000ff">Dim</span> Directories() <span style="color: #0000ff">As</span> DirectoryInfo
+    <span style="color: #0000ff">Dim</span> Files() <span style="color: #0000ff">As</span> FileInfo
+    
+    <span style="color: #0000ff">Set</span> di = NewDirectoryInfo(Path)
+    Directories = di.GetDirectories(SearchPattern, SearchOption.TopDirectoryOnly)
+    Files = di.GetFiles(SearchPattern, SearchOption.TopDirectoryOnly)
+    
+    Debug.Print <span style="color: #a31515">&quot;Directories that begin with the letter &quot;&quot;s&quot;&quot; in &quot;</span> &amp; Path
+    
+    DisplayFileSystemInfo Directories
+    
+    Debug.Print t(<span style="color: #a31515">&quot;\nFiles that begin with the letter &quot;&quot;s&quot;&quot; in &quot;</span>) &amp; Path
+    
+    DisplayFileSystemInfo Files
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> DisplayFileSystemInfo(<span style="color: #0000ff">ByRef</span> Source <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>)
+    <span style="color: #0000ff">Dim</span> Item <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>
+    <span style="color: #0000ff">Dim</span> Info <span style="color: #0000ff">As</span> FileSystemInfo
+    
+    <span style="color: #0000ff">For</span> <span style="color: #0000ff">Each</span> Item <span style="color: #0000ff">In</span> Source
+        <span style="color: #0000ff">Set</span> Info = Item
+        Debug.Print CorString.Format(<span style="color: #a31515">&quot;{0,-25} {1,25}&quot;</span>, Info.FullName, Info.LastWriteTime)
+    <span style="color: #0000ff">Next</span>
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+</pre></div>
