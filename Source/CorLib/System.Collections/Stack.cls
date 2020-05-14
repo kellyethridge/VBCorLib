@@ -116,20 +116,21 @@ Public Sub CopyTo(ByRef Arr As Variant, ByVal Index As Long)
 End Sub
 
 ''
-' Returns the number of items on the stack.
+' Gets the number of elements contained in the <a href="Stack.html">Stack</a>.
 '
-' @return The number of items.
-'
+' @return The number of elements contained in the <a href="Stack.html">Stack</a>.
+' @remarks The capacity is the number of elements that the Stack can store. <b>Count</b> is the number of elements that are actually in the <a href="Stack.html">Stack</a>.
+' <p>The capacity is always greater than or equal to <b>Count</b>. If <b>Count</b> exceeds the capacity while adding elements,
+' the capacity is automatically increased by reallocating the internal array before copying the old elements and adding the new elements.</p>
 Public Property Get Count() As Long
     Count = mCount
 End Property
 
 ''
-' Returns a boolean indicating if the value and this object
-' instance are the same instance.
+' Determines whether the specified value is equal to the current object.
 '
-' @param value The value to compare this object to.
-' @return Boolean indicating equality.
+' @param value The value to compare with the current object.
+' @return <b>True</b> if the specified value is equal to the current object; otherwise, <b>False</b>.
 Public Function Equals(ByRef Value As Variant) As Boolean
     Equals = MyBase.Equals(Me, Value)
 End Function

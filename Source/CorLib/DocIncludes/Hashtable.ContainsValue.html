@@ -1,0 +1,84 @@
+@remarks The values of the elements of the <a href="Hashtable.html">Hashtable</a> are compared to the specified value using the <a href="ObjectStatic.Equals.html">Object.Equals</a> method.
+<p>This method performs a linear search; therefore, this method is an O(<i>n</i>) operation, where <i>n</i> is <a href="Hashtable.Get.Count.html">Count</a>.</p>
+@examples The following example shows how to determine whether the <a href="Hashtable.html">Hashtable</a> contains a specific element.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #008000">&#39; Creates and initializes a new Hashtable.</span>
+    <span style="color: #0000ff">Dim</span> MyHT <span style="color: #0000ff">As</span> <span style="color: #0000ff">New</span> Hashtable
+    MyHT.Add 0, <span style="color: #a31515">&quot;zero&quot;</span>
+    MyHT.Add 1, <span style="color: #a31515">&quot;one&quot;</span>
+    MyHT.Add 2, <span style="color: #a31515">&quot;two&quot;</span>
+    MyHT.Add 3, <span style="color: #a31515">&quot;three&quot;</span>
+    MyHT.Add 4, <span style="color: #a31515">&quot;four&quot;</span>
+
+    <span style="color: #008000">&#39; Displays the values of the Hashtable.</span>
+    Debug.Print <span style="color: #a31515">&quot;The Hashtable contains the following values:&quot;</span>
+    PrintIndexAndKeysAndValues MyHT
+
+    <span style="color: #008000">&#39; Searches for a specific key.</span>
+    <span style="color: #0000ff">Dim</span> myKey <span style="color: #0000ff">As</span> <span style="color: #2b91af">Integer</span>
+    myKey = 2
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;The key &quot;&quot;{0}&quot;&quot; is &quot;</span>, myKey);
+    <span style="color: #0000ff">If</span> MyHT.ContainsKey(myKey) <span style="color: #0000ff">Then</span>
+       Debug.Print <span style="color: #a31515">&quot;in the Hashtable.&quot;</span>
+    <span style="color: #0000ff">Else</span>
+       Debug.Print <span style="color: #a31515">&quot;NOT in the Hashtable.&quot;</span>
+    <span style="color: #0000ff">End</span> <span style="color: #0000ff">If</span>
+
+    myKey = 6
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;The key &quot;&quot;{0}&quot;&quot; is &quot;</span>, myKey);
+    <span style="color: #0000ff">If</span> MyHT.ContainsKey(myKey) <span style="color: #0000ff">Then</span>
+       Debug.Print <span style="color: #a31515">&quot; in the Hashtable.&quot;</span>
+    <span style="color: #0000ff">Else</span>
+       Debug.Print <span style="color: #a31515">&quot; NOT in the Hashtable.&quot;</span>
+    <span style="color: #0000ff">End</span> <span style="color: #0000ff">If</span>
+
+    <span style="color: #008000">&#39; Searches for a specific value.</span>
+    <span style="color: #0000ff">Dim</span> MyValue <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+    MyValue = <span style="color: #a31515">&quot;three&quot;</span>
+    
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;The value &quot;&quot;{0}&quot;&quot; is &quot;</span>, MyValue);
+    <span style="color: #0000ff">If</span> MyHT.ContainsValue(MyValue) <span style="color: #0000ff">Then</span>
+       Debug.Print <span style="color: #a31515">&quot; in the Hashtable.&quot;</span>
+    <span style="color: #0000ff">Else</span>
+       Debug.Print <span style="color: #a31515">&quot; NOT in the Hashtable.&quot;</span>
+    <span style="color: #0000ff">End</span> <span style="color: #0000ff">If</span>
+
+    MyValue = <span style="color: #a31515">&quot;nine&quot;</span>
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;The value &quot;&quot;{0}&quot;&quot; is &quot;</span>, MyValue);
+    <span style="color: #0000ff">If</span> MyHT.ContainsValue(MyValue) <span style="color: #0000ff">Then</span>
+       Debug.Print <span style="color: #a31515">&quot; in the Hashtable.&quot;</span>
+    <span style="color: #0000ff">Else</span>
+       Debug.Print <span style="color: #a31515">&quot; NOT in the Hashtable.&quot;</span>
+    <span style="color: #0000ff">End</span> <span style="color: #0000ff">If</span>
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> PrintIndexAndKeysAndValues(<span style="color: #0000ff">ByVal</span> MyHT <span style="color: #0000ff">As</span> Hashtable)
+    <span style="color: #0000ff">Dim</span> de <span style="color: #0000ff">As</span> DictionaryEntry
+    <span style="color: #0000ff">Dim</span> i <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
+    
+    Debug.Print t(<span style="color: #a31515">&quot;\t-INDEX-\t-KEY-\t-VALUE-&quot;</span>)
+    
+    <span style="color: #0000ff">For</span> <span style="color: #0000ff">Each</span> de <span style="color: #0000ff">In</span> MyHT
+        Debug.Print CorString.Format(t(<span style="color: #a31515">&quot;\t[{0}]:\t{1}\t{2}&quot;</span>), i, de.Key, de.Value)
+        i = i + 1
+    <span style="color: #0000ff">Next</span>
+    
+    Debug.Print
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+
+<span style="color: #008000">&#39; This example code produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    The Hashtable contains the following values:</span>
+<span style="color: #008000">&#39;        -INDEX- -KEY-   -VALUE-</span>
+<span style="color: #008000">&#39;        [0]:    0   zero</span>
+<span style="color: #008000">&#39;        [1]:    1   one</span>
+<span style="color: #008000">&#39;        [2]:    2   two</span>
+<span style="color: #008000">&#39;        [3]:    3   three</span>
+<span style="color: #008000">&#39;        [4]:    4   four</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    The key &quot;2&quot; is in the Hashtable.</span>
+<span style="color: #008000">&#39;    The key &quot;6&quot; is  NOT in the Hashtable.</span>
+<span style="color: #008000">&#39;    The value &quot;three&quot; is  in the Hashtable.</span>
+<span style="color: #008000">&#39;    The value &quot;nine&quot; is  NOT in the Hashtable.</span>
+</pre></div>
