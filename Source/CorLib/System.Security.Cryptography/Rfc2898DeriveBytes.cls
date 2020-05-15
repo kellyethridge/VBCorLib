@@ -36,14 +36,10 @@ Attribute VB_Exposed = True
 '
 
 ''
-' Provides a methods to derive Byte array keys from string passwords.
-'
-' @remarks This class implements the RFC2898 standard for generating keys from string
-' or byte array passwords utilizing the SHA-1 hash algorithm.
-' <p>With this class, a key of any length can be generated from a string or byte array password.</p>
+' Implements password-based key derivation functionality, PBKDF2, by using a pseudo-random number generator based on <a href="HMACSHA1.html">HMACSHA1</a>.
 '
 ' @see Constructors
-'
+' @include "..\DocIncludes\Rfc2898DeriveBytes.html"
 Option Explicit
 Implements IObject
 
@@ -60,20 +56,19 @@ Private mBytesBuffered      As Long
 
 
 ''
-' Returns the number of iterations used when computing the next set of bytes.
+' Gets the number of iterations for the operation.
 '
-' @Return The number of iterations to be used.
-'
+' @Return The number of iterations for the operation.
+' @include "..\DocIncludes\Rfc2898DeriveBytes.Get.IterationCount.html"
 Public Property Get IterationCount() As Long
     IterationCount = mIterations
 End Property
 
 ''
-' Sets the number of iterations to be used when computing the next set of bytes.
+' Sets the number of iterations for the operation.
 '
-' @param Value The number of iterations to be used.
-' @remarks The value must be greater than 0.
-'
+' @param Value The number of iterations for the operation.
+' @include "..\DocIncludes\Rfc2898DeriveBytes.Let.IterationCount.html"
 Public Property Let IterationCount(ByVal Value As Long)
     If Value < 1 Then _
         Error.ArgumentOutOfRange "Value", ArgumentOutOfRange_NeedPosNum
@@ -83,20 +78,37 @@ Public Property Let IterationCount(ByVal Value As Long)
 End Property
 
 ''
-' Returns any Salt being used during key generation.
+' Gets the key salt value for the operation.
 '
-' @return The Salt being used during key generation.
-'
+' @return The key salt value for the operation.
+' @remarks Salt, a random set of bytes, is used to make unauthorized decrypting of a message more difficult. A dictionary attack
+' is an attack in which the attacker attempts to decrypt an encrypted message by comparing the encrypted value with previously
+' computed encrypted values for the most likely keys. This attack is made much more difficult by the introduction of salt, or
+' random bytes, at the end of the password before the key derivation.
 Public Property Get Salt() As Byte()
     Salt = mSalt
 End Property
 
 ''
-' Sets the Salt to be used during key generation.
+' Sets the key salt value for the operation.
 '
-' @param Value The Salt to be used.
+' @param Value The key salt value for the operation.
 ' @remarks The length of the array cannot be less than 8 bytes.
-'
+' @remarks Salt, a random set of bytes, is used to make unauthorized decrypting of a message more difficult. A dictionary attack
+' is an attack in which the attacker attempts to decrypt an encrypted message by comparing the encrypted value with previously
+' computed encrypted values for the most likely keys. This attack is made much more difficult by the introduction of salt, or
+' random bytes, at the end of the password before the key derivation.
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th><th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ArgumentException.html">ArgumentException</a></td><td>The specified salt size is smaller than 8 bytes.</td>
+'   </tr>
+'    <tr>
+'        <td><a href="ArgumentNullException.html">ArgumentNullException</a></td><td>The salt is an uninitialized array.</td>
+'    </tr>
+' </table>
 Public Property Let Salt(ByRef Value() As Byte)
     ValidateArray Value, NameOfValue
     
@@ -108,10 +120,11 @@ Public Property Let Salt(ByRef Value() As Byte)
 End Property
 
 ''
-' Returns the next set of bytes to be generated for a specific string password.
+' Returns the pseudo-random key for this object.
 '
-' @param cb The number of bytes to be generated.
-'
+' @param cb The number of pseudo-random key bytes to generate.
+' @return A byte array filled with pseudo-random key bytes.
+' @include "..\DocIncludes\Rfc2898DeriveBytes.GetBytes.html"
 Public Function GetBytes(ByVal cb As Long) As Byte()
     Dim Blocks As Long
     Blocks = CorMath.Ceiling(cb / BlockSize)
@@ -140,8 +153,9 @@ Public Function GetBytes(ByVal cb As Long) As Byte()
 End Function
 
 ''
-' Resets the key generator.
+' Resets the state of the operation.
 '
+' @remarks This method is automatically called if the salt or iteration count is modified.
 Public Sub Reset()
     mHasher.Initialize
     mBlockCount = 0

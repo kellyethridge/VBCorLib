@@ -1,0 +1,58 @@
+@remarks Iteration count is the number of times an operation is performed. For this method, the count should be greater than zero.The minimum recommended number of iterations is 1000.
+@examples The following example shows how to use the <b>IterationCount</b> property to display the number of iterations used in the generation of the key. This code example is part of a larger example provided for the <a href="Rfc2898DeriveBytes.html">Rfc2898DeriveBytes</a> class.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">    <span style="color: #008000">&#39; The default iteration count is 1000 so the two methods use the same iteration count.</span>
+    <span style="color: #0000ff">Const</span> MyIterations <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span> = 1000
+    
+    <span style="color: #0000ff">On</span> <span style="color: #0000ff">Error</span> <span style="color: #0000ff">GoTo</span> <span style="color: #0000ff">Catch</span>
+    
+    <span style="color: #0000ff">Dim</span> K1 <span style="color: #0000ff">As</span> Rfc2898DeriveBytes
+    <span style="color: #0000ff">Dim</span> K2 <span style="color: #0000ff">As</span> Rfc2898DeriveBytes
+    
+    <span style="color: #0000ff">Set</span> K1 = NewRfc2898DeriveBytes(Pwd1, Salt1, MyIterations)
+    <span style="color: #0000ff">Set</span> K2 = NewRfc2898DeriveBytes(Pwd1, Salt1)
+    
+    <span style="color: #008000">&#39; Encrypt the data.</span>
+    <span style="color: #0000ff">Dim</span> EncAlg <span style="color: #0000ff">As</span> TripleDES
+    <span style="color: #0000ff">Dim</span> EncryptionStream <span style="color: #0000ff">As</span> <span style="color: #0000ff">New</span> MemoryStream
+    <span style="color: #0000ff">Dim</span> Encrypt <span style="color: #0000ff">As</span> CryptoStream
+    <span style="color: #0000ff">Dim</span> UtfD1() <span style="color: #0000ff">As</span> <span style="color: #2b91af">Byte</span>
+    
+    <span style="color: #0000ff">Set</span> EncAlg = TripleDES.Create()
+    EncAlg.Key = K1.GetBytes(16)
+    <span style="color: #0000ff">Set</span> Encrypt = NewCryptoStream(EncryptionStream, EncAlg.CreateEncryptor(), CryptoStreamMode.WriteMode)
+    UtfD1 = NewUTF8Encoding(<span style="color: #0000ff">False</span>).GetBytes(Data1)
+    
+    Encrypt.WriteBlock UtfD1, 0, CorArray.Length(UtfD1)
+    Encrypt.FlushFinalBlock
+    Encrypt.CloseStream
+    
+    <span style="color: #0000ff">Dim</span> EData1() <span style="color: #0000ff">As</span> <span style="color: #2b91af">Byte</span>
+    EData1 = EncryptionStream.ToArray()
+    K1.Reset
+
+    <span style="color: #008000">&#39; Try to decrypt, thus showing it can be round-tripped.</span>
+    <span style="color: #0000ff">Dim</span> DecAlg <span style="color: #0000ff">As</span> TripleDES
+    <span style="color: #0000ff">Dim</span> DecryptionStreamBacking <span style="color: #0000ff">As</span> <span style="color: #0000ff">New</span> MemoryStream
+    <span style="color: #0000ff">Dim</span> Decrypt <span style="color: #0000ff">As</span> CryptoStream
+        
+    <span style="color: #0000ff">Set</span> DecAlg = TripleDES.Create()
+    DecAlg.Key = K2.GetBytes(16)
+    DecAlg.IV = EncAlg.IV
+    
+    <span style="color: #0000ff">Set</span> Decrypt = NewCryptoStream(DecryptionStreamBacking, DecAlg.CreateDecryptor(), CryptoStreamMode.WriteMode)
+    Decrypt.WriteBlock EData1, 0, CorArray.Length(EData1)
+    Decrypt.Flush
+    Decrypt.CloseStream
+    K2.Reset
+    
+    <span style="color: #0000ff">Dim</span> Data2 <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+    Data2 = NewUTF8Encoding(<span style="color: #0000ff">False</span>).GetString(DecryptionStreamBacking.ToArray())
+
+    <span style="color: #0000ff">If</span> Data1 &lt;&gt; Data2 <span style="color: #0000ff">Then</span>
+        Debug.Print <span style="color: #a31515">&quot;Error: The two values are not equal.&quot;</span>
+    <span style="color: #0000ff">Else</span>
+        Debug.Print <span style="color: #a31515">&quot;The two values are equal.&quot;</span>
+        Debug.Print CorString.Format(<span style="color: #a31515">&quot;K1 iterations: {0}&quot;</span>, K1.IterationCount)
+        Debug.Print CorString.Format(<span style="color: #a31515">&quot;K2 iterations: {0}&quot;</span>, K2.IterationCount)
+    <span style="color: #0000ff">End</span> <span style="color: #0000ff">If</span>
+</pre></div>
