@@ -18,11 +18,14 @@ Option Explicit
 Implements ITestCaseSource
 Implements ICategorizable
 
+
+
 Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
     Cat.ForFixture "System"
 End Sub
 
 Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseCollector)
+    Dim Zone As TimeZone
     Select Case Test.MethodName
         Case "ToOADate_WithValues_ReturnsExpected"
             Test.Use #1/1/2004 8:30:30 AM#
@@ -167,10 +170,20 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "h:mm:ss tt", "1:05:06 PM"
             Test.Use "\d", "d"
             Test.Use "\dddd", "dSat"
-            Test.Use "%z", "-8"
-            Test.Use "%zz", "-08"
-            Test.Use "%zzz", "-08:00"
-            Test.Use "%zzzz", "-08:00"
+            
+            Set Zone = TimeZone.CurrentTimeZone
+            If (UCase$(Zone.StandardName) <> "US MOUNTAIN STANDARD TIME") Then
+                Test.Use "%z", "-8"
+                Test.Use "%zz", "-08"
+                Test.Use "%zzz", "-08:00"
+                Test.Use "%zzzz", "-08:00"
+            Else
+                Test.Use "%z", "-7"
+                Test.Use "%zz", "-07"
+                Test.Use "%zzz", "-07:00"
+                Test.Use "%zzzz", "-07:00"
+            End If
+            
             Test.Use "'HH H'", "HH H"
             Test.Use "'\'HH H\''", "'HH H'"
             
@@ -762,10 +775,11 @@ End Sub
 
 Public Sub ToString_WithFormat_ReturnsExpected(ByVal Format As String, ByVal Expected As String)
     Dim Actual As String
-    
+   
     Actual = NewDateTime(2001, 2, 3, 13, 5, 6, 123).ToString(Format, CultureInfo.InvariantCulture)
     
     Assert.That Actual, Iz.EqualTo(Expected)
+    
 End Sub
 
 Public Sub ToString_WithFractionsOfSecond_ReturnsExpected(ByVal Format As String, ByVal Expected As String)
