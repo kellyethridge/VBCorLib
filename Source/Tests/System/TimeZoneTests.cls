@@ -28,6 +28,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use #2/25/2014#, False
             Test.Use #5/1/2014#, True
             Test.Use #11/25/2014#, False
+            Test.Use #6/1/2014#, False
             
     End Select
 End Sub
@@ -42,6 +43,8 @@ Public Sub Constructor_WhenCalled_ReturnsExpected()
             PacificTests Zone
         Case "CENTRAL STANDARD TIME"
         Case "MOUNTAIN STANDARD TIME"
+        
+        Case "US MOUNTAIN STANDARD TIME"
     
         Case Else
             Assert.Fail "Time zone '" & Zone.StandardName & "' is not supported by tests."
@@ -60,6 +63,7 @@ Private Sub PacificTests(ByVal Zone As TimeZone)
     Assert.That Zone.GetUtcOffset(#2/25/2014#), Equals(TimeSpan.FromHours(-8))
     Assert.That Zone.GetUtcOffset(#5/25/2014#), Equals(TimeSpan.FromHours(-7))
     Assert.That Zone.GetUtcOffset(#11/25/2014#), Equals(TimeSpan.FromHours(-8))
+    Assert.That Zone.GetUtcOffset(#6/1/2014#), Equals(TimeSpan.FromHours(-7))
 End Sub
 
 Public Sub IsDayLightSavings_WithValues_ReturnsExpected(ByVal DateToTest As Date, ByVal Expected As Boolean)
@@ -69,7 +73,11 @@ Public Sub IsDayLightSavings_WithValues_ReturnsExpected(ByVal DateToTest As Date
     Dim Actual As Boolean
     Actual = Zone.IsDayLightSavingTime(DateToTest)
     
-    Assert.That Actual, Iz.EqualTo(Expected)
+    If (UCase$(Zone.StandardName) <> "US MOUNTAIN STANDARD TIME") Then 'This zone doesn't observe DST
+        Assert.That Actual, Iz.EqualTo(Expected)
+    Else
+        Assert.Pass
+    End If
 End Sub
 
 Public Sub ToLocalTime_WithLocalDateTime_ReturnsSameValue()
