@@ -77,7 +77,6 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             
         Case "Parse_WithInvalidValueAndCustomCurrencyThousandsSeparator_ThrowsFormatException"
             Test.Use "$1,0"
-            
     End Select
 End Sub
 
@@ -98,49 +97,51 @@ Public Sub Parse_WithInvalidValue_ThrowsFormatException(ByVal s As String, ByVal
 End Sub
 
 Public Sub Parse_WithValidValueAndCustomCurrencyDecimalSeparator_ReturnsBigInteger(ByVal s As String)
-    Dim info As NumberFormatInfo
-    Set info = NumberFormatInfo.CurrentInfo.Clone
-    info.CurrencyDecimalSeparator = "["
+    Dim Info As NumberFormatInfo
+    Set Info = NumberFormatInfo.CurrentInfo.Clone
+    Info.CurrencyDecimalSeparator = "["
     
     Dim Actual As BigInteger
-    Set Actual = BigInteger.Parse(s, NumberStyles.AllowDecimalPoint Or NumberStyles.AllowCurrencySymbol, info)
+    Set Actual = BigInteger.Parse(s, NumberStyles.AllowDecimalPoint Or NumberStyles.AllowCurrencySymbol, Info)
     
     AssertNumber Actual, NewBytes(1), 1
 End Sub
 
 Public Sub Parse_WithInvalidValueAndCustomCurrencyDecimalSeparator_ThrowsFormatException(ByVal s As String)
-    Dim info As NumberFormatInfo
-    Set info = NumberFormatInfo.CurrentInfo.Clone
-    info.CurrencyDecimalSeparator = "["
+    Dim Info As NumberFormatInfo
+    Set Info = NumberFormatInfo.CurrentInfo.Clone
+    Info.CurrencyDecimalSeparator = "["
     
     On Error Resume Next
     
     Dim Actual As BigInteger
-    Set Actual = BigInteger.Parse(s, NumberStyles.AllowDecimalPoint Or NumberStyles.AllowCurrencySymbol, info)
+    Set Actual = BigInteger.Parse(s, NumberStyles.AllowDecimalPoint Or NumberStyles.AllowCurrencySymbol, Info)
 
     AssertFormatException Err
 End Sub
 
 Public Sub Parse_WithValidValueAndCustomCurrencyThousandsSeparator_ReturnsBigInteger(ByVal s As String)
-    Dim info As NumberFormatInfo
-    Set info = NumberFormatInfo.CurrentInfo.Clone
-    info.CurrencyGroupSeparator = "["
+    Dim Info As NumberFormatInfo
+    Set Info = NumberFormatInfo.CurrentInfo.Clone
+    Info.CurrencyGroupSeparator = "["
     
     Dim Actual As BigInteger
-    Set Actual = BigInteger.Parse(s, NumberStyles.AllowThousands Or NumberStyles.AllowCurrencySymbol, info)
+    Set Actual = BigInteger.Parse(s, NumberStyles.AllowThousands Or NumberStyles.AllowCurrencySymbol, Info)
     
     AssertNumber Actual, NewBytes(10), 1
 End Sub
 
 Public Sub Parse_WithInvalidValueAndCustomCurrencyThousandsSeparator_ThrowsFormatException(ByVal s As String)
-    Dim info As NumberFormatInfo
-    Set info = NumberFormatInfo.CurrentInfo.Clone
-    info.CurrencyGroupSeparator = "["
+    Dim Info As NumberFormatInfo
+    Set Info = NumberFormatInfo.CurrentInfo.Clone
+    Info.CurrencyGroupSeparator = "["
     
     On Error Resume Next
     
     Dim Actual As BigInteger
-    Set Actual = BigInteger.Parse(s, NumberStyles.AllowThousands Or NumberStyles.AllowCurrencySymbol, info)
+    Set Actual = BigInteger.Parse(s, NumberStyles.AllowThousands Or NumberStyles.AllowCurrencySymbol, Info)
 
     AssertFormatException Err
 End Sub
+
+

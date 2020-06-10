@@ -107,6 +107,7 @@ End Property
 ''
 ' Sets the last year of a 100-year range that can be represented by a 2-digit year.
 '
+' @param Value An integer representing the last year of a 100-year range.
 ' @return The last year of a 100-year range that can be represented by a 2-digit year.
 ' @remarks
 ' <table style="width: auto">
@@ -311,10 +312,9 @@ End Function
 ''
 ' Returns the era in the specified <a href="CorDateTime.html">CorDateTime</a>.
 '
-' @param The <a href="CorDateTime.html">CorDateTime</a> to read.
+' @param Time The <a href="CorDateTime.html">CorDateTime</a> to read.
 ' @return An integer that represents the era in the specified <a href="CorDateTime.html">CorDateTime</a>.
 ' @remarks The <a href="TaiwanCalendar.html">TaiwanCalendar</a> class recognizes only the current era.
-'
 Public Function GetEra(ByRef Time As Variant) As Long
     CorDateTime.Validate Time
     GetEra = 1
@@ -388,10 +388,9 @@ End Function
 ' Returns the week of the year that includes the date in the specified Date or <a href="CorDateTime.html">CorDateTime</a>.
 '
 ' @param Time The Date or <a href="CorDateTime.html">CorDateTime</a> to read.
-' @param Rule One of the <a href="Calendar.CalendarWeekRule.html>CalendarWeekRule</a> values that defines a calendar week.
-' @param FirstDayOfWeek One of the <a href="CorDateTimeStatic.DayOfWeek.html">DayOfWeek</a> values that represents the first day of the week.
-' @return A 1-based positive integer that represents the week of the year that includes the date in the <i>time</i> parameter.
-'
+' @param Rule One of the <a href="Calendar.CalendarWeekRule.html">CalendarWeekRule</a> values that defines a calendar week.
+' @param FirstDayOfWeek One of the <a href="CorDateTimeStatic.DayOfWeek.html">DayOfWeek</a> enumeration values that represents the first day of the week.
+' @return A 1-based positive integer that represents the week of the year that includes the date in the <i>Time</i> parameter.
 Public Function GetWeekOfYear(ByRef Time As Variant, ByVal Rule As CalendarWeekRule, ByVal FirstDayOfWeek As DayOfWeek) As Long
     GetWeekOfYear = Statics.Calendar.GetWeekOfYear(Time, Rule, FirstDayOfWeek, Me)
 End Function

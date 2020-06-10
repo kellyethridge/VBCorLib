@@ -70,7 +70,7 @@ Private mBytesUnknown(0 To 1)       As Byte
 ''
 ' When implemented in a derived class, gets a value indicating whether the current encoding is read-only.
 '
-' @return <b>true</b> if the current <a href="Encoding.html">Encoding</a> is read-only; otherwise, <b>false</b>. The default is <b>true</b>.
+' @return <b>True</b> if the current <a href="Encoding.html">Encoding</a> is read-only; otherwise, <b>False</b>. The default is <b>True</b>.
 '
 Public Property Get IsReadOnly() As Boolean
     IsReadOnly = mIsReadOnly
@@ -88,7 +88,7 @@ Public Function Clone() As UTF8Encoding
 End Function
 
 ''
-' Returns if the current encoding uses single-byte code points.
+' Gets if the current encoding uses single-byte code points.
 '
 ' @return Returns True for single-byte, False for multi-byte code points.
 '
@@ -97,7 +97,7 @@ Public Property Get IsSingleByte() As Boolean
 End Property
 
 ''
-' Returns the encoding name to be used in with the mail agent body tags.
+' Gets the encoding name to be used in with the mail agent body tags.
 '
 ' @return The body tag compatible encoding name.
 '
@@ -106,7 +106,7 @@ Public Property Get BodyName() As String
 End Property
 
 ''
-' Returns the encoding name registered with the Internet Assigned Numbers Authority.
+' Gets the encoding name registered with the Internet Assigned Numbers Authority.
 '
 ' @return The registered encoding name.
 '
@@ -115,7 +115,7 @@ Public Property Get WebName() As String
 End Property
 
 ''
-' Returns the encoding name to be used in with the mail agent header tags.
+' Gets the encoding name to be used in with the mail agent header tags.
 '
 ' @return The header tag compatible encoding name.
 '
@@ -124,7 +124,7 @@ Public Property Get HeaderName() As String
 End Property
 
 ''
-' Returns the code page identifier for this encoding.
+' Gets the code page identifier for this encoding.
 '
 ' @return Code page identifier.
 '
@@ -133,7 +133,7 @@ Public Property Get CodePage() As Long
 End Property
 
 ''
-' Returns the Windows Operating System's code page for this encoding.
+' Gets the Windows Operating System's code page for this encoding.
 '
 ' @return The Windows code page for this encoding.
 '
@@ -142,7 +142,7 @@ Public Property Get WindowsCodePage() As Long
 End Property
 
 ''
-' The name of this encoding.
+' Gets the name of this encoding.
 '
 ' @return The encoding's name.
 '
@@ -151,7 +151,7 @@ Public Property Get EncodingName() As String
 End Property
 
 ''
-' Indicates if this encoding can be used by browsers to display text.
+' Gets if this encoding can be used by browsers to display text.
 '
 ' @return The indication for browser display capable.
 '
@@ -160,7 +160,7 @@ Public Property Get IsBrowserDisplay() As Boolean
 End Property
 
 ''
-' Indicates if this encoding can be used to save data with this encoding.
+' Gets if this encoding can be used to save data with this encoding.
 '
 ' @return The indication for the browser saving capable.
 '
@@ -169,7 +169,7 @@ Public Property Get IsBrowserSave() As Boolean
 End Property
 
 ''
-' Indicates if this encoding can be used to display mail and news by
+' Gets if this encoding can be used to display mail and news by
 ' mail and news clients.
 '
 ' @return Indication for mail and news client capable.
@@ -179,7 +179,7 @@ Public Property Get IsMailNewsDisplay() As Boolean
 End Property
 
 ''
-' Indicates if this encoding can be used to save data by mail and news clients.
+' Gets if this encoding can be used to save data by mail and news clients.
 '
 ' @return Indication for the mail and news clients to use this encoding for saving.
 '
@@ -188,7 +188,7 @@ Public Property Get IsMailNewsSave() As Boolean
 End Property
 
 ''
-' Returns the current DecoderFallback instance used by the encoding.
+' Gets the current DecoderFallback instance used by the encoding.
 '
 ' @return An object derived from <a href="DecoderFallback.html">DecoderFallback</a>.
 ' @remarks The default will return an instance of <a href="DecoderReplacementFallback.html">DecoderReplacementFallback</a>.
@@ -216,7 +216,7 @@ Public Property Set DecoderFallback(ByVal Value As DecoderFallback)
 End Property
 
 ''
-' Returns the current EncoderFallback instance used by the encoding.
+' Gets the current EncoderFallback instance used by the encoding.
 '
 ' @return An object derived from <a href="EncoderFallback.html">EncoderFallback</a>.
 ' @remarks The default will return an instance of <a href="EncoderReplacementFallback.html">EncoderReplacementFallback</a>.
@@ -332,7 +332,6 @@ End Function
 '
 Public Function GetBytesEx(ByRef Chars As Variant, ByVal CharIndex As Long, ByVal CharCount As Long, ByRef Bytes() As Byte, ByVal ByteIndex As Long) As Long
     Dim LocalChars()    As Integer
-    Dim Range           As ListRange
     Dim ByteCount       As Long
     
     LocalChars = AsChars(Chars)

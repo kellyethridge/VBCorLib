@@ -42,16 +42,16 @@ Public Type BigNumber
 End Type
 
 
-Public Function Equals(ByRef x As BigNumber, ByRef y As BigNumber) As Boolean
-    If x.Sign <> y.Sign Then
+Public Function Equals(ByRef X As BigNumber, ByRef Y As BigNumber) As Boolean
+    If X.Sign <> Y.Sign Then
         Exit Function
-    ElseIf x.Precision <> y.Precision Then
+    ElseIf X.Precision <> Y.Precision Then
         Exit Function
     End If
     
     Dim i As Long
-    For i = 0 To x.Precision - 1
-        If x.Digits(i) <> y.Digits(i) Then
+    For i = 0 To X.Precision - 1
+        If X.Digits(i) <> Y.Digits(i) Then
             Exit Function
         End If
     Next
@@ -59,24 +59,24 @@ Public Function Equals(ByRef x As BigNumber, ByRef y As BigNumber) As Boolean
     Equals = True
 End Function
 
-Public Function Compare(ByRef x As BigNumber, ByRef y As BigNumber) As Long
+Public Function Compare(ByRef X As BigNumber, ByRef Y As BigNumber) As Long
     Dim Result As Long
     
-    Result = x.Sign - y.Sign
+    Result = X.Sign - Y.Sign
     
     If Result = 0 Then
-        Result = x.Precision - y.Precision
+        Result = X.Precision - Y.Precision
         
         If Result = 0 Then
             Dim i As Long
-            For i = x.Precision - 1 To 0 Step -1
-                Result = (x.Digits(i) And &HFFFF&) - (y.Digits(i) And &HFFFF&)
+            For i = X.Precision - 1 To 0 Step -1
+                Result = (X.Digits(i) And &HFFFF&) - (Y.Digits(i) And &HFFFF&)
                 If Result <> 0 Then
                     Exit For
                 End If
             Next i
         Else
-            Result = x.Sign * Result
+            Result = X.Sign * Result
         End If
     End If
     
@@ -417,16 +417,16 @@ Private Sub DivideCore(ByRef u As BigNumber, ByRef v As BigNumber, ByRef Quotien
     Quotient.Sign = 1
     
     If v.Precision = 1 Then
-        Dim R As Long
-        Quotient.Digits = SinglePlaceDivide(u.Digits, u.Precision, v.Digits(0), R)
+        Dim r As Long
+        Quotient.Digits = SinglePlaceDivide(u.Digits, u.Precision, v.Digits(0), r)
         Quotient.Precision = UBound(Quotient.Digits) + 1
         Normalize Quotient
         
         If IncludeRemainder Then
             ReDim Remainder.Digits(1)
             
-            If R Then
-                Remainder.Digits(0) = R
+            If r Then
+                Remainder.Digits(0) = r
                 Remainder.Sign = 1
                 Remainder.Precision = 1
             End If
@@ -472,10 +472,7 @@ Private Sub DivideCore(ByRef u As BigNumber, ByRef v As BigNumber, ByRef Quotien
     End If
     ' ** D1 End **
     
-'    Dim Quotient() As Integer
-'    ReDim Quotient(0 To m + 1)
     ReDim Quotient.Digits(0 To m + 1)
-    
     Dim vDigit  As Long
     Dim vDigit2 As Long
     
@@ -800,14 +797,14 @@ End Sub
 ' The buffer is modified by this routine.
 '
 Public Function SingleInPlaceDivideBy10(ByRef n As BigNumber) As Long
-    Dim R As Long
+    Dim r As Long
     Dim i As Long
     Dim f As Boolean
     Dim d As Long
 
     For i = n.Precision - 1 To 0 Step -1
-        R = (R * &H10000) + (n.Digits(i) And &HFFFF&)
-        d = R \ 10
+        r = (r * &H10000) + (n.Digits(i) And &HFFFF&)
+        d = r \ 10
 
 #If Release Then
         n.Digits(i) = d And &HFFFF&
@@ -815,7 +812,7 @@ Public Function SingleInPlaceDivideBy10(ByRef n As BigNumber) As Long
         n.Digits(i) = AsWord(d)
 #End If
 
-        R = R - (d * 10)
+        r = r - (d * 10)
 
         If Not f Then
             If n.Digits(i) = 0 Then
@@ -830,7 +827,7 @@ Public Function SingleInPlaceDivideBy10(ByRef n As BigNumber) As Long
         n.Sign = 0
     End If
 
-    SingleInPlaceDivideBy10 = R
+    SingleInPlaceDivideBy10 = r
 End Function
 
 #If Release Then
@@ -965,7 +962,7 @@ End Sub
 ' Divides an array by a single digit (16bit) value, returning the quotient and remainder.
 '
 Public Function SinglePlaceDivide(ByRef u() As Integer, ByVal Length As Long, ByVal v As Long, Optional ByRef Remainder As Long) As Integer()
-    Dim R   As Long
+    Dim r   As Long
     Dim q() As Integer
     Dim q2  As Long
     Dim r2  As Long
@@ -977,26 +974,26 @@ Public Function SinglePlaceDivide(ByRef u() As Integer, ByVal Length As Long, By
     
     Dim i As Long
     For i = Length - 1 To 0 Step -1
-        R = R * &H10000 + (u(i) And &HFFFF&)
+        r = r * &H10000 + (u(i) And &HFFFF&)
         
-        If R And &H80000000 Then
+        If r And &H80000000 Then
             Dim q1 As Long
-            q1 = (R And &H7FFFFFFF) \ v
-            R = (R And &H7FFFFFFF) - (q1 * v) + r2
+            q1 = (r And &H7FFFFFFF) \ v
+            r = (r And &H7FFFFFFF) - (q1 * v) + r2
 
-            If R >= v Then
+            If r >= v Then
                 q1 = q1 + 1
-                R = R - v
+                r = r - v
             End If
 
             q(i) = q1 + q2
         Else
-            q(i) = R \ v
-            R = R - (q(i) And &HFFFF&) * v
+            q(i) = r \ v
+            r = r - (q(i) And &HFFFF&) * v
         End If
     Next
     
-    Remainder = R
+    Remainder = r
     SinglePlaceDivide = q
 End Function
 
@@ -1068,22 +1065,22 @@ Public Sub SingleInPlaceAdd(ByRef n As BigNumber, ByVal Value As Integer)
     Loop
 End Sub
 
-Private Function UInt32x16To32(ByVal x As Long, ByVal y As Integer) As Long
+Private Function UInt32x16To32(ByVal X As Long, ByVal Y As Integer) As Long
     Dim v As Currency
     Dim w As Currency
     
-    v = y And &HFFFF&
-    w = (v * x) * 0.0001@
+    v = Y And &HFFFF&
+    w = (v * X) * 0.0001@
     
     UInt32x16To32 = AsLong(w)
 End Function
 
-Private Function UInt32Compare(ByVal x As Long, ByVal y As Long) As Long
+Private Function UInt32Compare(ByVal X As Long, ByVal Y As Long) As Long
     Dim u As Currency
     Dim v As Currency
     
-    AsLong(u) = x
-    AsLong(v) = y
+    AsLong(u) = X
+    AsLong(v) = Y
      
     UInt32Compare = Sgn(u - v)
 End Function
@@ -1161,55 +1158,55 @@ Public Function SinglePlaceDivide(ByRef u() As Integer, ByVal Length As Long, By
     Dim q() As Integer
     ReDim q(0 To Length)
     
-    Dim R As Long
+    Dim r As Long
     Dim i As Long
     For i = Length - 1 To 0 Step -1
-        R = R * vbShift16Bits + (u(i) And &HFFFF&)
-        q(i) = AsWord(UInt32d16To32(R, v))
-        R = AsWord(UInt32m16To32(R, v))
+        r = r * vbShift16Bits + (u(i) And &HFFFF&)
+        q(i) = AsWord(UInt32d16To32(r, v))
+        r = AsWord(UInt32m16To32(r, v))
     Next i
     
-    Remainder = R
+    Remainder = r
     SinglePlaceDivide = q
 End Function
 
-Private Function UInt16x16To32(ByVal x As Long, ByVal y As Long) As Long
+Private Function UInt16x16To32(ByVal X As Long, ByVal Y As Long) As Long
     Dim u As Currency
     Dim v As Currency
     Dim w As Currency
     
-    u = x And &HFFFF&
-    v = y And &HFFFF&
+    u = X And &HFFFF&
+    v = Y And &HFFFF&
     w = (u * v) * 0.0001@
       
     UInt16x16To32 = AsLong(w)
 End Function
 
-Private Function UInt32d16To32(ByVal x As Long, ByVal y As Long) As Long
+Private Function UInt32d16To32(ByVal X As Long, ByVal Y As Long) As Long
     Dim d As Currency
 
-    AsLong(d) = x
+    AsLong(d) = X
     d = d * 10000@
-    UInt32d16To32 = Int(d / (y And &HFFFF&))
+    UInt32d16To32 = Int(d / (Y And &HFFFF&))
 End Function
 
-Private Function UInt32m16To32(ByVal x As Long, ByVal y As Long) As Long
+Private Function UInt32m16To32(ByVal X As Long, ByVal Y As Long) As Long
     Dim q As Currency
     Dim d As Currency
     Dim v As Currency
     
-    v = y And &HFFFF&
-    AsLong(d) = x
+    v = Y And &HFFFF&
+    AsLong(d) = X
     d = d * 10000@
     q = Int(d / v)
     UInt32m16To32 = d - q * v
 End Function
 
-Private Function Make32(ByVal x As Integer, ByVal y As Integer) As Long
-    Make32 = Helper.ShiftLeft(x And &HFFFF&, 16) Or (y And &HFFFF&)
+Private Function Make32(ByVal X As Integer, ByVal Y As Integer) As Long
+    Make32 = Helper.ShiftLeft(X And &HFFFF&, 16) Or (Y And &HFFFF&)
 End Function
 
-Private Function RightShift16(ByVal x As Long) As Long
-    RightShift16 = ((x And &HFFFF0000) \ &H10000) And &HFFFF&
+Private Function RightShift16(ByVal X As Long) As Long
+    RightShift16 = ((X And &HFFFF0000) \ &H10000) And &HFFFF&
 End Function
 #End If

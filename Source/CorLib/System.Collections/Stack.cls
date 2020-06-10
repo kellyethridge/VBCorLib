@@ -48,7 +48,7 @@ Implements IObject
 Implements ICloneable
 Implements IEnumerable
 Implements ICollection
-Implements IVersionableCollection
+Implements IVersionable
 
 Private Const CountProperty         As String = "Count"
 Private Const CapacityProperty      As String = "Capacity"
@@ -406,6 +406,6 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   IVersionableCollection
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Property Get IVersionableCollection_CurrentVersion() As Long
-    IVersionableCollection_CurrentVersion = mVersion
+Private Property Get IVersionable_Version() As Long
+    IVersionable_Version = mVersion
 End Property

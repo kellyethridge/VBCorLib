@@ -65,10 +65,10 @@ Public Property Get KeySize() As Long: End Property
 Public Property Let KeySize(ByVal Value As Long): End Property
 
 ''
-' Returns an array of <b>KeySizes</b> representing all legal and valid key sizes
+' Returns an array of <a href="KeySizes.html">KeySizes</a> representing all legal and valid key sizes
 ' for the current instance of the algorithm.
 '
-' @return A array of <b>KeySizes</b> objects.
+' @return A array of <a href="KeySizes.html">KeySizes</a> objects.
 '
 Public Property Get LegalKeySizes() As KeySizes(): End Property
 

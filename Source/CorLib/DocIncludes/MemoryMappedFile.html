@@ -1,0 +1,44 @@
+@examples The following example creates a memory-mapped view of a part of an extremely large file and manipulates a portion of it.
+<p>The example uses the User-Defined type <b>MyColor</b> and passes it to several <a href="MemoryMappedViewAccessor.html">MemoryMappedViewAccessor</a> methods. In order for the code sample to work, the <b>MyColor</b> type needs to be exposed through a public class in an ActiveX dll or Exe.</p>
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> Type MyColor
+    Red     <span style="color: #0000ff">As</span> <span style="color: #2b91af">Integer</span>
+    Green   <span style="color: #0000ff">As</span> <span style="color: #2b91af">Integer</span>
+    Blue    <span style="color: #0000ff">As</span> <span style="color: #2b91af">Integer</span>
+    Alpha   <span style="color: #0000ff">As</span> <span style="color: #2b91af">Integer</span>
+<span style="color: #0000ff">End</span> Type
+
+<span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Brightener()
+    <span style="color: #0000ff">Const</span> Offset <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span> = &amp;H10000000   <span style="color: #008000">&#39; 256 megabytes</span>
+    <span style="color: #0000ff">Const</span> Length <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span> = &amp;H20000000   <span style="color: #008000">&#39; 512 megabytes</span>
+    
+    <span style="color: #0000ff">Dim</span> Mmf <span style="color: #0000ff">As</span> MemoryMappedFile
+    <span style="color: #0000ff">Dim</span> Accessor <span style="color: #0000ff">As</span> MemoryMappedViewAccessor
+    
+    <span style="color: #0000ff">Set</span> Mmf = MemoryMappedFile.CreateFromFile(<span style="color: #a31515">&quot;c:\ExtremelyLargeImage.data&quot;</span>, FileMode.OpenExisting, <span style="color: #a31515">&quot;ImgA&quot;</span>)
+    
+    <span style="color: #008000">&#39; Create a random access view, from the 256th megabyte (the offset)</span>
+    <span style="color: #008000">&#39; to the 768th megabyte (the offset plus length).</span>
+    <span style="color: #0000ff">Set</span> Accessor = Mmf.CreateViewAccessor(Offset, Length)
+    
+    <span style="color: #0000ff">Dim</span> i <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
+    <span style="color: #0000ff">Dim</span> Color <span style="color: #0000ff">As</span> MyColor
+    
+    <span style="color: #008000">&#39; Make changes to the view</span>
+    <span style="color: #0000ff">Do</span> <span style="color: #0000ff">While</span> i &lt; Length
+        Accessor.Read i, Color
+        Brighten Color, 10
+        Accessor.WriteValue i, Color
+        
+        i = i + LenB(Color)
+    <span style="color: #0000ff">Loop</span>
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> Brighten(<span style="color: #0000ff">ByRef</span> Color <span style="color: #0000ff">As</span> MyColor, <span style="color: #0000ff">ByVal</span> Value <span style="color: #0000ff">As</span> <span style="color: #2b91af">Integer</span>)
+    <span style="color: #0000ff">Const</span> Int16Max <span style="color: #0000ff">As</span> <span style="color: #2b91af">Integer</span> = 32737
+    
+    Color.Red = Min(Int16Max, <span style="color: #0000ff">CLng</span>(Color.Red) + Value)
+    Color.Green = Min(Int16Max, <span style="color: #0000ff">CLng</span>(Color.Green) + Value)
+    Color.Blue = Min(Int16Max, <span style="color: #0000ff">CLng</span>(Color.Blue) + Value)
+    Color.Alpha = Min(Int16Max, <span style="color: #0000ff">CLng</span>(Color.Alpha) + Value)
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+</pre></div>

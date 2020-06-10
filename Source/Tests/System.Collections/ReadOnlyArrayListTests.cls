@@ -132,7 +132,6 @@ End Sub
 Public Sub Clone_WhenCalled_ReturnsReadOnlyArrayList()
     Dim Original As ArrayList
     Dim Clone As ArrayList
-    Dim Actual As Boolean
     
     Set Original = MakeList
     Set Clone = Original.Clone

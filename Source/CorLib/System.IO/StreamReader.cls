@@ -40,10 +40,10 @@ Attribute VB_Exposed = True
 '
 ' @remarks The <b>StreamReader</b> object cannot be created directly. In order to
 ' create a new <b>StreamReader</b>, use the <b>Cor.NewStreamReader</b> method.
-' <p>Unlike the FileStream and MemoryStream classes, the StreamReader
-' reads bytes that are of a particular encoding to be decoded. Instead of reading
-' bytes, the StreamReader returns characters or strings of the decoded bytes.</p>
-' <p>The default encoding is UTF8Encoding.</p>
+' <p>Unlike the <a href="FileStream.html">FileStream</a> and <a href="MemoryStream.html">MemoryStream</a> classes,
+' the <b>StreamReader</b> reads bytes that are of a particular encoding to be decoded. Instead of reading
+' bytes, the <b>StreamReader</b> returns characters or strings of the decoded bytes.</p>
+' <p>The default encoding is <a href="UTF8Encoding.html">UTF8Encoding</a>.</p>
 '
 ' @see Constructors
 ' @see StreamWriter
@@ -141,7 +141,7 @@ Public Function Peek() As Long
     VerifyIsOpen
     
     If HaveChars Then
-        AsWord(Peek) = mCharBuffer(mCharIndex)
+        Peek = mCharBuffer(mCharIndex) And &HFFFF&
     Else
         Peek = -1
     End If
@@ -242,7 +242,7 @@ Public Function ReadLine() As String
                 ' If we aren't using the builder and we found a new line separator
                 ' then we can just create the return string from the current buffer.
                 If Not UsingBuilder Then
-                    Line = CorString.FromCharArray(mCharBuffer, StartIndex, mCharIndex - StartIndex)
+                    Line = Cor.NewString(mCharBuffer, StartIndex, mCharIndex - StartIndex)
                     mCharIndex = mCharIndex + 1
                     Exit Do
                 Else
@@ -312,7 +312,7 @@ Public Function ReadToEnd() As String
     ' be read from the stream. So the last of the characters have been
     ' read, so just take them and make a string.
     If mByteLength < mBufferSize Then
-        ReadToEnd = CorString.FromCharArray(mCharBuffer, mCharIndex, mCharLength - mCharIndex)
+        ReadToEnd = Cor.NewString(mCharBuffer, mCharIndex, mCharLength - mCharIndex)
     Else
         ' Keep reading from the stream and placing the characters into the
         ' builder. Keep refilling the buffer until the end of the stream is reached.
@@ -459,15 +459,34 @@ Private Sub DetermineEncoding()
         
     Select Case FirstTwoBytes
         Case UnicodeLittleEndianBOM
-            SetEncodingFromBOM Cor.NewUnicodeEncoding(False, False), UnicodeEncodingBOMLength
+            If mByteLength >= 4 Then
+                If mByteBuffer(2) = 0 And mByteBuffer(3) = 0 Then
+                    SetEncodingFromBOM Encoding.UTF32, 4
+                Else
+                    SetEncodingFromBOM Encoding.Unicode, UnicodeEncodingBOMLength
+                End If
+            Else
+                SetEncodingFromBOM Encoding.Unicode, UnicodeEncodingBOMLength
+            End If
 
         Case UnicodeBigEndianBOM
-            SetEncodingFromBOM Cor.NewUnicodeEncoding(True, False), UnicodeEncodingBOMLength
+            SetEncodingFromBOM Encoding.BigEndianUnicode, UnicodeEncodingBOMLength
 
         Case UTF8PartialBOM
             If mByteLength >= 3 Then
                 If mByteBuffer(2) = UTF8RemainingBOM Then
-                    SetEncodingFromBOM Cor.NewUTF8Encoding(False, False), UTF8EncodingBOMLength
+                    SetEncodingFromBOM Encoding.UTF8, UTF8EncodingBOMLength
+                Else
+                    mDetermineEncoding = False
+                End If
+            End If
+        
+        Case 0
+            If mByteLength >= 4 Then
+                If mByteBuffer(2) = &HFE And mByteBuffer(3) = &HFF Then
+                    SetEncodingFromBOM Cor.NewUTF32Encoding(True, True), 4
+                Else
+                    mDetermineEncoding = False
                 End If
             End If
             

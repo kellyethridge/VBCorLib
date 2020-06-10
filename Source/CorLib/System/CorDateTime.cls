@@ -61,18 +61,15 @@ Implements IFormattable
 
 Private Const PropMilliseconds      As String = "Milliseconds"
 Private Const PropKind              As String = "Kind"
-
 Private Const DefaultMilliseconds   As Long = 0
 Private Const DefaultKind           As Long = 0
-
 Private Const DaysPer100Years       As Long = DaysPer4Years * 25 - 1
 Private Const DaysPer400Years       As Long = DaysPer100Years * 4 + 1
 Private Const DaysTo10000           As Currency = DaysPer400Years * 25 - 366
 Private Const MaxMilliseconds       As Currency = DaysTo10000 * MilliSecondsPerDay
+Private Const MinOAMilliseconds     As Currency = 3124137600000@
 Private Const DaysTo1601            As Currency = DaysPer400Years * 4
 Private Const MillisecondsTo1601    As Currency = DaysTo1601 * MilliSecondsPerDay
-
-Private Const MinFiletime           As Currency = 50491123200000@
 
 
 ' Currency works perfectly as the 64bit Integer in .NET. Even though the
@@ -100,7 +97,7 @@ End Property
 ' @remarks This uses the current time zone settings of the system to determine when daylight savings should be.
 '
 Public Property Get IsDayLightSavingsTime() As Boolean
-    IsDayLightSavingsTime = TimeZone.CurrentTimeZone.IsDayLightSavingTime(Me)
+    IsDayLightSavingsTime = TimeZone.CurrentTimeZone.IsDaylightSavingTime(Me)
 End Property
 
 ''
@@ -110,27 +107,28 @@ End Property
 ' @return The Visual Basic compatible date.
 ' @remarks It is possible that this instance holds a date outside of the
 ' valid range of dates that Visual Basic can represent. If this happens,
-' then a normal VB error will be raised during the assignment.
-'
+' then an <a href="OverflowException.html">OverflowException</a> occurs.
 Public Function ToOADate() As Date
     Const DaysTo1899 As Long = 693593
     
-    If mMilliseconds = 0@ Then Exit Function
-    
+    If mMilliseconds = 0@ Then
+        Exit Function
+    End If
+        
     If mMilliseconds < MilliSecondsPerDay Then
         ToOADate = 1# * mMilliseconds / MilliSecondsPerDay
     Else
         Dim Days As Double
-        Days = Int(mMilliseconds / MilliSecondsPerDay)
+
+        If mMilliseconds < MinOAMilliseconds Then _
+            Throw New OverflowException
         
-        Dim Time As Double
-        Time = (mMilliseconds - (Days * MilliSecondsPerDay)) / MilliSecondsPerDay
+        Days = Int(mMilliseconds / MilliSecondsPerDay) - DaysTo1899
         
-        Days = Days - DaysTo1899
         If Days < 0# Then
-            ToOADate = Days - Time
+            ToOADate = Days - TimeSerial(Hour, Minute, Second)
         Else
-            ToOADate = Days + Time
+            ToOADate = Days + TimeSerial(Hour, Minute, Second)
         End If
     End If
 End Function
@@ -395,7 +393,7 @@ Public Function AddTicks(ByRef Value As Variant) As CorDateTime
     Dim DecimalValue As Variant
     DecimalValue = CDec(Value)
     
-    If DecimalValue < CDec(0) Or DecimalValue > CDec(MaxMilliseconds) * 10000 Then _
+    If DecimalValue < (CDec(0) - Ticks) Or DecimalValue > (CDec(MaxMilliseconds) * 10000) - Ticks Then _
         Throw Cor.NewArgumentOutOfRangeException("Value", "Ticks is outside the valid range of values")
     
     Set AddTicks = CorDateTime.FromMilliseconds(mMilliseconds + DecimalValue / 10000, mKind)
@@ -733,6 +731,7 @@ Friend Sub Init(ByVal Year As Long, ByVal Month As Long, ByVal Day As Long, ByVa
     Else
         mMilliseconds = Calendar.ToDateTime(Year, Month, Day, Hour, Minute, Second, Millisecond).TotalMilliseconds
     End If
+    
     mKind = Kind
 End Sub
 

@@ -114,13 +114,13 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "{C200E360-38C5-11CE-AE62-08002B2B79EE}", "{C200E360-38C5-11CE-AE62-08002B2B79Ef}", False
             
         Case "NewGuid_WithValue_ReturnsExpected"
-            Test.Use NewBytes(&H60, &HE3, &H0, &HC2, &HC5, &H38, &HCE, &H11, &HAE, &H62, &H8, &H0, &H2B, &H2B, &H79, &HEF), "{C200E360-38C5-11CE-AE62-08002B2B79EF}"
-            Test.Use "{C200E360-38C5-11CE-AE62-08002B2B79EF}", "{C200E360-38C5-11CE-AE62-08002B2B79EF}"
-            Test.Use "(C200E360-38C5-11CE-AE62-08002B2B79EF)", "{C200E360-38C5-11CE-AE62-08002B2B79EF}"
-            Test.Use "C200E360-38C5-11CE-AE62-08002B2B79EF", "{C200E360-38C5-11CE-AE62-08002B2B79EF}"
-            Test.Use "C200E36038C511CEAE6208002B2B79EF", "{C200E360-38C5-11CE-AE62-08002B2B79EF}"
-            Test.Use " C200E36038C511CEAE6208002B2B79EF", "{C200E360-38C5-11CE-AE62-08002B2B79EF}"
-            Test.Use " { 0xc20 0e360 , 0x38c 5,0x11ce, {0xae, 0x62,0x08,0x00,0x2b,0x2b,0x79,0xef} } ", "{C200E360-38C5-11CE-AE62-08002B2B79EF}"
+            Test.Use NewBytes(&H60, &HE3, &H0, &HC2, &HC5, &H38, &HCE, &H11, &HAE, &H62, &H8, &H0, &H2B, &H2B, &H79, &HEF), "c200e360-38c5-11ce-ae62-08002b2b79ef"
+            Test.Use "{C200E360-38C5-11CE-AE62-08002B2B79EF}", "c200e360-38c5-11ce-ae62-08002b2b79ef"
+            Test.Use "(C200E360-38C5-11CE-AE62-08002B2B79EF)", "c200e360-38c5-11ce-ae62-08002b2b79ef"
+            Test.Use "C200E360-38C5-11CE-AE62-08002B2B79EF", "c200e360-38c5-11ce-ae62-08002b2b79ef"
+            Test.Use "C200E36038C511CEAE6208002B2B79EF", "c200e360-38c5-11ce-ae62-08002b2b79ef"
+            Test.Use " C200E36038C511CEAE6208002B2B79EF", "c200e360-38c5-11ce-ae62-08002b2b79ef"
+            Test.Use " { 0xc20 0e360 , 0x38c 5,0x11ce, {0xae, 0x62,0x08,0x00,0x2b,0x2b,0x79,0xef} } ", "c200e360-38c5-11ce-ae62-08002b2b79ef"
             
         Case "ToString_WithInvalidFormatSpecifier_ThrowsFormatException"
             Test.Use "f"
@@ -294,7 +294,7 @@ Public Sub NewGuid_WithValue_ReturnsExpected(ByRef Value As Variant, ByVal Expec
     
     Set Actual = Cor.NewGuid(Value)
     
-    Assert.That Actual.ToString, Iz.EqualTo("c200e360-38c5-11ce-ae62-08002b2b79ef")
+    Assert.That Actual.ToString, Iz.EqualTo(Expected)
     Assert.That Actual.IsReadOnly, Iz.True
 End Sub
 

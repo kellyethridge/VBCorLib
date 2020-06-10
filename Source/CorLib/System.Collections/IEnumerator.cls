@@ -36,46 +36,43 @@ Attribute VB_Exposed = True
 '
 
 ''
-' This interface is used to allow for custom enumerators to be built.
+' Supports a simple iteration over a collection.
 '
-' @remarks
-' <p>The enumerator can be used manually to enumerate through the
-' values of a list, or it can be wrapped in a custom enumerator to allow it to be
-' used in the For..Each context.</p>
-' <p>To use an IEnumerator object in For..Each, call the CreateEnumerator method
-' passing in the IEnumerator object. The returned value is then returned in
-' the standard NewEnum(-4) function called by For..Each. The enumeration will then
-' be delegated to the custom IEnumerator object.<br><br>
-' <b>Example</b><br>
-' <pre>
-' Public Function NewEnum() As IUnknown
-'     Dim e As New MyEnumerator
-'     e.Init Me
-'     Set NewEnum = CreateEnumerator(e)
-' End Function<br>
-' </pre>
-'
+' @remarks The enumerator can be used manually to enumerate through the values of a list, or it
+' can be wrapped in a custom enumerator to allow it to be used in the <i>For..Each</i> context.
+' <p>To use an <b>IEnumerator</b> object in For..Each, call the <a href="Constructors.CreateEnumerator.html">CreateEnumerator</a> method
+' passing in the <b>IEnumerator</b> object. The returned value is then returned in the standard NewEnum(Procedure ID: -4) function called
+' by <i>For..Each</i>. The enumeration will then be delegated to the custom <b>IEnumerator</b> object.</p>
+' @see IEnumerable
+' @include "..\DocIncludes\IEnumerator.html"
 Option Explicit
 
 ''
-' This returns the current item of the enumeration. The current
-' item is called after a successful MoveNext.
+' Gets the current element in the collection.
 '
-' @return The current value in the enumeration.
-'
+' @return The current element in the collection.
+' @remarks After an enumerator is created or after the <a href="IEnumerator.Reset.html">Reset</a> method is called, the <a href="IEnumerator.MoveNext.html">MoveNext</a>
+' method must be called to advance the enumerator to the first element of the collection before reading the value of the <b>Current</b> property; otherwise, <b>Current</b> is undefined.
+' <p><b>Current</b> also throws an exception if the last call to <a href="IEnumerator.MoveNext.html">MoveNext</a> returned <b>False</a>, which indicates the end of the collection.</p>
+' <p><b>Current</b> does not move the position of the enumerator, and consecutive calls to <b>Current</b> return the same object until either
+' <a href="IEnumerator.MoveNext.html">MoveNext</a> or <a href="IEnumerator.Reset.html">Reset</a> is called.</p>
+' @include "..\DocIncludes\IEnumerator.html"
 Public Property Get Current() As Variant: End Property
 
 ''
-' Requests the enumerator moves to the next item being enumerated.
-' Returns True on success, False otherwise. This is called prior
-' to Current. If this is successful, Current will be called.
+' Advances the enumerator to the next element of the collection.
 '
-' @return Indication if the move was successful.
-'
+' @return <b>True</b> if the enumerator was successfully advanced to the next element; <b>False</b> if the enumerator has passed the end of the collection.
+' @remarks After an enumerator is created or after the <a href="IEnumerator.Reset.html">Reset</a> method is called, an enumerator is positioned before the
+' first element of the collection, and the first call to the <b>MoveNext</b> method moves the enumerator over the first element of the collection.
+' <p>If <b>MoveNext</b> passes the end of the collection, the enumerator is positioned after the last element in the collection and <b>MoveNext</b> returns <b>False</b>.
+' When the enumerator is at this position, subsequent calls to <b>MoveNext</b> also return <b>False</b> until <a href="IEnumerator.Reset.html">Reset</a> is called.</p>
+' @include "..\DocIncludes\IEnumerator.html"
 Public Function MoveNext() As Boolean: End Function
 
 ''
 ' Requests the enumerator resets itself to begin enumerating from the beginning.
 '
+' @include "..\DocIncludes\IEnumerator.html"
 Public Sub Reset(): End Sub
 

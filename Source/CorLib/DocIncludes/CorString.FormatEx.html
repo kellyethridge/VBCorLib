@@ -1,0 +1,150 @@
+@remarks This method uses the composite formatting feature of VBCorLib to convert the value of an object to its text representation and embed that representation in a string.
+<p>The provider parameter supplies custom and culture-specific information used to moderate the formatting process. The <i>Provider</i> parameter is an <a href="IFormatProvider.html">IFormatProvider</a> implementation whose <a href="IFormatProvider.GetFormat.html">GetFormat</a> method is called by the <b>CorString.FormatEx(IFormatProvider, String,Object())</b> method. The method must return an object to supply formatting information that is of the same type as the <i>FormatType</i> parameter. The <i>Provider</i> parameter's <a href="IFormatProvider.GetFormat.html">GetFormat</a> method is called one or more times, depending on the specific type of objects in <i>Args</i>, as follows:</p>
+<ul>
+	<li>It is always passed the format type name "ICustomFormatter".</li>
+	<li>It is passed the format type name "DateTimeFormatInfo" for each format item whose corresponding data type is a date and time value.</li>
+	<li>It is passed the format type name "NumberFormatInfo" for each format item whose corresponding data type is numeric.</li>
+</ul>
+<p>The <i>FormatText</i> parameter consists of zero or more runs of text intermixed with zero or more indexed placeholders, called format items, that correspond to a value in the parameter list of this method. The formatting process replaces each format item with the string representation of the corresponding value.</p>
+<p>The syntax of a format item is as follows:</p>
+<p>{<i>index</i>[,<i>length</i>][:<i>formatString</i>]}</p>
+<p>Elements in square brackets are optional. The following table describes each element.</p>
+<table style="width: auto">
+	<tr>
+		<th>Element</th><th>Description</th>
+	</tr>
+	<tr>
+		<td><i>index</i></td>
+		<td>The zero-based position in the parameter list of the value to be formatted. If the value specified by <i>index</i> is <b>Nothing</b>, the format item is replaced by an empty string (""). If there is no parameter in the <i>index</i> position, a <a href="FormatException.html">FormatException</a> is thrown.</td>
+	</tr>
+	<tr>
+		<td><i>,length</i></td>
+		<td>The minimum number of characters in the string representation of the parameter. If positive, the parameter is right-aligned; if negative, it is left-aligned.</td>
+	</tr>
+	<tr>
+		<td><i>:formatString</i></td>
+		<td>A standard or custom format string that is supported by the value to be formatted. Possible values for <i>formatString</i> are the same as the values supported by the value's <b>ToString(</b><i>FormatText</i><b>)</b> method. If <i>formatString</i> is not specified and the value to be formatted implements the <a href="IFormattable.html">IFormattable</a> interface, <b>vbNullString</b> is passed as the value of the <i>Format</i> parameter that is used as the <a href="IFormattable.ToString.html">IFormattable.ToString</a> format string.</td>
+	</tr>
+</table>
+<p>The leading and trailing brace characters, "{" and "}", are required. To specify a single literal brace character in <i>FormatText</i>, specify two leading or trailing brace characters; that is, "{{" or "}}".</p>
+@exceptions
+<table style="width: auto">
+	<tr>
+		<th>Exception</th><th>Condition</th>
+	</tr>
+	<tr>
+		<td><a href="FormatException.html">FormatException</a></td>
+		<td>
+			<i>FormatText</i> is invalid.<br/>
+			-or-<br/>
+			The index of a format item is less than zero, or greater than or equal to the length of the <i>Args</i> array.
+ 		</td>
+ 	</tr>
+</table>
+@examples
+The following example uses the <b>CorString.FormatEx(IFormatProvider, String,Object())</b> method to display the string representation of some date and time and numeric values using several different cultures.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> CultureNames() <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+    <span style="color: #0000ff">Dim</span> CultureName <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>
+    <span style="color: #0000ff">Dim</span> DateToDisplay <span style="color: #0000ff">As</span> <span style="color: #2b91af">Date</span>
+    <span style="color: #0000ff">Dim</span> Value <span style="color: #0000ff">As</span> <span style="color: #2b91af">Double</span>
+    
+    CultureNames = NewStrings(<span style="color: #a31515">&quot;en-US&quot;</span>, <span style="color: #a31515">&quot;fr-FR&quot;</span>, <span style="color: #a31515">&quot;de-DE&quot;</span>, <span style="color: #a31515">&quot;es-ES&quot;</span>)
+    DateToDisplay = #9/1/2009 6:32:00 PM#
+    Value = 9164.32
+    
+    Debug.Print <span style="color: #a31515">&quot;Culture     Date                                Value&quot;</span>
+    Debug.Print
+    
+    <span style="color: #0000ff">For</span> <span style="color: #0000ff">Each</span> CultureName <span style="color: #0000ff">In</span> CultureNames
+        <span style="color: #0000ff">Dim</span> Culture <span style="color: #0000ff">As</span> CultureInfo
+        <span style="color: #0000ff">Dim</span> Output <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+        
+        <span style="color: #0000ff">Set</span> Culture = NewCultureInfo(CultureName)
+        Output = CorString.FormatEx(Culture, <span style="color: #a31515">&quot;{0,-11} {1,-35:D} {2:N}&quot;</span>, Culture.Name, DateToDisplay, Value)
+        
+        Debug.Print Output
+    <span style="color: #0000ff">Next</span>
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; This code produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    Culture     Date                                Value</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    en-US       Tuesday, September 1, 2009          9,164.32</span>
+<span style="color: #008000">&#39;    fr-FR       mardi 1 septembre 2009              9 164,32</span>
+<span style="color: #008000">&#39;    de-DE       Dienstag, 1. September 2009         9.164,32</span>
+<span style="color: #008000">&#39;    es-ES       martes, 1 de septiembre de 2009     9.164,32</span>
+</pre></div>
+<p>The following example defines a customer number format provider that formats an integer value as a customer account number in the form x-xxxxx-xx.</p>
+<p>There are two modules created for this example. A BAS module containing the <b>Main</b> method and a Class module implementing the <a href="IFormatProvider.html">IFormatProvider</a> interface and <a href="ICustomFormatter.html">ICustomFormatter</a> interface.</p>
+<p>The following is a <b>Visual Basic Class</b> module named <b>CustomerFormatter</b>.</p>
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Option</span> Explicit
+<span style="color: #0000ff">Implements</span> IFormatProvider
+<span style="color: #0000ff">Implements</span> ICustomFormatter
+
+
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Function</span> IFormatProvider_GetFormat(FormatType <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>) <span style="color: #0000ff">As</span> <span style="color: #2b91af">Object</span>
+    <span style="color: #0000ff">If</span> CorString.Equals(FormatType, <span style="color: #a31515">&quot;ICustomFormatter&quot;</span>, OrdinalIgnoreCase) <span style="color: #0000ff">Then</span>
+        <span style="color: #0000ff">Set</span> IFormatProvider_GetFormat = <span style="color: #0000ff">Me</span>
+    <span style="color: #0000ff">End</span> <span style="color: #0000ff">If</span>
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Function</span>
+
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Function</span> ICustomFormatter_Format(<span style="color: #0000ff">ByVal</span> FormatText <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>, Arg <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>, <span style="color: #0000ff">ByVal</span> Provider <span style="color: #0000ff">As</span> CorLib.IFormatProvider) <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+    <span style="color: #0000ff">Dim</span> CustomerString <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+    <span style="color: #0000ff">Dim</span> Separator <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+    <span style="color: #0000ff">Dim</span> Result <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+    
+    <span style="color: #0000ff">If</span> <span style="color: #0000ff">Not</span> Provider <span style="color: #0000ff">Is</span> <span style="color: #0000ff">Me</span> <span style="color: #0000ff">Then</span>
+        <span style="color: #0000ff">Exit</span> <span style="color: #0000ff">Function</span>
+    End <span style="color: #0000ff">If</span>
+    
+    CustomerString = <span style="color: #2b91af">Object</span>.ToString(Arg)
+    
+    <span style="color: #0000ff">If</span> Len(CustomerString) &lt; 8 <span style="color: #0000ff">Then</span>
+        CustomerString = CorString.PadLeft(CustomerString, 8, <span style="color: #a31515">&quot;0&quot;</span>)
+    <span style="color: #0000ff">End</span> <span style="color: #0000ff">If</span>
+    
+    <span style="color: #0000ff">Select</span> <span style="color: #0000ff">Case</span> FormatText
+        <span style="color: #0000ff">Case</span> <span style="color: #a31515">&quot;&quot;</span>, <span style="color: #a31515">&quot;G&quot;</span>
+            Separator = <span style="color: #a31515">&quot;-&quot;</span>
+        <span style="color: #0000ff">Case</span> <span style="color: #a31515">&quot;S&quot;</span>
+            Separator = <span style="color: #a31515">&quot;/&quot;</span>
+        <span style="color: #0000ff">Case</span> <span style="color: #a31515">&quot;P&quot;</span>
+            Separator = <span style="color: #a31515">&quot;.&quot;</span>
+        <span style="color: #0000ff">Case</span> <span style="color: #0000ff">Else</span>
+            <span style="color: #0000ff">Throw</span> NewFormatException(CorString.Format(<span style="color: #a31515">&quot;The &#39;{0}&#39; format specifier is not supported.&quot;</span>, FormatText))
+    <span style="color: #0000ff">End</span> <span style="color: #0000ff">Select</span>
+    
+    ICustomFormatter_Format = Left$(CustomerString, 1) &amp; Separator &amp; Mid$(CustomerString, 2, 5) &amp; Separator &amp; Mid$(CustomerString, 7)
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Function</span>
+</pre></div>
+<br/>
+<p>The following is a <b>Visual Basic BAS</b> module containing <b>Main</b> start-up method.</p>
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Const</span> AcctNumber <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span> = 79203159
+    
+    Debug.Print CorString.FormatEx(<span style="color: #0000ff">New</span> CustomerFormatter, <span style="color: #a31515">&quot;{0}&quot;</span>, AcctNumber)
+    Debug.Print CorString.FormatEx(<span style="color: #0000ff">New</span> CustomerFormatter, <span style="color: #a31515">&quot;{0:G}&quot;</span>, AcctNumber)
+    Debug.Print CorString.FormatEx(<span style="color: #0000ff">New</span> CustomerFormatter, <span style="color: #a31515">&quot;{0:S}&quot;</span>, AcctNumber)
+    Debug.Print CorString.FormatEx(<span style="color: #0000ff">New</span> CustomerFormatter, <span style="color: #a31515">&quot;{0:P}&quot;</span>, AcctNumber)
+    
+    <span style="color: #0000ff">On</span> <span style="color: #0000ff">Error</span> <span style="color: #0000ff">GoTo</span> <span style="color: #0000ff">Catch</span>
+    Debug.Print CorString.FormatEx(<span style="color: #0000ff">New</span> CustomerFormatter, <span style="color: #a31515">&quot;{0:X}&quot;</span>, AcctNumber)
+    <span style="color: #0000ff">Exit</span> <span style="color: #0000ff">Sub</span>
+    
+Catch:
+    <span style="color: #0000ff">Dim</span> Ex <span style="color: #0000ff">As</span> FormatException
+    
+    <span style="color: #0000ff">Catch</span> Ex
+    Debug.Print Ex.Message
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; This code produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    7-92031-59</span>
+<span style="color: #008000">&#39;    7-92031-59</span>
+<span style="color: #008000">&#39;    7/92031/59</span>
+<span style="color: #008000">&#39;    7.92031.59</span>
+<span style="color: #008000">&#39;    The &#39;X&#39; format specifier is not supported.</span>
+</pre></div>

@@ -38,23 +38,23 @@ Attribute VB_Exposed = True
 ''
 ' An interface that can be used to get an enumerator for an object.
 '
-' @remarks<br>
-' Implement this interface for general cases where only an enumerator is needed.
-'
+' @remarks Implement this interface for general cases where only an enumerator is needed.
+' @include "..\DocIncludes\IEnumerable.html"
 Option Explicit
 
 ''
-' Returns an IEnumerator object.
+' Returns an enumerator that iterates through a collection.
 '
-' @return The enumerator.
-'
+' @return An <a href="IEnumerator.html">IEnumerator</a> object that can be used to iterate through the collection.
 Public Function GetEnumerator() As IEnumerator: End Function
 
 ''
-' Returns an IEnumVariant object.
+' Returns an <b>IEnumVariant</b> enumerator that iterates through a collection.
 '
-' @return The enumerator
-'
+' @return The enumerator.
+' @remarks This is to support the Visual Basic implementation of <i>For..Each</i>.
+' <p>The procedure ID is set to -4 indicating this method is to be used by <i>For..Each</i>. The method is
+' also marked as hidden and should not appear in an Intillisense listing.</p>
 Public Function NewEnum() As IUnknown: End Function
 Attribute NewEnum.VB_UserMemId = -4
 Attribute NewEnum.VB_MemberFlags = "40"

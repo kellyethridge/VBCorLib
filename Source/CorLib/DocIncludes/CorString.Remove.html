@@ -1,0 +1,34 @@
+@remarks The value of the <i>StartIndex</i> parameter can range from zero to one less than the length of the string.
+<table style="width: auto">
+	<tr>
+		<th>Note</th>
+	</tr>
+	<tr>
+		<td>This method does not modify the value of <i>s</i>i. Instead, it returns a new string in which the number of characters specified by the count parameter have been removed. The characters are removed at the position specified by <i>StartIndex</i>.
+		</td>
+	</tr>
+</table>
+@examples The following example demonstrates how you can remove the middle name from a complete name.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> Name    <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+    <span style="color: #0000ff">Dim</span> FoundS1 <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
+    <span style="color: #0000ff">Dim</span> FoundS2 <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
+    
+    Name = <span style="color: #a31515">&quot;Michelle Violet Banks&quot;</span>
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;The entire name is &#39;{0}&#39;&quot;</span>, Name)
+    
+    FoundS1 = InStr(Name, <span style="color: #a31515">&quot; &quot;</span>)
+    FoundS2 = InStr(FoundS1 + 1, Name, <span style="color: #a31515">&quot; &quot;</span>)
+    
+    <span style="color: #0000ff">If</span> FoundS1 &lt;&gt; FoundS2 <span style="color: #0000ff">And</span> FoundS1 &gt; 0 <span style="color: #0000ff">Then</span>
+        Name = CorString.Remove(Name, FoundS1, FoundS2 - FoundS1)
+        
+        Debug.Print CorString.Format(<span style="color: #a31515">&quot;After removing the middle name, we are left with &#39;{0}&#39;&quot;</span>, Name)
+    <span style="color: #0000ff">End</span> <span style="color: #0000ff">If</span>
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; This example produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    The entire name is &#39;Michelle Violet Banks&#39;</span>
+<span style="color: #008000">&#39;    After removing the middle name, we are left with &#39;Michelle Banks&#39;</span>
+</pre></div>

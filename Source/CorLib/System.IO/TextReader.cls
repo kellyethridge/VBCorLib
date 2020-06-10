@@ -41,7 +41,6 @@ Attribute VB_Exposed = True
 ' @see TextReaderStatic
 ' @see StreamReader
 ' @see StringReader
-'
 Option Explicit
 
 ''
@@ -67,47 +66,98 @@ Public Function GetHashCode() As Long: End Function
 ''
 ' Returns the next character from the stream without advancing to the next characters.
 '
-' @return The next character in the Stream, or -1 if no characters remain in the stream.
-'
+' @return The next character in the stream, or -1 if no characters remain in the stream.
+' @remarks The <b>Peek</b> method returns an integer value in order to determine whether the end of the file, or another error has occurred.
+' This allows a user to first check if the returned value is -1 before casting it to a <b>Integer</b> type.
+' <p>The current position of the <a href="TextReader.html">TextReader</a> is not changed by this operation. The returned value is -1 if no more characters are available.</p>
+' <p>If the returned value is not -1 then use the <a href="Char.ConvertFromInt32.html">Char.ConvertFromInt32</a> method to convert to an <b>Integer</b> character.</p>
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th><th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ObjectDisposedException.html">ObjectDisposedException</a></td><td>The <a href="TextReader.html">TextReader</a> is closed.</td>
+'   </tr>
+' </table>
 Public Function Peek() As Long: End Function
 
 ''
-' Returns the next character in the stream, consuming that character.
+' Reads the next character from the input stream and advances the character position by one character.
 '
-' @return The next character in the stream, or -1 if no more characters are in the stream.
-'
+' @return The next character from the input stream, or -1 if no more characters are available.
+' @remarks If the returned value is not -1 then use the <a href="Char.ConvertFromInt32.html">Char.ConvertFromInt32</a> method to convert to an <b>Integer</b> character.
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th><th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ObjectDisposedException.html">ObjectDisposedException</a></td><td>The <a href="TextReader.html">TextReader</a> is closed.</td>
+'   </tr>
+' </table>
 Public Function Read() As Long: End Function
 
 ''
-' Fills a character array (Integer Array) with the specified number of characters, returning
-' the actual number of characters read from the stream.
+' Reads a maximum of <i>Count</i> characters from the current stream, and writes the data to <i>Chars</i>, beginning at <i>Index</i>.
 '
 ' @param Chars The character array to receive <i>Count</i> characters from the stream.
 ' @param Index The starting index in <i>Chars</i> to begin storing characters.
-' @param Count The number of characters to be read from the stream.
-' @return The actual number of characters read from the stream.
+' @param Count The maximum number of characters to be read from the stream.
+' @return The number of characters that have been read. The number will be less than or equal to <i>Count</i>, depending on whether all input characters have been read.
 ' @remarks Characters are encoded within the stream. A single character may require more that
 ' one byte to represent it. This may result in fewer characters read than there are bytes in the stream.
-'
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th><th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ArgumentNullException.html">ArgumentNullException</a></td><td><i>Chars</i> is uninitialized.</td>
+'   </tr>
+'    <tr>
+'        <td><a href="ArgumentException.html">ArgumentException</a></td><td>The <i>Char</i> length minus <i>Index</i> is less than <i>Count</i>.</td>
+'    </tr>
+'    <tr>
+'        <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td><td><i>Index</i> or <i>Count</i> is negative.</td>
+'    </tr>
+'    <tr>
+'        <td><a href="ObjectDisposedException.html">ObjectDisposedException</a></td><td>The <a href="TextReader.html">TextReader</a> is closed.</td>
+'    </tr>
+' </table>
 Public Function ReadBlock(ByRef Chars() As Integer, ByVal Index As Long, ByVal Count As Long) As Long: End Function
 
 ''
-' Reads characters from the stream until a Return or a LineFeed is found, returning all
-' characters up to that line break.
+' Reads a line of characters from the current stream and returns the data as a string.
 '
-' @return A string containing characters up to the line break.
-' @remarks The line break is not included in the return value. If a Return is followed
-' immediately by a LineFeed, then the LineFeed is also removed.
-' <p>If the return value is a null-string, then the end of the stream was reached. To
-' determine if the return string is a null-string us the <b>cString.IsNull</b> function.</p>
-'
+' @return The next line from the input stream, or <b>vbNullString</b> if all characters have been read.
+' @remarks A line is defined as a sequence of characters followed by a carriage return (0x000d), a line feed (0x000a), a carriage return followed by
+' a line feed, <a href="Environment.Get.NewLine.html">Environment.NewLine</a>, or the end of stream marker. The string that is returned does not
+' contain the terminating carriage return and/or line feed. The returned value is <b>vbNullString</b> if the end of the input stream has been reached.
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th><th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ObjectDisposedException.html">ObjectDisposedException</a></td><td>The <a href="TextReader.html">TextReader</a> is closed.</td>
+'   </tr>
+' </table>
 Public Function ReadLine() As String: End Function
 
 ''
-' Reads the remaining characters in the stream, returning them as a string.
+' Reads all characters from the current position to the end of the <a href="TextReader.html">TextReader</a> and returns them as one string.
 '
-' @return A string containing the remaining characters in the stream.
-
+' @return A string containing all characters from the current position to the end of the <a href="TextReader.html">TextReader</a>.
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th><th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ObjectDisposedException.html">ObjectDisposedException</a></td><td>The <a href="TextReader.html">TextReader</a> is closed.</td>
+'   </tr>
+' </table>
 Public Function ReadToEnd() As String: End Function
 
 ''

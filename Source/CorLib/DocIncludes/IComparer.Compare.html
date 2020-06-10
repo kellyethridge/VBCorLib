@@ -1,102 +1,106 @@
-@remarks <h4>Example</h4> The following example will demonstrate how to create a custom comparer object to be used to sort arrays using special logic that might be needed.
-<p>To begin you will need the following items in a new Standard EXE project.<br><br>
-1. A Reference to the VBCorLib library. This should be named VB.EXT: VBCorLib<br>
-2. A Module file with Main set as your startup choice.<br>
-3. A Class file that will implement the <b>IComparer</b> interface.<br></p>
-<p>Once the project is set up we can write our compare logic in the class. The following
-is the entire contents of the Class. Rename the class to <b>OddEvenComparer</b> and put
-the following code in its code window.
-<pre>
-'' We want to sort our numbers by grouping them in odd and even
-'' groups. We want all odd numbers to be first in the list and
-'' all even numbers to be last. Within each odd and even group
-'' we want those number to be sorted in ascending order in that group.
-''
-'' Our comparer will compare on two levels. The first level
-'' is to compare whether or not the two values are odd or even.
-'' If they are both odd or both even, then they belong in the
-'' same group, so we just compare them as normal to keep them
-'' sorted within their group. If one is odd and the other is even,
-'' then we want all odd numbers to be first in the sorted list.
-'' This means they are a lesser value than even numbers, even if
-'' the actual value is greater.
-''
-'' Example:  7 is less than 2 because 7 is odd.
-''
-Option Explicit
+@exceptions
+<table style="width: auto">
+    <tr>
+        <th>Exception</th><th>Condition</th>
+    </tr>
+    <tr>
+        <td><a href="ArgumentException.html">ArgumentException</a></td>
+        <td>
+            Neither <i>a</i> nor <i>b</i> implements the <a href="IComparable.html">IComparable</a> interface.<br/>
+            -or-<br/>
+            <i>a</i> and <i>b</i> are of different types and cannot be compared.
+        </td>
+    </tr>
+</table>
+@examples The following code example demonstrates the use of the <b>IComparer</b> interface to sort an <a href="ArrayList.html">ArrayList</a> object. In this example, the <b>IComparer</b> interface is implemented using the <a href="CaseInsensitiveComparer.html">CaseInsensitiveComparer</a> class to reverse the order of the contents of the <a href="ArrayList.html">ArrayList</a>.
+<p>There are two modules created for this example. A BAS module containing the <b>Main</b> method and a Class module implementing the <b>IComparer</b> interface.</p>
+<p>The following is a <b>Visual Basic Class</b> module named <b>MyReverserClass</b>.</p>
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Option</span> Explicit
+<span style="color: #0000ff">Implements</span> IComparer
 
-'' Implement the IComparer interface to allow for custom
-'' comparisons to take place when sorting an array.
-Implements IComparer
+<span style="color: #0000ff">Private</span> mComparer <span style="color: #0000ff">As</span> <span style="color: #0000ff">New</span> CaseInsensitiveComparer
+
+<span style="color: #0000ff">Public</span> <span style="color: #0000ff">Function</span> Compare(<span style="color: #0000ff">ByRef</span> a <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>, <span style="color: #0000ff">ByRef</span> b <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>) <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
+    Compare = mComparer.Compare(b, a)
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Function</span>
 
 
-'' The IComparer interface implementation.
-'' The return value indicates if x is less than, equal to, or
-'' greater than y. Any method can be used to compare x to y,
-'' as long as it is consistant.
-''
-'' x < y should return a negative value
-'' x = y should return zero
-'' x > y should return a positive value
-Private Function IComparer_Compare(x As Variant, y As Variant) As Long
-    '' Check to see if x and y are both odd or both even.
-    If (x And 1) = (y And 1) Then
-        '' x and y are the same (odd or even), so we will
-        '' just use the default comparer object for them.
-        IComparer_Compare = Comparer.Default.Compare(x, y)
-    ElseIf x And 1 Then
-        '' if x is odd then we must indicate that x is less
-        '' than y by returning a negative value.
-        IComparer_Compare = -1
-    Else
-        '' x is even, therefore y is odd. x is then a
-        '' greater value and we indicate that by return
-        '' a positive value.
-        IComparer_Compare = 1
-    End If
-End Function
-</pre>
-<p>Now that the <b>OddEvenComparer</b> class is written, we can focuse on
-the <b>Main</b> method. In the Module code window copy the following.</p>
-<pre>
-Option Explicit
-
-Private Sub Main()
-    Dim ints() As Long
-    Dim i As Long
+<span style="color: #008000">&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;</span>
+<span style="color: #008000">&#39;   IComparer</span>
+<span style="color: #008000">&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;</span>
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Function</span> IComparer_Compare(a <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>, b <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>) <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
+    IComparer_Compare = Compare(a, b)
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Function</span>
+</pre></div>
+<br/>
+<p>The following is a <b>Visual Basic BAS</b> module containing <b>Main</b> start-up method.</p>
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> List <span style="color: #0000ff">As</span> <span style="color: #0000ff">New</span> ArrayList
     
-    '' Create an array using all digits from 0-9.
-    ints = cArray.NewArray(ciLong, 6, 4, 2, 8, 7, 1, 9, 0, 5, 3)
+    List.Add <span style="color: #a31515">&quot;The&quot;</span>
+    List.Add <span style="color: #a31515">&quot;quick&quot;</span>
+    List.Add <span style="color: #a31515">&quot;brown&quot;</span>
+    List.Add <span style="color: #a31515">&quot;fox&quot;</span>
+    List.Add <span style="color: #a31515">&quot;jumps&quot;</span>
+    List.Add <span style="color: #a31515">&quot;over&quot;</span>
+    List.Add <span style="color: #a31515">&quot;the&quot;</span>
+    List.Add <span style="color: #a31515">&quot;lazy&quot;</span>
+    List.Add <span style="color: #a31515">&quot;dog&quot;</span>
     
-    '' sort the array using our custom IComparer object.
-    cArray.Sort ints, New OddEvenComparer
+    Debug.Print <span style="color: #a31515">&quot;The ArrayList initially contains the following values:&quot;</span>
+    PrintIndexAndValues List
     
-    '' Display the sorted array.
-    For i = 0 To 9
-        '' We use the formatting capabilities of the Console class
-        '' to allow for easy value replacement within the output string.
-        Console.WriteLine "ints({0}) = {1}", i, ints(i)
-    Next i
+    List.Sort
+    Debug.Print <span style="color: #a31515">&quot;After sorting with the default comparer:&quot;</span>
+    PrintIndexAndValues List
     
-    '' Wait for user.
-    Console.WriteLine "Press Enter"
-    Console.ReadLine
-End Sub
+    List.Sort Comparer:=<span style="color: #0000ff">New</span> MyReverserClass
+    Debug.Print <span style="color: #a31515">&quot;After sorting with the reverse case-insensitive comparer:&quot;</span>
+    PrintIndexAndValues List
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
 
-'' This code will produce the following output.
-''
-'' ints(0) = 1
-'' ints(1) = 3
-'' ints(2) = 5
-'' ints(3) = 7
-'' ints(4) = 9
-'' ints(5) = 0
-'' ints(6) = 2
-'' ints(7) = 4
-'' ints(8) = 6
-'' ints(9) = 8
-'' Press Enter
-</pre>
-<p>As you can see, using our custom comparer enables us to sort an array using
-what ever logic we need. This allows the framework to be extended to the user's
-needs as they are.
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> PrintIndexAndValues(<span style="color: #0000ff">ByVal</span> List <span style="color: #0000ff">As</span> ArrayList)
+    <span style="color: #0000ff">Dim</span> i <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
+    
+    <span style="color: #0000ff">For</span> i = 0 <span style="color: #0000ff">To</span> List.Count - 1
+        Debug.Print CorString.Format(t(<span style="color: #a31515">&quot;\t[{0}]:\t{1}&quot;</span>), i, List(i))
+    <span style="color: #0000ff">Next</span>
+    
+    Debug.Print
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; This code produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;  The ArrayList initially contains the following values:</span>
+<span style="color: #008000">&#39;      [0]:    The</span>
+<span style="color: #008000">&#39;      [1]:    quick</span>
+<span style="color: #008000">&#39;      [2]:    brown</span>
+<span style="color: #008000">&#39;      [3]:    fox</span>
+<span style="color: #008000">&#39;      [4]:    jumps</span>
+<span style="color: #008000">&#39;      [5]:    over</span>
+<span style="color: #008000">&#39;      [6]:    the</span>
+<span style="color: #008000">&#39;      [7]:    lazy</span>
+<span style="color: #008000">&#39;      [8]:    dog</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;  After sorting with the default comparer:</span>
+<span style="color: #008000">&#39;      [0]:    brown</span>
+<span style="color: #008000">&#39;      [1]:    dog</span>
+<span style="color: #008000">&#39;      [2]:    fox</span>
+<span style="color: #008000">&#39;      [3]:    jumps</span>
+<span style="color: #008000">&#39;      [4]:    lazy</span>
+<span style="color: #008000">&#39;      [5]:    over</span>
+<span style="color: #008000">&#39;      [6]:    quick</span>
+<span style="color: #008000">&#39;      [7]:    the</span>
+<span style="color: #008000">&#39;      [8]:    The</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;  After sorting with the reverse case-insensitive comparer:</span>
+<span style="color: #008000">&#39;      [0]:    the</span>
+<span style="color: #008000">&#39;      [1]:    The</span>
+<span style="color: #008000">&#39;      [2]:    quick</span>
+<span style="color: #008000">&#39;      [3]:    over</span>
+<span style="color: #008000">&#39;      [4]:    lazy</span>
+<span style="color: #008000">&#39;      [5]:    jumps</span>
+<span style="color: #008000">&#39;      [6]:    fox</span>
+<span style="color: #008000">&#39;      [7]:    dog</span>
+<span style="color: #008000">&#39;      [8]:    brown</span>
+</pre></div>

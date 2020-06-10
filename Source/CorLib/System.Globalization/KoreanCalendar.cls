@@ -319,7 +319,7 @@ End Function
 ''
 ' Returns the era in the specified <a href="CorDateTime.html">CorDateTime</a>.
 '
-' @param The <a href="CorDateTime.html">CorDateTime</a> to read.
+' @param Time The <a href="CorDateTime.html">CorDateTime</a> to read.
 ' @return An integer that represents the era in the specified <a href="CorDateTime.html">CorDateTime</a>.
 ' @remarks The <a href="KoreanCalendar.html">KoreanCalendar</a> class recognizes only the current era.
 '

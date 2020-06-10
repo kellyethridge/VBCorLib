@@ -73,6 +73,14 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use #1/1/2000#, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Sunday, 52
             Test.Use #1/1/2000#, CalendarWeekRule.FirstFullWeek, DayOfWeek.Sunday, 52
         
+        Case "AddMonths_WithValues_ReturnsExpected"
+            Test.Use #12/1/2001#, 1, #1/1/2002#
+            Test.Use #12/31/2001#, 1, #1/31/2002#
+            Test.Use #1/31/2001#, 1, #2/28/2001#
+            Test.Use #1/1/2002#, -1, #12/1/2001#
+            Test.Use #1/31/2002#, -1, #12/31/2001#
+            Test.Use #2/28/2001#, -1, #1/28/2001#
+            
     End Select
 End Sub
 
@@ -111,13 +119,17 @@ Public Sub IsReadOnly_WhenMadeReadOnly_ReturnsTrue()
     Assert.That Actual.IsReadOnly, Iz.True
 End Sub
 
-Public Sub TwoDigitYearMax_WithDefault_Returns2029()
+Public Sub TwoDigitYearMax_WithDefault_ReturnsWindowsValue()
     Dim Calendar As New GregorianCalendar
-    
+    Dim Expected As Long
     Dim Actual As Long
+    
     Actual = Calendar.TwoDigitYearMax
     
-    Assert.That Actual, Iz.EqualTo(2029)
+    ' since the windows TwoDigitMaxYear seems to change every 20 years, we will just
+    ' have to retrieve it and make user we return the same value.
+    GetCalendarInfo LOCALE_USER_DEFAULT, CAL_GREGORIAN, CAL_ITWODIGITYEARMAX Or CAL_RETURN_NUMBER, vbNullString, 0, Expected
+    Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
 Public Sub TwoDigitYearMax_WithMinYearMinusOne_ThrowsArgumentOutOfRangeException()
@@ -255,13 +267,22 @@ Public Sub AddMethods_WhenCalled_ReturnsExpected()
     Assert.That Calendar.AddWeeks(d, 5), Equals(NewDate(#2/5/100#)), "#8"
 End Sub
 
-Public Sub AddYears_WithInvalidResult_ThrowsArgumentException()
+Public Sub AddMonths_WithValues_ReturnsExpected(ByVal d As Date, ByVal Months As Long, ByVal Expected As Date)
+    Dim Calendar As New GregorianCalendar
+    Dim Actual As CorDateTime
+    
+    Set Actual = Calendar.AddMonths(d, Months)
+    
+    Assert.That Actual, Equals(NewDate(Expected))
+End Sub
+
+Public Sub AddYears_WithInvalidResult_ThrowsArgumentOutOfRangeException()
     Dim Calendar As New GregorianCalendar
     
     On Error Resume Next
     Calendar.AddYears #1/1/2000#, 9000
     
-    AssertArgumentException Err
+    AssertArgumentOutOfRangeException Err
 End Sub
 
 Public Sub Kind_WhenAddMethodCalled_ReturnsUnspecified()

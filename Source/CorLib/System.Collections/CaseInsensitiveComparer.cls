@@ -1,7 +1,7 @@
 VERSION 1.0 CLASS
 BEGIN
   MultiUse = -1  'True
-  Persistable = 1  'Persistable
+  Persistable = 0  'NotPersistable
   DataBindingBehavior = 0  'vbNone
   DataSourceBehavior  = 0  'vbNone
   MTSTransactionMode  = 0  'NotAnMTSObject
@@ -38,10 +38,13 @@ Attribute VB_Exposed = True
 ''
 ' Provides a comparer that is case-insensitive when comparing strings.
 '
+' @see CaseInsensitiveComparerStatic
+' @see Constructors
 Option Explicit
 Implements IObject
 Implements IComparer
 
+Private mCulture As CultureInfo
 Private mDefault As IComparer
 
 ''
@@ -49,16 +52,26 @@ Private mDefault As IComparer
 '
 ' @param a The left-hand-side of the equation.
 ' @param b the right-hand-side of the equation.
-' @return The relationship between the values.<br>
-' Relationship guide:<br>
-' a is equal to b returns 0.<br>
-' a is greater than b returns a positive value (1).<br>
-' a is less than b returns a negative value (-1).
-'
+' @return The relationship between the values as shown in the table.<br>
+' <table style="width: auto">
+'   <tr>
+'       <th>Value</th>
+'       <th>Meaning</th>
+'   </tr>
+'   <tr>
+'        <td>Less than zero</td><td><i>a</i> is less than <i>b</i>, with casing ignored.</td>
+'   </tr>
+'   <tr>
+'        <td>Zero</td><td><i>a</i> equals <i>b</i>, with casing ignored.</td>
+'   </tr>
+'   <tr>
+'        <td>Greater than zero</td><td><i>a</i> is greater than <i>b</i>, with casing ignored.</td>
+'   </tr>
+' </table>
 Public Function Compare(ByRef a As Variant, ByRef b As Variant) As Long
     If VarType(a) = vbString Then
         If VarType(b) = vbString Then
-            Compare = StrComp(a, b, vbTextCompare)
+            Compare = CorString.CompareCulturalV(a, b, mCulture, CompareOptions.IgnoreCase)
             Exit Function
         End If
     End If
@@ -99,8 +112,16 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Friend Sub Init(ByVal Culture As CultureInfo)
+    If Culture Is Nothing Then _
+        Error.ArgumentNull "Culture"
+    
+    Set mCulture = Culture
+End Sub
+
 Private Sub Class_Initialize()
     Set mDefault = Comparer.Default
+    Set mCulture = CultureInfo.CurrentCulture
 End Sub
 
 
@@ -111,8 +132,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = GetHashCode
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

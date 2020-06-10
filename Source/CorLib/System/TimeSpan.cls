@@ -209,7 +209,7 @@ End Property
 ' <br><br>
 ' If <b>Nothing</b> is passed in 1 is returned.
 Public Function CompareTo(ByRef Value As TimeSpan) As Long
-    CompareTo = TimeSpan.CompareTo(Me, Value)
+    CompareTo = TimeSpan.Compare(Me, Value)
 End Function
 
 ''
@@ -221,51 +221,14 @@ Public Function Negate() As TimeSpan
 End Function
 
 ''
-' Returns a string representation of the duration.
+' Converts the value of the current <a href="TimeSpan.html">TimeSpan</a> object to its equivalent string representation by using the specified format and culture-specific formatting information.
 '
-' @return String representing the duration.
-' @remarks A string representation is in the form of [-][d.]hh:mm:ss[.ff]
-' where the bracketed fields are optional. The optional fields will be
-' included in the string their value is not zero, or the TimeSpan is negative.
+' @param ts The <a href="TimeSpan.html">TimeSpan</a> to be converted to a string.
+' @param Format A standard or custom <a href="TimeSpan.html">TimeSpan</a> format string.
+' @param FormatProvider An object that supplies culture-specific formatting information.
+' @return The string representation of the current <a href="TimeSpan.html">TimeSpan</a> value, as specified by <i>Format</i> and <i>FormatProvider</i>.
 Public Function ToString(Optional ByRef Format As String, Optional ByVal FormatProvider As IFormatProvider) As String
-    Dim Output As StringBuilder
-    Set Output = StringBuilderCache.Acquire
-    
-    Dim ms As Currency
-    ms = mMilliseconds
-    If ms < 0 Then
-        Output.AppendChar vbMinusChar
-        ms = -ms
-    End If
-    
-    Dim Days As Long
-    Days = Int(ms / MilliSecondsPerDay)
-    If Days <> 0 Then
-        Output.Append Days
-        Output.AppendChar vbPeriodChar
-    End If
-
-    AppendComponent Output, Int(ms / MillisecondsPerHour) Mod HoursPerDay, 2
-    Output.AppendChar vbColonChar
-    AppendComponent Output, Int(ms / MillisecondsPerMinute) Mod MinutesPerHour, 2
-    Output.AppendChar vbColonChar
-    AppendComponent Output, Int(ms / MillisecondsPerSecond) Mod SecondsPerMinute, 2
-    
-    Dim MillisecondComponent    As Long
-    Dim TicksComponent          As Long
-    MillisecondComponent = Modulus(ms, MillisecondsPerSecond)
-    TicksComponent = (mMilliseconds - Int(mMilliseconds)) * TicksPerMillisecond
-    
-    If MillisecondComponent <> 0 Then
-        Output.AppendChar vbPeriodChar
-        AppendComponent Output, MillisecondComponent, 3
-        AppendComponent Output, TicksComponent, 4
-    ElseIf TicksComponent <> 0 Then
-        Output.AppendChar vbPeriodChar
-        AppendComponent Output, TicksComponent, 7
-    End If
-    
-    ToString = StringBuilderCache.GetStringAndRelease(Output)
+    ToString = TimeSpan.ToString(Me, Format, FormatProvider)
 End Function
 
 ''
@@ -288,17 +251,9 @@ Public Function GetHashCode() As Long
     End With
 End Function
 
-Public Function LessThan(ByRef Other As TimeSpan) As Boolean
-    LessThan = TimeSpan.LessThan(Me, Other)
-End Function
-
-Public Function GreaterThan(ByRef Other As TimeSpan) As Boolean
-    GreaterThan = TimeSpan.GreaterThan(Me, Other)
-End Function
-
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByVal Days As Long, ByVal Hours As Long, ByVal Minutes As Long, ByVal Seconds As Long, ByVal Milliseconds As Long)
     InitFromMilliseconds (Days * MilliSecondsPerDay) + (Hours * MillisecondsPerHour) + (Minutes * MillisecondsPerMinute) + (Seconds * MillisecondsPerSecond) + Milliseconds
@@ -306,18 +261,6 @@ End Sub
 
 Friend Sub InitFromMilliseconds(ByVal Value As Currency)
     mMilliseconds = Value
-End Sub
-
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Helpers
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub AppendComponent(ByRef Output As StringBuilder, ByVal Component As Long, ByVal Width As Long)
-    Dim ComponentString As String
-    ComponentString = Component
-    
-    Output.AppendChar vbZeroChar, Width - Len(ComponentString)
-    Output.AppendString ComponentString
 End Sub
 
 

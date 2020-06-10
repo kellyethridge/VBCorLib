@@ -1,0 +1,47 @@
+@examples The following code example shows how to determine the index of a key or a value in a <a href="SortedList.html">SortedList</a> object.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> List <span style="color: #0000ff">As</span> <span style="color: #0000ff">New</span> SortedList
+    <span style="color: #0000ff">Dim</span> Key <span style="color: #0000ff">As</span> <span style="color: #2b91af">Integer</span>
+    <span style="color: #0000ff">Dim</span> Value <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+    
+    List.Add 1, <span style="color: #a31515">&quot;one&quot;</span>
+    List.Add 3, <span style="color: #a31515">&quot;three&quot;</span>
+    List.Add 2, <span style="color: #a31515">&quot;two&quot;</span>
+    List.Add 4, <span style="color: #a31515">&quot;four&quot;</span>
+    List.Add 0, <span style="color: #a31515">&quot;zero&quot;</span>
+    
+    Debug.Print <span style="color: #a31515">&quot;The SortedList contains the following values:&quot;</span>
+    PrintIndexAndKeysAndValues List
+    
+    Key = 2
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;The key &quot;&quot;{0}&quot;&quot; is at index {1}.&quot;</span>, Key, List.IndexOfKey(Key))
+    
+    Value = <span style="color: #a31515">&quot;three&quot;</span>
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;The value &quot;&quot;{0}&quot;&quot; is at index {1}.&quot;</span>, Value, List.IndexOfValue(Value))
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> PrintIndexAndKeysAndValues(<span style="color: #0000ff">ByVal</span> List <span style="color: #0000ff">As</span> SortedList)
+    <span style="color: #0000ff">Dim</span> i <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
+    
+    Debug.Print t(<span style="color: #a31515">&quot;-INDEX-\t-KEY-\t-VALUE-&quot;</span>)
+    
+    <span style="color: #0000ff">For</span> i = 0 <span style="color: #0000ff">To</span> List.Count - 1
+        Debug.Print CorString.Format(t(<span style="color: #a31515">&quot;[{0}]:\t{1}\t{2}&quot;</span>), i, List.GetKey(i), List.GetByIndex(i))
+    <span style="color: #0000ff">Next</span>
+    
+    Debug.Print
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; The following code produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    The SortedList contains the following values:</span>
+<span style="color: #008000">&#39;    -INDEX- -KEY-   -VALUE-</span>
+<span style="color: #008000">&#39;    [0]:    0   zero</span>
+<span style="color: #008000">&#39;    [1]:    1   one</span>
+<span style="color: #008000">&#39;    [2]:    2   two</span>
+<span style="color: #008000">&#39;    [3]:    3   three</span>
+<span style="color: #008000">&#39;    [4]:    4   four</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    The key &quot;2&quot; is at index 2.</span>
+<span style="color: #008000">&#39;    The value &quot;three&quot; is at index 3.</span>
+</pre></div>

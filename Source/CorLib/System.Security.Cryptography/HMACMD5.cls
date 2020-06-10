@@ -42,7 +42,7 @@ Attribute VB_Exposed = True
 ' <p>A Hash-based Message Authentication Code can be used to determine if messages sent over insecure channels
 ' have been modified. This works by each party at boths ends sharing a secret key used to sign the sent message and
 ' to also authenticate the received message. If the key were compromised, then the authentication cannot be guaranteed.</p>
-'
+' @see HMAC
 Option Explicit
 Implements IObject
 Implements HashAlgorithm
@@ -336,8 +336,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = GetHashCode
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

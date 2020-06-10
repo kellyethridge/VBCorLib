@@ -35,7 +35,14 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use(1, 1).Expect Iz.EqualTo(0)
             Test.Use(1, 0).Expect Iz.GreaterThan(0)
             Test.Use(0, 1).Expect Iz.LessThan(0)
-        
+            Test.Use("", "a").Expect Iz.EqualTo(-1)
+            Test.Use("a", "").Expect Iz.EqualTo(1)
+            Test.Use("", "").Expect Iz.EqualTo(0)
+            Test.Use(vbNullString, vbNullString).Expect Iz.EqualTo(0)
+            Test.Use(vbNullString, "").Expect Iz.EqualTo(0)
+            Test.Use(vbNullString, "a").Expect Iz.LessThan(0)
+            Test.Use("a", vbNullString).Expect Iz.EqualTo(1)
+            
         Case "Compare_WithOrdinalIgnoreCaseComparer_ReturnsExpected"
             Test.Use("a", "a").Expect Iz.EqualTo(0)
             Test.Use("a", "b").Expect Iz.LessThan(0)
@@ -47,6 +54,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use(1, 1).Expect Iz.EqualTo(0)
             Test.Use(1, 0).Expect Iz.GreaterThan(0)
             Test.Use(0, 1).Expect Iz.LessThan(0)
+            
             
         Case "Equals_WithOrdinalComparer_ReturnsExpected"
             Test.Use "a", "a", True
@@ -128,3 +136,50 @@ Public Sub GetHashCode_WithOrdinalIgnoreCaseComparer_ReturnsExpected(ByRef x As 
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
+
+Public Sub Equals_WithTextCompare_ReturnsExpected()
+    Dim Actual As Boolean
+    
+    Actual = StringComparer.TextCompare.Equals("a", "A")
+    
+    Assert.That Actual, Iz.True
+End Sub
+
+Public Sub Compare_WithTextCompare_ReturnsExpected()
+    Assert.That StringComparer.TextCompare.Compare("a", "A"), Iz.EqualTo(0)
+    Assert.That StringComparer.TextCompare.Compare("a", "b"), Iz.EqualTo(-1)
+    Assert.That StringComparer.TextCompare.Compare("b", "a"), Iz.EqualTo(1)
+End Sub
+
+Public Sub Compare_WithBinaryCompare_ReturnsExpected()
+    Assert.That StringComparer.BinaryCompare.Compare("a", "a"), Iz.EqualTo(0)
+    Assert.That StringComparer.BinaryCompare.Compare("a", "A"), Iz.EqualTo(1)
+End Sub
+
+Public Sub Equals_WithBinaryCompare_ReturnsExpected()
+    Assert.That StringComparer.BinaryCompare.Equals("a", "a"), Iz.True
+    Assert.That StringComparer.BinaryCompare.Equals("a", "A"), Iz.False
+End Sub
+
+Public Sub Equals_WithInvariantCulture_ReturnsExpected()
+    Assert.That StringComparer.InvariantCulture.Equals("a", "a"), Iz.True
+    Assert.That StringComparer.InvariantCulture.Equals("a", "A"), Iz.False
+End Sub
+
+Public Sub Compare_WithInvariantCulture_ReturnsExpected()
+    Assert.That StringComparer.InvariantCulture.Compare("a", "a"), Iz.EqualTo(0)
+    Assert.That StringComparer.InvariantCulture.Compare("a", "A"), Iz.EqualTo(-1)
+End Sub
+
+Public Sub Equals_WithInvariantCultureIgnoreCase_ReturnsExpected()
+    Assert.That StringComparer.InvariantCultureIgnoreCase.Equals("a", "A"), Iz.True
+End Sub
+
+Public Sub Equals_WithCurrentCulture_ReturnsExpected()
+    Assert.That StringComparer.CurrentCulture.Equals("a", "a"), Iz.True
+End Sub
+
+Public Sub Equals_WithCurrentCultureIgnoreCase_ReturnsExpected()
+    Assert.That StringComparer.CurrentCultureIgnoreCase.Equals("a", "A"), Iz.True
+End Sub
+

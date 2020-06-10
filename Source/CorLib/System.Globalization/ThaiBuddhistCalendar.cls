@@ -378,10 +378,9 @@ End Function
 ' Returns the week of the year that includes the date in the specified Date or <a href="CorDateTime.html">CorDateTime</a>.
 '
 ' @param Time The Date or <a href="CorDateTime.html">CorDateTime</a> to read.
-' @param Rule One of the <a href="Calendar.CalendarWeekRule.html>CalendarWeekRule</a> values that defines a calendar week.
+' @param Rule One of the <a href="Calendar.CalendarWeekRule.html">CalendarWeekRule</a> values that defines a calendar week.
 ' @param FirstDayOfWeek One of the <a href="CorDateTimeStatic.DayOfWeek.html">DayOfWeek</a> values that represents the first day of the week.
 ' @return A 1-based positive integer that represents the week of the year that includes the date in the <i>time</i> parameter.
-'
 Public Function GetWeekOfYear(ByRef Time As Variant, ByVal Rule As CalendarWeekRule, ByVal FirstDayOfWeek As DayOfWeek) As Long
     GetWeekOfYear = Statics.Calendar.GetWeekOfYear(Time, Rule, FirstDayOfWeek, Me)
 End Function

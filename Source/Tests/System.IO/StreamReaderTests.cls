@@ -312,24 +312,24 @@ End Sub
 
 Public Sub Read_WithLittleEndianUnicodeEncodingBOM_SetsCorrectEncoding()
     Dim Reader As StreamReader
-    Set Reader = MakeReader(t("\u00ff\u00fe"))
+    Set Reader = MakeReader(t("\u00ff\u00fedata"))
     
     Dim Actual As Encoding
     Reader.Read
     Set Actual = Reader.CurrentEncoding
     
-    Assert.That Actual, Equals(Cor.NewUnicodeEncoding(False, False))
+    Assert.That Actual, Equals(Cor.NewUnicodeEncoding(False, True))
 End Sub
 
 Public Sub Read_WithBigEndianUnicodeEncodingBOM_SetsCorrectEncoding()
     Dim Reader As StreamReader
-    Set Reader = MakeReader(t("\u00fe\u00ff"))
+    Set Reader = MakeReader(t("\u00fe\u00ffdata"))
     
     Dim Actual As Encoding
     Reader.Read
     Set Actual = Reader.CurrentEncoding
     
-    Assert.That Actual, Equals(Cor.NewUnicodeEncoding(True, False))
+    Assert.That Actual, Equals(Cor.NewUnicodeEncoding(True, True))
 End Sub
 
 Public Sub Read_WithUTF8EncodingBOM_SetsCorrectEncoding()
@@ -340,7 +340,7 @@ Public Sub Read_WithUTF8EncodingBOM_SetsCorrectEncoding()
     Reader.Read
     Set Actual = Reader.CurrentEncoding
     
-    Assert.That Actual, Equals(Cor.NewUTF8Encoding(False))
+    Assert.That Actual, Equals(Cor.NewUTF8Encoding(True))
 End Sub
 
 Public Sub Read_WithPartialUTF8EncodingBOM_DoesNotAlterEncoding()
@@ -384,6 +384,34 @@ Public Sub Read_WithPartialUTF8EncodingBOM_ReturnsMinusOne()
     Assert.That Actual, Iz.EqualTo(-1)
 End Sub
 
+Public Sub Read_WithLittleEndianUTF32BOM_SetsUTF32Encoding()
+    Dim Reader As StreamReader
+    Dim Actual As Encoding
+    Dim Ch      As Long
+    
+    Set Reader = MakeReader(t("\u00ff\u00fe\u0000\u0000a\u0000\u0000\u0000"))
+    
+    Ch = Reader.Read
+    Set Actual = Reader.CurrentEncoding
+    
+    Assert.That Actual, Equals(Cor.NewUTF32Encoding(False, True))
+    Assert.That Ch, Iz.EqualTo(97)
+End Sub
+
+Public Sub Read_WithBigEndianUTF32BOM_SetsUTF32Encoding()
+    Dim Reader As StreamReader
+    Dim Actual As Encoding
+    Dim Ch      As Long
+    
+    Set Reader = MakeReader(t("\u0000\u0000\u00fe\u00ff\u0000\u0000\u0000a"))
+    
+    Ch = Reader.Read
+    Set Actual = Reader.CurrentEncoding
+    
+    Assert.That Actual, Equals(Cor.NewUTF32Encoding(True, True))
+    Assert.That Ch, Iz.EqualTo(97)
+End Sub
+
 
 Private Function MakeEmptyReader() As StreamReader
     Set MakeEmptyReader = Cor.NewStreamReader(MakeEmptyStream)
@@ -409,4 +437,5 @@ Private Function MakeStream(Optional ByRef Data As String) As Stream
     
     Set MakeStream = Stream
 End Function
+
 

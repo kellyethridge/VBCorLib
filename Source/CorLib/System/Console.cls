@@ -46,9 +46,8 @@ Attribute VB_Exposed = True
 ' window from which is it run, the EXE needs to be converted to a console application.
 ' This can be accomplished by hand using the <i>Link</i> program that is included with
 ' Visual Basic 6. In a console window use the following command:
-' <p>link /edit /subsystem:console <i>EXE Name</i></p>
-' <p>Replace <EXE> with the path and executable to be flagged as a console application.
-' Be sure the <i>Link</i> and application are both in paths the console window can find.
+' <p>link /edit /subsystem:console <i>Application Name</i></p>
+' <p>Be sure the <i>Link</i> and application are both in paths the console window can find.
 ' Once the command has been executed, the VB6 application will run inside the console
 ' window from which it was run. If no window existed, then a new one will be created.</p>
 ' <p>The Console can be used to display text on the screen, and retrieve
@@ -76,8 +75,6 @@ Private Declare Function SetConsoleWindowInfo Lib "kernel32.dll" (ByVal hConsole
 Private Declare Function GetStdHandle Lib "kernel32.dll" (ByVal nStdHandle As Long) As Long
 Private Declare Function GetConsoleScreenBufferInfo Lib "kernel32.dll" (ByVal hConsoleOutput As Long, ByRef lpConsoleScreenBufferInfo As CONSOLE_SCREEN_BUFFER_INFO) As Long
 Private Declare Function SetConsoleScreenBufferSize Lib "kernel32.dll" (ByVal hConsoleOutput As Long, ByRef dwSize As Any) As Long
-Private Declare Function CreateConsoleScreenBuffer Lib "kernel32.dll" (ByVal dwDesiredAccess As Long, ByVal dwShareMode As Long, ByRef lpSecurityAttributes As Any, ByVal dwFlags As Long, ByRef lpScreenBufferData As Any) As Long
-Private Declare Function SetConsoleActiveScreenBuffer Lib "kernel32.dll" (ByVal hConsoleOutput As Long) As Long
 Private Declare Function SetConsoleTitleW Lib "kernel32.dll" (ByVal lpConsoleTitle As Long) As Long
 Private Declare Function GetConsoleTitleW Lib "kernel32.dll" (ByVal lpConsoleTitle As Long, ByVal nSize As Long) As Long
 Private Declare Function GetLargestConsoleWindowSize Lib "kernel32.dll" (ByVal hConsoleOutput As Long) As COORD
@@ -102,7 +99,6 @@ Private Declare Function FindWindow Lib "user32.dll" Alias "FindWindowA" (ByVal 
 Private Const STD_OUTPUT_HANDLE         As Long = -11&
 Private Const STD_INPUT_HANDLE          As Long = -10&
 Private Const STD_ERROR_HANDLE          As Long = -12&
-Private Const CONSOLE_TEXTMODE_BUFFER   As Long = 1
 Private Const MaxTitleLength            As Long = 24500
 Private Const MaxWindowSize             As Long = &H7FFF
 Private Const KEY_EVENT                 As Long = &H1
@@ -290,7 +286,8 @@ Public Property Get Out() As TextWriter
     Dim Writer As StreamWriter
     
     If mOutput Is Nothing Then
-        Set Writer = Cor.NewStreamWriter(OpenStandardOutput, Encoding.GetEncoding(GetConsoleOutputCP))
+        Set Writer = Cor.NewStreamWriter(OpenStandardOutput, Encoding:=OutputEncoding)
+        Writer.HaveWrittenPreamble
         Writer.AutoFlush = True
         Set mOutput = Writer
     End If
@@ -307,7 +304,7 @@ End Property
 '
 Public Property Get In_() As TextReader
     If mInput Is Nothing Then
-        Set mInput = Cor.NewStreamReader(OpenStandardInput, Encoding.GetEncoding(GetConsoleCP), False)
+        Set mInput = Cor.NewStreamReader(OpenStandardInput, InputEncoding, False)
     End If
     
     Set In_ = mInput
@@ -765,8 +762,8 @@ End Property
 '
 ' @return The largest possible window height.
 '
-Public Property Get largestWindowHeight() As Long
-    largestWindowHeight = GetLargestConsoleWindowSize(mOutputHandle).y
+Public Property Get LargestWindowHeight() As Long
+    LargestWindowHeight = GetLargestConsoleWindowSize(mOutputHandle).y
 End Property
 
 ''
@@ -786,7 +783,10 @@ Public Property Get Title() As String
         Case 0
             Dim e As Long
             e = Err.LastDllError
-            If e <> 0 Then Statics.Error.Win32Error e
+            
+            If e <> 0 Then
+                Statics.Error.Win32Error e
+            End If
         Case Is > MaxTitleLength
             Statics.Error.InvalidOperation ArgumentOutOfRange_ConsoleTitleTooLong
     End Select
@@ -1294,7 +1294,7 @@ Private Sub WriteLineCore(ByRef Args() As Variant)
     
 Catch:
     GoSub Finally
-    Throw
+    ThrowOrErr Err
 Finally:
     FreeArguments Shifted
     Return

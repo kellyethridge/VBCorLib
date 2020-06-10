@@ -32,18 +32,19 @@ Attribute VB_Exposed = True
 'DEALINGS IN THE SOFTWARE.
 '
 '
-' Module: MathExt
+' Module: CorMath
 '
 
 ''
 ' Provides extended math functionality.
 '
 ' @remarks The functions in this class are global. To access them simply call
-' the functions directly as any normal function. The MathExt class does not need
+' the functions directly as any normal function. The CorMath class does not need
 ' to be referenced.
 '
 ' <pre>
 ' Debug.Print PI
+' Debug.Print Max(1, 2)
 ' </pre>
 '
 Option Explicit
@@ -341,6 +342,78 @@ Public Function CRad(ByVal Degrees As Double) As Double
     CRad = corPI * Degrees / 180#
 End Function
 
+''
+' Produces the full product of two 32-bit numbers.
+'
+' @param a The first number to multiply.
+' @param b The second number to multiply.
+' @return The number containing the product of the specified numbers.
+Public Function BigMul(ByVal a As Long, ByVal b As Long) As Int64
+    Dim a64 As Int64
+    Dim b64 As Int64
+    
+    If a < 0 Then
+        If b < 0 Then
+            a64.LowPart = -a
+            b64.LowPart = -b
+            Statics.Int64.MultiplyPositives a64, b64, BigMul
+        Else
+            a64.LowPart = a
+            a64.HighPart = -1
+            b64.LowPart = b
+            Statics.Int64.MultiplyByNegative b64, a64, BigMul
+        End If
+    ElseIf b < 0 Then
+        a64.LowPart = a
+        b64.LowPart = b
+        b64.HighPart = -1
+        Statics.Int64.MultiplyByNegative a64, b64, BigMul
+    Else
+        a64.LowPart = a
+        b64.LowPart = b
+        Statics.Int64.MultiplyPositives a64, b64, BigMul
+    End If
+End Function
+
+''
+' Returns value clamped to the inclusive range of <i>Min</i> and <i>Max</i>.
+'
+' @param Value The value to be clamped.
+' @param Min The lower bound of the result.
+' @param Max The upper bound of the result.
+' @return Returns <i>Value</i> if between <i>Min</i> and <i>Max</i>.<br/>
+' -or-<br/>
+' <i>Min</i> if <i>Value</i> is less than.<br/>
+' -or-<br/>
+' <i>Max</i> if <i>Value</i> is greater than.
+Public Function Clamp(ByRef Value As Variant, ByRef Min As Variant, ByRef Max As Variant) As Variant
+    Dim Value64 As Int64
+    Dim Min64 As Int64
+    Dim Max64 As Int64
+    
+    If IsAnyInt64(Value, Min, Max) Then
+        Value64 = CInt64(Value)
+        Min64 = CInt64(Min)
+        Max64 = CInt64(Max)
+        
+        If Statics.Int64.Compare(Value64, Min64) < 0 Then
+            Clamp = Min64
+        ElseIf Statics.Int64.Compare(Value64, Max64) > 0 Then
+            Clamp = Max64
+        Else
+            Clamp = Value
+        End If
+    Else
+        If Value < Min Then
+            Clamp = Min
+        ElseIf Value > Max Then
+            Clamp = Max
+        Else
+            Clamp = Value
+        End If
+    End If
+End Function
+
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Constructors
@@ -353,6 +426,16 @@ End Sub
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Function IsAnyInt64(ByRef a As Variant, ByRef b As Variant, ByRef c As Variant) As Boolean
+    If IsInt64(a) Then
+        IsAnyInt64 = True
+    ElseIf IsInt64(b) Then
+        IsAnyInt64 = True
+    Else
+        IsAnyInt64 = IsInt64(c)
+    End If
+End Function
+
 Private Function IsGtOrEq(ByRef x As Variant, ByRef y As Variant) As Boolean
     Select Case VarType(x)
         Case vbObject
@@ -360,6 +443,11 @@ Private Function IsGtOrEq(ByRef x As Variant, ByRef y As Variant) As Boolean
                 Throw Cor.NewArgumentException(Environment.GetResourceString(Arg_MustBeOfType, TypeName(x)), "Y")
             
             IsGtOrEq = Comparer.Default.Compare(x, y) >= 0
+        Case vbUserDefinedType
+            If (Not IsInt64(x)) Or (Not IsInt64(y)) Then _
+                Throw Cor.NewArgumentException(Environment.GetResourceString(Arg_MustBeOfType, "Int64"))
+            
+            IsGtOrEq = CallFunc_T_T_Long(AddressOf Int64Compare, DataPtr(x), DataPtr(y)) >= 0
         Case VarType(y)
             IsGtOrEq = x >= y
         Case Else
@@ -374,6 +462,11 @@ Private Function IsLtOrEq(ByRef x As Variant, ByRef y As Variant) As Boolean
                 Throw Cor.NewArgumentException(Environment.GetResourceString(Arg_MustBeOfType, TypeName(x)), "Y")
             
             IsLtOrEq = Comparer.Default.Compare(x, y) <= 0
+        Case vbUserDefinedType
+            If (Not IsInt64(x)) Or (Not IsInt64(y)) Then _
+                Throw Cor.NewArgumentException(Environment.GetResourceString(Arg_MustBeOfType, "Int64"))
+            
+            IsLtOrEq = CallFunc_T_T_Long(AddressOf Int64Compare, DataPtr(x), DataPtr(y)) <= 0
         Case VarType(y)
             IsLtOrEq = x <= y
         Case Else

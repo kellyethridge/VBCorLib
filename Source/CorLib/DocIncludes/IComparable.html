@@ -1,0 +1,86 @@
+@example The following example illustrates the implementation of <a href="IComparable.html">IComparable</a> and the requisite <a href="IComparable.CompareTo.html">CompareTo</a> method.
+<p>There are two modules created for this example. A BAS module containing the <b>Main</b> method
+and a Class module implementing the <a href="IComparable.html">IComparable</a> interface.</p>
+<p>The following is a <b>Visual Basic Class</b> module named <b>Temperature</b>.</p>
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Option</span> Explicit
+<span style="color: #0000ff">Implements</span> IComparable
+
+<span style="color: #0000ff">Private</span> mTemperatureF <span style="color: #0000ff">As</span> <span style="color: #2b91af">Double</span>
+
+<span style="color: #0000ff">Public</span> <span style="color: #0000ff">Function</span> CompareTo(<span style="color: #0000ff">ByRef</span> Value <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>) <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
+    <span style="color: #0000ff">Dim</span> Other <span style="color: #0000ff">As</span> Temperature
+    
+    <span style="color: #0000ff">On</span> <span style="color: #0000ff">Error</span> <span style="color: #0000ff">GoTo</span> <span style="color: #0000ff">Catch</span>
+    <span style="color: #0000ff">Set</span> Other = Value
+    
+    <span style="color: #0000ff">If</span> Other <span style="color: #0000ff">Is</span> <span style="color: #0000ff">Nothing</span> <span style="color: #0000ff">Then</span>
+        CompareTo = 1
+    <span style="color: #0000ff">Else</span>
+        CompareTo = Comparer.Default.Compare(mTemperatureF, Other.Fahrenheit)
+    <span style="color: #0000ff">End</span> <span style="color: #0000ff">If</span>
+    <span style="color: #0000ff">Exit</span> <span style="color: #0000ff">Function</span>
+    
+Catch:
+    <span style="color: #0000ff">Throw</span> NewArgumentException(<span style="color: #a31515">&quot;Value is not a Temperature&quot;</span>)
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Function</span>
+
+<span style="color: #0000ff">Public</span> <span style="color: #0000ff">Property</span> Get Fahrenheit() <span style="color: #0000ff">As</span> <span style="color: #2b91af">Double</span>
+    Fahrenheit = mTemperatureF
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Property</span>
+
+<span style="color: #0000ff">Public</span> <span style="color: #0000ff">Property</span> Let Fahrenheit(<span style="color: #0000ff">ByVal</span> Value <span style="color: #0000ff">As</span> <span style="color: #2b91af">Double</span>)
+    mTemperatureF = Value
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Property</span>
+
+<span style="color: #0000ff">Public</span> <span style="color: #0000ff">Property</span> Get Celsius() <span style="color: #0000ff">As</span> <span style="color: #2b91af">Double</span>
+    Celsius = (mTemperatureF - 32) * (5# / 9#)
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Property</span>
+
+<span style="color: #0000ff">Public</span> <span style="color: #0000ff">Property</span> Let Celsius(<span style="color: #0000ff">ByVal</span> Value <span style="color: #0000ff">As</span> <span style="color: #2b91af">Double</span>)
+    mTemperatureF = (Value * 9# / 5#) + 32
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Property</span>
+
+
+<span style="color: #008000">&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;</span>
+<span style="color: #008000">&#39;   IComparable</span>
+<span style="color: #008000">&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;</span>
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Function</span> IComparable_CompareTo(Value <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>) <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
+    IComparable_CompareTo = CompareTo(Value)
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Function</span>
+</pre></div>
+<br/>
+<p>The following is a <b>Visual Basic BAS</b> module containing <b>Main</b> start-up method.</p>
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> Temperatures <span style="color: #0000ff">As</span> <span style="color: #0000ff">New</span> ArrayList
+    <span style="color: #0000ff">Dim</span> r <span style="color: #0000ff">As</span> <span style="color: #0000ff">New</span> Random
+    <span style="color: #0000ff">Dim</span> i <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
+    <span style="color: #0000ff">Dim</span> Degrees <span style="color: #0000ff">As</span> <span style="color: #2b91af">Double</span>
+    <span style="color: #0000ff">Dim</span> Temp <span style="color: #0000ff">As</span> Temperature
+    
+    <span style="color: #0000ff">For</span> i = 1 <span style="color: #0000ff">To</span> 10
+        Degrees = r.NextRange(0, 100)
+        <span style="color: #0000ff">Set</span> Temp = <span style="color: #0000ff">New</span> Temperature
+        Temp.Fahrenheit = Degrees
+        Temperatures.Add Temp
+    <span style="color: #0000ff">Next</span>
+    
+    Temperatures.Sort
+    
+    <span style="color: #0000ff">For</span> <span style="color: #0000ff">Each</span> Temp <span style="color: #0000ff">In</span> Temperatures
+        Debug.Print Temp.Fahrenheit
+    <span style="color: #0000ff">Next</span>
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; This code produces the following output (individual values may vary because they are randomly generated):</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    13</span>
+<span style="color: #008000">&#39;    18</span>
+<span style="color: #008000">&#39;    31</span>
+<span style="color: #008000">&#39;    36</span>
+<span style="color: #008000">&#39;    65</span>
+<span style="color: #008000">&#39;    65</span>
+<span style="color: #008000">&#39;    66</span>
+<span style="color: #008000">&#39;    78</span>
+<span style="color: #008000">&#39;    92</span>
+<span style="color: #008000">&#39;    98</span>
+</pre></div>

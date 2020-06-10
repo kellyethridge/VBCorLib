@@ -1,0 +1,83 @@
+@remarks If a <b>Byte</b> array is passed in, then the bytes from the underlying stream are
+copied to the array. If an <b>Integer</b> array is passed in, then enough bytes are read from
+the stream to produce the requested number of decoded characters. The decoded characters
+are placed in the array starting at <i>Index</i>.
+<p>The position within the stream is advanced based on the <a href="Encoding.html">Encoding</a> being used.</p>
+<p>If all parameters are missing then a single character will be decoded from the stream and returned.</p>
+<p>All parameters must either be missing or supplied or an exception is thrown.</p>
+@exceptions
+<table style="width: auto">
+  <tr>
+      <th>Exception</th>
+      <th>Condition</th>
+  </tr>
+   <tr>
+       <td><a href="ObjectDisposedException.html">ObjectDisposedException</a></td><td>The stream is closed.</td>
+   </tr>
+   <tr>
+       <td><a href="IOException.html">IOException</a></td><td>An I/O error occurs.</td>
+   </tr>
+</table>
+@examples This example writes several bytes to a <a href="MemoryStream.html">MemoryStream</a> and read back from the stream bytes and characters depending what parameters are specified.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> Source <span style="color: #0000ff">As</span> <span style="color: #0000ff">New</span> MemoryStream
+    <span style="color: #0000ff">Dim</span> Reader <span style="color: #0000ff">As</span> BinaryReader
+    <span style="color: #0000ff">Dim</span> Bytes(0 <span style="color: #0000ff">To</span> 1) <span style="color: #0000ff">As</span> <span style="color: #2b91af">Byte</span>
+    <span style="color: #0000ff">Dim</span> Chars(0 <span style="color: #0000ff">To</span> 1) <span style="color: #0000ff">As</span> <span style="color: #2b91af">Integer</span>
+    
+    Source.WriteBlock NewBytes(65, 66, 67, 194, 163, 70), 0, 6
+    Source.Position = 0
+    
+    <span style="color: #0000ff">Set</span> Reader = NewBinaryReader(Source)
+    
+    Debug.Print <span style="color: #a31515">&quot;Read next one character.&quot;</span>
+    PrintChar Reader.Read
+    Debug.Print
+    
+    Debug.Print <span style="color: #a31515">&quot;Read next two bytes.&quot;</span>
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;  {0} byte(s) read.&quot;</span>, Reader.Read(Bytes, 0, 2))
+    PrintBytes Bytes
+    Debug.Print
+    
+    Debug.Print <span style="color: #a31515">&quot;Read next two characters.&quot;</span>
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;  {0} character(s) read.&quot;</span>, Reader.Read(Chars, 0, 2))
+    PrintChars Chars
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> PrintChars(<span style="color: #0000ff">ByRef</span> Chars() <span style="color: #0000ff">As</span> <span style="color: #2b91af">Integer</span>)
+    <span style="color: #0000ff">Dim</span> <span style="color: #2b91af">Char</span> <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>
+    
+    <span style="color: #0000ff">For</span> <span style="color: #0000ff">Each</span> <span style="color: #2b91af">Char</span> <span style="color: #0000ff">In</span> Chars
+        PrintChar <span style="color: #2b91af">Char</span>
+    <span style="color: #0000ff">Next</span>
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> PrintChar(<span style="color: #0000ff">ByVal</span> <span style="color: #2b91af">Char</span> <span style="color: #0000ff">As</span> <span style="color: #2b91af">Integer</span>)
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;  {0,3} = &quot;&quot;{0:$}&quot;&quot;&quot;</span>, <span style="color: #2b91af">Char</span>)
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> PrintBytes(<span style="color: #0000ff">ByRef</span> Bytes() <span style="color: #0000ff">As</span> <span style="color: #2b91af">Byte</span>)
+    <span style="color: #0000ff">Dim</span> Value <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>
+    
+    <span style="color: #0000ff">For</span> <span style="color: #0000ff">Each</span> Value <span style="color: #0000ff">In</span> Bytes
+        Debug.Print CorString.Format(<span style="color: #a31515">&quot;  &amp;h{0:X2} &quot;</span>, Value)
+    <span style="color: #0000ff">Next</span>
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; This example code produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    Read next one character.</span>
+<span style="color: #008000">&#39;       65 = &quot;A&quot;</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    Read next two bytes.</span>
+<span style="color: #008000">&#39;      2 byte(s) read.</span>
+<span style="color: #008000">&#39;      &amp;h42</span>
+<span style="color: #008000">&#39;      &amp;h43</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    Read next two characters.</span>
+<span style="color: #008000">&#39;      2 character(s) read.</span>
+<span style="color: #008000">&#39;      163 = &quot;£&quot;</span>
+<span style="color: #008000">&#39;       70 = &quot;F&quot;</span>
+</pre></div>
+@see CorString
+@see Constructors

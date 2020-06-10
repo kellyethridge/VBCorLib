@@ -163,6 +163,12 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use(&HFFFFD800, &HD801&).Expect Iz.Negative
             Test.Use(&HFFFFD801, &HD800&).Expect Iz.Positive
             
+        Case "Compare_WithInvalidAOrB_ThrowsArgumentOutOfRangeException"
+            Test.Use -32769, 0, "a"
+            Test.Use 0, -32769, "b"
+            Test.Use 65536, 0, "a"
+            Test.Use 0, 65536, "b"
+            
         Case "ConvertToUtf32_WithValues_ReturnsExpected"
             Test.Use &HD800, &HDC00, &H10000
             Test.Use &HD800&, &HDC00&, &H10000
@@ -176,6 +182,29 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use t("\xFFFF"), &HFFFF&
             Test.Use t("\xD800\xDC00"), &H10000
             Test.Use t("\xDBFF\xDFFF"), &H10FFFF
+            
+        Case "ConvertToInt32_WithValue_ReturnsExpected"
+            Test.Use Char.MinValue, 0
+            Test.Use Char.MaxValue, &HFFFF&
+            Test.Use &H8000, 32768
+            
+        Case "ConvertFromInt32_WithValue_ReturnsExpected"
+            Test.Use 0, Char.MinValue
+            Test.Use 65535, Char.MaxValue
+            Test.Use 32768, -32768
+            Test.Use &HFFFF8000, &H8000
+            Test.Use &HFFFFFFFF, Char.MaxValue
+
+        Case "ConvertFromUtf32_WithUtf32Value_ReturnsExpected"
+            Test.Use &H41, ChrW$(&H41)
+            Test.Use &H1D161, ChrW$(&HD834) & ChrW$(&HDD61)
+            Test.Use &H8000&, ChrW$(&H8000&)
+            
+        Case "ConvertFromUtf32_WithInvalidUtf32Value_ThrowsArgumentOutOfRangeException"
+            Test.Use -1
+            Test.Use &H110000
+            Test.Use &HD800
+            Test.Use &HDFFF
             
     End Select
 End Sub
@@ -345,6 +374,14 @@ Public Function Compare_WithValues_ReturnsExpected(ByVal a As Long, ByVal b As L
     Compare_WithValues_ReturnsExpected = Char.Compare(a, b)
 End Function
 
+Public Function Compare_WithInvalidAOrB_ThrowsArgumentOutOfRangeException(ByVal a As Long, ByVal b As Long, ByVal InvalidParameter As String)
+    On Error Resume Next
+    
+    Char.Compare a, b
+    
+    AssertArgumentOutOfRangeException Err, InvalidParameter
+End Function
+
 Public Sub ConvertToUtf32_WithValues_ReturnsExpected(ByVal High As Long, ByVal Low As Long, ByVal Expected As Long)
     Dim Actual As Long
     
@@ -393,3 +430,50 @@ Public Sub ConvertToUtf32Str_WithFirstCharAsLowSurrogate_ThrowsArgumentException
      AssertArgumentException Err, "s"
 End Sub
 
+Public Sub ConvertFromUtf32_WithUtf32Value_ReturnsExpected(ByVal Utf32Value As Long, ByVal Expected As String)
+    Dim Actual As String
+    
+    Actual = Char.ConvertFromUtf32(Utf32Value)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub ConvertFromUtf32_WithInvalidUtf32Value_ThrowsArgumentOutOfRangeException(ByVal Utf32Value As Long)
+     On Error Resume Next
+     
+     Char.ConvertFromUtf32 Utf32Value
+     
+     AssertArgumentOutOfRangeException Err, "Utf32"
+End Sub
+
+Public Sub ConvertToInt32_WithValue_ReturnsExpected(ByVal Ch As Integer, ByVal Expected As Long)
+    Dim Actual As Long
+    
+    Actual = Char.ConvertToInt32(Ch)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub ConvertFromInt32_WithValue_ReturnsExpected(ByVal Value As Long, ByVal Expected As Integer)
+    Dim Actual As Integer
+    
+    Actual = Char.ConvertFromInt32(Value)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub ConvertFromInt32_WithTooLargeValue_ThrowsArgumentOutOfRangeException()
+    On Error Resume Next
+    
+    Char.ConvertFromInt32 65536
+    
+    AssertArgumentOutOfRangeException Err, "Value"
+End Sub
+
+Public Sub ConvertFromInt32_WithTooSmallValue_ThrowsArgumentOutOfRangeException()
+    On Error Resume Next
+    
+    Char.ConvertFromInt32 -32769
+    
+    AssertArgumentOutOfRangeException Err, "Value"
+End Sub

@@ -45,6 +45,8 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use 2, 5, 5
             Test.Use NewInt32(2), NewInt32(5), NewInt32(5)
             Test.Use NewInt32(5), NewInt32(2), NewInt32(5)
+            Test.Use Int64.One, Int64.MinusOne, Int64.One
+            Test.Use Int64.MinusOne, Int64.One, Int64.One
         
         Case "Min_WithValues_ReturnsExpected"
             Test.Use 5, 5, 5
@@ -52,6 +54,8 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use 2, 5, 2
             Test.Use NewInt32(2), NewInt32(5), NewInt32(2)
             Test.Use NewInt32(5), NewInt32(2), NewInt32(2)
+            Test.Use Int64.One, Int64.MinusOne, Int64.MinusOne
+            Test.Use Int64.MinusOne, Int64.One, Int64.MinusOne
             
         Case "DivRem_WithValues_ReturnsExpected"
             Test.Use 11, 4, 2, 3
@@ -87,6 +91,21 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use Cor.NewArrayList(Source:=Array(NewDate(#1/1/2001#), NewDate(#1/2/2001#), NewDate(#1/1/2000#))), NewDate(#1/2/2001#)
             Test.Use New ArrayList, Empty
         
+        Case "BigMul_WithValues_ReturnsExpected"
+            Test.Use 10, 20, CInt64(200)
+            Test.Use 10, -20, CInt64(-200)
+            Test.Use -10, 20, CInt64(-200)
+            Test.Use -10, -20, CInt64(200)
+            Test.Use &H7FFFFFFF, &H7FFFFFFF, CInt64("4611686014132420609")
+            
+        Case "Clamp_WithValues_ReturnsExpected"
+            Test.Use 5, 1, 10, 5
+            Test.Use 0, 1, 10, 1
+            Test.Use 11, 1, 10, 10
+            Test.Use CInt64(5), CInt64(1), CInt64(10), CInt64(5)
+            Test.Use CInt64(0), CInt64(1), CInt64(10), CInt64(1)
+            Test.Use CInt64(11), CInt64(1), CInt64(10), CInt64(10)
+            
     End Select
 End Sub
 
@@ -124,44 +143,59 @@ End Sub
 
 Public Sub Min_WithValues_ReturnsExpected(ByRef Value1 As Variant, ByRef Value2 As Variant, ByRef Expected As Variant)
     Dim Actual As Variant
-    
+
     MoveVariant Actual, Min(Value1, Value2)
-    
+
     Assert.That Actual, Equals(Expected)
 End Sub
 
 Public Sub Max_WithNonComparable_ThrowsArgumentException()
     On Error Resume Next
-    
+
     Max Me, New CorMathTests
-    
+
     AssertArgumentException Err
 End Sub
 
 Public Sub DivRem_WithValues_ReturnsExpected(ByVal a As Long, ByVal b As Long, ByVal ExpectedQ As Long, ByVal ExpectedR As Long)
     Dim ActualQ As Long
     Dim ActualR As Long
-    
+
     ActualQ = DivRem(a, b, ActualR)
-    
+
     Assert.That ActualQ, Iz.EqualTo(ExpectedQ)
     Assert.That ActualR, Iz.EqualTo(ExpectedR)
 End Sub
 
 Public Sub MinIn_WithValues_ReturnsExpected(ByRef List As Variant, ByRef Expected As Variant)
     Dim Actual As Variant
-    
+
     MoveVariant Actual, MinIn(List)
-    
+
     Assert.That Actual, Equals(Expected)
 End Sub
 
 Public Sub MaxIn_WithValues_ReturnsExpected(ByRef List As Variant, ByRef Expected As Variant)
     Dim Actual As Variant
-    
+
     MoveVariant Actual, MaxIn(List)
-    
+
     Assert.That Actual, Equals(Expected)
 End Sub
 
+Public Sub BigMul_WithValues_ReturnsExpected(ByVal a As Long, ByVal b As Long, ByRef Expected As Int64)
+    Dim Actual As Int64
+    
+    Actual = BigMul(a, b)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub Clamp_WithValues_ReturnsExpected(ByRef Value As Variant, ByRef Min As Variant, ByRef Max As Variant, ByRef Expected As Variant)
+    Dim Actual As Variant
+    
+    Actual = CorMath.Clamp(Value, Min, Max)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
 

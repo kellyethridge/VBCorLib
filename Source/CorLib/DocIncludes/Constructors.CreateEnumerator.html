@@ -1,0 +1,7 @@
+@examples The following example shows a typical usage of <b>CreateEnumerator</b> within the <b>NewEnum</b> method that an enumerable class implements.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Function</span> NewEnum() <span style="color: #0000ff">As</span> IUnknown
+    <span style="color: #0000ff">Dim</span> en <span style="color: #0000ff">As</span> <span style="color: #0000ff">New</span> MyEnumerator
+    en.Init <span style="color: #0000ff">Me</span>
+    <span style="color: #0000ff">Set</span> NewEnum = CreateEnumerator(en)
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Function</span>
+</pre></div>

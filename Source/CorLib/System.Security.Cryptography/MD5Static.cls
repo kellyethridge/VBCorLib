@@ -34,9 +34,20 @@ Attribute VB_Exposed = True
 '
 ' Module: MD5Static
 '
+
+''
+' Represents the abstract class from which all implementations of the <a href="MD5.html">MD5</a> hash algorithm inherit.
+'
+' @see MD5
+' @see MD5CryptoServiceProvider
 Option Explicit
 
+''
+' Creates an instance of the specified implementation of the <a href="MD5.html">MD5</a> hash algorithm.
+'
+' @param HashName The name of the specific implementation of <a href="MD5.html">MD5</a> to use.
+' @return A new instance of the specified implementation of <a href="MD5.html">MD5</a>.
+' @remarks Possible values for <i>HashName</i> are <b>MD5</b>, <b>CorLib.MD5</b>, <b>CorLib.MD5CryptoServiceProvider</b>, and <b>CorLib.MD5Managed</b>.
 Public Function Create(Optional ByRef HashName As String = "CorLib.MD5") As MD5
     Set Create = CryptoConfig.CreateFromName(HashName)
 End Function
-

@@ -65,7 +65,7 @@ End Property
 ' @param Calendar The <a href="Calendar.html">Calendar</a> object.
 ' @return The <a href="Calendar.html">Calendar</a> object specified by the calendar parameter, if calendar is read-only.<br/>
 ' -or-<br/>
-' A read-only memberwise clone of the <a href="Calendar.html">Calendar</a> object specified by <i>calendar</i>, if <i>calendar</i> is not read-only.
+' A read-only memberwise clone of the <a href="Calendar.html">Calendar</a> object specified by <i>Calendar</i>, if <i>Calendar</i> is not read-only.
 '
 Public Function ReadOnly(ByVal Calendar As Calendar) As Calendar
     If Calendar Is Nothing Then _
@@ -209,8 +209,12 @@ Friend Function AddMonths(ByVal Calendar As Calendar, ByRef Time As Variant, ByV
     End Select
     
     Dim MaxDays As Long
-    MaxDays = CorDateTime.DaysInMonth(Year, Month)
-    
+    If CorDateTime.IsLeapYear(Year) Then
+        MaxDays = DaysToMonthLeapYear(Month) - DaysToMonthLeapYear(Month - 1)
+    Else
+        MaxDays = DaysToMonth(Month) - DaysToMonth(Month - 1)
+    End If
+        
     If Day > MaxDays Then
         Day = MaxDays
     End If

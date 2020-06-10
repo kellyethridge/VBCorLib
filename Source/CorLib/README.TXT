@@ -1,5 +1,10 @@
 ** VBCorLib **
 
+version 3.x
+	* Fixed CorArray.Clear not releasing reference types correctly for Variant().
+	* Fixed BigInteger default output formatting was falling back to exponent when is should never.
+	* Fixed BigInteger default output formatting was not padding with leading zeros.
+
 version 3.0 (BREAKING CHANGES)
 	* Renamed cArray to CorArray.
 	* Renamed cString to CorString.
@@ -15,7 +20,6 @@ version 3.0 (BREAKING CHANGES)
 	* Updated CorArray.CreateInstance to support multi-dimension arrays with selected 0 lengths.
 	* Removed ciArrayTypes. Replaced with VbVarType. *BREAKING*
 	* Removed CorArray.NewArray. *BREAKING*
-	* Renamed CorArray.GetLength to CorArray.Length.
 	* Renamed CorArray.GetRank to CorArray.Rank.
 	* Fixed missing floating point leading zero before decimal.
 	* Fixed max negative Long not displaying correct number.
@@ -44,7 +48,8 @@ version 3.0 (BREAKING CHANGES)
 	* Added Char static class.
 	* Fixed CorDateTime.ToLocalTime and CorDateTime.ToUniversalTime. Were not setting corret DateTimeKind.
 	* Removed 'Format' parameter from Convert.ToString to align with .NET.
-	* Added StringComparer class with Ordinal and OrdinalIgnoreCase implementations.
+	* Added StringComparer interface.
+	* Added corrisponding .NET and Visual Basic StrComp StringComparer implementations.
 	* Removed IHashCodeProvider. *BREAKING*
 	* Added IEqualityComparer.
 	* Updated Hashtable to use IEqualityComparer instead of IHashCodeProvider/IComparer combination. *BREAKING*
@@ -55,7 +60,8 @@ version 3.0 (BREAKING CHANGES)
 	* CorString.Join method signature changed to match .NET. *BREAKING*
 	* CorString.Join Separator is now required.
 	* CorString.Join improved to support any array or enumerable collection of items.
-	* Added Restart to StopWatch class.
+	* Added CorString.IsNullOrWhiteSpace method.
+	* Added Restart method to StopWatch class.
 	* Removed RSAParameters InverseQ property from serialization process.
 	* Updated SecurityElement Attributes property to match .NET characteristics.
 	* Fixed SecurityElement AddAttributes. Should throw ArgumentException when adding duplicate attribute name.
@@ -95,7 +101,79 @@ version 3.0 (BREAKING CHANGES)
 	* Implemented IResourceWriter.CloseWriter in IniResourceWriter.
 	* Fixed tests that would break when run against a compiled VBCorLib.
 	* Fixed BitMapResourceDecoder. Was crashing when compiled because of improper release of resources.
-
+	* Removed WeakReference class because it is severely limited and unstable.
+	* Added CorArray.IsNullOrEmpty method.
+	* Added optional parameters to Path.Combine method.
+	* Added Path.CombineArray method.
+	* Renamed incorrectly spelled static method TimeSpan.CompareTo to TimeSpan.Compare.
+	* Added formatting functionality to TimeSpan.ToString method.
+	* Added StringBuilder.AppendFormatArray and StringBuilder.AppendFormatArrayEx methods.
+	* Changed StringReader contructor to accept parameter indicating of string should be copied, replacing parameter indicating string should be stolen. *BREAKING*
+	* Fixed CorDateTime.ToAODAte. Would round to incorrect time when having enough milliseconds.
+	* Added Int64 user-defined type.
+	* Added user-defined type support in ObjectStatic.
+	* Re-implemented MemoryMappedFile to create a MemoryMappedViewAccessor.
+	* Added MemoryMappedViewAccessor to access mapped views of a file.
+	* Fixed MemoryStream. Should throw ObjectDisposedException when reading Position property when closed.
+	* Re-implemented MemoryMappedFile to align with .NET 4.0.
+	* Added CopyTo method to Stream interface to align with .NET 4.0.
+	* Renamed IVersionableCollection interface to IVersionable.
+	* Added ReadInt64 to BinaryReader to support Int64 structure.	
+	* Added support for Int64 to BinaryWriter.WriteValue method.
+	* Renamed BitConverter class ToLong and ToInteger to ToInt32 and ToInt16 to match .NET. *BREAKING*
+	* Changed BinaryReader.ReadDate to read binary data that represents ticks to match .NET. *BREAKING*
+	* Changed BinaryWriter.WriteDate to write binary data that represents ticks to match .NET. *BREAKING*
+	* Changed BitConverter class to handle Date as ticks to match .NET. *BREAKING*
+	* Added Int64 static methods for manipulating and creating an Int64 data-type.
+	* Added CInt64 for easy conversion to Int64 data-type.
+	* Added support for BigInteger to be initialized from an Int64.
+	* Fixed NewCultureInfo(String). Should not be case-sensitive.
+	* Fixed BinaryWriter.SeekPostion. Was not returning new position.
+	* Fixed BinaryWriter.WriteChar. Was not converting large 32-bit values to 16-bit correctly.
+	* Added charactor formatting for Long, Integer, Byte, and Int64 to Object.ToString method. '$' forces the numeric value to converted to a character.
+	* Replaced CorString.FromCharArray with NewString constructor.
+	* Added BigMul to CorMath class.
+	* Added Int64 support to CorMath.Max and CorMath.Min methods.
+	* Added .NET style formatting to Decimal data-type.
+	* Changed data-type for NumberFormatInfo.PercentGroupSizes and NumberFormatInfo.NumberGroupSizes properties from Variant to Long().
+	* Improved support for custom numeric formatting when using Object.ToString method.
+	* Added Int64.ToDecimal method.
+	* Added Int64.IsNegative method.
+	* Changed BitConverter.DoubleToInt64Bits and BitConverter.Int64BitsToDouble to use Int64 data-type instead of Currency.
+	* Changed CorArray.GetLength to require Dimension parameter to match .NET.
+	* Added CorArray.Length method to return total of all elements in an array to match .NET.
+	* Added CorMath.Clamp method.
+	* Added BitConverter.Int64BitsToCurrency and BitConverter.CurrencyToInt64Bits methods.
+	* Added Int64 support in NewDecimals method.
+	* Added NewInt64s array constructor.
+	* Added IsDaylightSavingTime to TimeZoneStatic to match .NET.
+	* Removed optional daylightTimes parameter from TimeZone to match .NET.
+	* Added global public function t() used to replace escaped character sequences with literal versions.
+	* Added BitConverter.SingleToInt32Bits and BitConverter.Int32BitsToSingle method pair.
+	* Added CorString.CopyTo method.
+	* Added CorString.StartsWith method.
+	* Added CorString.EndsWith method.
+	* Added CorString.Split method.
+	* Changed CorArray.CopyEx to enforce matching ranks between source and destination arrays.
+	* Added UTF32Encoding class.
+	* Added UTF32Encoding BOM detection in StreamReader class.
+	* Fixed StreamWriter to write Preamble to any stream type as long as we are at the beginning of the stream.
+	* Fixed StreamWriter AutoFlush. When setting to true it should cause the writer to immediately flush.
+	* Added LeaveOpen constructor option to StreamWriter to match .NET.
+	* Added CorString.Equals method.
+	* Added CorString.Compare(Ex), CorString.CompareCultural(Ex), and CorString.CompareOrdinal(Ex) methods.
+	* Fixed Console.Out and Console._In not initialzing with Console.OutputEncoding and Console.InputEncoding respectively.
+	* Added Comparer.DefaultInvariant.
+	* Added CaseInsensitiveComparer.DefaultInvariant.
+	* Fixed Comparer.Default; should use culture-sensitive comparison.
+	* Fixed CaseInsensitiveCompare.Default; should use culture-sensistive comparison.
+	* Fixed CorArray.Sort; when sorting strings, should be culture aware. * may produce different results from previous. *
+	* Improved CorArray.Sort when sorting strings.
+	* Re-implemented global CharToLong and LongToChar methods to Char.ConvertToInt32 and Char.ConvertFromInt32 methods.
+	* Renamed BInt public method to CBigInt to align better with conversion method naming conventions.
+	* Re-implemented global CharAt method to CorString.CharAt method.
+	* Added CorString.StartsWithEx and CorString.EndsWithEx to support specified cultures.
+	
 version 2.3
 	* Updated ASM code to not trigger DEP protection.
 	* Updated ArrayList to include the ArrayList.Adapter method, wrapping an IList object.

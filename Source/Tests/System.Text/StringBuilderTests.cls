@@ -51,11 +51,12 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "hahahahahahahahahaha", "ha", "blahblah", "blahblahblahblahblahblahblahblahblahblahblahblahblahblahblahblahblahblahblahblah"
             Test.Use "blahblahblahblahblahblahblahblahblahblahblahblahblahblahblahblahblahblahblahblah", "blahblah", "ha", "hahahahahahahahahaha"
             Test.Use "abcabcabc", "abcf", "", "abcabcabc"
+            Test.Use "aaaaaaaaab", "aaaaaaaab", "1", "a1"
+            Test.Use "aabaabaaaa", "aabaaa", "1", "aab1a"
             
         Case "AppendString_WithValue_AppendText"
             Test.Use "bye", "hellobye"
             Test.Use "", "hello"
-            
     End Select
 End Sub
 
@@ -699,14 +700,44 @@ Public Sub AppendFormat_WithMultiplePlaceHolders_FormatsEach()
     Assert.That Actual, Iz.EqualTo("a b")
 End Sub
 
+Public Sub AppendFormat_WithObjectPlaceHolder_FormatsObject()
+    Dim sb As New StringBuilder
+    Dim Span As Variant
+    
+    Set Span = TimeSpan.Zero
+    sb.AppendFormat "{0}", Span
+    
+    Assert.That sb.ToString, Iz.EqualTo("00:00:00")
+End Sub
+
+Public Sub AppendFormat_WithInt64InVariant_FormatsObject()
+    Dim sb As New StringBuilder
+    Dim Value As Variant
+    
+    Value = CInt64(4)
+    sb.AppendFormat "{0}", Value
+    
+    Assert.That sb.ToString, Iz.EqualTo("4")
+End Sub
+
+Public Sub AppendFormat_WithInt32InVariant_FormatsObject()
+    Dim sb As New StringBuilder
+    Dim Value As Variant
+    
+    Value = 4&
+    sb.AppendFormat "{0}", Value
+    
+    Assert.That sb.ToString, Iz.EqualTo("4")
+End Sub
+
 Public Sub AppendFormat_WithRepeatedPlaceHolder_RepeatsFormat()
     Dim sb As New StringBuilder
     
-    sb.AppendFormat "{0} {0}", "a"
+    sb.AppendFormat "{0} {0}", CInt64(4)
     
     Dim Actual As String
     Actual = sb.ToString
-    Assert.That Actual, Iz.EqualTo("a a")
+    Assert.That Actual, Iz.EqualTo("4 4")
 End Sub
 
 Public Sub AppendFormat_WithUnpairedOpenBrace_ThrowsFormatException()

@@ -75,7 +75,13 @@ End Sub
 Friend Sub Win32Error(ByVal ErrorCode As Long)
     Dim Message As String
     Message = GetMessage(ErrorCode)
-    Throw Cor.NewApplicationException(Message)
+    
+    Select Case ErrorCode
+        Case ERROR_ACCESS_DENIED
+            Throw Cor.NewUnauthorizedAccessException(Message)
+        Case Else
+            Throw Cor.NewApplicationException(Message)
+    End Select
 End Sub
 
 Friend Sub Format(ByVal Key As ResourceStringKey)

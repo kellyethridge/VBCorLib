@@ -1,0 +1,42 @@
+@remarks <p>The <i>Style</i> parameter defines the style elements (such as white space or the positive sign) that are allowed in the <i>s</i> parameter for the parse operation to succeed. It must be a combination of bit flags from the <a href="NumberFormatInfoStatic.NumberStyles.html">NumberStyles</a> enumeration. Depending on the value of <i>Style</i>, the <i>s</i> parameter may include the following elements:</p>
+<p>[ws][$][sign][digits,]digits[.fractional_digits][e[sign]exponential_digits][ws]</p>
+<p>Or, if style includes <a href="NumberFormatInfoStatic.NumberStyles.html">AllowHexSpecifier</a>:</p>
+<p>[ws]hexdigits[ws]</p>
+<p>Elements in square brackets ([ and ]) are optional. The following table describes each element.</p>
+<table style="width: auto">
+  <tr>
+      <th>Element</th>
+      <th>Description</th>
+  </tr>
+  <tr>
+       <td><i>ws</i></td><td>Optional white space. White space can appear at the beginning of <i>s</i> if <i>Style</i> includes the <a href="NumberFormatInfoStatic.NumberStyles.html">NumberStyles.AllowLeadingWhite</a> flag, and it can appear at the end of <i>s</i> if <i>Style</i> includes the <a href="NumberFormatInfoStatic.NumberStyles.html">NumberStyles.AllowTrailingWhite</a> flag.</td>
+  </tr>
+   <tr>
+       <td><i>$</i></td><td>A culture-specific currency symbol. Its position in the string is defined by the <a href="NumberFormatInfo.get.CurrencyPositivePattern.html">NumberFormatInfo.CurrencyPositivePattern</a> property of the <a href="NumberFormatInfo.html">NumberFormatInfo</a> object returned by the <a href="IFormatProvider.GetFormat.html">GetFormat</a> method of the <i>Provider</i> parameter. The currency symbol can appear in <i>s</i> if style includes the <a href="NumberFormatInfoStatic.NumberStyles.html">NumberStyles.AllowCurrencySymbol</a> flag.</td>
+   </tr>
+   <tr>
+       <td>
+          <i>digits</i><br/>
+          <i>fractional_digits</i><br/>
+          <i>expontial_digits</i>
+       </td>
+       <td>A sequence of digits from 0 through 9.</td>
+   </tr>
+   <tr>
+       <td><i>,</i></td><td>A culture-specific thousands separator symbol. The thousands separator of the culture specified by <i>Provider</i> can appear in <i>s</i> if <i>Style</i> includes the <a href="NumberFormatInfoStatic.NumberStyles.html">NumberStyles.AllowThousands</a> flag.</td>
+   </tr>
+   <tr>
+       <td><i>.</i></td>
+       <td>
+          A culture-specific decimal point symbol. The decimal point symbol of the culture specified by <i>Provider</i> can appear in <i>s</i> if style includes the <a href="NumberFormatInfoStatic.NumberStyles.html">NumberStyles.AllowDecimalPoint</a> flag.<br/>
+          Only the digit 0 can appear as a fractional digit for the parse operation to succeed; if <i>fractional_digits</i> includes any other digit, an <a href="OverflowException.html">OverflowException</a> is thrown.
+       </td>
+   </tr>
+   <tr>
+       <td><i>e</i></td><td>The 'e' or 'E' character, which indicates that the value is represented in exponential notation. The <i>s</i> parameter can represent a number in exponential notation if <i>Style</i> includes the <a href="NumberFormatInfoStatic.NumberStyles.html">NumberStyles.AllowExponent</a> flag.</td>
+   </tr>
+   <tr>
+       <td><i>hexdigits</i></td><td>A sequence of hexadecimal digits from 0 through f, or 0 through F.</td>
+   </tr>
+</table>
+<p>A string expression beginning with "0x" or "&h" will be parsed as a hex value.</p>

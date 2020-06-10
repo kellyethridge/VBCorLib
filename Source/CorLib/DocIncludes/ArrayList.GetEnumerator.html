@@ -1,62 +1,67 @@
-@remarks <h4>Example</h4>
+@examples
 This example shows several methods of enumerating over an <b>ArrayList</b> object.
-<pre>
-Private Sub Main()
-    Dim list As New ArrayList
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> List <span style="color: #0000ff">As</span> <span style="color: #0000ff">New</span> ArrayList
     
-    list.Add "The"
-    list.Add "quick"
-    list.Add "brown"
-    list.Add "fox"
+    List.Add <span style="color: #a31515">&quot;The&quot;</span>
+    List.Add <span style="color: #a31515">&quot;quick&quot;</span>
+    List.Add <span style="color: #a31515">&quot;brown&quot;</span>
+    List.Add <span style="color: #a31515">&quot;fox&quot;</span>
     
-    '' Display the words using the standard For..Each method.
-    Console.WriteLine "Using For..Each"
-    IterateUsingForEach list
+    <span style="color: #008000">&#39; Display the words using the standard For..Each method.</span>
+    Debug.Print <span style="color: #a31515">&quot;Using For..Each&quot;</span>
+    IterateUsingForEach List
     
-    '' Display the words using the enumerator manually.
-    Console.WriteLine "Using an Enumerator"
-    IterateUsingEnumerator list
+    <span style="color: #008000">&#39; Display the words using the enumerator manually.</span>
+    Debug.Print <span style="color: #a31515">&quot;Using an Enumerator&quot;</span>
+    IterateUsingEnumerator List
     
-    '' Display a subset of the list using For..Each.
-    Console.WriteLine "Itertate Subset"
-    IterateSubset list, 1, 2
-    
-End Sub
+    <span style="color: #008000">&#39; Display a subset of the list using For..Each.</span>
+    Debug.Print <span style="color: #a31515">&quot;Itertate Subset&quot;</span>
+    IterateSubset List, 1, 2
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
 
-Private Sub IterateUsingForEach(ByVal list As ArrayList)
-    Dim word As Variant
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> IterateUsingForEach(<span style="color: #0000ff">ByVal</span> List <span style="color: #0000ff">As</span> ArrayList)
+    <span style="color: #0000ff">Dim</span> Word <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>
     
-    For Each word In list
-        Console.WriteValue vbTab & word
-    Next word
-    Console.WriteLine
-End Sub
-
-Private Sub IterateUsingEnumerator(ByVal list As ArrayList)
-    Dim en As IEnumerator
+    <span style="color: #0000ff">For</span> <span style="color: #0000ff">Each</span> Word <span style="color: #0000ff">In</span> List
+        Debug.Print vbTab &amp; Word<span style="border: 1px solid #FF0000">;</span>
+    <span style="color: #0000ff">Next</span> Word
     
-    Set en = list.GetEnumerator
-    Do While en.MoveNext
-        Console.WriteValue vbTab & en.Current
-    Loop
-    Console.WriteLine
-End Sub
+    Debug.Print
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
 
-Private Sub IterateSubset(ByVal list As ArrayList, ByVal StartIndex As Long, ByVal Count As Long)
-    Dim word As Variant
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> IterateUsingEnumerator(<span style="color: #0000ff">ByVal</span> List <span style="color: #0000ff">As</span> ArrayList)
+    <span style="color: #0000ff">Dim</span> En <span style="color: #0000ff">As</span> IEnumerator
     
-    For Each word In list.GetEnumerator(StartIndex, Count)
-        Console.WriteLine "word is {0}", word
-    Next word
-End Sub
+    <span style="color: #0000ff">Set</span> En = List.GetEnumerator
+    
+    <span style="color: #0000ff">Do</span> <span style="color: #0000ff">While</span> En.MoveNext
+        Debug.Print vbTab &amp; En.Current<span style="border: 1px solid #FF0000">;</span>
+    <span style="color: #0000ff">Loop</span>
+    
+    Debug.Print
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
 
-'' The following output is produced by this code.
-''
-'' Using For..Each
-''     The    quick    brown    fox
-'' Using an Enumerator
-''     The    quick    brown    fox
-'' Iterate Subset
-'' word is quick
-'' word is brown
-</pre>
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> IterateSubset(<span style="color: #0000ff">ByVal</span> List <span style="color: #0000ff">As</span> ArrayList, <span style="color: #0000ff">ByVal</span> StartIndex <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>, <span style="color: #0000ff">ByVal</span> Count <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>)
+    <span style="color: #0000ff">Dim</span> Word <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>
+    <span style="color: #0000ff">Dim</span> En <span style="color: #0000ff">As</span> IEnumerator
+    
+    <span style="color: #0000ff">Set</span> En = List.GetEnumerator(StartIndex, Count)
+    
+    <span style="color: #0000ff">Do</span> <span style="color: #0000ff">While</span> En.MoveNext
+        Debug.Print CorString.Format(<span style="color: #a31515">&quot;{0}word is &#39;{1}&#39;&quot;</span>, vbTab, En.Current)
+    <span style="color: #0000ff">Loop</span>
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; The following output is produced by this code.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    Using For..Each</span>
+<span style="color: #008000">&#39;        The    quick    brown    fox</span>
+<span style="color: #008000">&#39;    Using an Enumerator</span>
+<span style="color: #008000">&#39;        The    quick    brown    fox</span>
+<span style="color: #008000">&#39;    Itertate Subset</span>
+<span style="color: #008000">&#39;        word is &#39;quick&#39;</span>
+<span style="color: #008000">&#39;        word is &#39;brown&#39;</span>
+</pre></div>
+

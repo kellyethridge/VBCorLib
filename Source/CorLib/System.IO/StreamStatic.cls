@@ -44,6 +44,7 @@ Attribute VB_Exposed = True
 Option Explicit
 
 Private mNullStream As New NullStream
+Private mUTF8NoBOMAndThrows As UTF8Encoding
 
 ''
 ' Returns a Stream object with no backing store.
@@ -54,3 +55,40 @@ Public Property Get NullStream() As Stream
     Set NullStream = mNullStream
 End Property
 
+Friend Property Get UTF8NoBOMAndThrows() As UTF8Encoding
+    If mUTF8NoBOMAndThrows Is Nothing Then
+        Set mUTF8NoBOMAndThrows = Cor.NewUTF8Encoding(False, True)
+    End If
+    
+    Set UTF8NoBOMAndThrows = mUTF8NoBOMAndThrows
+End Property
+
+Friend Sub CopyTo(ByVal Source As Stream, ByVal Destination As Stream, ByVal BufferSize As Long)
+    Dim Buffer() As Byte
+    Dim ReadCount As Long
+    
+    If Source Is Nothing Then _
+        Error.ArgumentNull "Source"
+    If Destination Is Nothing Then _
+        Error.ArgumentNull "Destination"
+    If BufferSize < 1 Then _
+        Error.ArgumentOutOfRange "BufferSize", ArgumentOutOfRange_NeedPosNum
+    If Not Source.CanRead And Not Source.CanWrite Then _
+        Throw Cor.NewObjectDisposedException("Source", Environment.GetResourceString(ObjectDisposed_StreamClosed))
+    If Not Destination.CanRead And Not Destination.CanWrite Then _
+        Throw Cor.NewObjectDisposedException("Destination", Environment.GetResourceString(ObjectDisposed_StreamClosed))
+    If Not Source.CanRead Then _
+        Error.NotSupported NotSupported_UnreadableStream
+    If Not Destination.CanWrite Then _
+        Error.NotSupported NotSupported_UnwritableStream
+    
+    ReDim Buffer(0 To BufferSize - 1)
+    
+    Do
+        ReadCount = Source.ReadBlock(Buffer, 0, BufferSize)
+        
+        If ReadCount > 0 Then
+            Destination.WriteBlock Buffer, 0, ReadCount
+        End If
+    Loop While ReadCount = BufferSize
+End Sub

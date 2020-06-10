@@ -1,29 +1,25 @@
-@remarks The following example demonstrates how to write output to
-the console using the <b>WriteLine</b> method. There are 3 ways to
-use the <b>WriteLine</b> method effectively, and they are shown below.
-<pre>
-Private Sub Main()
-    '' writes a NewLine to the console
+@examples The following example demonstrates how to write output to the console using the <b>WriteLine</b> method. There are 3 ways to use the <b>WriteLine</b> method effectively, and they are shown below.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #008000">&#39; writes a NewLine to the console</span>
     Console.WriteLine
     
-    '' writes a string followed by a NewLine
-    Console.WriteLine "Hello"
+    <span style="color: #008000">&#39; writes a string followed by a NewLine</span>
+    Console.WriteLine <span style="color: #a31515">&quot;Hello&quot;</span>
     
-    '' writes a formatted string using the
-    '' supplied parameters, followed by a NewLine
-    Console.WriteLine "Hello, {0}", "Kelly"
+    <span style="color: #008000">&#39; writes a formatted string using the</span>
+    <span style="color: #008000">&#39; supplied parameters, followed by a NewLine</span>
+    Console.WriteLine <span style="color: #a31515">&quot;Hello, {0}&quot;</span>, <span style="color: #a31515">&quot;Kelly&quot;</span>
     
-    Console.WriteLine "Press Return"
-    Console.ReadLine    '' waits for return key to continue
-    
-    '' The above code outputs
-    ''
-    '' (Blank Line)
-    '' Hello
-    '' Hello, Kelly
-    '' Press Return
-End Sub
-</pre>
+    Console.WriteLine <span style="color: #a31515">&quot;Press Return&quot;</span>
+    Console.ReadLine    <span style="color: #008000">&#39; waits for return key to continue</span>
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; This example produces the following output.</span>
+<span style="color: #008000">&#39; (Blank Line)</span>
+<span style="color: #008000">&#39; Hello</span>
+<span style="color: #008000">&#39; Hello, Kelly</span>
+<span style="color: #008000">&#39; Press Return</span>
+</pre></div>
 As you can see, the <b>WriteLine</b> method accepts a variaty of
 parameters to create differently formatted outputs to the Console.
 The first parameter is the string to be written to the console, while

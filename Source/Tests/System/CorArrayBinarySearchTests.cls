@@ -61,6 +61,12 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use Array(NewInt32(1), NewInt32(2), NewInt32(3), NewInt32(4), NewInt32(5)), NewInt32(1), 0
             Test.Use Array(NewInt32(1), NewInt32(2), NewInt32(3), NewInt32(4), NewInt32(5)), NewInt32(3), 2
             Test.Use Array(NewInt32(1), NewInt32(2), NewInt32(3), NewInt32(4), NewInt32(5)), NewInt32(5), 4
+            Test.Use NewInt64s(1, 2, 3, 4, 5), CInt64(1), 0
+            Test.Use NewInt64s(1, 2, 3, 4, 5), 3, 2
+            Test.Use NewInt64s(1, 2, 3, 4, 5), CInt64(5), 4
+            Test.Use NewInt64s(1), CInt64(1), 0
+            Test.Use NewInt64s(1), 0, -1
+            Test.Use NewInt64s(1), CInt64(2), -2
             
     End Select
 End Sub

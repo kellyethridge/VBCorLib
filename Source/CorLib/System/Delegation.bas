@@ -53,6 +53,8 @@ Private mLocalVTablePtr     As Long
 Private mVTable             As DelegateVTable
 Private mOkVTablePtr        As Long
 Private mFailVTablePtr      As Long
+Private mFunc_T_T_LongDel   As Delegate
+Private mFunc_T_T_T_StringDel As Delegate
 
 
 ''
@@ -61,29 +63,86 @@ Private mFailVTablePtr      As Long
 '
 ' @param pfn The address to function to be called.
 ' @return A lightweight COM object used to call a function.
-'
+' @remarks When using this method of delegate creation by a class that will live for the
+' duration of an application, the class should unhook the reference using ObjectPtr instead
+' of letting the reference be set to Nothing and causing a call to the Release method in this
+' module. This is to prevent a possible call to the Release method after this module has been
+' deallocated during the tear-down phase of an application, since the delegate may be deallocated
+' after this module.
 Public Function NewDelegate(ByVal pfn As Long) As IUnknown
-    Init
-
     Dim This As Long
+    
+    Init
     This = CoTaskMemAlloc(SizeOfLocalDelegate)
+    
     If This = vbNullPtr Then _
         Throw New OutOfMemoryException
     
     mDelegateTemplate.pfn = pfn
     mDelegateTemplate.pVTable = mLocalVTablePtr
-        
     CopyMemory ByVal This, mDelegateTemplate, SizeOfLocalDelegate
     ObjectPtr(NewDelegate) = This
 End Function
 
+''
+' Initializes an existing delegate light-weight object with an optional function pointer.
+'
+' @param Struct The delegate object to be initialized.
+' @param pfn The initial function pointer the delegate will be set to.
+' @return An object reference to the delegate passed in.
+' @remarks When using this method of delegate creation by a class that will live for the
+' duration of an application, the class should unhook the reference using ObjectPtr instead
+' of letting the reference be set to Nothing and causing a call to the Release method in this
+' module. This is to prevent a possible call to the Release method after this module has been
+' deallocated during the tear-down phase of an application, since the delegate may be deallocated
+' after this module.
 Public Function InitDelegate(ByRef Struct As Delegate, Optional ByVal pfn As Long) As IUnknown
     Init
-    
     Struct.pfn = pfn
     Struct.pVTable = mOkVTablePtr
-    
     ObjectPtr(InitDelegate) = VarPtr(Struct)
+End Function
+
+Public Function CallFunc_T_T_Long(ByVal lpFunc As Long, ByVal lpArg1 As Long, ByVal lpArg2 As Long) As Long
+    Dim Caller As Func_T_T_Long
+    
+    Init
+    mFunc_T_T_LongDel.pfn = lpFunc
+    ObjectPtr(Caller) = VarPtr(mFunc_T_T_LongDel)
+    
+    On Error GoTo Catch
+    CallFunc_T_T_Long = Caller.Invoke(ByVal lpArg1, ByVal lpArg2)
+    
+    GoSub Finally
+    Exit Function
+    
+Catch:
+    GoSub Finally
+    ThrowOrErr Err
+Finally:
+    ObjectPtr(Caller) = vbNullPtr
+    Return
+End Function
+
+Public Function CallFunc_T_T_T_String(ByVal lpFunc As Long, ByVal lpArg1 As Long, ByVal lpArg2 As Long, ByVal lpArg3 As Long) As String
+    Dim Caller As Func_T_T_T_String
+    
+    Init
+    mFunc_T_T_T_StringDel.pfn = lpFunc
+    ObjectPtr(Caller) = VarPtr(mFunc_T_T_T_StringDel)
+    
+    On Error GoTo Catch
+    CallFunc_T_T_T_String = Caller.Invoke(ByVal lpArg1, ByVal lpArg2, ByVal lpArg3)
+    
+    GoSub Finally
+    Exit Function
+    
+Catch:
+    GoSub Finally
+    ThrowOrErr Err
+Finally:
+    ObjectPtr(Caller) = vbNullPtr
+    Return
 End Function
 
 
@@ -118,6 +177,9 @@ Private Sub Init()
             mOkVTablePtr = VarPtr(.Func(0))
             mFailVTablePtr = VarPtr(.Func(4))
         End With
+        
+        mFunc_T_T_LongDel.pVTable = mOkVTablePtr
+        mFunc_T_T_T_StringDel.pVTable = mOkVTablePtr
     End If
 End Sub
 

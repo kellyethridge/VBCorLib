@@ -36,13 +36,14 @@ Attribute VB_Exposed = True
 '
 
 ''
-' This class represent a proxy as a base class for those classes that implement IObject.
+' This class represent a proxy as a base class for those classes that implement <a href="IObject.html">IObject</a>.
 ' It is intended to give default behavior for the three main methods of the Object class in .NET.
-' The base class is accessed using the MyBase global static property.
+' The base class is accessed using the <a href="StaticClasses.Get.MyBase.html">MyBase</a> global static property.
 '
-' This class is not intended to be used by code other than in the methods of the IObject
+' This class is not intended to be used by code other than in the methods of the <a href="IObject.html">IObject</a>
 ' interface implementations.
 '
+' @include "..\DocIncludes\ObjectBase.html"
 Option Explicit
 
 
@@ -51,8 +52,8 @@ Option Explicit
 '
 ' @param ObjA The subclass requesting the call.
 ' @param ObjB The value to be equating the subclass to.
-' @return Returns true if both values point to the same object instance.
-'
+' @return <b>True</b> if both values point to the same object instance; <b>False</b> otherwise.
+' @include "..\DocIncludes\ObjectBase.html"
 Public Function Equals(ByVal ObjA As IObject, ByRef ObjB As Variant) As Boolean
     If IsObject(ObjB) Then
         Equals = ObjA Is ObjB
@@ -64,7 +65,7 @@ End Function
 '
 ' @param Obj The object to generate the hashcode for.
 ' @return Returns a Long as the representation of the hashcode.
-'
+' @include "..\DocIncludes\ObjectBase.html"
 Public Function GetHashCode(ByVal Obj As IObject) As Long
     GetHashCode = ObjPtr(CUnk(Obj))
 End Function
@@ -75,7 +76,7 @@ End Function
 ' @param Obj The object to return a string representation of.
 ' @param AppObject The classes App object used to determine the project name.
 ' @return Returns a combination of the object type name and project name.
-'
+' @include "..\DocIncludes\ObjectBase.html"
 Public Function ToString(ByVal Obj As IObject, Optional ByVal AppObject As Object) As String
     If Obj Is Nothing Then
         Exit Function

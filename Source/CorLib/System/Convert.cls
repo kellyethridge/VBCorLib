@@ -38,64 +38,8 @@ Attribute VB_Exposed = True
 ''
 ' Provides methods used to encode and decode byte arrays to and from base-64 encoded characters.
 '
-' @remarks
-' To access the methods of this class, simply call the method using the <b>Convert.*</b> syntax.
-' <pre>
-'''This example takes a byte array containing 10 values
-'''from 1 to 10 and encodes it into a Base-64 string encoding.
-'''The encoded string is then decoded back into the original
-'''byte array and displayed for view.
-'
-''Private Sub Main()
-''    Dim original() As Byte
-''    Dim decoded() As Byte
-''    Dim s As String
-'
-''    ' Create a byte array containing values 1 to 10.
-''    original = Cor.NewBytes( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
-'
-''    ' Display the original byte array values
-''    Console.WriteLine "Original Bytes"
-''    DisplayBytes original
-'
-''    ' Encode the byte array into a Base-64 Encoded string.
-''    s = Convert.ToBase64String(original)
-'
-''    ' Display Base-64 Encoded string.
-''    Console.WriteLine
-''    Console.WriteLine "Base-64 Encoded String"
-''    Console.WriteLine " " & s
-'
-''    ' Decode Base-64 string into byte array.
-''    decoded = Convert.FromBase64String(s)
-'
-''    ' Display decoded byte array.
-''    Console.WriteLine "Bytes After Decoding"
-''    DisplayBytes decoded
-'
-''    ' Wait for user to press enter
-''    Console.ReadLine
-''End Sub
-'
-'''Displays the contents of a byte array.
-''Private Sub DisplayBytes(ByRef bytes() As Byte)
-''    Dim i As Long
-'
-''    For i = LBound(bytes) To UBound(bytes)
-''        Console.WriteValue " " & bytes(i)
-''    Next i
-''End Sub
-'
-'''This code produces the following output.
-'
-'''original bytes
-''' 1 2 3 4 5 6 7 8 9 10
-'''Base-64 Encoded String
-''' AQIDBAUGBwgJCg==
-'''Bytes After Decoding
-''' 1 2 3 4 5 6 7 8 9 10
-' </pre>
-'
+' @remarks To access the methods of this class, call the method using the <b>Convert.<i>Method</i></b> syntax.
+' @include "..\DocIncludes\Convert.html"
 Option Explicit
 
 ''
@@ -106,10 +50,8 @@ Option Explicit
 ' @param InArray The bytes to be converted to a base-64 character array.
 ' @param Offset Offset within <em>Bytes</em> to begin encoding to base-64 characters.
 ' @param Length The number of bytes to encode.
-' @param InsertLineBreaks Indicates if a vbCrLf should be inserted every 76 characters to
-' conform with MIME line formatting.
+' @param InsertLineBreaks Indicates if a vbCrLf should be inserted every 76 characters to conform with MIME line formatting.
 ' @return A string containg the byte array encoded as base-64 characters.
-'
 Public Function ToBase64String(ByRef InArray() As Byte, Optional ByRef Offset As Variant, Optional ByRef Length As Variant, Optional ByVal InsertLineBreaks As Boolean = False) As String
     ValidateArray InArray, NameOfInArray
     
@@ -118,7 +60,7 @@ Public Function ToBase64String(ByRef InArray() As Byte, Optional ByRef Offset As
     
     Range = MakeArrayRange(InArray, Offset, Length)
     
-    ' we are doing custom validation because .NET throws an ArgumentOutOfRangeException
+    ' We are doing custom validation because .NET throws an ArgumentOutOfRangeException
     ' instead of an ArgumentException when Offset+Length > InArray size.
     If Range.Index < LBound(InArray) Then _
         Error.ArgumentOutOfRange "Offset", ArgumentOutOfRange_LBound
@@ -147,7 +89,6 @@ End Function
 ' conform with MIME line formatting.
 ' @return The number of base-64 characters created.
 ' @remarks Added .NET 2.0 ability to insert linebreaks every 76 characters for MIME formatting.
-'
 Public Function ToBase64CharArray(ByRef InArray() As Byte, ByVal IndexIn As Long, ByVal Length As Long, ByRef OutArray() As Integer, ByVal IndexOut As Long, Optional ByVal InsertLineBreaks As Boolean = False) As Long
     ValidateArray InArray, NameOfInArray
     ValidateArray OutArray, NameOfOutArray
@@ -173,14 +114,12 @@ Public Function ToBase64CharArray(ByRef InArray() As Byte, ByVal IndexIn As Long
 End Function
 
 ''
-' Decodes a base-64 character array to a byte array. The Offset and length specify a subset of
-' the character array to be decoded.
+' Decodes a base-64 character array to a byte array. The Offset and length specify a subset of the character array to be decoded.
 '
 ' @param InArray A base-64 character array to be decoded to a byte array.
 ' @param Offset The character within the character array to begin decoding.
 ' @param Length The number of characters to be decoded into the byte array.
 ' @return A byte array that has been decoded from a base-64 character array.
-'
 Public Function FromBase64CharArray(ByRef InArray() As Integer, ByVal Offset As Long, ByVal Length As Long) As Byte()
     ValidateArray InArray, NameOfInArray
             
@@ -276,13 +215,11 @@ Finally:
 End Function
 
 ''
-' Converts a datatype value to a string representation using any
-' supplied formatting or provider arguments.
+' Converts a datatype value to a string representation using any supplied formatting or provider arguments.
 '
 ' @param Value The value to convert to a string.
 ' @param Provider A formatting provider to help custom formatting.
 ' @return A string representation of the value.
-'
 Public Function ToString(ByRef Value As Variant, Optional ByVal Provider As IFormatProvider) As String
     ToString = Object.ToString(Value, Provider:=Provider)
 End Function
@@ -293,7 +230,6 @@ End Function
 ' @param Value Value to be converted.
 ' @param Provider An object that supplies culture-specific formatting information.
 ' @return The date and time equivalent of the value of <i>value</i>, or the date and time equivalent of <a href="CorDateTimeStatic.MinValue.html">CorDateTime.MinValue</a> if <i>value</i> is <b>Nothing</b>.
-'
 Public Function ToDateTime(ByRef Value As Variant, Optional ByVal Provider As IFormatProvider) As CorDateTime
     Select Case VarType(Value)
         Case vbObject
@@ -311,6 +247,15 @@ Public Function ToDateTime(ByRef Value As Variant, Optional ByVal Provider As IF
         Case Else
             Throw New InvalidCastException
     End Select
+End Function
+
+''
+' Converts the value of the specified object to a 64-bit signed integer.
+'
+' @param Value A value that is convertable to <a href="Int64Static.Int64.html">Int64</a>.
+' @return A 64-bit signed integer that is equivalent to <i>Value</i>.
+Public Function ToInt64(ByRef Value As Variant) As Int64
+    ToInt64 = ConversionMethods.CInt64(Value)
 End Function
 
 

@@ -42,7 +42,6 @@ Option Explicit
 
 Private Const FILE_FLAG_BACKUP_SEMANTICS        As Long = &H2000000
 Private Const ERROR_NO_MORE_FILES               As Long = 18&
-Private Const DOUBLE_PERIOD                     As Long = &H2E002E
 
 Private Enum SystemEntryTypes
     FileEntry = 1
@@ -183,7 +182,7 @@ Public Sub Delete(ByRef Path As String, Optional ByVal Recursive As Boolean = Fa
         End With
     End If
     
-    If Api.RemoveDirectory(NormalizedPath) = BOOL_FALSE Then
+    If RemoveDirectoryW(NormalizedPath) = BOOL_FALSE Then
         If Err.LastDllError <> ERROR_PATH_NOT_FOUND Then
             ThrowIOError Err.LastDllError, Path
         End If
@@ -270,8 +269,8 @@ Public Function GetCurrentDirectory() As String
     Dim Result  As String
     Dim Size    As Long
     
-    Result = String$(Path.MaxPath, 0)
-    Size = Api.GetCurrentDirectory(Len(Result), Result)
+    Result = String$(MAX_PATH, 0)
+    Size = GetCurrentDirectoryW(Len(Result), Result)
     
     If Size = 0 Then
         ThrowIOError Err.LastDllError
@@ -412,12 +411,12 @@ Public Sub Move(ByRef SourceDirName As String, ByRef DestDirName As String)
     FullSourceDirName = Path.GetFullPath(SourceDirName)
     FullDestDirName = Path.GetFullPath(DestDirName)
     
-    If CorString.Equals(FullSourceDirName, FullDestDirName, OrdinalIgnoreCase) Then _
+    If CorString.Equals(FullSourceDirName, FullDestDirName, StringComparison.OrdinalIgnoreCase) Then _
         Error.IO IO_SourceDestMustBeDifferent
     If Path.GetPathRoot(FullSourceDirName) <> Path.GetPathRoot(FullDestDirName) Then _
         Error.IO IO_SourceDestMustHaveSameRoot
         
-    If Api.MoveFile(FullSourceDirName, FullDestDirName) = BOOL_FALSE Then
+    If MoveFileW(FullSourceDirName, FullDestDirName) = BOOL_FALSE Then
         ThrowIOError Err.LastDllError, SourceDirName
     End If
 End Sub
@@ -429,14 +428,14 @@ End Sub
 ' @remarks The path can be absolute or relative.
 '
 Public Sub SetCurrentDirectory(ByRef Path As String)
-    If Len(Path) = 0 Then _
-        Error.Argument Argument_EmptyPath, "Path"
-    
     Dim FullPath As String
     
+    If Len(Path) = 0 Then _
+        Error.Argument Argument_EmptyPath, "Path"
+        
     FullPath = Statics.Path.GetFullPath(Path)
 
-    If Not Win32Native.SetCurrentDirectory(FullPath) Then
+    If SetCurrentDirectoryW(FullPath) = BOOL_FALSE Then
         ThrowIOError Err.LastDllError, FullPath
     End If
 End Sub

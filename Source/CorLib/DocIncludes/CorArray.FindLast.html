@@ -1,0 +1,24 @@
+@examples The following example will search a given array for the last occurrence of age that is over 25.
+<p>The result does not return the position of the found element, only the element itself.</p>
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> Ages() <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
+    <span style="color: #0000ff">Dim</span> Age <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
+    
+    Ages = NewLongs(14, 22, 31, 27, 18)
+    
+    <span style="color: #008000">&#39; To find the last age over 25, pass the array and</span>
+    <span style="color: #008000">&#39; address of the callback method to CorArray.FindLast.</span>
+    Age = CorArray.FindLast(Ages, <span style="color: #0000ff">AddressOf</span> AgeOver25)
+    
+    <span style="color: #008000">&#39; Dispay the the last age over 25 found.</span>
+    Debug.Print <span style="color: #a31515">&quot;The last age over 25 found: &quot;</span> &amp; Age
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; The method accepts a ByRef parameter of the array element type.</span>
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Function</span> AgeOver25(<span style="color: #0000ff">ByRef</span> Age <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>) <span style="color: #0000ff">As</span> <span style="color: #2b91af">Boolean</span>
+    AgeOver25 = Age &gt; 25
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Function</span>
+
+<span style="color: #008000">&#39; This code example produces the following output.</span>
+<span style="color: #008000">&#39;    The last age over 25 found: 27</span>
+</pre></div>

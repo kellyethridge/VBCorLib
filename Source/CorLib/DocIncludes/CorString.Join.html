@@ -1,0 +1,53 @@
+@remarks For example, if <i>Separator</i> is ", " and the elements of <i>Value</i> are "apple", "orange", "grape", and "pear", <b>Join(separator, value, 1, 2)</b> returns "orange, grape".
+@exceptions
+<table style="width: auto">
+  <tr>
+      <th>Exception</th>
+      <th>Condition</th>
+  </tr>
+  <tr>
+       <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+       <td>
+          <i>StartIndex</i> is less than the lower-bound of <i>Value</i>.<br/>
+          -or-<br/>
+          <i>Count</i> is less than zero.<br/>
+          -or-<br/>
+          <i>StartIndex</i> plus <i>Count</i> is greater than the upper-bound of <i>Value</i>.
+       </td>
+  </tr>
+</table>
+@examples The following example concatenates two elements from an array of names of fruit.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> Value() <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+    <span style="color: #0000ff">Dim</span> List    <span style="color: #0000ff">As</span> Collection
+    <span style="color: #0000ff">Dim</span> Sep     <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+    <span style="color: #0000ff">Dim</span> Result  <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+    
+    Sep = <span style="color: #a31515">&quot;, &quot;</span>
+    Value = NewStrings(<span style="color: #a31515">&quot;apple&quot;</span>, <span style="color: #a31515">&quot;orange&quot;</span>, <span style="color: #a31515">&quot;grape&quot;</span>, <span style="color: #a31515">&quot;pear&quot;</span>)
+    <span style="color: #0000ff">Set</span> List = NewCollection(<span style="color: #a31515">&quot;apple&quot;</span>, <span style="color: #a31515">&quot;orange&quot;</span>, <span style="color: #a31515">&quot;grape&quot;</span>, <span style="color: #a31515">&quot;pear&quot;</span>)
+    
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;Sep = &#39;{0}&#39;&quot;</span>, Sep)
+    Debug.Print
+    
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;Value() = {{&#39;{0}&#39; &#39;{1}&#39; &#39;{2}&#39; &#39;{3}&#39;}}&quot;</span>, Value(0), Value(1), Value(2), Value(3))
+    Result = CorString.Join(Sep, Value, 1, 2)
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;CorString.Join(Sep, Value, 1, 2) = &#39;{0}&#39;&quot;</span>, Result)
+    Debug.Print
+    
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;List = {{&#39;{0}&#39; &#39;{1}&#39; &#39;{2}&#39; &#39;{3}&#39;}}&quot;</span>, List(1), List(2), List(3), List(4))
+    Result = CorString.Join(Sep, List)
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;CorString.Join(Sep, List) = &#39;{0}&#39;&quot;</span>, Result)
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; This example produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    Sep = &#39;, &#39;</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    Value() = {&#39;apple&#39; &#39;orange&#39; &#39;grape&#39; &#39;pear&#39;}</span>
+<span style="color: #008000">&#39;    CorString.Join(Sep, Value, 1, 2) = &#39;orange, grape&#39;</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    List = {&#39;apple&#39; &#39;orange&#39; &#39;grape&#39; &#39;pear&#39;}</span>
+<span style="color: #008000">&#39;    CorString.Join(Sep, List) = &#39;apple, orange, grape, pear&#39;</span>
+</pre></div>
+

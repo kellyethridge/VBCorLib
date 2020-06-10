@@ -39,7 +39,7 @@ Attribute VB_Exposed = True
 ' Represents a base interface to be implemented by all MD5 hash algorithms.
 '
 ' @see MD5CryptoServiceProvider
-'
+' @see MD5Static
 Option Explicit
 
 ''

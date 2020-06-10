@@ -36,14 +36,12 @@ Attribute VB_Exposed = True
 '
 
 ''
-' Provides methods for manipulating, searching and sorting arrays.
+' Provides methods for creating, manipulating, searching, and sorting arrays.
 '
-' @remarks This class cannot be directly instantiated. To access the methods
-' use the class name directly.
-' <pre>
-' Debug.Print CorArray.Length(MyArray)
-' </pre>
-'
+' @remarks Arrays are a common data structure used when building applications. The <b>CorArray</b> class
+' provides several methods to help manage arrays through the course of an applications lifetime.
+' @see PublicFunctions
+' @include "..\DocIncludes\CorArray.html"
 Option Explicit
 
 
@@ -56,31 +54,35 @@ Private Type GuidSafeArray1d
     SA      As SafeArray1d
 End Type
 
-Private CallbackSorter          As New CallbackSorter
+Private Type ArrayInfo
+    SAPtr       As Long
+    DataPtr     As Long
+    ElementSize As Long
+End Type
 
 
 ''
-' Uses a callback method to check if an element in an array exists.
+' Determines whether the specified array contains elements that match the conditions defined by the specified predicate.
 '
-' @param arr The one-dimensional array to check if an element exists according to the callback criteria.
-' @param AddressOfPredicate The AddressOf the callback method used to determine if
-' an element matches the specified criteria.
-' @return Indication of the element existing in the array.
-' @remarks Each array element is passed into a user callback method. The user
-' then checks the element value to determine if it matches any criteria necessary
-' and returns the result. The criteria is defined outside of the
-' <b>Exists</b> method. How the criteria is defined and checked is up to the
-' user of the function.
-' <p>The function signature for the callback has a specific format.
+' @param Arr The one-dimensional array to search.
+' @param AddressOfPredicate The <b>AddressOf</b> a callback method used to determine if an element matches the specified criteria.
+' @return <b>True</b> if <i>Arr</i> contains one or more elements that match the conditions defined by the specified predicate callback; otherwise, <b>False</b>.
+' @remarks The <i>AddressOfPredicate</i> is an address to a method that returns <b>True</b> if the value passed to it matches the conditions defined in the callback method.
+' The elements of <i>Arr</i> are individually passed to the callback method, and processing is stopped when a match is found.
+' <p>The callback method should have a signature resembling the following:</p>
 ' <pre>
-' Public Function ExistsCallback(ByRef x As [Array Datatype]) As Boolean
-'     '' return True if x matches your criteria.
-' End Sub
+' Public Function CallbackMethod(ByRef Value As &lt;Type&gt;) As Boolean
+'   '' Evaluate value
+' End Function
 ' </pre>
-' The [Array Datatype] must be replaced with the datatype of the array. If the
-' array is an array of Variants, then [Array Datatype] would be a Variant, not
-' any specific sub-type within the variants of the array.</p>
-'
+' <p>It has one parameter that is defined as <b>ByRef</b> and should be the same type as the elements in the array to be searched.</p>
+' <p>It is extremely important to define the callback method correctly. If the method is incorrect, the application may crash.</p>
+' @see #Find
+' @see #FindIndex
+' @see #FindLast
+' @see #FindLastIndex
+' @see #FindAll
+' @include "..\DocIncludes\CorArray.Exists.html"
 Public Function Exists(ByRef Arr As Variant, ByVal AddressOfPredicate As Long) As Boolean
     Exists = (FindIndex(Arr, AddressOfPredicate) >= LBound(Arr))
 End Function
@@ -89,19 +91,23 @@ End Function
 ' Uses a callback method to search an array for the first element that matches the criteria.
 '
 ' @param arr The one-dimensional array to search.
-' @param AddressOfPredicate The callback method address used to determine if an element
-' matches the specified criteria.
+' @param AddressOfPredicate The callback method address used to determine if an element matches the specified criteria.
 ' @return The element value if a match is found, otherwise a default for that element type.
-' @remarks <p>The function signature for the callback has a specific format.
+' @remarks The <i>AddressOfPredicate</i> is an address to a method that returns <b>True</b> if the value passed to it matches the conditions defined in the callback method.
+' The elements of <i>Arr</i> are individually passed to the callback method, and processing is stopped when a match is found.
+' <p>The callback method should have a signature resembling the following:</p>
 ' <pre>
-' Public Function FindCallback(ByRef x As [Array Datatype]) As Boolean
-'     '' return True if x matches your criteria.
-' End Sub
+' Public Function CallbackMethod(ByRef Value As &lt;Type&gt;) As Boolean
+'   '' Evaluate value
+' End Function
 ' </pre>
-' The [Array Datatype] must be replaced with the datatype of the array. If the
-' array is an array of Variants, then [Array Datatype] would be a Variant, not
-' any specific sub-type within the variants of the array.</p>
-'
+' <p>It has one parameter that is defined as <b>ByRef</b> and should be the same type as the elements in the array to be searched.</p>
+' <p>It is extremely important to define the callback method correctly. If the method is incorrect, the application may crash.</p>
+' @see #Exists
+' @see #FindIndex
+' @see #FindLast
+' @see #FindLastIndex
+' @see #FindAll
 ' @include "..\DocIncludes\CorArray.Find.html"
 Public Function Find(ByRef Arr As Variant, ByVal AddressOfPredicate As Long) As Variant
     Dim Index As Long
@@ -115,32 +121,41 @@ Public Function Find(ByRef Arr As Variant, ByVal AddressOfPredicate As Long) As 
 End Function
 
 ''
-' Finds the index of the first array element that matches the criteria
-' specified by the callback function.
+' Searches for an element that matches the conditions defined by the specified callback method,
+' and returns the lower-bound based index of the first occurrence within the range of elements
+' in the array that starts at the specified index and contains the specified number of elements.
 '
-' @param arr The one-dimensional array to be searched.
+' @param Arr The one-dimensional array to be searched.
 ' @param AddressOfPredicate The address of the callback function used to match the array elements.
-' @param Index The starting element of the array to beging the matching process.
-' @param Count The number of elements to include in the array search.
-' @return The index of the matched element, or LowerBound - 1 if none is found.
-' @remarks <p>The function signature for the callback has a specific format.
+' @param Index The starting index of the search.
+' @param Count The number of elements in the section to search.
+' @return The index of the first occurrence of an element that matches the conditions
+' defined in the callback method, if found; otherwise the lower-bound of the array minus one.
+' @remarks The <i>AddressOfPredicate</i> is an address to a method that returns <b>True</b> if the value passed to it matches the conditions defined in the callback method.
+' The elements of <i>Arr</i> are individually passed to the callback method, and processing is stopped when a match is found.
+' <p>The callback method should have a signature resembling the following:</p>
 ' <pre>
-' Public Function FindIndexCallback(ByRef x As [Array Datatype]) As Boolean
-'     '' return True if x matches your criteria.
-' End Sub
+' Public Function CallbackMethod(ByRef Value As &lt;Type&gt;) As Boolean
+'   '' Evaluate value
+' End Function
 ' </pre>
-' The [Array Datatype] must be replaced with the datatype of the array. If the
-' array is an array of Variants, then [Array Datatype] would be a Variant, not
-' any specific sub-type within the variants of the array.</p>
-'
-' @include "..\DocIncludes\CorArray.Find.html"
+' <p>It has one parameter that is defined as <b>ByRef</b> and should be the same type as the elements in the array to be searched.</p>
+' <p>It is extremely important to define the callback method correctly. If the method is incorrect, the application may crash.</p>
+' <p>The search is based on the array lower-bound, not zero-based.</p>
+' @see #Exists
+' @see #Find
+' @see #FindLast
+' @see #FindLastIndex
+' @see #FindAll
+' @include "..\DocIncludes\CorArray.FindIndex.html"
 Public Function FindIndex(ByRef Arr As Variant, ByVal AddressOfPredicate As Long, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Long
-    ValidateArray Arr
-    Dim Ptr As Long
-    Ptr = SAPtrV(Arr)
-    
+    Dim Info As ArrayInfo
     Dim ElementIndex   As Long
     Dim ElementCount   As Long
+    Dim ElementPtr As Long
+    Dim Predicate As Func_T_Boolean
+    
+    ValidateArray Arr
     ElementIndex = CLngOrDefault(Index, LBound(Arr))
     ElementCount = CLngOrDefault(Count, UBound(Arr) - ElementIndex + 1)
     
@@ -150,14 +165,9 @@ Public Function FindIndex(ByRef Arr As Variant, ByVal AddressOfPredicate As Long
         Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_Count
     If ElementIndex + ElementCount - 1 > UBound(Arr) Then _
         Error.ArgumentOutOfRange "", ArgumentOutOfRange_UBound
-    
-    Dim ElementSize As Long
-    ElementSize = SafeArrayGetElemsize(Ptr)
-    
-    Dim ElementPtr As Long
-    ElementPtr = MemLong(Ptr + PVDATA_OFFSET) + (ElementIndex - LBound(Arr)) * ElementSize
-    
-    Dim Predicate As Func_T_Boolean
+        
+    GetArrayInfo Arr, Info
+    ElementPtr = Info.DataPtr + (ElementIndex - LBound(Arr)) * Info.ElementSize
     Set Predicate = NewDelegate(AddressOfPredicate)
     
     Dim i As Long
@@ -166,133 +176,151 @@ Public Function FindIndex(ByRef Arr As Variant, ByVal AddressOfPredicate As Long
             FindIndex = ElementIndex + i - 1
             Exit Function
         End If
-        ElementPtr = ElementPtr + ElementSize
+        
+        ElementPtr = ElementPtr + Info.ElementSize
     Next
     
     FindIndex = LBound(Arr) - 1
 End Function
 
 ''
-' Finds all matching elements in an array, returning an array of the matched elements.
+' Retrieves all the elements that match the conditions defined by the specified callback method.
 '
-' @param arr The one-dimensional array to find all matching elements.
+' @param Arr The one-dimensional array to find all matching elements.
 ' @param AddressOfPredicate The callback address of the matching criteria method.
 ' @return An array of all matched elements.
-' @remarks <p>The function signature for the callback has a specific format.
+' @remarks The <i>AddressOfPredicate</i> is an address to a method that returns <b>True</b> if the value passed to it matches the conditions defined in the callback method.
+' All elements of <i>Arr</i> are individually passed to the callback method and includes in the result if they match the criteria.
+' <p>The callback method should have a signature resembling the following:</p>
 ' <pre>
-' Public Function FindAllCallback(ByRef x As [Array Datatype]) As Boolean
-'     '' return True if x matches your criteria.
-' End Sub
+' Public Function CallbackMethod(ByRef Value As &lt;Type&gt;) As Boolean
+'   '' Evaluate value
+' End Function
 ' </pre>
-' The [Array Datatype] must be replaced with the datatype of the array. If the
-' array is an array of Variants, then [Array Datatype] would be a Variant, not
-' any specific sub-type within the variants of the array.</p>
-'
-' @include "..\DocIncludes\CorArray.Find.html"
+' <p>It has one parameter that is defined as <b>ByRef</b> and should be the same type as the elements in the array to be searched.</p>
+' <p>It is extremely important to define the callback method correctly. If the method is incorrect, the application may crash.</p>
+' <p>The returned array is of the same type as <i>Arr</i>.</p>
+' @see #Exists
+' @see #Find
+' @see #FindIndex
+' @see #FindLast
+' @see #FindLastIndex
+' @include "..\DocIncludes\CorArray.FindAll.html"
 Public Function FindAll(ByRef Arr As Variant, ByVal AddressOfPredicate As Long) As Variant
-    ValidateArray Arr
-    
-    Dim Ptr As Long
-    Ptr = SAPtrV(Arr)
-    
-    Dim LowerBound As Long
-    LowerBound = LBound(Arr)
-    
-    Dim Count As Long
-    Count = UBound(Arr) - LowerBound + 1
-    
-    Dim ElemSize As Long
-    ElemSize = SafeArrayGetElemsize(Ptr)
-    
-    Dim pElem As Long
-    pElem = MemLong(Ptr + PVDATA_OFFSET)
-    
-    Dim Predicate As Func_T_Boolean
-    Set Predicate = NewDelegate(AddressOfPredicate)
-    
-    ' iterate each array element, passing the memory address
-    ' to the user supplied AddressOf callback. This will appear
-    ' as a ByRef parameter of the array's datatype in the callback.
-    Dim i                   As Long
+    Dim Info                As ArrayInfo
     Dim MatchCount          As Long
     Dim MatchedIndexes()    As Long
     
+    ValidateArray Arr
+    GetArrayInfo Arr, Info
+    MatchedIndexes = FindAllMatches(Arr, Info, AddressOfPredicate, MatchCount)
+    
+    Select Case VarType(Arr) And &HFF
+        Case vbObject
+            SetFindAllObjectResult Arr, Info, MatchedIndexes, MatchCount, FindAll
+        Case vbUserDefinedType
+            SetFindAllUdtResult Arr, Info, MatchedIndexes, MatchCount, FindAll
+        Case Else
+            SetFindAllResult Arr, Info, MatchedIndexes, MatchCount, FindAll
+    End Select
+End Function
+
+Private Function FindAllMatches(ByRef Arr As Variant, ByRef Info As ArrayInfo, ByVal AddressOfPredicate As Long, ByRef MatchCount As Long) As Long()
+    Dim ElementPtr          As Long
+    Dim Predicate           As Func_T_Boolean
+    Dim MatchedIndexes()    As Long
+    
     ReDim MatchedIndexes(0 To 31)
-    For i = LowerBound To LowerBound + Count - 1
-        If Predicate.Invoke(ByVal pElem) Then
+    ElementPtr = Info.DataPtr
+    Set Predicate = NewDelegate(AddressOfPredicate)
+
+    ' iterate each array element, passing the memory address
+    ' to the user supplied AddressOf callback. This will appear
+    ' as a ByRef parameter of the array's datatype in the callback.
+    Dim i As Long
+    For i = LBound(Arr) To UBound(Arr)
+        If Predicate.Invoke(ByVal ElementPtr) Then
             If MatchCount > UBound(MatchedIndexes) Then
                 ReDim Preserve MatchedIndexes(0 To MatchCount * 2 - 1)
             End If
+            
             MatchedIndexes(MatchCount) = i
             MatchCount = MatchCount + 1
         End If
-        pElem = pElem + ElemSize
+        
+        ElementPtr = ElementPtr + Info.ElementSize
     Next i
     
-    Dim Ret         As Variant
-    Dim ArrayType   As Long
-    
-    ArrayType = VarType(Arr) And &HFF   ' knock off the vbArray bit.
-    Select Case ArrayType
-        Case vbObject
-            ' as an array of objects, we create a new array using the
-            ' same Guid value as that of the original array.
-            VariantType(Ret) = vbObject Or vbArray
-            MemLong(VarPtr(Ret) + VARIANTDATA_OFFSET) = SafeArrayCreateVectorEx(vbObject, 0, MatchCount, Ptr - vbSizeOfGuid)
-            
-            For i = 0 To MatchCount - 1
-                Set Ret(i) = Arr(MatchedIndexes(i))
-            Next i
-            
-        Case vbUserDefinedType
-            Dim UDT As IRecordInfo
-            Set UDT = SafeArrayGetRecordInfo(Ptr)    ' gets an object used to manipulate a UDT.
-            
-            Dim pvData  As Long
-            pvData = MemLong(Ptr + PVDATA_OFFSET)
-            
-            Dim pReturnSafeArray As Long
-            pReturnSafeArray = SafeArrayCreateVectorEx(vbUserDefinedType, 0, MatchCount, ObjPtr(UDT))
-            
-            Dim pDstElem As Long
-            pDstElem = MemLong(pReturnSafeArray + PVDATA_OFFSET)
-            
-            For i = 0 To MatchCount - 1
-                UDT.RecordCopy pvData + (MatchedIndexes(i) - LowerBound) * ElemSize, pDstElem
-                pDstElem = pDstElem + ElemSize
-            Next i
-            
-            VariantType(Ret) = vbUserDefinedType Or vbArray
-            MemLong(VarPtr(Ret) + VARIANTDATA_OFFSET) = pReturnSafeArray
-            
-        Case Else
-            Ret = CreateInstance(ArrayType, MatchCount)
-            For i = 0 To MatchCount - 1
-                Ret(i) = Arr(MatchedIndexes(i))
-            Next i
-    End Select
-    
-    FindAll = Ret
+    FindAllMatches = MatchedIndexes
 End Function
 
+Private Sub SetFindAllObjectResult(ByRef Arr As Variant, ByRef Info As ArrayInfo, ByRef MatchedIndexes() As Long, ByVal MatchCount As Long, ByRef Result As Variant)
+    Dim i As Long
+    
+    ' as an array of objects, we create a new array using the
+    ' same Guid value as that of the original array.
+    VariantType(Result) = vbObject Or vbArray
+    MemLong(VarPtr(Result) + VARIANTDATA_OFFSET) = SafeArrayCreateVectorEx(vbObject, 0, MatchCount, Info.SAPtr - vbSizeOfGuid)
+    
+    For i = 0 To MatchCount - 1
+        Set Result(i) = Arr(MatchedIndexes(i))
+    Next i
+End Sub
+
+Private Sub SetFindAllResult(ByRef Arr As Variant, ByRef Info As ArrayInfo, ByRef MatchedIndexes() As Long, ByVal MatchCount As Long, ByRef Result As Variant)
+    Dim i As Long
+    
+    VariantType(Result) = VarType(Arr)
+    MemLong(VarPtr(Result) + VARIANTDATA_OFFSET) = SafeArrayCreateVectorEx(VarType(Arr) And &HFF, 0, MatchCount, Info.SAPtr - vbSizeOfGuid)
+
+    For i = 0 To MatchCount - 1
+        Result(i) = Arr(MatchedIndexes(i))
+    Next i
+End Sub
+
+Private Sub SetFindAllUdtResult(ByRef Arr As Variant, ByRef Info As ArrayInfo, ByRef MatchedIndexes() As Long, ByVal MatchCount As Long, ByRef Result As Variant)
+    Dim Record As IRecordInfo
+    Dim pReturnSafeArray As Long
+    Dim pDstElem As Long
+    Dim LowerBound As Long
+    Dim i As Long
+    
+    Set Record = SafeArrayGetRecordInfo(Info.SAPtr)    ' gets an object used to manipulate a UDT.
+    pReturnSafeArray = SafeArrayCreateVectorEx(vbUserDefinedType, 0, MatchCount, ObjPtr(Record))
+    pDstElem = MemLong(pReturnSafeArray + PVDATA_OFFSET)
+    LowerBound = LBound(Arr)
+    
+    For i = 0 To MatchCount - 1
+        Record.RecordCopy Info.DataPtr + (MatchedIndexes(i) - LowerBound) * Info.ElementSize, pDstElem
+        pDstElem = pDstElem + Info.ElementSize
+    Next i
+    
+    VariantType(Result) = vbUserDefinedType Or vbArray
+    MemLong(VarPtr(Result) + VARIANTDATA_OFFSET) = pReturnSafeArray
+End Sub
+
 ''
-' Finds the last occurence of a matched element in the array.
+' Searches for an element that matches the conditions defined by the specified callback method, and returns the last occurrence within the entire array.
 '
 ' @param arr The array to search.
 ' @param AddressOfPredicate A callback address of the matching criteria method.
-' @return The last element in the array to match the criteria, or the
-' default for the array type if no elements matched.
-' @remarks <p>The function signature for the callback has a specific format.
+' @return The last element in the array to match the criteria, or the default for the array type if no elements matched.
+' @remarks The <i>AddressOfPredicate</i> is an address to a method that returns <b>True</b> if the value passed to it matches the conditions defined in the callback method.
+' The elements of <i>Arr</i> are individually passed to the callback method, and processing is stopped when a match is found.
+' <p>The callback method should have a signature resembling the following:</p>
 ' <pre>
-' Public Function FindLastCallback(ByRef x As [Array Datatype]) As Boolean
-'     '' return True if x matches your criteria.
-' End Sub
+' Public Function CallbackMethod(ByRef Value As &lt;Type&gt;) As Boolean
+'   '' Evaluate value
+' End Function
 ' </pre>
-' The [Array Datatype] must be replaced with the datatype of the array. If the
-' array is an array of Variants, then [Array Datatype] would be a Variant, not
-' any specific sub-type within the variants of the array.</p>
-'
-' @include "..\DocIncludes\CorArray.Find.html"
+' <p>It has one parameter that is defined as <b>ByRef</b> and should be the same type as the elements in the array to be searched.</p>
+' <p>It is extremely important to define the callback method correctly. If the method is incorrect, the application may crash.</p>
+' @see #Exists
+' @see #Find
+' @see #FindIndex
+' @see #FindLastIndex
+' @see #FindAll
+' @include "..\DocIncludes\CorArray.FindLast.html"
 Public Function FindLast(ByRef Arr As Variant, ByVal AddressOfPredicate As Long) As Variant
     Dim Index As Long
     
@@ -312,27 +340,33 @@ End Function
 ' @param Index The starting index in the array to begin the backward search.
 ' @param Count The number of elements to search.
 ' @return The index of the last occurence of the matched element.
-' @remarks <p>The function signature for the callback has a specific format.
+' @remarks The <i>AddressOfPredicate</i> is an address to a method that returns <b>True</b> if the value passed to it matches the conditions defined in the callback method.
+' The elements of <i>Arr</i> are individually passed to the callback method, and processing is stopped when a match is found.
+' <p>The callback method should have a signature resembling the following:</p>
 ' <pre>
-' Public Function FindLastIndexCallback(ByRef x As [Array Datatype]) As Boolean
-'     '' return True if x matches your criteria.
-' End Sub
+' Public Function CallbackMethod(ByRef Value As &lt;Type&gt;) As Boolean
+'   '' Evaluate value
+' End Function
 ' </pre>
-' The [Array Datatype] must be replaced with the datatype of the array. If the
-' array is an array of Variants, then [Array Datatype] would be a Variant, not
-' any specific sub-type within the variants of the array.</p>
-'
-' @include "..\DocIncludes\CorArray.Find.html"
+' <p>It has one parameter that is defined as <b>ByRef</b> and should be the same type as the elements in the array to be searched.</p>
+' <p>It is extremely important to define the callback method correctly. If the method is incorrect, the application may crash.</p>
+' @see #Exists
+' @see #Find
+' @see #FindIndex
+' @see #FindLast
+' @see #FindAll
+' @include "..\DocIncludes\CorArray.FindLastIndex.html"
 Public Function FindLastIndex(ByRef Arr As Variant, ByVal AddressOfPredicate As Long, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Long
+    Dim Info        As ArrayInfo
+    Dim ElementPtr  As Long
+    Dim Predicate   As Func_T_Boolean
+    Dim ElemIndex   As Long
+    Dim ElemCount   As Long
+    
     ValidateArray Arr
-    
-    Dim Ptr As Long
-    Ptr = SAPtrV(Arr)
-    
-    Dim ElemIndex As Long
-    Dim ElemCount As Long
     ElemIndex = CLngOrDefault(Index, UBound(Arr))
     ElemCount = CLngOrDefault(Count, ElemIndex + 1)
+    
     If ElemIndex < LBound(Arr) Or ElemIndex > UBound(Arr) Then _
         Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_ArrayBounds
     If ElemCount < 0 Then _
@@ -340,121 +374,119 @@ Public Function FindLastIndex(ByRef Arr As Variant, ByVal AddressOfPredicate As 
     If ElemIndex - ElemCount + 1 < LBound(Arr) Then _
         Error.ArgumentOutOfRange "", ArgumentOutOfRange_LBound
     
-    Dim ElemSize As Long
-    ElemSize = SafeArrayGetElemsize(Ptr)
-    
-    Dim pElem As Long
-    pElem = MemLong(Ptr + PVDATA_OFFSET) + (ElemIndex - LBound(Arr)) * ElemSize
-    
-    Dim Predicate As Func_T_Boolean
+    GetArrayInfo Arr, Info
+    ElementPtr = Info.DataPtr + (ElemIndex - LBound(Arr)) * Info.ElementSize
     Set Predicate = NewDelegate(AddressOfPredicate)
     
     Dim i As Long
     For i = ElemCount To 1 Step -1
-        If Predicate.Invoke(ByVal pElem) Then
+        If Predicate.Invoke(ByVal ElementPtr) Then
             FindLastIndex = LBound(Arr) + i - 1
             Exit Function
         End If
-        pElem = pElem - ElemSize
+        
+        ElementPtr = ElementPtr - Info.ElementSize
     Next i
+    
     FindLastIndex = LBound(Arr) - 1
 End Function
 
 ''
-' Returns a boolean indicating if all elements in the array matched the criteria.
+' Determines whether every element in the array matches the conditions defined by the specified callback method.
 '
-' @param arr The array to compare against the criteria.
+' @param Arr The array to check against the conditions.
 ' @param AddressOfPredicate The callback address used to match the criteria.
-' @Return Indication of the entire array matching the criteria or not.
-' @remarks <p>The function signature for the callback has a specific format.
+' @Return <b>True</b> if every element in array matches the conditions defined by the specified predicate; otherwise, <b>False</b>.
+' If there are no elements in the array, the return value is <b>True</b>.
+' @remarks The <i>AddressOfPredicate</i> is an address to a method that returns <b>True</b> if the value passed to it matches the conditions defined in the callback method.
+' The elements of <i>Arr</i> are individually passed to the callback method, and processing is stopped when the method returns <b>False</b> for any element.
+' <p>The callback method should have a signature resembling the following:</p>
 ' <pre>
-' Public Function TrueForAllCallback(ByRef x As [Array Datatype]) As Boolean
-'     '' return True if x matches your criteria.
-' End Sub
+' Public Function CallbackMethod(ByRef Value As &lt;Type&gt;) As Boolean
+'   '' Evaluate value
+' End Function
 ' </pre>
-' The [Array Datatype] must be replaced with the datatype of the array. If the
-' array is an array of Variants, then [Array Datatype] would be a Variant, not
-' any specific sub-type within the variants of the array.</p>
-'
+' <p>It has one parameter that is defined as <b>ByRef</b> and should be the same type as the elements in the array to be searched.</p>
+' <p>It is extremely important to define the callback method correctly. If the method is incorrect, the application may crash.</p>
+' @include "..\DocIncludes\CorArray.TrueForAll.html"
 Public Function TrueForAll(ByRef Arr As Variant, ByVal AddressOfPredicate As Long) As Boolean
+    Dim Info        As ArrayInfo
+    Dim ElementPtr  As Long
+    Dim Predicate   As Func_T_Boolean
+        
     ValidateArray Arr
-    
-    Dim Ptr As Long
-    Ptr = SAPtrV(Arr)
-    
-    Dim ElemSize As Long
-    ElemSize = SafeArrayGetElemsize(Ptr)
-    
-    Dim pElem As Long
-    pElem = MemLong(Ptr + PVDATA_OFFSET)
-    
-    Dim Predicate As Func_T_Boolean
+    GetArrayInfo Arr, Info
+    ElementPtr = Info.DataPtr
     Set Predicate = NewDelegate(AddressOfPredicate)
     
     Dim i As Long
     For i = LBound(Arr) To UBound(Arr)
-        If Not Predicate.Invoke(ByVal pElem) Then
+        If Not Predicate.Invoke(ByVal ElementPtr) Then
             Exit Function
         End If
         
-        pElem = pElem + ElemSize
+        ElementPtr = ElementPtr + Info.ElementSize
     Next i
+    
     TrueForAll = True
 End Function
 
 ''
-' Iterates over an array passing in each element into an Action function to be performed on the element.
+' Performs the specified action on each element of the specified array.
 '
 ' @param Arr The one-dimensional array containing the elements to be processed.
 ' @param AddressOfAction The callback address of the function to process an array element.
-' @remarks <p>The callback method must be a Sub with a single ByRef parameter of the same
-' type as the array.
+' @remarks The <i>AddressOfAction</i> is an address to a method that will perform an action on the value passed to it.
+' <p>The callback method should have a signature resembling the following:</p>
 ' <pre>
-' Public Sub ActionMethod(ByRef e As [Data Type])
-'     '' Perform action on e.
+' Public Sub CallbackMethod(ByRef Value As &lt;Type&gt;)
+'   '' Perform action using Value
 ' End Sub
 ' </pre>
-' The [Array Datatype] must be replaced with the datatype of the array. If the
-' array is an array of Variants, then the [Array Datatype] would be a Variant, not
-' any specific sub-type within the variants of the array.</p>
-'
+' <p>It has one parameter that is defined as <b>ByRef</b> and should be the same type as the elements in the array to be searched.</p>
+' <p>It is extremely important to define the callback method correctly. If the method is incorrect, the application may crash.</p>
+' @include "..\DocIncludes\CorArray.ForEach.html"
 Public Sub ForEach(ByRef Arr As Variant, ByVal AddressOfAction As Long)
+    Dim Info        As ArrayInfo
+    Dim ElementPtr  As Long
+    Dim Action      As Action_T
+    
     ValidateArray Arr
-    
-    Dim Ptr As Long
-    Ptr = SAPtrV(Arr)
-    
-    Dim ElemSize As Long
-    ElemSize = SafeArrayGetElemsize(Ptr)
-    
-    Dim pElem As Long
-    pElem = MemLong(Ptr + PVDATA_OFFSET)
-    
-    Dim Action As Action_T
+    GetArrayInfo Arr, Info
+    ElementPtr = Info.DataPtr
     Set Action = NewDelegate(AddressOfAction)
     
     Dim i As Long
     For i = LBound(Arr) To UBound(Arr)
-        Action.Invoke ByVal pElem
-        pElem = pElem + ElemSize
+        Action.Invoke ByVal ElementPtr
+        ElementPtr = ElementPtr + Info.ElementSize
     Next i
 End Sub
 
 ''
-' Performs a binary search on a given array. A subportion of the array can
-' be searched using the startindex and length parameters. A custom user
-' comparer can optionally be supplied to perform special comparisons
-' between elements in the array.
+' Searches the entire one-dimensional sorted array for a specific element, using an optionally specified <a href="IComparer.html">IComparer</a> interface.
 '
-' @param Arr The array to search for a specific value.
+' @param Arr The sorted one-dimensional array to search.
 ' @param Value The value to search for in the array.
-' @param Comparer A user supplied object to compare elements within the array.
-' @return The index at which the value was found.
-' @remarks If the returned value is less than the lower bound of the array, then
-' the value indicates where the value would have been found in the array. The
-' following is how to convert the return value to the array index:<br><br>
-' Lowerbound of 0:  return = Not return<br>
-' Other lowerbound: return = (Not (return - lowerbound)) + lowerbound<br>
+' @param Comparer An object used to compare elements within the array. If this is <b>Nothing</b> then <a href="ComparerStatic.Get.Default.html">Comparer.Default</a> is used.
+' @return The index of the specified <i>Value</i> in the specified array, if <i>Value</i> is found. If <i>Value</i> is not found and <i>Value</i> is less than one or more
+' elements in <i>Arr</i>, a negative number which is the bitwise complement of the index of the first element that is larger than <i>Value</i>. If <i>Value</i> is not found
+' and <i>Value</i> is greater than any of the elements in <i>Arr</i>, a negative number which is the bitwise complement of (the index of the last element plus 1).
+' @remarks The <i>Arr</i> must be sorted before calling this method.
+' <p>If the returned value is less than the lower bound of the array, the value is a bitwise <b>Not</b> indication of where the value would have been found in the array.
+' The following shows how to convert the result for a value that is not found.
+' <table style="width: auto">
+'   <tr>
+'       <th>Lower Bound of <i>Arr</i></th><th>Conversion Method</th>
+'   </tr>
+'   <tr>
+'       <td>Zero</td><td>Index = Not Result</td>
+'   </tr>
+'   <tr>
+'       <td>Non-zero</td><td>Index = (Not (Result - LBound(<i>Arr</i>))) + LBound(<i>Arr</i>)</td>
+'   </tr>
+' </table>
+' @see #BinarySearchEx
 ' @include "..\DocIncludes\CorArray.BinarySearch.html"
 Public Function BinarySearch(ByRef Arr As Variant, ByRef Value As Variant, Optional ByVal Comparer As IComparer) As Long
     ValidateArray Arr
@@ -462,23 +494,35 @@ Public Function BinarySearch(ByRef Arr As Variant, ByRef Value As Variant, Optio
 End Function
 
 ''
-' Performs a binary search on a given array. A subportion of the array can
-' be searched using the startindex and length parameters. A custom user
-' comparer can optionally be supplied to perform special comparisons
-' between elements in the array.
+' Searches a range of elements in a one-dimensional sorted <i>Arr</i> for a value, using an optionally specified <a href="IComparer.html">IComparer</a> interface.
 '
-' @param Arr The array to search for a specific value.
-' @param Index The starting index in the array to begin searching.
-' @param Length The number of elements to search, starting at startindex.
+' @param Arr The sorted one-dimensional array to search.
+' @param Index The starting index in the range to search.
+' @param Length The length of the range to search.
 ' @param Value The value to search for in the array.
-' @param Comparer A user supplied object to compare elements within the array.
-' @return The index at which the value was found.
+' @param Comparer The <a href="IComparer.html">IComparer</a> implementation to use when comparing elements.<br/>
+' -or-<br/>
+' <b>Nothing</b> to use the default <a href="ComparerStatic.Get.Default.html">Comparer</a> implementation.
+' @return The index of the specified <i>Value</i> in the specified array, if <i>Value</i> is found. If <i>Value</i> is not found and <i>Value</i> is less than one or more
+' elements in <i>Arr</i>, a negative number which is the bitwise complement of the index of the first element that is larger than <i>Value</i>. If <i>Value</i> is not found
+' and <i>Value</i> is greater than any of the elements in <i>Arr</i>, a negative number which is the bitwise complement of (the index of the last element plus 1).
+' @remarks The <i>Arr</i> must be sorted before calling this method.
 ' @remarks If the returned value is less than the lower bound of the array, then
-' the value indicates where the value would have been found in the array. The
-' following is how to convert the return value to the array index:<br><br>
-' Lowerbound of 0:  return = Not return<br>
-' Other lowerbound: return = (Not (return - lowerbound)) + lowerbound<br>
-' @include "..\DocIncludes\CorArray.BinarySearch.html"
+' <p>If the returned value is less than the lower bound of the array, the value is a bitwise <b>Not</b> indication of where the value would have been found in the array.
+' The following shows how to convert the result for a value that is not found.
+' <table style="width: auto">
+'   <tr>
+'       <th>Lower Bound of <i>Arr</i></th><th>Conversion Method</th>
+'   </tr>
+'   <tr>
+'       <td>Zero</td><td>Index = Not Result</td>
+'   </tr>
+'   <tr>
+'       <td>Non-zero</td><td>Index = (Not (Result - LBound(<i>Arr</i>))) + LBound(<i>Arr</i>)</td>
+'   </tr>
+' </table>
+' @see #BinarySearch
+' @include "..\DocIncludes\CorArray.BinarySearchEx.html"
 Public Function BinarySearchEx(ByRef Arr As Variant, ByVal Index As Long, ByVal Length As Long, ByRef Value As Variant, Optional ByVal Comparer As IComparer) As Long
     ValidateArrayRange Arr, Index, Length, CountName:=NameOfLength
     BinarySearchEx = InternalBinarySearch(Arr, Index, Length, Value, Comparer)
@@ -490,9 +534,30 @@ End Function
 ' @param Arr The array to clear elements from.
 ' @param Index The starting element to being clearing.
 ' @param Length The number of elements to be cleared.
-'
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ArgumentNullException.html">ArgumentNullException</a></td><td><i>Arr</i> is uninitialized.</td>
+'   </tr>
+'    <tr>
+'        <td><a href="IndexOutOfRangeException.html">IndexOutOfRangeException</a></td>
+'        <td>
+'           <i>Index</i> is less than the lower-bound of <i>Arr</i>.<br/>
+'           -or-<br/>
+'           <i>Length</i> is less than zero.<br/>
+'           -or-<br/>
+'           The sum of <i>Index</i> and <i>Length</i> is greater than the upper-bound of <i>Arr</i>.
+'        </td>
+'    </tr>
+' </table>
 Public Sub Clear(ByRef Arr As Variant, ByVal Index As Long, ByVal Length As Long)
     Dim pSafeArray  As Long
+    Dim SubArray    As GuidSafeArray1d
+    Dim IIDOffset   As Long
     
     pSafeArray = SAPtrV(Arr)
     If pSafeArray = vbNullPtr Then _
@@ -506,35 +571,23 @@ Public Sub Clear(ByRef Arr As Variant, ByVal Index As Long, ByVal Length As Long
     
     If Length = 0 Then Exit Sub
     
-    Dim IIDOffset As Long
     Select Case VarType(Arr) And &HFF   ' knock off the vbArray bit
         Case vbObject
             IIDOffset = vbSizeOfGuid
-            
         Case vbString, vbUserDefinedType
             IIDOffset = 4
-            
         Case Else
-            ' we can use ZeroMemory for everything else.
-            Dim ElemSize As Long
-            ElemSize = SafeArrayGetElemsize(pSafeArray)
-            
-            Dim pElem As Long
-            pElem = MemLong(pSafeArray + PVDATA_OFFSET)
-            
-            ' optimize by zeroing out the memory directly.
-            ZeroMemory ByVal pElem + (Index - LBound(Arr)) * ElemSize, Length * ElemSize
-            Exit Sub
+            IIDOffset = 0 ' We don't need to set this, but we like explicit defaults here.
     End Select
     
-    Dim SubArray As GuidSafeArray1d
     CopyMemory ByVal VarPtr(SubArray.SA) - IIDOffset, ByVal pSafeArray - IIDOffset, Len(SubArray.SA) + IIDOffset
     
     With SubArray.SA
         .fFeatures = .fFeatures Or FADF_FIXEDSIZE Or FADF_STATIC Or FADF_AUTO
-        .pvData = .pvData + (Index - LBound(Arr)) * .cbElements
+        .PVData = .PVData + (Index - LBound(Arr)) * .cbElements
         .cElements = Length
     End With
+    
     SafeArrayDestroyData VarPtr(SubArray.SA)
 End Sub
 
@@ -544,7 +597,47 @@ End Sub
 ' @param SourceArray The array from which to copy the elements.
 ' @param DestinationArray The array in which to place the elements.
 ' @param Length The number of elements to copy.
-'
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th><th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ArgumentNullException.html">ArgumentNullException</a></td>
+'        <td>
+'           <i>SourceArray</i> is <b>null</b>.<br/>
+'           -or-<br/>
+'           <i>DestinationArray</i> is <b>null</b>.
+'        </td>
+'   </tr>
+'    <tr>
+'        <td><a href="RankException.html">RankException</a></td><td><i>SourceArray</i> and <i>DestinationArray</i> have different ranks.</td>
+'    </tr>
+'    <tr>
+'        <td><a href="ArrayTypeMismatchException.html">ArrayTypeMismatchException</a></td><td><i>SourceArray</i> and <i>DestinationArray</i> are incompatible types.</td>
+'    </tr>
+'    <tr>
+'        <td><a href="InvalidCastException.html">InvalidCastException</a></td><td>At least one element in <i>SourceArray</i> cannot be cast to the type of <i>DestinationArray</i>.</td>
+'    </tr>
+'    <tr>
+'        <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td><td><i>Length</i> is less than zero.</td>
+'    </tr>
+'    <tr>
+'        <td><a href="ArgumentException.html">ArgumentException</a></td>
+'        <td>
+'           <i>Length</i> is greater than the number of elements from <i>SourceIndex</i> to the end of <i>SourceArray</i>.<br/>
+'           -or-<br/>
+'           <i>Length</i> is greater than the number of elements from <i>DestinationIndex</i> to the end of <i>DestinationArray</i>.
+'        </td>
+'    </tr>
+' </table>
+' @remarks The <i>SourceArray</i> and <i>DestinationArray</i> parameters must have the same number of dimensions.
+' In addition, <i>DestinationArray</i> must already have been dimensioned and must have a sufficient number of elements to accommodate the copied data.
+' <p>When copying between multidimensional arrays, the array behaves like a long one-dimensional array, where the rows (or columns) are conceptually
+' laid end to end. For example, if an array has three rows (or columns) with four elements each, copying six elements from the beginning of the array
+' would copy all four elements of the first row (or column) and the first two elements of the second row (or column).</p>
+' @see #CopyEx
+' @include "..\DocIncludes\CorArray.html"
 Public Sub Copy(ByRef SourceArray As Variant, ByRef DestinationArray As Variant, ByVal Length As Long)
     If IsNull(SourceArray) Then _
         Error.ArgumentNull "SourceArray", ArgumentNull_Array
@@ -562,22 +655,74 @@ End Sub
 ' @param Destinationarray The array in which to place the elements.
 ' @param Destinationindex The starting element in the destination array to place elements.
 ' @param Length The number of elements to copy.
-'
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ArgumentNullException.html">ArgumentNullException</a></td>
+'        <td>
+'           <i>SourceArray</i> is <b>null</b>.<br/>
+'           -or-<br/>
+'           <i>DestinationArray</i> is <b>null</b>.
+'        </td>
+'   </tr>
+'    <tr>
+'        <td><a href="RankException.html">RankException</a></td><td><i>SourceArray</i> and <i>DestinationArray</i> have different ranks.</td>
+'    </tr>
+'    <tr>
+'        <td><a href="ArrayTypeMismatchException.html">ArrayTypeMismatchException</a></td><td><i>SourceArray</i> and <i>DestinationArray</i> are incompatible types.</td>
+'    </tr>
+'    <tr>
+'        <td><a href="InvalidCastException.html">InvalidCastException</a></td><td>At least one element in <i>SourceArray</i> cannot be cast to the type of <i>DestinationArray</i>.</td>
+'    </tr>
+'    <tr>
+'        <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+'        <td>
+'           <i>SourceIndex</i> is less than the lower-bound of the first dimension of <i>SourceArray</i>.<br/>
+'           -or-<br/>
+'           <i>DestinationIndex</i> is less than the lower-bound of the first dimension of <i>DestinationArray</i>.<br/>
+'           -or-<br/>
+'           <i>Length</i> is less than zero.
+'        </td>
+'    </tr>
+'    <tr>
+'        <td><a href="ArgumentException.html">ArgumentException</a></td>
+'        <td>
+'           <i>Length</i> is greater than the number of elements from <i>SourceIndex</i> to the end of <i>SourceArray</i>.<br/>
+'           -or-<br/>
+'           <i>Length</i> is greater than the number of elements from <i>DestinationIndex</i> to the end of <i>DestinationArray</i>.
+'        </td>
+'    </tr>
+' </table>
+' @remarks The <i>SourceArray</i> and <i>DestinationArray</i> parameters must have the same number of dimensions.
+' In addition, <i>DestinationArray</i> must already have been dimensioned and must have a sufficient number of elements to accommodate the copied data.
+' <p>When copying between multidimensional arrays, the array behaves like a long one-dimensional array, where the rows (or columns) are conceptually
+' laid end to end. For example, if an array has three rows (or columns) with four elements each, copying six elements from the beginning of the array
+' would copy all four elements of the first row (or column) and the first two elements of the second row (or column).</p>
+' @see #Copy
+' @include "..\DocIncludes\CorArray.html"
 Public Sub CopyEx(ByRef SourceArray As Variant, ByVal SourceIndex As Long, ByRef DestinationArray As Variant, ByVal DestinationIndex As Long, ByVal Length As Long)
-    Dim pSourceSafeArray As Long
+    Dim pSourceSafeArray        As Long
+    Dim pDestinationSafeArray   As Long
+    Dim SourceLength            As Long
+    Dim DestinationLength       As Long
+    Dim SourceArrayType         As VbVarType
+    Dim DestinationArrayType    As VbVarType
+    Dim Assigner                As Long
+
     pSourceSafeArray = SAPtrV(SourceArray)
+    pDestinationSafeArray = SAPtrV(DestinationArray)
+    
     If pSourceSafeArray = vbNullPtr Then _
         Error.ArgumentNull "SourceArray", ArgumentNull_Array
-    
-    Dim pDestinationSafeArray As Long
-    pDestinationSafeArray = SAPtrV(DestinationArray)
     If pDestinationSafeArray = vbNullPtr Then _
         Error.ArgumentNull "DestinationArray", ArgumentNull_Array
     
-    Dim SourceLength As Long
-    SourceLength = LengthCore(pSourceSafeArray, 0)
-    Dim DestinationLength As Long
-    DestinationLength = LengthCore(pDestinationSafeArray, 0)
+    SourceLength = LengthCore(pSourceSafeArray)
+    DestinationLength = LengthCore(pDestinationSafeArray)
     
     If Length < 0 Then _
         Error.ArgumentOutOfRange "Length", ArgumentOutOfRange_NeedNonNegNum
@@ -589,11 +734,10 @@ Public Sub CopyEx(ByRef SourceArray As Variant, ByVal SourceIndex As Long, ByRef
         Error.ArgumentOutOfRange "SourceIndex", ArgumentOutOfRange_ArrayLB
     If DestinationIndex < LBound(DestinationArray) Then _
         Error.ArgumentOutOfRange "DestinationIndex", ArgumentOutOfRange_ArrayLB
-    
-    Dim SourceArrayType As VbVarType
+    If SafeArrayGetDim(pSourceSafeArray) <> SafeArrayGetDim(pDestinationSafeArray) Then _
+        Error.Rank Rank_MustMatch
+        
     SourceArrayType = VarType(SourceArray) And &HFF    ' knock off the vbArray bit.
-    
-    Dim DestinationArrayType As VbVarType
     DestinationArrayType = VarType(DestinationArray) And &HFF   ' knock off the vbArray bit.
     
     If SourceArrayType = DestinationArrayType Then
@@ -624,8 +768,8 @@ Public Sub CopyEx(ByRef SourceArray As Variant, ByVal SourceIndex As Long, ByRef
                 CopyValueTypes pSourceSafeArray, SourceIndex, pDestinationSafeArray, DestinationIndex, Length
         End Select
     Else
-        Dim Assigner As Long
         Assigner = GetAssigningFunction(SourceArrayType, DestinationArrayType)
+        
         If Assigner = vbNullPtr Then _
             Throw Cor.NewArrayTypeMismatchException(Environment.GetResourceString(ArrayTypeMismatch_Incompatible))
         
@@ -645,7 +789,26 @@ End Sub
 ' If one length is defined as zero, then all other defined lengths must be zero.
 ' This does not mean that lengths 2 and 3 need to be set to zero if only an empty
 ' one-dimensional array is being created.
-'
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ArgumentException.html">ArgumentException</a></td><td><i>ElementType</i> is not a valid type.</td>
+'   </tr>
+'    <tr>
+'        <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+'        <td>
+'           <i>Length1</i> is less than zero.<br/>
+'           -or-<br/>
+'           <i>Length2</i> is less than zero.<br/>
+'           -or-<br/>
+'           <i>Length3</i> is less than zero.
+'        </td>
+'    </tr>
+' </table>
 Public Function CreateInstance(ByVal ElementType As VbVarType, Optional ByVal Length1 As Long = 0, Optional ByRef Length2 As Variant, Optional ByRef Length3 As Variant) As Variant
     Dim Bounds(2)   As SafeArrayBound
     Dim Rank        As Long
@@ -683,25 +846,39 @@ Public Function CreateInstance(ByVal ElementType As VbVarType, Optional ByVal Le
 End Function
 
 ''
-' Returns the number of elements in the specified dimension. If 0 is
-' specified, this returns the total number of elements in the array.
+' Gets a 32-bit integer that represents the total number of elements in all dimensions of the array.
 '
-' @param arr The array to retrieve the number of elements from.
-' @param dimension (Optional) the specific dimension to get the number of elements.
-' @return The number of elements in the specified dimension or the entire array.
+' @param Arr The array to retrieve the number of elements from.
+' @return A 32-bit integer that represents the total number of elements in all the dimensions of <i>Arr</i>; zero if there are no elements in the array.
+' @see #GetLength
+Public Function Length(ByRef Arr As Variant) As Long
+    Dim Ptr As Long
+    
+    Ptr = GetValidSAPtr(Arr)
+    Length = LengthCore(Ptr)
+End Function
+
+''
+' Gets a 32-bit integer that represents the number of elements in the specified dimension of the array.
 '
-Public Function Length(ByRef Arr As Variant, Optional ByVal Dimension As Long) As Long
-    If Not IsArray(Arr) Then _
-        Error.Argument Argument_ArrayRequired, "Arr"
+' @param Arr The array to get the dimension length from.
+' @param Dimension A one-based dimension of the array whose length needs to be determined.
+' @return A 32-bit integer that represents the number of elements in the specified dimension.
+' @see #Length
+' @include "..\DocIncludes\CorArray.GetLength.html"
+Public Function GetLength(ByRef Arr As Variant, ByVal Dimension As Long) As Long
+    Dim ArrayPtr    As Long
+    Dim Rank        As Long
+    Dim BoundPtr    As Long
     
-    Dim SafeArrayPtr  As Long
+    ArrayPtr = GetValidSAPtr(Arr)
+    Rank = SafeArrayGetDim(ArrayPtr)
     
-    SafeArrayPtr = SAPtrV(Arr)
+    If Dimension < 1 Or Dimension > Rank Then _
+        Error.IndexOutOfRange IndexOutOfRange_Dimension
     
-    If SafeArrayPtr = vbNullPtr Then _
-        Error.ArgumentNull "Arr", ArgumentNull_Array
-    
-    Length = LengthCore(SafeArrayPtr, Dimension)
+    BoundPtr = ArrayPtr + vbSizeOfSafeArray + (Rank - Dimension) * vbSizeOfSafeArrayBound
+    GetLength = MemLong(BoundPtr)
 End Function
 
 ''
@@ -710,16 +887,9 @@ End Function
 ' @param Arr The array to retrieve the number of dimensions from.
 ' @return The number of dimension in the array.
 Public Function Rank(ByRef Arr As Variant) As Long
-    If Not IsArray(Arr) Then _
-        Error.Argument Argument_ArrayRequired
-    
     Dim Ptr As Long
     
-    Ptr = SAPtrV(Arr)
-    
-    If Ptr = vbNullPtr Then _
-        Error.ArgumentNull "Arr", ArgumentNull_Array
-    
+    Ptr = GetValidSAPtr(Arr)
     Rank = SafeArrayGetDim(Ptr)
 End Function
 
@@ -732,13 +902,11 @@ End Function
 ' @param Count The number of elements to search, starting from startindex.
 ' @return Value indicating the index the value was found. If a value of less that
 ' the lower-bounds is returned, then the value was not found in the array.
+' @see #LastIndexOf
 Public Function IndexOf(ByRef Arr As Variant, ByRef Value As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As Long
+    Dim Range   As ListRange
+        
     ValidateArray Arr
-    
-    Dim Ptr As Long
-    Ptr = SAPtrV(Arr)
-    
-    Dim Range As ListRange
     Range = MakeDefaultStepRange(StartIndex, LBound(Arr), Count, Len1D(Arr), Parameter_StartIndex)
     
     If Range.Index < LBound(Arr) Or Range.Index > UBound(Arr) Then _
@@ -747,7 +915,8 @@ Public Function IndexOf(ByRef Arr As Variant, ByRef Value As Variant, Optional B
         Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_Count
     
     On Error GoTo Catch
-    If TrySZIndexOf(Ptr, Value, Range.Index, Range.Count, IndexOf) Then
+    
+    If TrySZIndexOf(Arr, Value, Range.Index, Range.Count, IndexOf) Then
         Exit Function
     End If
     
@@ -770,9 +939,54 @@ End Function
 ' Returns if an array variable is uninitialized.
 '
 ' @param arr The array to test for initialization.
-' @return Value indicating if the array is initialized.
+' @return Returns <b>True</b> if the array is uninitialized, <b>False</b> otherwise.
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ArgumentException.html">ArgumentException</a></td><td><i>Arr</i> is not an array.</td>
+'   </tr>
+' </table>
+' @see #IsNullOrEmpty
 Public Function IsNull(ByRef Arr As Variant) As Boolean
+    If Not IsArray(Arr) Then _
+        Error.Argument Argument_ArrayRequired, "Arr"
+    
     IsNull = SAPtrV(Arr) = vbNullPtr
+End Function
+
+''
+' Returns if the array variable is unitialized(null) or empty(no elements).
+'
+' @param Arr The array to inspectd.
+' @return Returns <b>True</b> if the array is unitialized or has zero elements, <b>False</b> otherwise.
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ArgumentException.html">ArgumentException</a></td><td><i>Arr</i> is not an array.</td>
+'   </tr>
+' </table>
+' @see #IsNull
+Public Function IsNullOrEmpty(ByRef Arr As Variant) As Boolean
+    Dim Ptr As Long
+    
+    If Not IsArray(Arr) Then _
+        Error.Argument Argument_ArrayRequired, "Arr"
+    
+    Ptr = SAPtrV(Arr)
+    
+    If Ptr = vbNullPtr Then
+        IsNullOrEmpty = True
+    ElseIf LengthCore(Ptr) = 0 Then
+        IsNullOrEmpty = True
+    End If
 End Function
 
 ''
@@ -784,15 +998,12 @@ End Function
 ' @param Count The number of elements to search, starting from startindex.
 ' @return Value indicating the index the value was found. If no value was found,
 ' then one less than the lower bound of the array is returned.
-'
+' @see #IndexOf
 Public Function LastIndexOf(ByRef Arr As Variant, ByRef Value As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As Long
-    ValidateArray Arr
-    
-    Dim Ptr As Long
-    Ptr = SAPtrV(Arr)
-    
     Dim ElemIndex   As Long
     Dim ElemCount   As Long
+    
+    ValidateArray Arr
     ElemIndex = CLngOrDefault(StartIndex, UBound(Arr))
     ElemCount = CLngOrDefault(Count, ElemIndex - LBound(Arr) + 1)
     
@@ -804,7 +1015,8 @@ Public Function LastIndexOf(ByRef Arr As Variant, ByRef Value As Variant, Option
         Error.ArgumentOutOfRange "", ArgumentOutOfRange_LBound
     
     On Error GoTo Catch
-    If TrySZLastIndexOf(Ptr, Value, ElemIndex, ElemCount, LastIndexOf) Then
+    
+    If TrySZLastIndexOf(Arr, Value, ElemIndex, ElemCount, LastIndexOf) Then
         Exit Function
     End If
     
@@ -813,6 +1025,7 @@ Public Function LastIndexOf(ByRef Arr As Variant, ByRef Value As Variant, Option
             LastIndexOf = ElemIndex
             Exit Function
         End If
+        
         ElemIndex = ElemIndex - 1
         ElemCount = ElemCount - 1
     Loop
@@ -830,15 +1043,15 @@ End Function
 ' @param Arr The array to reverse.
 ' @param Index The starting element to begin reversing elements.
 ' @param Count The number of elements to reverse in the array.
-'
 Public Sub Reverse(ByRef Arr As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant)
-    ValidateArray Arr
-    
-    Dim Ptr As Long
-    Ptr = SAPtrV(Arr)
-    
+    Dim Info        As ArrayInfo
     Dim ElemIndex   As Long
     Dim ElemCount   As Long
+    Dim Element1Ptr As Long
+    Dim Element2Ptr As Long
+    Dim Swapper     As Action_T_T
+    
+    ValidateArray Arr
     ElemIndex = CLngOrDefault(Index, LBound(Arr))
     ElemCount = CLngOrDefault(Count, UBound(Arr) - ElemIndex + 1)
     
@@ -849,42 +1062,42 @@ Public Sub Reverse(ByRef Arr As Variant, Optional ByRef Index As Variant, Option
     If ElemIndex + ElemCount - 1 > UBound(Arr) Then _
         Error.Argument Argument_InvalidOffLen
     
-    Dim ElemSize As Long
-    ElemSize = SafeArrayGetElemsize(Ptr)
+    GetArrayInfo Arr, Info
+    Element1Ptr = Info.DataPtr + (ElemIndex - LBound(Arr)) * Info.ElementSize
+    Element2Ptr = Element1Ptr + (ElemCount - 1) * Info.ElementSize
     
-    Dim pLowElem As Long
-    pLowElem = MemLong(Ptr + PVDATA_OFFSET) + (ElemIndex - LBound(Arr)) * ElemSize
-    
-    Dim pHighElem As Long
-    pHighElem = pLowElem + (ElemCount - 1) * ElemSize
-    
-    Select Case ElemSize
-        Case 1, 2, 4, 8, 16
-            Do While pLowElem < pHighElem
-                Select Case ElemSize
-                    Case 1: Helper.Swap1 ByVal pLowElem, ByVal pHighElem
-                    Case 2: Helper.Swap2 ByVal pLowElem, ByVal pHighElem
-                    Case 4: Helper.Swap4 ByVal pLowElem, ByVal pHighElem
-                    Case 8: Helper.Swap8 ByVal pLowElem, ByVal pHighElem
-                    Case 16: Helper.Swap16 ByVal pLowElem, ByVal pHighElem
-                End Select
-                pLowElem = pLowElem + ElemSize
-                pHighElem = pHighElem - ElemSize
-            Loop
-            
+    Select Case Info.ElementSize
+        Case 1
+            Set Swapper = NewDelegate(AddressOf SwapByte)
+        Case 2
+            Set Swapper = NewDelegate(AddressOf SwapInteger)
+        Case 4
+            Set Swapper = NewDelegate(AddressOf SwapLong)
+        Case 8
+            Set Swapper = NewDelegate(AddressOf SwapCurrency)
+        Case 16
+            Set Swapper = NewDelegate(AddressOf SwapVariant)
         Case Else
-            Dim pSwapBuffer As Long
-            pSwapBuffer = CoTaskMemAlloc(ElemSize)
+            Dim TempPtr As Long
+            TempPtr = CoTaskMemAlloc(Info.ElementSize)
             
-            Do While pLowElem < pHighElem
-                CopyMemory ByVal pSwapBuffer, ByVal pLowElem, ElemSize
-                CopyMemory ByVal pLowElem, ByVal pHighElem, ElemSize
-                CopyMemory ByVal pHighElem, ByVal pSwapBuffer, ElemSize
-                pLowElem = pLowElem + ElemSize
-                pHighElem = pHighElem - ElemSize
+            Do While Element1Ptr < Element2Ptr
+                CopyMemory ByVal TempPtr, ByVal Element1Ptr, Info.ElementSize
+                CopyMemory ByVal Element1Ptr, ByVal Element2Ptr, Info.ElementSize
+                CopyMemory ByVal Element2Ptr, ByVal TempPtr, Info.ElementSize
+                Element1Ptr = Element1Ptr + Info.ElementSize
+                Element2Ptr = Element2Ptr - Info.ElementSize
             Loop
-            CoTaskMemFree pSwapBuffer
+            
+            CoTaskMemFree TempPtr
+            Exit Sub
     End Select
+    
+    Do While Element1Ptr < Element2Ptr
+        Swapper.Invoke ByVal Element1Ptr, ByVal Element2Ptr
+        Element1Ptr = Element1Ptr + Info.ElementSize
+        Element2Ptr = Element2Ptr - Info.ElementSize
+    Loop
 End Sub
 
 ''
@@ -893,28 +1106,16 @@ End Sub
 '
 ' @param Arr The array to sort.
 ' @param Comparer (Optional) An IComparer object or address of a comparer callback function.
-' @remarks The Comparer parameter can be an <b>IComparer</b> object or a
-' callback address to a compare function using the <b>AddressOf</b> method. The
-' callback method signature is defined as follows:
-' <pre>
-' Public Function SortCallback(ByRef x As [Array Datatype], ByRef y As [Array Datatype]) As Long
-'     '' return a negative value if x is less than y.
-'     '' return a positive value if x is greater than y.
-'     '' return 0 if x equals y.
-' End Function
-' </pre>
-' The [Array Datatype] must be replaced with the datatype of the array. If the
-' array is an array of Variants, then [Array Datatype] would be a Variant, not
-' any specific sub-type within the variants of the array.</p>
-'
+' @see IComparer
+' @see #SortEx
+' @see #SortKey
+' @see #SortKeyEx
 ' @include "..\DocIncludes\CorArray.Sort.html"
 Public Sub Sort(ByRef Arr As Variant, Optional ByRef Comparer As Variant)
     If IsNull(Arr) Then _
         Error.ArgumentNull "Arr", ArgumentNull_Array
     
-    Dim Length As Long
-    Length = UBound(Arr) - LBound(Arr) + 1
-    SortKeyEx Arr, Empty, LBound(Arr), Length, Comparer
+    SortKeyEx Arr, Missing, LBound(Arr), Len1D(Arr), Comparer
 End Sub
 
 ''
@@ -926,25 +1127,28 @@ End Sub
 ' @param Index The starting index in the array to start sorting.
 ' @param Length The number of elements to be sorted.
 ' @param Comparer An IComparer object or address of a comparer callback function.
-' @remarks The Comparer parameter can be an <b>IComparer</b> object or a
+' @remarks The <i>Comparer</i> parameter can be an <a href="IComparer.html">IComparer</a> interface or a
 ' callback address to a compare function using the <b>AddressOf</b> method. The
 ' callback method signature is defined as follows:
 ' <pre>
-' Public Function SortCallback(ByRef x As [Array Datatype], ByRef y As [Array Datatype]) As Long
-'     '' return a negative value if x is less than y.
-'     '' return a positive value if x is greater than y.
-'     '' return 0 if x equals y.
+' Public Function SortCallback(ByRef x As &lt;Type&gt;, ByRef y As &lt;Type&gt;) As Long
+'     '' return less than zero if x is less than y.
+'     '' return greater than zero if x is greater than y.
+'     '' return zero if x equals y.
 ' End Function
 ' </pre>
-' The [Array Datatype] must be replaced with the datatype of the array. If the
-' array is an array of Variants, then [Array Datatype] would be a Variant, not
-' any specific sub-type within the variants of the array.</p>
-'
+' The &lt;Type&gt; the type of element of the array. If the
+' array is an array of <b>Variants</>, then &lt;Type&gt; would be a <b>Variant</b>, not
+' any specific sub-type within the variant elements of the array.</p>
+' @see IComparer
+' @see #Sort
+' @see #SortKey
+' @see #SortKeyEx
 Public Sub SortEx(ByRef Arr As Variant, ByVal Index As Long, ByVal Length As Long, Optional ByRef Comparer As Variant)
     If IsNull(Arr) Then _
         Error.ArgumentNull "Arr", ArgumentNull_Array
     
-    SortKeyEx Arr, Empty, Index, Length, Comparer
+    SortKeyEx Arr, Missing, Index, Length, Comparer
 End Sub
 
 ''
@@ -954,28 +1158,29 @@ End Sub
 ' @param keys An array the sorting is based on.
 ' @param items An array that is sorted based on the sorting of keys.
 ' @param Comparer (Optional) An IComparer object or address of a comparer callback function.
-' @remarks The Comparer parameter can be an <b>IComparer</b> object or a
+' @remarks The <i>Comparer</i> parameter can be an <a href="IComparer.html">IComparer</a> interface or a
 ' callback address to a compare function using the <b>AddressOf</b> method. The
 ' callback method signature is defined as follows:
 ' <pre>
-' Public Function SortCallback(ByRef x As [Array Datatype], ByRef y As [Array Datatype]) As Long
-'     '' return a negative value if x is less than y.
-'     '' return a positive value if x is greater than y.
-'     '' return 0 if x equals y.
+' Public Function SortCallback(ByRef x As &lt;Type&gt;, ByRef y As &lt;Type&gt;) As Long
+'     '' return less than zero if x is less than y.
+'     '' return greater than zero if x is greater than y.
+'     '' return zero if x equals y.
 ' End Function
 ' </pre>
-' The [Array Datatype] must be replaced with the datatype of the array. If the
-' array is an array of Variants, then [Array Datatype] would be a Variant, not
-' any specific sub-type within the variants of the array.</p>
-'
+' The &lt;Type&gt; the type of element of the array. If the
+' array is an array of <b>Variants</b>, then &lt;Type&gt; would be a <b>Variant</b>, not
+' any specific sub-type within the variant elements of the array.</p>
+' @see IComparer
+' @see #Sort
+' @see #SortEx
+' @see #SortKeyEx
 ' @include "..\DocIncludes\CorArray.SortKey.html"
 Public Sub SortKey(ByRef Keys As Variant, ByRef Items As Variant, Optional ByRef Comparer As Variant)
     If IsNull(Keys) Then _
         Error.ArgumentNull "Keys", ArgumentNull_Array
     
-    Dim Length As Long
-    Length = UBound(Keys) - LBound(Keys) + 1
-    SortKeyEx Keys, Items, LBound(Keys), Length, Comparer
+    SortKeyEx Keys, Items, LBound(Keys), Len1D(Keys), Comparer
 End Sub
 
 ''
@@ -988,70 +1193,89 @@ End Sub
 ' @param Index The starting index in the array to start sorting.
 ' @param Length The number of elements to be sorted.
 ' @param Comparer (Optional) An IComparer object or address of a comparer callback function.
-' @remarks The Comparer parameter can be an <b>IComparer</b> object or a
+' @remarks The <i>Comparer</i> parameter can be an <a href="IComparer.html">IComparer</a> interface or a
 ' callback address to a compare function using the <b>AddressOf</b> method. The
 ' callback method signature is defined as follows:
 ' <pre>
-' Public Function SortCallback(ByRef x As [Array Datatype], ByRef y As [Array Datatype]) As Long
-'     '' return a negative value if x is less than y.
-'     '' return a positive value if x is greater than y.
-'     '' return 0 if x equals y.
+' Public Function SortCallback(ByRef x As &lt;Type&gt;, ByRef y As &lt;Type&gt;) As Long
+'     '' return less than zero if x is less than y.
+'     '' return greater than zero if x is greater than y.
+'     '' return zero if x equals y.
 ' End Function
 ' </pre>
-' The [Array Datatype] must be replaced with the datatype of the array. If the
-' array is an array of Variants, then [Array Datatype] would be a Variant, not
-' any specific sub-type within the variants of the array.</p>
-'
+' The &lt;Type&gt; the type of element of the array. If the
+' array is an array of <b>Variants</b>, then &lt;Type&gt; would be a <b>Variant</b>, not
+' any specific sub-type within the variant elements of the array.</p>
+' @see IComparer
+' @see #Sort
+' @see #SortEx
+' @see #SortKey
 Public Sub SortKeyEx(ByRef Keys As Variant, ByRef Items As Variant, ByVal Index As Long, ByVal Length As Long, Optional ByRef Comparer As Variant)
+    Dim KeysPtr     As Long
+    Dim ItemsPtr    As Long
+    Dim Left        As Long
+    Dim Right       As Long
+    
     ValidateArrayRange Keys, Index, Length, Parameter_Keys, CountName:=NameOfLength
-    
-    Dim KeysPtr  As Long
-    Dim ItemsPtr As Long
-    
     KeysPtr = SAPtrV(Keys)
+    Left = Index
+    Right = Index + Length - 1
     
-    If Not IsEmpty(Items) Then
+    If Not IsMissing(Items) Then
         ValidateArray Items, Parameter_Items
-        ItemsPtr = SAPtrV(Items)
         
         ' Items array must match the Keys array in size and bounds.
         If (LBound(Keys) <> LBound(Items)) Or _
            (UBound(Keys) <> UBound(Items)) Then _
             Error.Argument Argument_MatchingBounds
-        
-        SetSortItems ItemsPtr
+                
+        ' If a callback address was passed in for the Comparer then
+        ' a callback sort routine will be used and it will
+        ' allocate its own sort-item swap buffer.
+        If Not IsInteger(Comparer) Then
+            ItemsPtr = SAPtrV(Items)
+            SetSortItems ItemsPtr
+        End If
     End If
     
     On Error GoTo Catch
     Select Case VarType(Comparer)
         ' use an IComparer object to sort with.
         Case vbObject
-            SetSortKeys KeysPtr
-            
-            If Comparer Is Nothing Then
-                Set SortComparer = CorLib.Comparer.Default
-            Else
-                Set SortComparer = Comparer
+            ' use specialized sorting for different types of string comparisons.
+            If (VarType(Keys) And &HFF) = vbString Then
+                SortStringsWithComparer Keys, Left, Right, Comparer
+                GoSub Finally
+                Exit Sub
+            ElseIf Comparer Is Nothing Or Comparer Is Statics.Comparer.Default Then
+                ' try specialized sorting using default comparisons.
+                If TrySZSort(Keys, Left, Right) Then
+                    GoSub Finally
+                    Exit Sub
+                End If
             End If
             
-            QuickSortGeneral Keys, Index, Index + Length - 1
+            If Comparer Is Nothing Then _
+                Error.ArgumentNull "Comparer"
+            If Not TypeOf Comparer Is IComparer Then _
+                Throw Cor.NewInvalidCastException(Environment.GetResourceString(InvalidCast_IComparer))
+            
+            SetSortKeys KeysPtr
+            QuickSortGeneral Keys, Left, Right, CUnk(Comparer)
             
         ' Use a callback method to sort with.
         ' This allows a user to supply a highspeed comparison
         ' routine to compare two elements of the array.
         Case vbLong
-            CallbackSorter.Sort KeysPtr, ItemsPtr, Index, Index + Length - 1, Comparer
+            Dim Sorter As CallbackSorter
+            Set Sorter = Cor.NewCallbackSorter(Comparer)
+            Sorter.Sort Keys, Items, Left, Right
             
-        ' try optimized routines first, then fallback to the default IComparer object.
-        Case vbError
-            If Not TrySZSort(KeysPtr, Index, Index + Length - 1) Then
-                ' If we get here, then no optimized routine existed,
-                ' so we'll set our comparer to the default and loop
-                ' around again, letting this case statement fall
-                ' into the QuickSortGeneral routine.
+        ' No compare given so try optimized routines first, then fallback to general sort.
+        Case vbMissing
+            If Not TrySZSort(Keys, Left, Right) Then
                 SetSortKeys KeysPtr
-                Set SortComparer = CorLib.Comparer.Default
-                QuickSortGeneral Keys, Index, Index + Length - 1
+                QuickSortGeneral Keys, Left, Right, Statics.Comparer.Default
             End If
         Case Else
             Error.Argument Argument_InvalidComparer, "Comparer"
@@ -1062,7 +1286,7 @@ Public Sub SortKeyEx(ByRef Keys As Variant, ByRef Items As Variant, ByVal Index 
     
 Catch:
     GoSub Finally
-    Throw
+    ThrowOrErr Err
 Finally:
     ClearSortKeys
     ClearSortItems
@@ -1070,36 +1294,32 @@ Finally:
     Return
 End Sub
 
-Private Sub CleanUpSortRoutine()
-    ClearSortKeys
-    ClearSortItems
-    Set SortComparer = Nothing
-End Sub
-
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Internal
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Function InternalBinarySearch(ByRef Arr As Variant, ByVal Index As Long, ByVal Length As Long, ByRef Value As Variant, ByVal Comparer As IComparer) As Long
+    Dim MiddleIndex As Long
+    Dim LowIndex    As Long
+    Dim HighIndex   As Long
+        
     On Error GoTo Catch
     
     If Comparer Is Nothing Then
-        If TrySZBinarySearch(SAPtrV(Arr), Value, Index, Length, InternalBinarySearch) Then
+        If TrySZBinarySearch(Arr, Value, Index, Length, InternalBinarySearch) Then
             Exit Function
         End If
         
         Set Comparer = Statics.Comparer.Default
     End If
-    
+        
     ' perform a search using comparer.
-    Dim MiddleIndex As Long
-    Dim LowIndex    As Long
-    Dim HighIndex   As Long
-    
     LowIndex = Index
     HighIndex = LowIndex + Length - 1
+    
     Do While LowIndex <= HighIndex
         MiddleIndex = (LowIndex + HighIndex) \ 2
+        
         Select Case Comparer.Compare(Arr(MiddleIndex), Value)
             Case 0
                 InternalBinarySearch = MiddleIndex
@@ -1122,46 +1342,33 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Function LengthCore(ByVal SafeArrayPtr As Long, ByVal Dimension As Long) As Long
+Private Function LengthCore(ByVal SafeArrayPtr As Long) As Long
     Dim Rank            As Long
     Dim ArrayBoundPtr   As Long
     
     Debug.Assert SafeArrayPtr <> 0
     
     Rank = SafeArrayGetDim(SafeArrayPtr)
-    
-    If Dimension > Rank Then _
-        Error.IndexOutOfRange IndexOutOfRange_Dimension
-    
     ArrayBoundPtr = SafeArrayPtr + vbSizeOfSafeArray
     
-    If Dimension < 1 Then
-        ' optimize for 99% of calls
-        If Rank = 1 Then
-            LengthCore = MemLong(ArrayBoundPtr)
-        Else
-            LengthCore = CalculateProductOfDimensions(ArrayBoundPtr, Rank)
-        End If
+    ' optimize for 99% of calls
+    If Rank = 1 Then
+        LengthCore = MemLong(ArrayBoundPtr)
     Else
-        LengthCore = GetDimensionSize(ArrayBoundPtr, Rank, Dimension)
+        LengthCore = CalculateProductOfDimensions(ArrayBoundPtr, Rank)
     End If
 End Function
 
 Private Function CalculateProductOfDimensions(ByVal ArrayBoundPtr As Long, ByVal Rank As Long) As Long
-    Dim Result As Long
+    Dim Ptr     As Long
+    Dim Result  As Long
     
     Result = 1
-    Dim Ptr As Long
     For Ptr = ArrayBoundPtr To ArrayBoundPtr + (vbSizeOfSafeArrayBound * (Rank - 1)) Step vbSizeOfSafeArrayBound
         Result = Result * MemLong(Ptr)
     Next
 
     CalculateProductOfDimensions = Result
-End Function
-
-Private Function GetDimensionSize(ByVal ArrayBoundPtr As Long, ByVal Rank As Long, ByVal Dimension As Long) As Long
-    ArrayBoundPtr = ArrayBoundPtr + (Rank - Dimension) * vbSizeOfSafeArrayBound
-    GetDimensionSize = MemLong(ArrayBoundPtr)
 End Function
 
 ''
@@ -1204,18 +1411,15 @@ Private Sub AssignDefaultElementValue(ByRef Arr As Variant, ByRef RetVal As Vari
 End Sub
 
 ' Value types can be copied quickly using CopyMemory.
-'
-Private Sub CopyValueTypes(ByVal srcpSA As Long, ByVal SourceIndex As Long, ByVal dstpSA As Long, ByVal DestinationIndex As Long, ByVal Length As Long)
-    Dim ElemSize As Long
-    ElemSize = SafeArrayGetElemsize(srcpSA)
+Private Sub CopyValueTypes(ByVal SrcSAPtr As Long, ByVal SourceIndex As Long, ByVal DstSAPtr As Long, ByVal DestinationIndex As Long, ByVal Length As Long)
+    Dim ElementSize     As Long
+    Dim SrcElementPtr   As Long
+    Dim DstElementPtr   As Long
     
-    Dim pSrcElem As Long
-    pSrcElem = MemLong(srcpSA + PVDATA_OFFSET) + (SourceIndex - SafeArrayGetLBound(srcpSA, 1)) * ElemSize
-    
-    Dim pDstElem As Long
-    pDstElem = MemLong(dstpSA + PVDATA_OFFSET) + (DestinationIndex - SafeArrayGetLBound(dstpSA, 1)) * ElemSize
-    
-    CopyMemory ByVal pDstElem, ByVal pSrcElem, Length * ElemSize
+    ElementSize = SafeArrayGetElemsize(SrcSAPtr)
+    SrcElementPtr = MemLong(SrcSAPtr + PVDATA_OFFSET) + (SourceIndex - SafeArrayGetLBound(SrcSAPtr, 1)) * ElementSize
+    DstElementPtr = MemLong(DstSAPtr + PVDATA_OFFSET) + (DestinationIndex - SafeArrayGetLBound(DstSAPtr, 1)) * ElementSize
+    CopyMemory ByVal DstElementPtr, ByVal SrcElementPtr, Length * ElementSize
 End Sub
 
 ' Copies reference types, dealing with possible overlapping source and destination regions.
@@ -1239,13 +1443,13 @@ Private Sub CopyReferenceTypes(ByVal srcpSA As Long, ByVal SourceIndex As Long, 
             Dim ClearSA As GuidSafeArray1d
             ClearSA = srcSA
             With ClearSA.SA
-                .pvData = .pvData + (SourceIndex + Length) * .cbElements
+                .PVData = .PVData + (SourceIndex + Length) * .cbElements
                 .cElements = DestinationIndex - SourceIndex
             End With
             SafeArrayDestroyData VarPtr(ClearSA.SA)
             
             With srcSA.SA
-                CopyMemory ByVal .pvData + (DestinationIndex - .lLbound) * .cbElements, ByVal .pvData + (SourceIndex - .lLbound) * .cbElements, Length * .cbElements
+                CopyMemory ByVal .PVData + (DestinationIndex - .lLbound) * .cbElements, ByVal .PVData + (SourceIndex - .lLbound) * .cbElements, Length * .cbElements
     
                 ' If we have moved reference type values, then we need to
                 ' fill in the uncovered portion of the original values
@@ -1254,7 +1458,7 @@ Private Sub CopyReferenceTypes(ByVal srcpSA As Long, ByVal SourceIndex As Long, 
                 ' moved the references without making copies to objects or strings.
                 ' Once the uncovered portion is set up, we can copy backwards using
                 ' the standard reference copy method without stepping on ourselves.
-                ZeroMemory ByVal .pvData + (SourceIndex - .lLbound) * .cbElements, (DestinationIndex - SourceIndex) * .cbElements
+                ZeroMemory ByVal .PVData + (SourceIndex - .lLbound) * .cbElements, (DestinationIndex - SourceIndex) * .cbElements
             End With
             
             Length = DestinationIndex - SourceIndex
@@ -1271,77 +1475,74 @@ Private Sub CopyReferenceTypes(ByVal srcpSA As Long, ByVal SourceIndex As Long, 
     SafeArrayCopyData VarPtr(srcSA.SA), VarPtr(dstSA.SA)
 End Sub
 
-Private Sub CopyWithCast(ByVal srcpSA As Long, ByVal SourceIndex As Long, ByVal dstpSA As Long, ByVal DestinationIndex As Long, ByVal Length As Long, ByVal pfn As Long)
-    Dim srcSize As Long
-    srcSize = SafeArrayGetElemsize(srcpSA)
+Private Sub CopyWithCast(ByVal SrcSAPtr As Long, ByVal SourceIndex As Long, ByVal DstSAPtr As Long, ByVal DestinationIndex As Long, ByVal Length As Long, ByVal pfn As Long)
+    Dim SrcSize     As Long
+    Dim Src         As Long
+    Dim DstSize     As Long
+    Dim Dst         As Long
+    Dim Assigner    As Action_T_T
     
-    Dim srcLb   As Long
-    srcLb = SafeArrayGetLBound(srcpSA, 1)
-    
-    Dim src     As Long
-    src = MemLong(srcpSA + PVDATA_OFFSET) + (SourceIndex - srcLb) * srcSize
-    
-    Dim dstSize As Long
-    dstSize = SafeArrayGetElemsize(dstpSA)
-    
-    Dim dstLb   As Long
-    dstLb = SafeArrayGetLBound(dstpSA, 1)
-    
-    Dim dst     As Long
-    dst = MemLong(dstpSA + PVDATA_OFFSET) + (DestinationIndex - dstLb) * dstSize
-    
-    Dim Assigner As Action_T_T
+    SrcSize = SafeArrayGetElemsize(SrcSAPtr)
+    Src = MemLong(SrcSAPtr + PVDATA_OFFSET) + (SourceIndex - SafeArrayGetLBound(SrcSAPtr, 1)) * SrcSize
+    DstSize = SafeArrayGetElemsize(DstSAPtr)
+    Dst = MemLong(DstSAPtr + PVDATA_OFFSET) + (DestinationIndex - SafeArrayGetLBound(DstSAPtr, 1)) * DstSize
     Set Assigner = NewDelegate(pfn)
     
+    On Error GoTo Catch
+    
     Do While Length > 0
-        Assigner.Invoke ByVal dst, ByVal src
-        src = src + srcSize
-        dst = dst + dstSize
+        Assigner.Invoke ByVal Dst, ByVal Src
+        Src = Src + SrcSize
+        Dst = Dst + DstSize
         Length = Length - 1
     Loop
+    
+    Exit Sub
+    
+Catch:
+    Throw Cor.NewInvalidCastException(Environment.GetResourceString(InvalidCast_DownCastArrayElement))
 End Sub
 
 ' Copies objects and checks for compatible interfaces during the copy.
 '
-Private Sub CopyObjectTypesCast(ByVal srcpSA As Long, ByVal SourceIndex As Long, ByVal dstpSA As Long, ByVal DestinationIndex As Long, ByVal Length As Long)
+Private Sub CopyObjectTypesCast(ByVal SrcSAPtr As Long, ByVal SourceIndex As Long, ByVal DstSAPtr As Long, ByVal DestinationIndex As Long, ByVal Length As Long)
     Const SizeOfPointer As Long = 4
-    Dim SrcLowerBound As Long
-    SrcLowerBound = SafeArrayGetLBound(srcpSA, 1)
     
-    Dim DstLowerBound As Long
-    DstLowerBound = SafeArrayGetLBound(dstpSA, 1)
+    Dim SrcLowerBound   As Long
+    Dim DstLowerBound   As Long
+    Dim SrcElementPtr   As Long
+    Dim DstElementPtr   As Long
+    Dim DstGuidPtr      As Long
     
-    Dim pSrcElem As Long
-    pSrcElem = MemLong(srcpSA + PVDATA_OFFSET) + (SourceIndex - SrcLowerBound) * SizeOfPointer
-    
-    Dim pDstElem As Long
-    pDstElem = MemLong(dstpSA + PVDATA_OFFSET) + (DestinationIndex - DstLowerBound) * SizeOfPointer
-    
-    Dim pDstGuid As Long
-    pDstGuid = dstpSA - vbSizeOfGuid
+    SrcLowerBound = SafeArrayGetLBound(SrcSAPtr, 1)
+    DstLowerBound = SafeArrayGetLBound(DstSAPtr, 1)
+    SrcElementPtr = MemLong(SrcSAPtr + PVDATA_OFFSET) + (SourceIndex - SrcLowerBound) * SizeOfPointer
+    DstElementPtr = MemLong(DstSAPtr + PVDATA_OFFSET) + (DestinationIndex - DstLowerBound) * SizeOfPointer
+    DstGuidPtr = DstSAPtr - vbSizeOfGuid
     
     Dim pObj    As Long
     Dim SrcObj  As IVBUnknown
     Dim DstObj  As IVBUnknown
     Do While Length > 0
-        ObjectPtr(SrcObj) = MemLong(pSrcElem)
+        ObjectPtr(SrcObj) = MemLong(SrcElementPtr)
         pObj = 0
+        
         If Not SrcObj Is Nothing Then
-            If SrcObj.QueryInterface(ByVal pDstGuid, pObj) = E_NOINTERFACE Then
+            If SrcObj.QueryInterface(ByVal DstGuidPtr, pObj) = E_NOINTERFACE Then
                 ObjectPtr(SrcObj) = vbNullPtr
                 ObjectPtr(DstObj) = vbNullPtr
-                Throw Cor.NewArrayTypeMismatchException(Environment.GetResourceString(ArrayTypeMismatch_Incompatible))
+                Throw Cor.NewInvalidCastException(Environment.GetResourceString(InvalidCast_DownCastArrayElement))
             End If
         End If
         
-        ObjectPtr(DstObj) = MemLong(pDstElem)
+        ObjectPtr(DstObj) = MemLong(DstElementPtr)
         If Not DstObj Is Nothing Then
             DstObj.Release
         End If
-        MemLong(pDstElem) = pObj
+        MemLong(DstElementPtr) = pObj
         
-        pSrcElem = pSrcElem + SizeOfPointer
-        pDstElem = pDstElem + SizeOfPointer
+        SrcElementPtr = SrcElementPtr + SizeOfPointer
+        DstElementPtr = DstElementPtr + SizeOfPointer
         Length = Length - 1
     Loop
     
@@ -1355,6 +1556,7 @@ End Sub
 '
 Private Function GetAssigningFunction(ByVal srcType As VbVarType, ByVal dstType As VbVarType) As Long
     Dim Ret As Long
+    
     Select Case srcType
         Case vbLong
             Select Case dstType
@@ -1428,15 +1630,21 @@ Private Function GetAssigningFunction(ByVal srcType As VbVarType, ByVal dstType 
                 Case vbCurrency:                Ret = FuncAddr(AddressOf NarrowVariantToCurrency)
             End Select
     End Select
+    
     GetAssigningFunction = Ret
 End Function
 
 Private Sub SetCopyArrayDescriptor(ByRef desc As SafeArray1d, ByVal Index As Long, ByVal Length As Long)
     With desc
-        .pvData = .pvData + (Index - .lLbound) * .cbElements
+        .PVData = .PVData + (Index - .lLbound) * .cbElements
         .cElements = Length
     End With
 End Sub
 
+Private Sub GetArrayInfo(ByRef Arr As Variant, ByRef Info As ArrayInfo)
+    Info.SAPtr = SAPtrV(Arr)
+    Info.DataPtr = MemLong(Info.SAPtr + PVDATA_OFFSET)
+    Info.ElementSize = SafeArrayGetElemsize(Info.SAPtr)
+End Sub
 
 

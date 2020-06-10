@@ -36,7 +36,7 @@ Attribute VB_Exposed = True
 '
 
 ''
-' Provides static methods to help create Version objects.
+' Provides static methods to help create <a href="Version.html">Version</a> objects.
 '
 ' @see Version
 '
@@ -45,13 +45,35 @@ Option Explicit
 Private mParser As New VersionParser
 
 ''
-' Parses a string in the format of major.minor[.build[.revision]].
+' Converts the string representation of a version number to an equivalent <a href="VersionStatic.html">VersionStatic</a> object.
 '
-' @param s The string to be parsed.
-' @return A version defined from the string.
-' @remarks Atleast 2 of the version numbers must be supplied, and
-' all version numbers must be non-negative.
-'
+' @param s A string that contains a version number to convert.
+' @return An object that is equivalent to the version number specified in the <i>s</i> parameter.
+' <h4>Exceptions</h4>
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ArgumentException.html">ArgumentException</a></td><td><i>s</i> has fewer than two or more than four version components.</td>
+'   </tr>
+'    <tr>
+'        <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td><td>At least one component in <i>s</i> is less than zero.</td>
+'    </tr>
+'    <tr>
+'        <td><a href="FormatException.html">FormatException</a></td><td>At least one component in <i>s</i> is not an integer.</td>
+'    </tr>
+'    <tr>
+'        <td><a href="OverflowException.html">OverflowException</a></td><td>At least one component in <i>s</i> represents a number that is greater than the max 32-bit value.</td>
+'    </tr>
+' </table>
+' @remarks The <i>s</i> parameter must have the following format:
+' <pre>
+'   Major.Minor[.Build[.Revision]]
+' </pre>
+' where <i>Major</i>, <i>Minor</i>, <i>Build</i>, and <i>Revision</i> are the string representations of the version number's four components: major version number, minor version number, build number, and revision number.
+' Optional components are shown in square brackets ([ and ]). The components must appear in the specified order, and must be separated by periods.
 Public Function Parse(ByRef s As String) As Version
     If Not mParser.TryParse(s, Parse) Then
         mParser.ThrowError
@@ -59,15 +81,12 @@ Public Function Parse(ByRef s As String) As Version
 End Function
 
 ''
-' Tries to parse a string in the format of major.minor[.build[.revision]] returning a boolean value
-' indicating the success or failure of parsing. The parsed version is returned
-' through the <b>ByRef Result</b> parameter supplied.
+' Tries to convert the string representation of a version number to an equivalent <a href="Version.html">Version</a> object, and returns a value that indicates whether the conversion succeeded.
 '
-' @param s The string containing the version information to be parsed.
-' @param Result The <b>ByRef</b> parameter used to pass the <pre>Version</pre>
-' back with on a successful parse.
-' @return <b>True</b> if the <i>input</i> was successfully parsed; otherwise <b>False</b>..
-'
+' @param s A string that contains a version number to convert.
+' @param Result When this method returns, contains the <a href="Version.html">Version</a> equivalent of the number that is contained in <i>s</i>,
+' if the conversion succeeded, or <b>Nothing</b> if the conversion failed.
+' @return <b>True</b> if the <i>s</i> parameter was converted successfully; otherwise <b>False</b>..
 Public Function TryParse(ByRef s As String, ByRef Result As Version) As Boolean
     TryParse = mParser.TryParse(s, Result)
 End Function

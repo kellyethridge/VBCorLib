@@ -1,0 +1,29 @@
+@exceptions
+<table style="width: auto">
+	<tr>
+		<th>Exception</th><th>Condition</th>
+	</tr>
+	<tr>
+		<td><a href="DivideByZeroException.html">DivideByZeroException</a></td>
+		<td>Attempt to divide by zero.</td>
+	</tr>
+</table>
+@examples The following code will calculate the quotient and remainder of a division operation.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> x <span style="color: #0000ff">As</span> Int64
+    <span style="color: #0000ff">Dim</span> y <span style="color: #0000ff">As</span> Int64
+    <span style="color: #0000ff">Dim</span> q <span style="color: #0000ff">As</span> Int64
+    <span style="color: #0000ff">Dim</span> r <span style="color: #0000ff">As</span> Int64
+    
+    x = CInt64(500)
+    y = CInt64(55)
+    q = Int64.DivRem(x, y, r)
+    
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;The quotient of {0} / {1} = {2}&quot;</span>, x, y, q)
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;The remainder of {0} / {1} = {2}.&quot;</span>, x, y, r)
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39;This code produces the following.</span>
+<span style="color: #008000">&#39;    The quotient of 500 / 55 = 9</span>
+<span style="color: #008000">&#39;    The remainder of 500 / 55 = 5.</span>
+</pre></div>

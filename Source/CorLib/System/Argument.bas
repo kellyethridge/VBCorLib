@@ -92,7 +92,7 @@ Public Function MakeDefaultRange(ByRef Index As Variant, ByVal DefaultIndex As L
     End If
 End Function
 
-Public Function MakeDefaultStepRange(ByRef Index As Variant, ByVal DefaultIndex As Long, ByRef Count As Variant, ByVal DefaultCount As Long, Optional ByVal IndexName As ParameterName = NameOfIndex, Optional ByVal CountName As ParameterName = NameOfCount) As ListRange
+Public Function MakeDefaultStepRange(ByRef Index As Variant, ByVal DefaultIndex As Long, ByRef Count As Variant, ByVal DefaultCount As Long, Optional ByVal IndexName As ParameterName = NameOfIndex) As ListRange
     If IsMissing(Index) Then
         If Not IsMissing(Count) Then _
             Error.Argument Argument_ParamRequired, Environment.GetParameterName(IndexName)

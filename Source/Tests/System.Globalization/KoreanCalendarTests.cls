@@ -92,10 +92,17 @@ Public Sub Era_WhenCalled_ReturnsOneEra()
     Assert.That Actual, Iz.EqualTo(NewLongs(1))
 End Sub
 
-Public Sub TwoDigitYearMax_WhenNew_Returns4362()
+Public Sub TwoDigitYearMax_WithDefault_ReturnsWindowsValue()
     Dim Calendar As New KoreanCalendar
+    Dim Expected As Long
+    Dim Actual As Long
     
-    Assert.That Calendar.TwoDigitYearMax, Iz.EqualTo(4362)
+    Actual = Calendar.TwoDigitYearMax
+    
+    ' since the windows TwoDigitMaxYear seems to change every 20 years, we will just
+    ' have to retrieve it and make user we return the same value.
+    GetCalendarInfo LOCALE_USER_DEFAULT, CAL_KOREA, CAL_ITWODIGITYEARMAX Or CAL_RETURN_NUMBER, vbNullString, 0, Expected
+    Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
 Public Sub TwoDigitYearMax_WithBoundryValue_SetsValue(ByVal Value As Long)
@@ -150,40 +157,40 @@ Public Sub AddMethods_WhenCalled_ReturnsExpected()
     Assert.That Calendar.AddWeeks(d, 5), Equals(#2/5/1900#), "AddWeeks #1"
 End Sub
 
-Public Sub AddMilliseconds_WhenResultIsLessThanMinSupported_ThrowsArgumentException()
+Public Sub AddMilliseconds_WhenResultIsLessThanMinSupported_ThrowsArgumentOutOfRangeException()
     Dim Calendar As New KoreanCalendar
     
     On Error Resume Next
     Calendar.AddMilliseconds Calendar.MinSupportedDateTime, -1
     
-    AssertArgumentException Err
+    AssertArgumentOutOfRangeException Err
 End Sub
 
-Public Sub AddMilliseconds_WhenResultGreaterThanMaxSupported_ThrowsArgumentException()
+Public Sub AddMilliseconds_WhenResultGreaterThanMaxSupported_ThrowsArgumentOutOfRangeException()
     Dim Calendar As New KoreanCalendar
     
     On Error Resume Next
     Calendar.AddMilliseconds Calendar.MaxSupportedDateTime, 1
     
-    AssertArgumentException Err
+    AssertArgumentOutOfRangeException Err
 End Sub
 
-Public Sub AddMonths_WhenResultIsLessThanMinSupported_ThrowsArgumentException()
+Public Sub AddMonths_WhenResultIsLessThanMinSupported_ThrowsArgumentOutOfRangeException()
     Dim Calendar As New KoreanCalendar
     
     On Error Resume Next
     Calendar.AddMonths Calendar.MinSupportedDateTime, -1
     
-    AssertArgumentException Err
+    AssertArgumentOutOfRangeException Err
 End Sub
 
-Public Sub AddMonths_WhenResultGreaterThanMaxSupported_ThrowsArgumentException()
+Public Sub AddMonths_WhenResultGreaterThanMaxSupported_ThrowsArgumentOutOfRangeException()
     Dim Calendar As New KoreanCalendar
     
     On Error Resume Next
     Calendar.AddMonths Calendar.MaxSupportedDateTime, 1
     
-    AssertArgumentException Err
+    AssertArgumentOutOfRangeException Err
 End Sub
 
 Public Sub GetProperties_WhenCalled_ReturnsExpected()

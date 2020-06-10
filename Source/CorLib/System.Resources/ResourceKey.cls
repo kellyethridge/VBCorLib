@@ -91,12 +91,7 @@ Public Enum ResourceTypes
     AniCursor = 21
     AniIcon = 22
     HTML = 23
-    
-    #If False Then
-        Dim StringResource
-    #End If
 End Enum
-
 
 Private mResourceName   As Variant
 Private mResourceType   As Variant
@@ -209,7 +204,7 @@ End Sub
 Private Function EqualStringOrInt(ByRef x As Variant, ByRef y As Variant) As Boolean
     If VarType(x) = vbString Then
         If VarType(y) = vbString Then
-            EqualStringOrInt = CorString.EqualsV(x, y, OrdinalIgnoreCase)
+            EqualStringOrInt = CorString.EqualsV(x, y, StringComparison.OrdinalIgnoreCase)
         End If
     Else
         EqualStringOrInt = (x = y)

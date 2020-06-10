@@ -469,9 +469,9 @@ Private Function GetNumber(ByVal Element As SecurityElement, ByRef Name As Strin
         Case 1
             GetNumber = Bytes(0)
         Case 2
-            GetNumber = BitConverter.ToInteger(Bytes, 0)
+            GetNumber = BitConverter.ToInt16(Bytes, 0)
         Case Else
-            GetNumber = BitConverter.ToLong(Bytes, 0)
+            GetNumber = BitConverter.ToInt32(Bytes, 0)
     End Select
 End Function
 

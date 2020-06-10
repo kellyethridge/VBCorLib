@@ -110,7 +110,6 @@ End Type
 
 Private mProps      As PropsType
 Private mLoaded     As Boolean
-Private mPattern    As CharBuffer
 
 
 ''
@@ -697,7 +696,7 @@ End Function
 ' @return The formatting provider, or Nothing is none is available.
 '
 Public Function GetFormat(ByRef FormatType As String) As Object
-    If CorString.Equals(FormatType, vbDateTimeFormatInfo, OrdinalIgnoreCase) Then
+    If CorString.Equals(FormatType, vbDateTimeFormatInfo, StringComparison.OrdinalIgnoreCase) Then
         Set GetFormat = Me
     End If
 End Function
@@ -871,8 +870,11 @@ Private Function CustomFormat(ByRef dt As CorDateTime, ByRef Pattern As String) 
     Dim ZoneOffset  As TimeSpan
     Dim Percented   As Boolean
     Dim Quote       As Long
+    Dim PatternChars() As Integer
+    Dim MaxIndex    As Long
     
-    InitChars mPattern, Pattern
+    PatternChars = AllocChars(Pattern)
+    MaxIndex = UBound(PatternChars)
     Set sb = StringBuilderCache.Acquire
     
     On Error GoTo Catch
@@ -895,9 +897,9 @@ Private Function CustomFormat(ByRef dt As CorDateTime, ByRef Pattern As String) 
         Designator = mProps.PMDesignator
     End If
     
-    Do While pos < mPattern.Buffer.cElements
-        Ch = mPattern.Chars(pos)
-        Count = GetRepeatCount(pos)
+    Do While pos <= MaxIndex
+        Ch = PatternChars(pos)
+        Count = GetRepeatCount(PatternChars, pos)
         
         If Not Escaped Then
             If Quote <> 0 Then
@@ -1006,11 +1008,16 @@ Private Function CustomFormat(ByRef dt As CorDateTime, ByRef Pattern As String) 
         Throw Cor.NewFormatException("A matching quote was not found in the format string.")
     
     CustomFormat = StringBuilderCache.GetStringAndRelease(sb)
+    GoSub Finally
     Exit Function
     
 Catch:
+    GoSub Finally
     StringBuilderCache.Release sb
-    Throw
+    ThrowOrErr Err
+Finally:
+    FreeChars PatternChars
+    Return
 End Function
 
 Private Function GetSecondsFraction(ByRef Ticks As Variant) As Long
@@ -1059,19 +1066,23 @@ End Sub
 ' @param Index The starting location in mPatterns to be counting repeate characters.
 ' @return The number of time the character repeated starting at the index.
 '
-Private Function GetRepeatCount(ByVal Index As Long) As Long
-    Dim i   As Long
-    Dim Ch  As Integer
+Private Function GetRepeatCount(ByRef PatternChars() As Integer, ByVal Index As Long) As Long
+    Dim i           As Long
+    Dim Ch          As Integer
+    Dim MaxIndex    As Long
     
-    Ch = mPattern.Chars(Index)
+    MaxIndex = UBound(PatternChars)
+    Ch = PatternChars(Index)
     i = Index + 1
-    Do While i < mPattern.Buffer.cElements
-        If mPattern.Chars(i) <> Ch Then
+    
+    Do While i <= MaxIndex
+        If PatternChars(i) <> Ch Then
             Exit Do
         End If
         
         i = i + 1
     Loop
+    
     GetRepeatCount = i - Index
 End Function
 

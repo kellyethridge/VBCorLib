@@ -1,0 +1,14 @@
+@examples The following code performs a NOT operation on a 64-bit integer value.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> x <span style="color: #0000ff">As</span> Int64
+    <span style="color: #0000ff">Dim</span> r <span style="color: #0000ff">As</span> Int64
+    
+    x = CInt64(<span style="color: #a31515">&quot;0xf0000000&quot;</span>)
+    r = Int64.BitwiseNot(x)
+    
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;NOT 0x{0:x} = 0x{1:x8}&quot;</span>, x, r)
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39;This code produces the following.</span>
+<span style="color: #008000">&#39;    NOT 0xf0000000 = 0xffffffff0fffffff</span>
+</pre></div>

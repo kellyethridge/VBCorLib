@@ -52,14 +52,6 @@ Private mInvalidFileNameChars() As Integer
 Private mTrimEndChars()         As Integer
 
 
-Friend Property Get MaxPath() As Long
-    MaxPath = MAX_PATH
-End Property
-
-Friend Property Get MaxLongPath() As Long
-    MaxLongPath = MAX_LONG_PATH
-End Property
-
 ''
 ' Returns the character code for the alternative directory separator character.
 '
@@ -181,7 +173,9 @@ End Function
 ' <p>This function does not verify that the path actually exists.</p>
 '
 Public Function IsPathRooted(ByRef Path As String) As Boolean
-    If Len(Path) = 0 Then Exit Function
+    If Len(Path) = 0 Then
+        Exit Function
+    End If
     
     CheckValidPathChars Path
     
@@ -205,11 +199,10 @@ End Function
 ' filename is considered not to have an extension.
 '
 Public Function HasExtension(ByRef Path As String) As Boolean
-    CheckValidPathChars Path
-    
     Dim Index As Long
-    Index = GetExtensionCharIndex(Path)
     
+    CheckValidPathChars Path
+    Index = GetExtensionCharIndex(Path)
     HasExtension = Index > 0 And Index < Len(Path)
 End Function
 
@@ -218,6 +211,7 @@ End Function
 '
 ' @param Path1 The left-hand side of the two paths to be joined.
 ' @param Path2 The right-hand side of the two paths to be joined.
+' @param Paths Additional paths to be joined.
 ' @return The joined paths.
 ' @remarks <p>If Path1 is an empty string, then Path2 is returned as is. If Path2
 ' is empty, but not Path1, then Path1 is returned as is.</p>
@@ -226,27 +220,42 @@ End Function
 ' <p>If Path1 does not end with a directory separator, one will be inserted.</p>
 ' <p>This function does not verify that the paths exist.</p>
 '
-Public Function Combine(ByRef Path1 As String, ByRef Path2 As String) As String
+Public Function Combine(ByRef Path1 As String, ByRef Path2 As String, ParamArray Paths() As Variant) As String
+    Dim Result  As String
+    Dim Part    As Variant
+    
     CheckValidPathChars Path1
+    Result = CombinePaths(Path1, Path2)
     
-    If IsPathRooted(Path2) Then
-        Combine = Path2
+    For Each Part In Paths
+        Result = CombinePaths(Result, Object.ToString(Part))
+    Next
+    
+    Combine = Result
+End Function
+
+''
+' Combines an array of path fragments returning a complete path.
+'
+' @param Paths The array of path fragments to be combined.
+' @return Returns a concatenated string of the path fragments.
+Public Function CombineArray(ByRef Paths() As String) As String
+    Dim Index   As Long
+    Dim Result  As String
+    
+    If CorArray.IsNullOrEmpty(Paths) Then
         Exit Function
     End If
     
-    If Len(Path1) = 0 Then
-        Combine = Path2
-        Exit Function
-    ElseIf Len(Path2) = 0 Then
-        Combine = Path1
-        Exit Function
-    End If
+    Index = LBound(Paths)
+    Result = Paths(Index)
+    CheckValidPathChars Result
     
-    If IsSeparator(CorString.LastChar(Path1)) Then
-        Combine = Path1 & Path2
-    Else
-        Combine = Path1 & vbDirectorySeparator & Path2
-    End If
+    For Index = Index + 1 To UBound(Paths)
+        Result = CombinePaths(Result, Paths(Index))
+    Next
+    
+    CombineArray = Result
 End Function
 
 ''
@@ -257,16 +266,15 @@ End Function
 ' @remarks The function does not verify that the directory exists.
 '
 Public Function GetDirectoryName(ByRef Path As String) As String
+    Dim NormalizedPath  As String
+    Dim PathLength      As Long
+    Dim RootLength      As Long
+    
     If Len(Path) = 0 Then _
         Error.Argument Argument_EmptyPath, "Path"
     
     CheckValidPathChars Path
-    
-    Dim NormalizedPath As String
     NormalizedPath = NormalizePath(Path, False)
-    
-    Dim PathLength As Long
-    Dim RootLength As Long
     RootLength = GetRootLength(NormalizedPath)
     
     If RootLength < Len(NormalizedPath) Then
@@ -292,7 +300,9 @@ End Function
 '
 Public Function GetExtension(ByRef Path As String) As String
     Dim Index As Long
+    
     Index = GetExtensionCharIndex(Path)
+    
     If Index > 0 And Index < Len(Path) Then
         GetExtension = Mid$(Path, Index)
     End If
@@ -306,9 +316,9 @@ End Function
 ' @remarks This function does not verify that the file exists.
 '
 Public Function GetFileName(ByRef Path As String) As String
-    CheckValidPathChars Path
-    
     Dim Index As Long
+    
+    CheckValidPathChars Path
     Index = GetDirectoryCharIndex(Path)
     
     If Index > 0 Then
@@ -327,10 +337,11 @@ End Function
 '
 Public Function GetFileNameWithoutExtension(ByRef Path As String) As String
     Dim FileName As String
-    FileName = GetFileName(Path)
+    Dim Index    As Long
     
-    Dim Index As Long
+    FileName = GetFileName(Path)
     Index = InStrRev(FileName, ".")
+    
     If Index > 0 Then
         GetFileNameWithoutExtension = Left$(FileName, Index - 1)
     Else
@@ -350,6 +361,7 @@ End Function
 '
 Public Function GetFullPath(ByRef Path As String) As String
     Dim FullPath As String
+    
     FullPath = NormalizePath(Path, True)
     
     If InStr(3, FullPath, vbVolumeSeparator) >= 3 Then _
@@ -368,6 +380,7 @@ End Function
 '
 Public Function GetPathRoot(ByRef Path As String) As String
     Dim NormalizedPath As String
+    
     NormalizedPath = NormalizePath(Path, False)
     GetPathRoot = Left$(NormalizedPath, GetRootLength(NormalizedPath))
 End Function
@@ -381,7 +394,8 @@ End Function
 '
 Public Function GetTempFileName() As String
     Dim FileName As String
-    FileName = String$(MaxPath, 0)
+    
+    FileName = String$(MAX_PATH, 0)
     
     If GetTempFileNameW(GetTempPath, "tmp", 0, FileName) = BOOL_FALSE Then
         IOError.WinIOError Err.LastDllError
@@ -399,10 +413,10 @@ Public Function GetTempPath() As String
     Dim PathName    As String
     Dim Size        As Long
     
-    PathName = String$(MaxPath, 0)
-    Size = GetTempPathW(MaxPath, PathName)
+    PathName = String$(MAX_PATH, 0)
+    Size = GetTempPathW(MAX_PATH, PathName)
     
-    If Size = 0 Or Size > MaxPath Then
+    If Size = 0 Or Size > MAX_PATH Then
         IOError.WinIOError Err.LastDllError
     End If
 
@@ -424,17 +438,174 @@ Public Function GetInvalidFileNameChars() As Integer()
 End Function
 
 
-Friend Sub CheckValidPathChars(ByRef Path As String)
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Constructors
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Sub Class_Initialize()
+    mInvalidPathChars = Cor.NewIntegers(&H22, &H3C, &H3E, &H7C, &H0, &H1, &H2, &H3, &H4, &H5, &H6, &H7, &H8, &H9, &HA, &HB, &HC, &HD, &HE, &HF, &H10, &H11, &H12, &H13, &H14, &H15, &H16, &H17, &H18, &H19, &H1A, &H1B, &H1C, &H1D, &H1E, &H1F)
+    mInvalidFileNameChars = Cor.NewIntegers(&H22, &H3C, &H3E, &H7C, &H0, &H1, &H2, &H3, &H4, &H5, &H6, &H7, &H8, &H9, &HA, &HB, &HC, &HD, &HE, &HF, &H10, &H11, &H12, &H13, &H14, &H15, &H16, &H17, &H18, &H19, &H1A, &H1B, &H1C, &H1D, &H1E, &H1F, &H3A, &H2A, &H3F, &H5C, &H2F)
+    mTrimEndChars = Cor.NewIntegers(&H9, &HA, &HB, &HC, &HD, &H20, &H85, &HA0)
+End Sub
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Helpers
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Function GetRootLength(ByRef Path As String) As Long
+    Dim PathChars() As Integer
+    Dim Result      As Long
+    Dim Length      As Long
+    
+    PathChars = AllocChars(Path)
+    Length = Len(Path)
+    
+    If Length > 0 Then
+        With AsDWord(PathChars(0))
+            If IsDirectorySeparator(.LoWord) Then
+                If IsDirectorySeparator(.HiWord) Then
+                    ' find unc server->share length
+                    Dim SlashCount As Long
+                    Dim i As Long
+                    i = 2
+                    
+                    Do While i < Length
+                        If IsDirectorySeparator(PathChars(i)) Then
+                            SlashCount = SlashCount + 1
+                            
+                            If SlashCount = 2 Then
+                                Exit Do
+                            End If
+                        End If
+                        
+                        i = i + 1
+                    Loop
+                    
+                    Result = i
+                Else
+                    Result = 1
+                End If
+            ElseIf .HiWord = vbVolumeSeparatorChar Then
+                Result = 2
+                
+                ' check for following directory separator
+                If Length > 2 Then
+                    If PathChars(2) = vbDirectorySeparatorChar Then
+                        Result = 3
+                    End If
+                End If
+            End If
+        End With
+    End If
+    
+    FreeChars PathChars
+    
+    GetRootLength = Result
+End Function
+
+Private Function IsSeparator(ByVal Ch As Integer) As Boolean
+    IsSeparator = Ch = vbDirectorySeparatorChar Or _
+                  Ch = vbAltDirectorySeparatorChar Or _
+                  Ch = vbVolumeSeparatorChar
+End Function
+
+Private Sub VerifyUNCPathFormat(ByVal NewBuffer As PathHelper, ByVal LengthToCheck As Long)
+    Dim pos As Long
+    
+    pos = 2
+    
+    Do While pos < LengthToCheck
+        If NewBuffer.Chars(pos) = vbDirectorySeparatorChar Then
+            pos = pos + 1
+            Exit Do
+        End If
+        
+        pos = pos + 1
+    Loop
+
+    If pos = LengthToCheck Then _
+        Error.Argument Arg_PathIllegalUNC
+End Sub
+
+Private Function GetExtensionCharIndex(ByRef Path As String) As Long
+    Dim PathChars() As Integer
+    Dim Index       As Long
+    
+    PathChars = AllocChars(Path)
+    Index = Len(Path) - 1
+    
+    Do While Index >= 0
+        Select Case PathChars(Index)
+            Case vbPeriodChar
+                GetExtensionCharIndex = Index + 1
+                Exit Do
+            Case vbAltDirectorySeparatorChar, vbDirectorySeparatorChar, vbVolumeSeparatorChar
+                Exit Do
+        End Select
+        
+        Index = Index - 1
+    Loop
+    
+    FreeChars PathChars
+End Function
+
+Private Function GetDirectoryCharIndex(ByRef Path As String) As Long
+    Dim PathChars() As Integer
+    Dim Index       As Long
+    
+    PathChars = AllocChars(Path)
+    Index = Len(Path) - 1
+    
+    Do While Index >= 0
+        If IsSeparator(PathChars(Index)) Then
+            GetDirectoryCharIndex = Index + 1
+            Exit Do
+        End If
+        
+        Index = Index - 1
+    Loop
+        
+    FreeChars PathChars
+End Function
+
+Private Function FirstTwoChars(ByRef s As String) As DWord
+    If LenB(s) > 0 Then
+        FirstTwoChars = MemDWord(StrPtr(s))
+    End If
+End Function
+
+Private Function CombinePaths(ByRef Path1 As String, ByRef Path2 As String) As String
+    If IsPathRooted(Path2) Then
+        CombinePaths = Path2
+        Exit Function
+    End If
+    
+    If Len(Path1) = 0 Then
+        CombinePaths = Path2
+        Exit Function
+    ElseIf Len(Path2) = 0 Then
+        CombinePaths = Path1
+        Exit Function
+    End If
+    
+    If IsSeparator(CorString.LastChar(Path1)) Then
+        CombinePaths = Path1 & Path2
+    Else
+        CombinePaths = Path1 & vbDirectorySeparator & Path2
+    End If
+End Function
+
+Private Sub CheckValidPathChars(ByRef Path As String)
     If HasIllegalCharacters(Path) Then
         Error.Argument Argument_InvalidPathChars
     End If
 End Sub
 
-Friend Function HasIllegalCharacters(ByRef Path As String) As Boolean
+Private Function HasIllegalCharacters(ByRef Path As String) As Boolean
     Dim PathChars() As Integer
+    Dim i           As Long
+    
     PathChars = AllocChars(Path)
     
-    Dim i As Long
     For i = 0 To Len(Path) - 1
         Select Case PathChars(i)
             Case vbQuoteChar, vbLessThanChar, vbGreaterThanChar, vbPipeChar, Is < vbSpaceChar
@@ -446,19 +617,14 @@ Friend Function HasIllegalCharacters(ByRef Path As String) As Boolean
     FreeChars PathChars
 End Function
 
-Friend Function NormalizePath(ByRef Path As String, ByVal FullCheck As Boolean) As String
+Private Function NormalizePath(ByRef Path As String, ByVal FullCheck As Boolean) As String
     Dim NewBuffer   As New PathHelper
     Dim PathChars() As Integer
     Dim Index       As Long
     Dim MaxIndex    As Long
     
     If FullCheck Then
-        Dim CleanPath As String
-        CleanPath = CorString.TrimEnd(Path, mTrimEndChars)
-        If HasIllegalCharacters(CleanPath) Then _
-            Error.Argument Argument_InvalidPathChars
-        
-        PathChars = AllocChars(CleanPath)
+        PathChars = AllocChars(CleanPath(Path))
     Else
         PathChars = AllocChars(Path)
     End If
@@ -468,9 +634,10 @@ Friend Function NormalizePath(ByRef Path As String, ByVal FullCheck As Boolean) 
     End If
     
     MaxIndex = UBound(PathChars)
+    
     Do While Index <= MaxIndex
-        If ProcessPreSigCharSegment(PathChars, NewBuffer, FullCheck, Index) Then
-            ProcessSigCharSegment PathChars, NewBuffer, FullCheck, Index
+        If ProcessPreSigCharSegment(PathChars, NewBuffer, Index) Then
+            ProcessSigCharSegment PathChars, NewBuffer, Index
         End If
     Loop
     
@@ -479,7 +646,21 @@ Friend Function NormalizePath(ByRef Path As String, ByVal FullCheck As Boolean) 
     If NewBuffer.Length = 0 Then _
         Error.Argument Arg_PathIllegal
     
+    ValidateUNCPath NewBuffer, FullCheck
+    NormalizePath = NewBuffer.ToString
+End Function
+
+Private Function CleanPath(ByRef Path As String) As String
+    CleanPath = CorString.TrimEnd(Path, mTrimEndChars)
+    
+    If HasIllegalCharacters(CleanPath) Then
+        Error.Argument Argument_InvalidPathChars
+    End If
+End Function
+
+Private Sub ValidateUNCPath(ByRef NewBuffer As PathHelper, ByVal FullCheck As Boolean)
     Dim MaxUNCPathCheck As Long
+    
     If FullCheck Then
         If NewBuffer.StartsWith("http:") Or NewBuffer.StartsWith("file:") Then _
             Error.Argument Argument_PathUriFormatNotSupported
@@ -494,11 +675,9 @@ Friend Function NormalizePath(ByRef Path As String, ByVal FullCheck As Boolean) 
             VerifyUNCPathFormat NewBuffer, MaxUNCPathCheck
         End If
     End If
-    
-    NormalizePath = NewBuffer.ToString
-End Function
+End Sub
 
-Friend Function IsDirectorySeparator(ByVal Ch As Integer) As Boolean
+Private Function IsDirectorySeparator(ByVal Ch As Integer) As Boolean
     IsDirectorySeparator = Ch = vbDirectorySeparatorChar Or _
                            Ch = vbAltDirectorySeparatorChar
 End Function
@@ -527,7 +706,7 @@ Private Sub PrepareForVolumeLabel(ByRef PathChars() As Integer, ByRef Index As L
     End If
 End Sub
 
-Private Function ProcessPreSigCharSegment(ByRef PathChars() As Integer, ByVal NewBuffer As PathHelper, ByVal FullCheck As Boolean, ByRef Index As Long) As Boolean
+Private Function ProcessPreSigCharSegment(ByRef PathChars() As Integer, ByVal NewBuffer As PathHelper, ByRef Index As Long) As Boolean
     Dim pos             As Long
     Dim Ch              As Integer
     Dim MaxIndex        As Long
@@ -590,7 +769,7 @@ Private Function ProcessPreSigCharSegment(ByRef PathChars() As Integer, ByVal Ne
     ProcessPreSigCharSegment = FoundSigChar
 End Function
 
-Private Sub ProcessSigCharSegment(ByRef PathChars() As Integer, ByVal NewBuffer As PathHelper, ByVal FullCheck As Boolean, ByRef Index As Long)
+Private Sub ProcessSigCharSegment(ByRef PathChars() As Integer, ByVal NewBuffer As PathHelper, ByRef Index As Long)
     Dim pos         As Long
     Dim Ch          As Integer
     Dim MaxIndex    As Long
@@ -627,139 +806,6 @@ Private Sub ProcessSigCharSegment(ByRef PathChars() As Integer, ByVal NewBuffer 
     
     Index = pos
 End Sub
-
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Constructors
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub Class_Initialize()
-    mInvalidPathChars = Cor.NewIntegers(&H22, &H3C, &H3E, &H7C, &H0, &H1, &H2, &H3, &H4, &H5, &H6, &H7, &H8, &H9, &HA, &HB, &HC, &HD, &HE, &HF, &H10, &H11, &H12, &H13, &H14, &H15, &H16, &H17, &H18, &H19, &H1A, &H1B, &H1C, &H1D, &H1E, &H1F)
-    mInvalidFileNameChars = Cor.NewIntegers(&H22, &H3C, &H3E, &H7C, &H0, &H1, &H2, &H3, &H4, &H5, &H6, &H7, &H8, &H9, &HA, &HB, &HC, &HD, &HE, &HF, &H10, &H11, &H12, &H13, &H14, &H15, &H16, &H17, &H18, &H19, &H1A, &H1B, &H1C, &H1D, &H1E, &H1F, &H3A, &H2A, &H3F, &H5C, &H2F)
-    mTrimEndChars = Cor.NewIntegers(&H9, &HA, &HB, &HC, &HD, &H20, &H85, &HA0)
-End Sub
-
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Helpers
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Function GetRootLength(ByRef Path As String) As Long
-    Dim PathChars() As Integer
-    PathChars = AllocChars(Path)
-    
-    Dim Result As Long
-    Dim Length As Long
-    Length = Len(Path)
-    
-    If Length > 0 Then
-        With AsDWord(PathChars(0))
-            If IsDirectorySeparator(.LoWord) Then
-                If IsDirectorySeparator(.HiWord) Then
-                    ' find unc server->share length
-                    Dim SlashCount As Long
-                    Dim i As Long
-                    i = 2
-                    
-                    Do While i < Length
-                        If IsDirectorySeparator(PathChars(i)) Then
-                            SlashCount = SlashCount + 1
-                            
-                            If SlashCount = 2 Then
-                                Exit Do
-                            End If
-                        End If
-                        
-                        i = i + 1
-                    Loop
-                    
-                    Result = i
-                Else
-                    Result = 1
-                End If
-            ElseIf .HiWord = vbVolumeSeparatorChar Then
-                Result = 2
-                
-                ' check for following directory separator
-                If Length > 2 Then
-                    If PathChars(2) = vbDirectorySeparatorChar Then
-                        Result = 3
-                    End If
-                End If
-            End If
-        End With
-    End If
-    
-    FreeChars PathChars
-    
-    GetRootLength = Result
-End Function
-
-Private Function IsSeparator(ByVal Ch As Integer) As Boolean
-    IsSeparator = Ch = vbDirectorySeparatorChar Or _
-                  Ch = vbAltDirectorySeparatorChar Or _
-                  Ch = vbVolumeSeparatorChar
-End Function
-
-Private Sub VerifyUNCPathFormat(ByVal NewBuffer As PathHelper, ByVal LengthToCheck As Long)
-    Dim pos As Long
-    pos = 2
-    
-    Do While pos < LengthToCheck
-        If NewBuffer.Chars(pos) = vbDirectorySeparatorChar Then
-            pos = pos + 1
-            Exit Do
-        End If
-        pos = pos + 1
-    Loop
-
-    If pos = LengthToCheck Then _
-        Error.Argument Arg_PathIllegalUNC
-End Sub
-
-Private Function GetExtensionCharIndex(ByRef Path As String) As Long
-    Dim PathChars() As Integer
-    PathChars = AllocChars(Path)
-    
-    Dim Index As Long
-    Index = Len(Path) - 1
-    
-    Do While Index >= 0
-        Select Case PathChars(Index)
-            Case vbPeriodChar
-                GetExtensionCharIndex = Index + 1
-                Exit Do
-            Case vbAltDirectorySeparatorChar, vbDirectorySeparatorChar, vbVolumeSeparatorChar
-                Exit Do
-        End Select
-        Index = Index - 1
-    Loop
-    
-    FreeChars PathChars
-End Function
-
-Private Function GetDirectoryCharIndex(ByRef Path As String) As Long
-    Dim PathChars() As Integer
-    PathChars = AllocChars(Path)
-    
-    Dim Index As Long
-    Index = Len(Path) - 1
-    
-    Do While Index >= 0
-        If IsSeparator(PathChars(Index)) Then
-            GetDirectoryCharIndex = Index + 1
-            Exit Do
-        End If
-        
-        Index = Index - 1
-    Loop
-        
-    FreeChars PathChars
-End Function
-
-Private Function FirstTwoChars(ByRef s As String) As DWord
-    If LenB(s) > 0 Then
-        FirstTwoChars = MemDWord(StrPtr(s))
-    End If
-End Function
 
 
 

@@ -38,6 +38,13 @@ Attribute VB_Exposed = True
 ''
 ' Provides a common interface to be implementated by all keyed hash implentations.
 '
+' @see HMACMD5
+' @see HMACSHA1
+' @see HMACSHA256
+' @see HMACSHA384
+' @see HMACSHA512
+' @see HMACRIPEMD160
+' @see MACTripleDES
 Option Explicit
 
 

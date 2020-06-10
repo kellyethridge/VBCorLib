@@ -1,0 +1,22 @@
+@examples This example creates a new character array using both string and Unicode values then displays them.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> Chars() <span style="color: #0000ff">As</span> <span style="color: #2b91af">Integer</span>
+    <span style="color: #0000ff">Dim</span> <span style="color: #2b91af">Char</span> <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>
+    
+    Chars = NewChars(<span style="color: #a31515">&quot;a&quot;</span>, <span style="color: #a31515">&quot;b&quot;</span>, 99, 100)
+    
+    Debug.Print <span style="color: #a31515">&quot;The set of characters.&quot;</span>
+    
+    <span style="color: #0000ff">For</span> <span style="color: #0000ff">Each</span> <span style="color: #2b91af">Char</span> <span style="color: #0000ff">In</span> Chars
+        Debug.Print CorString.Format(<span style="color: #a31515">&quot;{0,3} = &quot;&quot;{0:$}&quot;&quot;&quot;</span>, <span style="color: #2b91af">Char</span>)
+    <span style="color: #0000ff">Next</span>
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; This example code produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    The set of characters.</span>
+<span style="color: #008000">&#39;     97 = &quot;a&quot;</span>
+<span style="color: #008000">&#39;     98 = &quot;b&quot;</span>
+<span style="color: #008000">&#39;     99 = &quot;c&quot;</span>
+<span style="color: #008000">&#39;    100 = &quot;d&quot;</span>
+</pre></div>

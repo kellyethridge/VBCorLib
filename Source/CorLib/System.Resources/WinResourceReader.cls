@@ -101,17 +101,15 @@ Public Sub CloseReader()
 End Sub
 
 ''
-' Returns an IDictionaryEnumerator object.
+' Returns an <a href="IDictionaryEnumerator.html">IDictionaryEnumerator</a> object.
 '
 ' @return An enumerator.
 ' @remarks The enumerator returns values as <b>DictionaryEntry</b>
-' objects. The value property in the <b>DictionaryEntry</b> object
+' objects. The <a href="DictionaryEntry.Get.Value.html">Value</a> property in the <a href="DictionaryEntry.html">DictionaryEntry</a> object
 ' returns a <b>Win32Resource</b> object which contains details about
 ' the specific resource found in the EXE or DLL file.
-' The <i>Key</b> property returns the ID for the specific resource.
-' The Keys may not be unique across all resources, os using the Key
-' as a unique identifier is not recommended.
-'
+' The <a href="DictionaryEntry.Get.Key.html">Key</a> property returns the ID for the specific resource.
+' The keys may not be unique across all resources, os using the Key as a unique identifier is not recommended.
 Public Function GetEnumerator() As IDictionaryEnumerator
     VerifyReader
     LoadResources
@@ -122,17 +120,16 @@ Public Function GetEnumerator() As IDictionaryEnumerator
 End Function
 
 ''
-' Returns an IDictionaryEnumerator object.
+' Returns an <a href="IDictionaryEnumerator.html">IDictionaryEnumerator</a> object.
 '
 ' @return An enumerator.
 ' @remarks The enumerator returns values as <b>DictionaryEntry</b>
-' objects. The value property in the <b>DictionaryEntry</b> object
+' objects. The <a href="DictionaryEntry.Get.Value.html">Value</a> property in the <a href="DictionaryEntry.html">DictionaryEntry</a> object
 ' returns a <b>Win32Resource</b> object which contains details about
 ' the specific resource found in the EXE or DLL file.
-' The <i>Key</b> property returns the ID for the specific resource.
-' The Keys may not be unique across all resources, os using the Key
+' The <a href="DictionaryEntry.Get.Key.html">Key</a> property returns the ID for the specific resource.
+' The keys may not be unique across all resources, os using the Key
 ' as a unique identifier is not recommended.
-'
 Public Function NewEnum() As IUnknown
 Attribute NewEnum.VB_UserMemId = -4
 Attribute NewEnum.VB_MemberFlags = "40"

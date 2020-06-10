@@ -38,6 +38,11 @@ Option Explicit
 
 Private mCurrentThread As New Thread
 
+
+''
+' Gets the currently running thread.
+'
+' @return A <a href="Thread.html">Thread</a> that is the representation of the currently running thread.
 Public Property Get CurrentThread() As Thread
     Set CurrentThread = mCurrentThread
 End Property

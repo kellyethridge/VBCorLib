@@ -1,0 +1,41 @@
+@remarks The range of Unicode code points that represent a character in Visual Basic is U+0000 to U+FFFF (0 to 65535). VBCorLib internally represents characters using the <b>Integer</b> type which has a range from -32768 to 32767. This usually does not present an issue, however, when the need to compare two characters occurs the characters must be converted to correctly handle the 16 bit representation. For instance an <b>Integer</b> value of -1 is Unicode code point U+FFFF which should be the largest code point value during a comparison. In order to correctly compare two characters they are converted to a <b>Long</b> type then ANDed with 0x0000FFFF in order to get a correct ordered representation. The result has an identical 16 bit representation that can be compared correctly.
+<p>This method handles character code range -32768 to 65535. A bitwise AND is performed to convert the negative values to their corrisponding positive values. For example -1 is converted to 65535 (U+FFFF) using the bitwise AND operation with a <b>Long</b> type using <code>value = value And &H0000FFFF&</code>.</p>
+@exceptions
+<table style="width: auto">
+	<tr>
+		<th>Exception</th><th>Condition</th>
+	</tr>
+	<tr>
+		<td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+		<td>
+			<i>a</i> is outside of the valid range -32768 to 65535.<br/>
+			-or-<br/>
+			<i>b</i> is outside of the valid range -32768 to 65535.
+		</td>
+	</tr>
+</table>
+@examples The following example compares several <b>Integer</b> to <b>Long</b> character values demonstrating 16 bit comparisons
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    ShowComparison 32767, -32768
+    ShowComparison -1, 65535
+    ShowComparison -32768, 32768
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> ShowComparison(<span style="color: #0000ff">ByVal</span> a <span style="color: #0000ff">As</span> <span style="color: #2b91af">Integer</span>, <span style="color: #0000ff">ByVal</span> b <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>)
+    <span style="color: #0000ff">Dim</span> Relation <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+    
+    <span style="color: #0000ff">If</span> <span style="color: #2b91af">Char</span>.Equals(a, b) <span style="color: #0000ff">Then</span>
+        Relation = <span style="color: #a31515">&quot;=&quot;</span>
+    <span style="color: #0000ff">Else</span>
+        Relation = <span style="color: #a31515">&quot;&lt;&gt;&quot;</span>
+    <span style="color: #0000ff">End</span> <span style="color: #0000ff">If</span>
+    
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;{0,7}({0:X4}) {1} {2,7}({2:X8})&quot;</span>, a, Relation, b)
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; This code produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;     32767(7FFF) &lt;&gt;  -32768(FFFF8000)</span>
+<span style="color: #008000">&#39;        -1(FFFF) =   65535(0000FFFF)</span>
+<span style="color: #008000">&#39;    -32768(8000) =   32768(00008000)</span>
+</pre></div>

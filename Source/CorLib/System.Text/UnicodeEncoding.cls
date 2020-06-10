@@ -40,7 +40,7 @@ Attribute VB_Exposed = True
 '
 ' @remarks <p>This encoding can encode characters using big-endian or little-endian
 ' notation. The default is little-endian (least significant byte first).</p>
-' <p>A Byte order Mark will be emitted if selected using the Cor.NewUnicodeEncoding constructor.</p>
+' <p>A Byte order Mark will be emitted if selected using the <a href="Constructors.NewUnicodeEncoding.html">Cor.NewUnicodeEncoding</a> constructor.</p>
 '
 ' @see Constructors
 ' @see Encoding
@@ -87,7 +87,7 @@ Public Function Clone() As UnicodeEncoding
 End Function
 
 ''
-' Returns if the current encoding uses single-byte code points.
+' Gets if the current encoding uses single-byte code points.
 '
 ' @return Returns True for single-byte, False for multi-byte code points.
 Public Property Get IsSingleByte() As Boolean
@@ -95,7 +95,7 @@ Public Property Get IsSingleByte() As Boolean
 End Property
 
 ''
-' Returns the encoding name to be used in with the mail agent body tags.
+' Gets the encoding name to be used in with the mail agent body tags.
 '
 ' @return The body tag compatible encoding name.
 '
@@ -104,7 +104,7 @@ Public Property Get BodyName() As String
 End Property
 
 ''
-' Returns the code page identifier for this encoding.
+' Gets the code page identifier for this encoding.
 '
 ' @return Code page identifier.
 '
@@ -113,7 +113,7 @@ Public Property Get CodePage() As Long
 End Property
 
 ''
-' The name of this encoding.
+' Gets the name of this encoding.
 '
 ' @return The encoding's name.
 '
@@ -122,7 +122,7 @@ Public Property Get EncodingName() As String
 End Property
 
 ''
-' Returns the encoding name to be used in with the mail agent header tags.
+' Gets the encoding name to be used in with the mail agent header tags.
 '
 ' @return The header tag compatible encoding name.
 '
@@ -131,7 +131,7 @@ Public Property Get HeaderName() As String
 End Property
 
 ''
-' Indicates if this encoding can be used by browsers to display text.
+' Gets if this encoding can be used by browsers to display text.
 '
 ' @return The indication for browser display capable.
 '
@@ -140,7 +140,7 @@ Public Property Get IsBrowserDisplay() As Boolean
 End Property
 
 ''
-' Indicates if this encoding can be used to save data with this encoding.
+' Gets if this encoding can be used to save data with this encoding.
 '
 ' @return The indication for the browser saving capable.
 '
@@ -149,7 +149,7 @@ Public Property Get IsBrowserSave() As Boolean
 End Property
 
 ''
-' Indicates if this encoding can be used to display mail and news by
+' Gets if this encoding can be used to display mail and news by
 ' mail and news clients.
 '
 ' @return Indication for mail and news client capable.
@@ -159,7 +159,7 @@ Public Property Get IsMailNewsDisplay() As Boolean
 End Property
 
 ''
-' Indicates if this encoding can be used to save date by mail and news clients.
+' Gets if this encoding can be used to save date by mail and news clients.
 '
 ' @return Indication for the mail and news clients to use this encoding for saving.
 '
@@ -168,7 +168,7 @@ Public Property Get IsMailNewsSave() As Boolean
 End Property
 
 ''
-' Returns the encoding name registered with the Internet Assigned Numbers Authority.
+' Gets the encoding name registered with the Internet Assigned Numbers Authority.
 '
 ' @return The registered encoding name.
 '
@@ -177,7 +177,7 @@ Public Property Get WebName() As String
 End Property
 
 ''
-' Returns the Windows Operating System's code page for this encoding.
+' Gets the Windows Operating System's code page for this encoding.
 '
 ' @return The Windows code page for this encoding.
 '
@@ -186,7 +186,7 @@ Public Property Get WindowsCodePage() As Long
 End Property
 
 ''
-' Returns the current DecoderFallback instance used by the encoding.
+' Gets the current DecoderFallback instance used by the encoding.
 '
 ' @return An object derived from <a href="DecoderFallback.html">DecoderFallback</a>.
 ' @remarks The default will return an instance of <a href="DecoderReplacementFallback.html">DecoderReplacementFallback</a>.
@@ -214,7 +214,7 @@ Public Property Set DecoderFallback(ByVal Value As DecoderFallback)
 End Property
 
 ''
-' Returns the current EncoderFallback instance used by the encoding.
+' Gets the current EncoderFallback instance used by the encoding.
 '
 ' @return An object derived from <a href="EncoderFallback.html">EncoderFallback</a>.
 ' @remarks The default will return an instance of <a href="EncoderReplacementFallback.html">EncoderReplacementFallback</a>.
@@ -323,8 +323,8 @@ End Function
 ' @param ByteIndex The index of the first byte stored in the destination array.
 ' @return The number of bytes produce by the encoding.
 ' @remarks The <i>Bytes</i> array cannot be null and must be large enough to hold the encoded
-' set of characters. To obtain the size required, use GetByteCount to find the necessary size.
-' Or, use GetMaxByteCount to get the largest size that could be produced. The largest size is not
+' set of characters. To obtain the size required, use <a href="UnicodeEncoding.GetByteCount.html">GetByteCount</a> to find the necessary size.
+' Or, use <a href="UnicodeEncoding.GetMaxByteCount.html">GetMaxByteCount</a> to get the largest size that could be produced. The largest size is not
 ' the perfect size, only the maximum number of bytes that could ever be produced by a number of
 ' characters. Resizing of the resultant <i>Bytes</i> array may be necessary.
 '
@@ -461,7 +461,7 @@ End Function
 ' Returns an array of bytes that represents this encoding.
 '
 ' @return A byte array containg the bytes to be used to identify this encoding type.
-' @remarks <p>If the encoding was created setting the <i>BigEndian</i> paramter
+' @remarks <p>If the encoding was created setting the <a href="Constructors.NewUnicodeEncoding.html">BigEndian</a> paramter
 ' to true, then this will return the Unicode byte array identifer &HFEFF otherwise
 ' &hFFFE for a non-bigEndian encoding. If no identifier is to be emitted, then an
 ' empty byte array is returned (not a null array).
@@ -526,7 +526,7 @@ End Function
 ' Returns a decoder that maintains state.
 '
 ' @return The stateful decoder.
-' @remarks Unlike UnicodeEncoding, the decoder maintains state between decoding calls.
+' @remarks Unlike <b>UnicodeEncoding</b>, the decoder maintains state between decoding calls.
 ' Since a single unicode character required exactly 2 bytes to be decoded, it is possible
 ' that an odd number of bytes may be attempted to be decoding, creating an orphaned byte
 ' which represents only half of a unicode character. The remaining byte is held until

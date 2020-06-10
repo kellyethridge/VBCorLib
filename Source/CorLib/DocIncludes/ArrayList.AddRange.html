@@ -1,92 +1,47 @@
-@remarks 
-<h4>Exceptions</h4>
-<table>
+@exceptions 
+<table style="width: auto">
 <tr>
-<th width="50%">Exception Type</th><th>Condition</th>
+<th>Exception Type</th><th>Condition</th>
 </tr><tr>
-<td>ArgumentNullException</td>
-<td><i>c</i> is an uninitialized array.<br>
-- or -<br>
-<i>c</i> is Nothing.</td>
+<td><a href="ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>c</i> is an uninitialized array.<br/>
+-or-<br/>
+<i>c</i> is <b>Nothing</b>.</td>
 </tr>
 <tr>
-<td>NotSupportedException</td>
-<td>The <b>ArrayList</b> is Read-Only<br>
-- or -<br>
-The <b>ArrayList</b> is Fixed-Size.</td>
+<td><a href="NotSupportedException.html">NotSupportedException</a></td>
+<td>The <a href="ArrayList.html">ArrayList</a> is read-only<br/>
+-or-<br/>
+The <a href="ArrayList.html">ArrayList</a> is fixed size.</td>
 </tr>
 <tr>
-<td>InvalidCastException</td><td><i>c</i> is not a <b>VBA.Collection</b>, <b>ICollection</b> object, or an <b>Array</b>.</td>
+<td><a href="InvalidCastException.html">InvalidCastException</a></td><td><i>c</i> is not a <b>VBA.Collection</b>, <a href="ICollection.html">ICollection</a> object, or an <b>Array</b>.</td>
 </tr>
 </table>
-<h4>Example</h4>
-The following example shows how to add the elements from an existing
-collection to the <b>ArrayList</b> using the AddRange method.
-<p>An <b>ArrayList</b> is created and filled with an initial set of
-elements, then a <b>Queue</b> is filled with additional elements that
-will be added to the <b>ArrayList</b> using AddRange.
-<pre>
-Private Sub Main()
-    Dim list As New ArrayList
+@examples
+The following example demonstrates using the <b>AddRange</b> method to add a collection of items.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> List <span style="color: #0000ff">As</span> <span style="color: #0000ff">New</span> ArrayList
+    <span style="color: #0000ff">Dim</span> Words() <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
     
-    '' add several elements to the ArrayList
-    list.Add "Humpty"
-    list.Add "Dumpty"
-    list.Add "sat"
-    list.Add "on"
-    list.Add "a"
-    list.Add "wall."
+    Words = NewStrings(<span style="color: #a31515">&quot;The&quot;</span>, <span style="color: #a31515">&quot;fox&quot;</span>, <span style="color: #a31515">&quot;jumps&quot;</span>, <span style="color: #a31515">&quot;over&quot;</span>, <span style="color: #a31515">&quot;the&quot;</span>, <span style="color: #a31515">&quot;dog&quot;</span>)
     
-    '' Display the contents of the ArrayList
-    Console.WriteLine "The ArrayList initially contains:"
-    PrintValues list
+    List.AddRange Words
     
-    Dim que As New Queue
-    que.Enqueue "Humpty"
-    que.Enqueue "Dumpty"
-    que.Enqueue "had"
-    que.Enqueue "a"
-    que.Enqueue "great"
-    que.Enqueue "fall."
-    
-    '' Display the contents of the Queue
-    Console.WriteLine "The Queue initially contains:"
-    PrintValues que
-    
-    '' Add the elements in the Queue to the ArrayList
-    list.AddRange que
-    
-    '' Display the new contents of the ArrayList
-    Console.WriteLine "The ArrayList with the elements from the Queue:"
-    PrintValues list
-    
-    '' Wait for user to press return key
-    Console.ReadLine
-    
-End Sub
+    PrintValues List
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
 
-Private Sub PrintValues(ByVal en As IEnumerable)
-    Const Space As String = " "
-    
-    Dim value As Variant
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> PrintValues(<span style="color: #0000ff">ByVal</span> Source <span style="color: #0000ff">As</span> IEnumerable)
+    <span style="color: #0000ff">Dim</span> Value <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>
     
     Console.WriteValue vbTab
     
-    '' Iterate over the list
-    For Each value In en
-        '' Write each value onto the same line
-        Console.WriteValue value
-        Console.WriteValue Space
-    Next value
-    Console.WriteLine
-End Sub
+    <span style="color: #0000ff">For</span> <span style="color: #0000ff">Each</span> Value <span style="color: #0000ff">In</span> Source
+        Debug.Print CorString.Format(<span style="color: #a31515">&quot;{0} &quot;</span>, Value)<span style="border: 1px solid #FF0000">;</span>
+    <span style="color: #0000ff">Next</span> Value
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
 
-'' This code produces the following output.
-''
-'' The ArrayList initially contains:
-''     Humpty Dumpty sat on a wall.
-'' The Queue initially contains:
-''     Humpty Dumpty had a great fall.
-'' The ArrayList with the elements from the Queue:
-''     Humpty Dumpty sat on a wall. Humpty Dumpty had a great fall.
-</pre>
+<span style="color: #008000">&#39; This example produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    The fox jumps over the dog</span>
+</pre></div>

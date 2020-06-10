@@ -28,40 +28,27 @@ Attribute VB_Name = "CharMethods"
 ' static class method because these are types of methods that will likely be used in looping scenarios.
 ' The public facing Char class forwards calls to this module for clients of this library.
 '
+' These methods do no validation. It is assumed the caller validated the arguments.
 Option Explicit
 
-Private Const UnicodePlane1Start As Long = &H10000
-
+Public Const UnicodePlane1Start As Long = &H10000
+Public Const UnicodePlane16End  As Long = &H10FFFF
 Public Const SurrogateStart     As Long = &HD800&
 Public Const SurrogateEnd       As Long = &HDFFF&
 Public Const HighSurrogateStart As Long = &HD800&
 Public Const HighSurrogateEnd   As Long = &HDBFF&
 Public Const LowSurrogateStart  As Long = &HDC00&
 Public Const LowSurrogateEnd    As Long = &HDFFF&
+Public Const vbSizeOfUTF32Char  As Long = 4
+Public Const MaxCharValue       As Long = 65535
+Public Const MinCharValue       As Long = -32768
 
 
-Public Function Compare(ByVal a As Long, ByVal b As Long) As Long
-    a = a And &HFFFF&
-    b = b And &HFFFF&
-
-    If a < b Then
-        Compare = -1
-    ElseIf a > b Then
-        Compare = 1
-    End If
-End Function
-
-Public Function Equals(ByVal a As Long, ByVal b As Long) As Boolean
-    Equals = (a And &HFFFF&) = (b And &HFFFF&)
-End Function
-
-Public Function IsWhiteSpaceStr(ByRef s As String, ByVal Index As Long) As Boolean
-    If Index < 0 Or Index >= Len(s) Then _
-        Error.ArgumentOutOfRange "Index"
-        
-    Dim Ptr As Long
-    Ptr = StrPtr(s) + Index * vbSizeOfChar
-    IsWhiteSpaceStr = IsWhiteSpace(MemWord(Ptr))
+Public Function IsValidChar(ByVal Value As Long) As Boolean
+    Select Case Value
+        Case MinCharValue To MaxCharValue
+            IsValidChar = True
+    End Select
 End Function
 
 Public Function IsWhiteSpace(ByVal c As Long) As Boolean
@@ -74,15 +61,6 @@ Public Function IsWhiteSpace(ByVal c As Long) As Boolean
     End Select
 End Function
 
-Public Function IsHighSurrogateStr(ByRef s As String, ByVal Index As Long) As Boolean
-    If Index < 0 Or Index >= Len(s) Then _
-        Error.ArgumentOutOfRange "Index"
-    
-    Dim Ptr As Long
-    Ptr = StrPtr(s) + Index * vbSizeOfChar
-    IsHighSurrogateStr = IsHighSurrogate(MemWord(Ptr))
-End Function
-
 Public Function IsHighSurrogate(ByVal c As Long) As Boolean
     Select Case c And &HFFFF&
         Case HighSurrogateStart To HighSurrogateEnd
@@ -90,32 +68,10 @@ Public Function IsHighSurrogate(ByVal c As Long) As Boolean
     End Select
 End Function
 
-Public Function IsLowSurrogateStr(ByRef s As String, ByVal Index As Long) As Boolean
-    If Index < 0 Or Index >= Len(s) Then _
-        Error.ArgumentOutOfRange "Index"
-    
-    Dim Ptr As Long
-    Ptr = StrPtr(s) + Index * vbSizeOfChar
-    IsLowSurrogateStr = IsLowSurrogate(MemWord(Ptr))
-End Function
-
 Public Function IsLowSurrogate(ByVal c As Long) As Boolean
     Select Case c And &HFFFF&
         Case LowSurrogateStart To LowSurrogateEnd
             IsLowSurrogate = True
-    End Select
-End Function
-
-Public Function IsSurrogateStr(ByRef s As String, ByVal Index As Long) As Boolean
-    If Index < 0 Or Index >= Len(s) Then _
-        Error.ArgumentOutOfRange "Index"
-    
-    Dim Ptr As Long
-    Ptr = StrPtr(s) + Index * vbSizeOfChar
-    
-    Select Case MemWord(Ptr) And &HFFFF&
-        Case SurrogateStart To SurrogateEnd
-            IsSurrogateStr = True
     End Select
 End Function
 
@@ -127,37 +83,6 @@ Public Function IsSurrogate(ByVal c As Long) As Boolean
 End Function
 
 Public Function ConvertToUtf32(ByVal HighSurrogate As Long, ByVal LowSurrogate As Long) As Long
-    If Not IsHighSurrogate(HighSurrogate) Then _
-        Error.ArgumentOutOfRange "HighSurrogate", ArgumentOutOfRange_InvalidHighSurrogate
-    If Not IsLowSurrogate(LowSurrogate) Then _
-        Error.ArgumentOutOfRange "LowSurrogate", ArgumentOutOfRange_InvalidLowSurrogate
-        
     ConvertToUtf32 = (HighSurrogate And &H3FF) * vbShift10Bits + (LowSurrogate And &H3FF) + UnicodePlane1Start
-End Function
-
-Public Function ConvertToUtf32Str(ByRef s As String, ByVal Index As Long) As Long
-    Dim Char1   As Long
-    Dim Char2   As Long
-    Dim Ptr     As Long
-    
-    If Index < 0 Or Index >= Len(s) Then _
-        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_Index
-    
-    Ptr = StrPtr(s) + Index * vbSizeOfChar
-    Char1 = MemWord(Ptr) And &HFFFF&
-    
-    If IsLowSurrogate(Char1) Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidLowSurrogate, Index), "s")
-    
-    If IsHighSurrogate(Char1) Then
-        Char2 = MemWord(Ptr + vbSizeOfChar) And &HFFFF&
-                
-        If Not IsLowSurrogate(Char2) Then _
-            Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidHighSurrogate, Index), "s")
-            
-        ConvertToUtf32Str = (Char1 And &H3FF) * vbShift10Bits + (Char2 And &H3FF) + UnicodePlane1Start
-    Else
-        ConvertToUtf32Str = Char1
-    End If
 End Function
 

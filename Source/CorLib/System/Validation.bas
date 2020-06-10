@@ -28,12 +28,11 @@ Public Sub ValidateArrayRange(ByRef Arr As Variant, ByRef Index As Variant, ByRe
                               Optional ByVal ArrName As ParameterName = NameOfArr, _
                               Optional ByVal IndexName As ParameterName = NameOfIndex, _
                               Optional ByVal CountName As ParameterName = NameOfCount)
-    ValidateArray Arr, ArrName
-    
     Dim RangeIndex      As Long
     Dim RangeCount      As Long
     Dim IndexIsMissing  As Boolean
     
+    ValidateArray Arr, ArrName
     IndexIsMissing = IsMissing(Index)
     
     If IndexIsMissing <> IsMissing(Count) Then

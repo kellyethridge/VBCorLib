@@ -127,8 +127,7 @@ End Property
 ' @param Value The calendar type to set this instance to.
 ' @remarks <p>This value is only tracked with the calendar object. It
 ' does not apply languages to text values.</p>
-'
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width:auto">
 '   <tr>
 '       <th>Exception</th><th>Condition</th>
@@ -616,7 +615,17 @@ End Function
 '   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByVal CalendarType As GregorianCalendarTypes)
-    mCalendarType = CalendarType
+    Select Case CalendarType
+        Case GregorianCalendarTypes.Arabic, _
+             GregorianCalendarTypes.Localized, _
+             GregorianCalendarTypes.MiddleEastFrench, _
+             GregorianCalendarTypes.TransliteratedEnglish, _
+             GregorianCalendarTypes.TransliteratedFrench, _
+             GregorianCalendarTypes.USEnglish
+            mCalendarType = CalendarType
+        Case Else
+            Error.ArgumentOutOfRange "CalendarType", ArgumentOutOfRange_Enum
+    End Select
 End Sub
 
 Friend Sub InitClone(ByVal Other As GregorianCalendar)

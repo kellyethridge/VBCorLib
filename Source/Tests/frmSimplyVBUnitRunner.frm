@@ -61,6 +61,7 @@ Private Sub Form_Load()
     AddSystemSecurityCryptography
     AddSystemResources
     AddSystemIO
+    AddSystemIOMemoryMappedFiles
     AddSystemText
     AddSystemGlobalization
     AddSystemNumerics
@@ -109,20 +110,21 @@ Private Sub AddSystem()
         .Add New StringComparerTests
         .Add New EnvironmentTests
         .Add New OperatingSystemTests
-        
+
         .Add NewSuite("Object Tests", _
             New ObjectBaseTests, _
             New ObjectTests, _
             New ObjectToStringWithDoublesTests, _
             New ObjectToStringWithLongsTests, _
             New ObjectToStringWithSinglesTests, _
-            New ObjectToStringWithValuesTests)
-        
+            New ObjectToStringWithValuesTests, _
+            New ObjectToStringWithDecimalsTests)
+
         .Add NewSuite("Convert Tests", _
             New ConvertToBase64Tests, _
             New ConvertFromBase64Tests, _
             New ConvertTests)
-    
+
         .Add NewSuite("CorArray Tests", _
             New CorArrayTests, _
             New CorArrayCopyTests, _
@@ -133,10 +135,13 @@ Private Sub AddSystem()
             New CorArrayLastIndexOfTests, _
             New CorArrayCreateInstanceTests, _
             New CorArrayFindTests)
-    
+        .Add New CorArrayTests
+
         .Add New PublicFunctionsTests
+        .Add New ConsoleKeyInfoTests
 '        .Add New ConsoleTests ' we exclude them here to prevent a console from being displayed
-'        .Add New WeakReferenceTests
+        .Add New Int64Tests
+        .Add New ConstructorsTests
         
         AddTest .This
     End With
@@ -167,11 +172,11 @@ Private Sub AddSystemCollections()
         .Add NewSuite("Queue Tests", _
             New QueueTests, _
             New QueueEnumeratorTests)
-                
+
         .Add NewSuite("Stack Tests", _
             New StackTests, _
             New StackEnumeratorTests)
-        
+
         .Add NewSuite("Hashtable Tests", _
             New HashtableTests, _
             New HashtableEnumeratorTests, _
@@ -274,7 +279,6 @@ Private Sub AddSystemIO()
         .Add New FileInfoTests
         .Add New FileTests
         .Add New StreamReaderTests
-        .Add New MemoryMappedFileTests
         .Add New FileNotFoundExceptionTests
         .Add New IniFileTests
         .Add New IniResourceWriterTests
@@ -287,6 +291,16 @@ Private Sub AddSystemIO()
         .Add New PathTests
         .Add New FileStreamTests
         .Add New StreamWriterTests
+        
+        AddTest .This
+    End With
+End Sub
+
+Private Sub AddSystemIOMemoryMappedFiles()
+    With Sim.NewTestSuite("System.IO.MemoryMappedFiles")
+        .Add New MemoryMappedFileTests
+        .Add New MemoryMappedViewAccessorTests
+        .Add New MemoryMappedViewStreamTests
         
         AddTest .This
     End With
@@ -311,11 +325,14 @@ Private Sub AddSystemText()
         .Add New UnicodeEncodingTests
         .Add New UnicodeDecoderTests
         .Add New UnicodeEncoderTests
-        .Add New EncodingInfoTests
+        .Add New EncodingTests
         .Add New SBCSCodePageEncodingTests
         .Add New DBCSCodePageEncodingTests
         .Add New DBCSCodePageDecoderTests
         .Add New StringBuilderTests
+        .Add New UTF32EncodingTests
+        .Add New UTF32EncoderTests
+        .Add New UTF32DecoderTests
         
         AddTest .This
     End With

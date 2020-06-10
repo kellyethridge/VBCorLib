@@ -50,6 +50,35 @@ Public Sub InitGlobalization()
     DaysToMonthLeapYear = Cor.NewLongs(0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335, 366)
 End Sub
 
+Public Function GetLocaleString(ByVal LCID As Long, ByVal LCType As Long) As String
+    Dim Buf         As String
+    Dim Size        As Long
+    Dim ErrorCode   As Long
+    
+    Size = 128
+    Do
+        Buf = String$(Size, vbNullChar)
+        Size = GetLocaleInfoW(LCID, LCType, Buf, Size)
+        
+        If Size > 0 Then
+            Exit Do
+        End If
+        
+        ErrorCode = Err.LastDllError
+        
+        If ErrorCode <> ERROR_INSUFFICIENT_BUFFER Then _
+            Error.Win32Error ErrorCode
+            
+        Size = GetLocaleInfoW(LCID, LCType, vbNullString, 0)
+    Loop
+    
+    GetLocaleString = Left$(Buf, Size - 1)
+End Function
+
+Public Function GetLocaleLong(ByVal LCID As Long, ByVal LCType As Long) As Long
+    GetLocaleLong = GetLocaleString(LCID, LCType)
+End Function
+
 Public Function DateToMilliseconds(ByVal d As Date) As Currency
     Const MillisecondsTo1899 As Currency = 59926435200000#
     Dim Days As Currency

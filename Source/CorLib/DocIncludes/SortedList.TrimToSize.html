@@ -1,0 +1,103 @@
+@exceptions
+<table style="width: auto;">
+	<tr>
+		<th>Exception</th><th>Condition</th>
+	</tr>
+	<tr>
+		<td><a href="NotSupportedException.html">NotSupportedException</a></td>
+		<td>
+			The <a href="SortedList.html">SortedList</a> object is read-only.<br/>
+			-or-<br/>
+			The <a href="SortedList.html">SortedList</a> is fixed size.
+		</td>
+	</tr>
+</table>
+@examples The following code example shows how to trim the unused portions of a <a href="SortedList.html">SortedList</a> object and how to clear its values.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> List <span style="color: #0000ff">As</span> <span style="color: #0000ff">New</span> SortedList
+
+    List.Add <span style="color: #a31515">&quot;one&quot;</span>, <span style="color: #a31515">&quot;The&quot;</span>
+    List.Add <span style="color: #a31515">&quot;two&quot;</span>, <span style="color: #a31515">&quot;quick&quot;</span>
+    List.Add <span style="color: #a31515">&quot;three&quot;</span>, <span style="color: #a31515">&quot;brown&quot;</span>
+    List.Add <span style="color: #a31515">&quot;four&quot;</span>, <span style="color: #a31515">&quot;fox&quot;</span>
+    List.Add <span style="color: #a31515">&quot;five&quot;</span>, <span style="color: #a31515">&quot;jumped&quot;</span>
+    
+    Debug.Print <span style="color: #a31515">&quot;Initially,&quot;</span>
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;   Count    : {0}&quot;</span>, List.Count)
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;   Capacity : {0}&quot;</span>, List.Capacity)
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;   Values:&quot;</span>)
+    PrintKeysAndValues List
+    
+    List.TrimToSize
+    
+    Debug.Print <span style="color: #a31515">&quot;After TrimToSize,&quot;</span>
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;   Count    : {0}&quot;</span>, List.Count)
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;   Capacity : {0}&quot;</span>, List.Capacity)
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;   Values:&quot;</span>)
+    PrintKeysAndValues List
+    
+    List.Clear
+    
+    Debug.Print <span style="color: #a31515">&quot;After Clear,&quot;</span>
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;   Count    : {0}&quot;</span>, List.Count)
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;   Capacity : {0}&quot;</span>, List.Capacity)
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;   Values:&quot;</span>)
+    PrintKeysAndValues List
+    
+    List.TrimToSize
+    
+    Debug.Print <span style="color: #a31515">&quot;After the second TrimToSize,&quot;</span>
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;   Count    : {0}&quot;</span>, List.Count)
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;   Capacity : {0}&quot;</span>, List.Capacity)
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;   Values:&quot;</span>)
+    PrintKeysAndValues List
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> PrintKeysAndValues(<span style="color: #0000ff">ByVal</span> List <span style="color: #0000ff">As</span> SortedList)
+    <span style="color: #0000ff">Dim</span> i <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
+    
+    Debug.Print t(<span style="color: #a31515">&quot;\t-KEY-\t-VALUE-&quot;</span>)
+    
+    <span style="color: #0000ff">For</span> i = 0 <span style="color: #0000ff">To</span> List.Count - 1
+        Debug.Print CorString.Format(t(<span style="color: #a31515">&quot;\t{0}:\t{1}&quot;</span>), List.GetKey(i), List.GetByIndex(i))
+    <span style="color: #0000ff">Next</span>
+    
+    Debug.Print
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; The following code produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    Initially,</span>
+<span style="color: #008000">&#39;       Count    : 5</span>
+<span style="color: #008000">&#39;       Capacity : 256</span>
+<span style="color: #008000">&#39;    Values:</span>
+<span style="color: #008000">&#39;        -KEY-   -VALUE-</span>
+<span style="color: #008000">&#39;    five:                   jumped</span>
+<span style="color: #008000">&#39;    four:                   fox</span>
+<span style="color: #008000">&#39;    one:                    the</span>
+<span style="color: #008000">&#39;    three:                  brown</span>
+<span style="color: #008000">&#39;    two:                    quick</span>
+<span style="color: #008000">&#39;    </span>
+<span style="color: #008000">&#39;    After TrimToSize,</span>
+<span style="color: #008000">&#39;       Count    : 5</span>
+<span style="color: #008000">&#39;       Capacity : 5</span>
+<span style="color: #008000">&#39;    Values:</span>
+<span style="color: #008000">&#39;        -KEY-   -VALUE-</span>
+<span style="color: #008000">&#39;    five:                   jumped</span>
+<span style="color: #008000">&#39;    four:                   fox</span>
+<span style="color: #008000">&#39;    one:                    the</span>
+<span style="color: #008000">&#39;    three:                  brown</span>
+<span style="color: #008000">&#39;    two:                    quick</span>
+<span style="color: #008000">&#39;    </span>
+<span style="color: #008000">&#39;    After Clear,</span>
+<span style="color: #008000">&#39;       Count    : 0</span>
+<span style="color: #008000">&#39;       Capacity : 5</span>
+<span style="color: #008000">&#39;    Values:</span>
+<span style="color: #008000">&#39;        -KEY-   -VALUE-</span>
+<span style="color: #008000">&#39;    </span>
+<span style="color: #008000">&#39;    After the second TrimToSize,</span>
+<span style="color: #008000">&#39;       Count    : 0</span>
+<span style="color: #008000">&#39;       Capacity : 0</span>
+<span style="color: #008000">&#39;    Values:</span>
+<span style="color: #008000">&#39;        -KEY-   -VALUE-</span>
+</pre></div>

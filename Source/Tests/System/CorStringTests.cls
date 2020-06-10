@@ -28,11 +28,11 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "Hello", NewIntegers(Asc("H"), Asc("e"), Asc("l"), Asc("l"), Asc("o"))
             Test.Use "", NewIntegers()
             
-        Case "FromCharArray_WithArrayOfCharacters_ReturnsExpected"
+        Case "NewString_WithArrayOfCharacters_ReturnsExpected"
             Test.Use NewIntegers(Asc("H"), Asc("e"), Asc("l"), Asc("l"), Asc("o")), "Hello"
             Test.Use NewIntegers(), ""
         
-        Case "IsEmptyOrWhitespace_WithValues_ReturnsExpected"
+        Case "IsNullOrWhitespace_WithValues_ReturnsExpected"
             Test.Use "", True
             Test.Use "a", False
             Test.Use " ", True
@@ -80,6 +80,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
         Case "Trim_WithValues_ReturnsExpected"
             Test.Use "", WhiteSpaces, ""
             Test.Use WhiteSpaces & "hello" & WhiteSpaces, WhiteSpaces, "hello"
+            Test.Use WhiteSpaces & "hello" & WhiteSpaces, WhiteSpaceChars, "hello"
             Test.Use "hello" & WhiteSpaces, "helo", WhiteSpaces
             Test.Use WhiteSpaces & "hello", "helo", WhiteSpaces
             Test.Use "hello", "helo", ""
@@ -99,7 +100,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use 9, "123456789"
             Test.Use 10, "1234567890"
             
-        Case "Join_WihtLongsSubset_ReturnsJoined"
+        Case "Join_WithLongsSubset_ReturnsJoined"
             Test.Use 0, 10, "1,2,3,4,5,6,7,8,9,0"
             Test.Use 1, 9, "2,3,4,5,6,7,8,9,0"
             Test.Use 0, 9, "1,2,3,4,5,6,7,8,9"
@@ -177,11 +178,257 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use vbNullString, "", StringComparison.Ordinal, True
             Test.Use "", vbNullString, StringComparison.Ordinal, True
             Test.Use vbNullString, vbNullString, StringComparison.Ordinal, True
+            Test.Use vbNullString, "a", StringComparison.Ordinal, False
+            Test.Use "a", vbNullString, StringComparison.Ordinal, False
+            Test.Use vbNullString, "a", StringComparison.OrdinalIgnoreCase, False
+            Test.Use "a", vbNullString, StringComparison.OrdinalIgnoreCase, False
+            Test.Use "a" & ChrW$(&H30A), ChrW$(&HE5), StringComparison.OrdinalIgnoreCase, False
+            Test.Use "a" & ChrW$(&H30A), ChrW$(&HE5), StringComparison.CurrentCulture, True
+            Test.Use ChrW$(&HDF), ChrW$(&H1E9E), StringComparison.OrdinalIgnoreCase, False
+            Test.Use "a", "a", StringComparison.InvariantCulture, True
+            Test.Use "A", "a", StringComparison.InvariantCulture, False
+            Test.Use "a", "a", StringComparison.InvariantCultureIgnoreCase, True
+            Test.Use "A", "a", StringComparison.InvariantCultureIgnoreCase, True
+            
+            ' This will work when compiled. Both StrComp and CompareString behave differently when run in the IDE VS compiled.
+            ' In the IDE both report ChrW$(&h1E9E) < ChrW$(&hDF)
+            ' Compiled both report ChrW$(&h1E9E) = ChrW$(&hDF) <- this should be the correct result always.
+            ' Test.Use ChrW$(&HDF), ChrW$(&H1E9E), StringComparison.CurrentCultureIgnoreCase, True
+            
+        Case "StartsWith_WithValues_ReturnsExpected"
+            Test.Use "", "", True
+            Test.Use vbNullString, vbNullString, True
+            Test.Use "abc", "abc", True
+            Test.Use "abc", "A", False
+            Test.Use "abcdef", "ab", True
+            Test.Use "abcdef", "a", True
+            Test.Use "abcdef", "", True
+            Test.Use "abcdef", vbNullString, True
+            Test.Use "abc", "b", False
+            
+        Case "StartsWith_WithValuesWhenIgnoringCase_ReturnsExpected"
+            Test.Use "", "", True
+            Test.Use vbNullString, vbNullString, True
+            Test.Use "ABC", "abc", True
+            Test.Use "abc", "AbC", True
+            Test.Use "abcdef", "aB", True
+            Test.Use "abcdef", "A", True
+            Test.Use "abcdef", "a", True
+            Test.Use "abcdef", "", True
+            Test.Use "abcdef", vbNullString, True
+            Test.Use "abc", "B", False
+            Test.Use "abc", "b", False
+            
+        Case "StartsWithEx_WithValue_ReturnsExpected"
+            Test.Use "", "", True
+            Test.Use vbNullString, vbNullString, True
+            Test.Use "abc", "abc", True
+            Test.Use "abcdef", "ab", True
+            Test.Use "abcdef", "a", True
+            Test.Use "abc", "A", False
+            Test.Use "abcdef", "", True
+            Test.Use "abcdef", vbNullString, True
+            Test.Use "abc", "b", False
+            
+        Case "StartsWithEx_WithValueIgnoringCase_ReturnsExpected"
+            Test.Use "", "", True
+            Test.Use vbNullString, vbNullString, True
+            Test.Use "ABC", "abc", True
+            Test.Use "abc", "AbC", True
+            Test.Use "abcdef", "aB", True
+            Test.Use "abcdef", "A", True
+            Test.Use "abcdef", "a", True
+            Test.Use "abcdef", "", True
+            Test.Use "abcdef", vbNullString, True
+            Test.Use "abc", "B", False
+            Test.Use "abc", "b", False
+                
+        Case "EndsWith_WithValues_ReturnsExpected"
+            Test.Use "", "", True
+            Test.Use vbNullString, vbNullString, True
+            Test.Use "abc", "abc", True
+            Test.Use "abcdef", "ef", True
+            Test.Use "abcdef", "f", True
+            Test.Use "abcdef", "F", False
+            Test.Use "abcdef", "", True
+            Test.Use "abcdef", vbNullString, True
+            Test.Use "abc", "b", False
+            
+        Case "EndsWith_WithValuesWhenIgnoringCase_ReturnsExpected"
+            Test.Use "", "", True
+            Test.Use vbNullString, vbNullString, True
+            Test.Use "ABC", "abc", True
+            Test.Use "abc", "AbC", True
+            Test.Use "abcdef", "Ef", True
+            Test.Use "abcdef", "F", True
+            Test.Use "abcdef", "f", True
+            Test.Use "abcdef", "", True
+            Test.Use "abcdef", vbNullString, True
+            Test.Use "abc", "B", False
+            Test.Use "abc", "b", False
+            
+        Case "EndsWithEx_WhenNotIgnoringCaseWithSourceAndValue_ReturnsExpected"
+            Test.Use "", "", True
+            Test.Use vbNullString, vbNullString, True
+            Test.Use "abc", "abc", True
+            Test.Use "abcdef", "ef", True
+            Test.Use "abcdef", "f", True
+            Test.Use "abcdef", "F", False
+            Test.Use "abcdef", "", True
+            Test.Use "abcdef", vbNullString, True
+            Test.Use "abc", "b", False
+            
+        Case "EndsWithEx_WhenIgnoringCaseWithSourceAndValue_ReturnsExpected"
+            Test.Use "", "", True
+            Test.Use vbNullString, vbNullString, True
+            Test.Use "ABC", "abc", True
+            Test.Use "abc", "AbC", True
+            Test.Use "abcdef", "Ef", True
+            Test.Use "abcdef", "F", True
+            Test.Use "abcdef", "f", True
+            Test.Use "abcdef", "", True
+            Test.Use "abcdef", vbNullString, True
+            Test.Use "abc", "B", False
+            Test.Use "abc", "b", False
+        
+        Case "Split_WithStringSeparators_ReturnsExpected"
+            Test.Use "abc", NewStrings("b"), NewStrings("a", "c")
+            Test.Use "abc", NewStrings("a"), NewStrings("", "bc")
+            Test.Use "abc", NewStrings("c"), NewStrings("ab", "")
+            Test.Use "abc", NewStrings("ab"), NewStrings("", "c")
+            Test.Use "abc", NewStrings("bc"), NewStrings("a", "")
+            Test.Use "abc", NewStrings("abc"), NewStrings("", "")
+            Test.Use "abc", NewStrings("d"), NewStrings("abc")
+            Test.Use "abc", NewStrings("a", "c"), NewStrings("", "b", "")
+            Test.Use "abc", NewStrings("abcd"), NewStrings("abc")
+            Test.Use "abcabc", NewStrings("b"), NewStrings("a", "ca", "c")
+            Test.Use "abccda", NewStrings("c"), NewStrings("ab", "", "da")
+            Test.Use "abccda", NewStrings("c", "d"), NewStrings("ab", "", "", "a")
+            Test.Use "abcd", NewStrings(), NewStrings("abcd")
+            Test.Use "abcd", NullStrings, NewStrings("abcd")
+            Test.Use "abcd", NewStrings("ce"), NewStrings("abcd")
+            Test.Use "abcd", NewStrings("de"), NewStrings("abcd")
+            Test.Use "", NewStrings("b"), NewStrings("")
+            Test.Use "", NewStrings(""), NewStrings("")
+            Test.Use "", NewStrings(), NewStrings("")
+            Test.Use vbNullString, NewStrings("b"), NewStrings("")
+            Test.Use vbNullString, NewStrings(""), NewStrings("")
+            Test.Use "a b c", NewStrings(), NewStrings("a", "b", "c")
+            Test.Use "a b c", NullStrings, NewStrings("a", "b", "c")
+            Test.Use "a,b,c", ",", NewStrings("a", "b", "c")
+            Test.Use "a b c", "", NewStrings("a", "b", "c")
+            
+        Case "Split_WithRemoveEmptyEntries_ReturnsFilledStringsOnly"
+            Test.Use "abbc", NewStrings("b"), NewStrings("a", "c")
+            Test.Use "abbc", NewStrings("a"), NewStrings("bbc")
+            Test.Use "abbc", NewStrings("c"), NewStrings("abb")
+            Test.Use "abbc", NewStrings("d"), NewStrings("abbc")
+            Test.Use "abcd", NewStrings(), NewStrings("abcd")
+            Test.Use "abcd", NullStrings, NewStrings("abcd")
+            Test.Use "abcd", NewStrings("ce"), NewStrings("abcd")
+            Test.Use "abcd", NewStrings("de"), NewStrings("abcd")
+            Test.Use "", NewStrings("b"), NewStrings()
+            Test.Use "", NewStrings(""), NewStrings()
+            
+        Case "Split_WithCount_ReturnsLimitedNumberOfSubstrings"
+            Test.Use "abc", NewStrings("b"), 2, NewStrings("a", "c")
+            Test.Use "abc", NewStrings("b"), 3, NewStrings("a", "c")
+            Test.Use "abc", NewStrings("b"), 1, NewStrings("abc")
+            Test.Use "abc", NewStrings("b"), 0, NewStrings()
+            Test.Use "", NewStrings("b"), 1, NewStrings("")
+            Test.Use "", NewStrings("b"), 0, NewStrings()
+            Test.Use "", NewStrings(""), 5, NewStrings("")
+            
+        Case "Split_WithCharSeparators_ReturnsExpected"
+            Test.Use "abc", NewChars("b"), NewStrings("a", "c")
+            Test.Use "abc", NewChars("a"), NewStrings("", "bc")
+            Test.Use "abc", NewChars("c"), NewStrings("ab", "")
+            Test.Use "abc", NewChars("d"), NewStrings("abc")
+            Test.Use "abc", NewChars("a", "c"), NewStrings("", "b", "")
+            Test.Use "abcabc", NewChars("b"), NewStrings("a", "ca", "c")
+            Test.Use "abccda", NewChars("c"), NewStrings("ab", "", "da")
+            Test.Use "abccda", NewChars("c", "d"), NewStrings("ab", "", "", "a")
+            Test.Use "abcd", NewChars(), NewStrings("abcd")
+            Test.Use "abcd", NullChars, NewStrings("abcd")
+            Test.Use "", NewChars("b"), NewStrings("")
+            Test.Use vbNullString, NewChars("b"), NewStrings("")
+            
+        Case "Compare_WithValues_ReturnsExpected"
+            Test.Use "abc", "abc", StringComparison.Ordinal, 0
+            Test.Use "aBc", "abc", StringComparison.Ordinal, -1
+            Test.Use "abc", "aBc", StringComparison.Ordinal, 1
+            Test.Use "aBc", "abc", StringComparison.OrdinalIgnoreCase, 0
+            Test.Use "abc", "aBc", StringComparison.OrdinalIgnoreCase, 0
+            Test.Use "", vbNullString, StringComparison.Ordinal, 0
+            
+        Case "CompareEx_WhenCalled_ComparesSubstrings"
+            Test.Use 0, 0, 5, StringComparison.Ordinal, 0
+            Test.Use 0, 5, 5, StringComparison.Ordinal, 1
+            Test.Use 0, 5, 5, StringComparison.OrdinalIgnoreCase, 0
+            Test.Use 5, 5, 10, StringComparison.Ordinal, 1
+            Test.Use 5, 5, 9, StringComparison.Ordinal, 1
+            Test.Use 5, 5, 9, StringComparison.OrdinalIgnoreCase, 0
+            
+        Case "CompareCultural_WithValues_ReturnsExpected"
+            Test.Use "brother", "Brother", CompareOptions.OrdinalOption, 1
+            Test.Use "brother", "Brother", CompareOptions.None, -1
+            Test.Use "Brother", "brother", CompareOptions.OrdinalOption, -1
+            Test.Use "Brother", "brother", CompareOptions.None, 1
+            Test.Use "brother", "Brother", CompareOptions.OrdinalIgnoreCaseOption, 0
+            Test.Use "brother", "Brother", CompareOptions.IgnoreCase, 0
+            
+        Case "CompareCulturalEx_WithValues_ReturnsExpected"
+            Test.Use 0, 0, 5, CompareOptions.OrdinalOption, 0
+            Test.Use 0, 5, 5, CompareOptions.OrdinalOption, 1
+            Test.Use 0, 5, 5, CompareOptions.OrdinalIgnoreCaseOption, 0
+            Test.Use 5, 5, 10, CompareOptions.OrdinalOption, 1
+            Test.Use 5, 5, 9, CompareOptions.OrdinalOption, 1
+            Test.Use 5, 5, 9, CompareOptions.OrdinalIgnoreCaseOption, 0
             
     End Select
 End Sub
 
-Public Sub IsEmptyOrWhitespace_WithValues_ReturnsExpected(ByVal s As String, ByVal Expected As Boolean)
+Public Sub Compare_WithValues_ReturnsExpected(ByVal s1 As String, ByVal s2 As String, ByVal ComparisonType As StringComparison, ByVal Expected As Long)
+    Dim Actual As Long
+    
+    Actual = CorString.Compare(s1, s2, ComparisonType)
+    
+    Assert.That Sgn(Actual), Iz.EqualTo(Expected)
+End Sub
+
+Public Sub CompareEx_WhenCalled_ComparesSubstrings(ByVal IndexA As Long, ByVal IndexB As Long, ByVal Length As Long, ByVal ComparisonType As StringComparison, ByVal Expected As Long)
+    Dim Actual As Long
+    
+    Actual = CorString.CompareEx("abcdeABCDEabcde", IndexA, "abcdeABCDEabcD", IndexB, Length, ComparisonType)
+    
+    Assert.That Sgn(Actual), Iz.EqualTo(Expected)
+End Sub
+
+Public Sub CompareEx_WithNullStrings_ReturnsZero()
+    Dim Actual As Long
+    
+    Actual = CorString.CompareEx(vbNullString, 0, vbNullString, 0, 0)
+    
+    Assert.That Sgn(Actual), Iz.EqualTo(0)
+End Sub
+
+Public Sub CompareCultural_WithValues_ReturnsExpected(ByVal s1 As String, ByVal s2 As String, ByVal Options As CompareOptions, ByVal Expected As Long)
+    Dim Actual As Long
+    
+    Actual = CorString.CompareCultural(s1, s2, Cor.NewCultureInfo("en-US"), Options)
+    
+    Assert.That Sgn(Actual), Iz.EqualTo(Expected)
+End Sub
+
+Public Sub CompareCulturalEx_WithValues_ReturnsExpected(ByVal IndexA As Long, ByVal IndexB As Long, ByVal Length As Long, ByVal Options As CompareOptions, ByVal Expected As Long)
+    Dim Actual As Long
+    
+    Actual = CorString.CompareCulturalEx("abcdeABCDEabcde", IndexA, "abcdeABCDEabcD", IndexB, Length, NewCultureInfo("en-US"), Options)
+    
+    Assert.That Sgn(Actual), Iz.EqualTo(Expected)
+End Sub
+
+Public Sub IsNullOrWhitespace_WithValues_ReturnsExpected(ByVal s As String, ByVal Expected As Boolean)
     Dim Actual As Boolean
 
     Actual = CorString.IsNullOrWhiteSpace(s)
@@ -245,55 +492,55 @@ Public Sub ToCharArray_WithStartIndexAndLengthGreaterThanTheSizeOfCharsArray_Thr
     AssertArgumentOutOfRangeException Err
 End Sub
 
-Public Sub FromCharArray_WithArrayOfCharacters_ReturnsExpected(ByRef CharactersToConvert() As Integer, ByVal Expected As String)
+Public Sub NewString_WithArrayOfCharacters_ReturnsExpected(ByRef CharactersToConvert() As Integer, ByVal Expected As String)
     Dim Actual As String
     
-    Actual = CorString.FromCharArray(CharactersToConvert)
+    Actual = Cor.NewString(CharactersToConvert)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub FromCharArray_WithIndexLessThanLBound_ThrowsArgumentOutOfRangeException()
+Public Sub NewString_WithIndexLessThanLBound_ThrowsArgumentOutOfRangeException()
     Dim Chars(1 To 10) As Integer
     
     On Error Resume Next
-    CorString.FromCharArray Chars, 0, 1
+    NewString Chars, 0, 1
     
-    AssertArgumentOutOfRangeException Err, "Index"
+    AssertArgumentOutOfRangeException Err, "StartIndex"
 End Sub
 
-Public Sub FromCharArray_WithCountLessThanZero_ThrowsArgumentOutOfRangeException()
+Public Sub NewString_WithCountLessThanZero_ThrowsArgumentOutOfRangeException()
     Dim Chars(0) As Integer
     
     On Error Resume Next
-    CorString.FromCharArray Chars, 0, -1
+    NewString Chars, 0, -1
     
-    AssertArgumentOutOfRangeException Err, "Count"
+    AssertArgumentOutOfRangeException Err, "Length"
 End Sub
 
-Public Sub FromCharArray_WithIndexAndCountBeyondUBound_ThrowsArgumentExceptin()
+Public Sub NewString_WithIndexAndCountBeyondUBound_ThrowsArgumentExceptin()
     Dim Chars(0 To 5) As Integer
     
     On Error Resume Next
-    CorString.FromCharArray Chars, 1, 6
+    NewString Chars, 1, 6
     
     AssertArgumentException Err
 End Sub
 
-Public Sub FromCharArray_WithNullArray_ThrowsArgumentNullException()
+Public Sub NewString_WithNullArray_ThrowsArgumentNullException()
     Dim NullChars() As Integer
     
     On Error Resume Next
-    CorString.FromCharArray NullChars
+    NewString NullChars
     
-    AssertArgumentNullException Err, "Chars"
+    AssertArgumentNullException Err, "Value"
 End Sub
 
-Public Sub FromCharArray_WithMultiDimArray_ThrowsRankException()
+Public Sub NewString_WithMultiDimArray_ThrowsRankException()
     Dim MultiDim(0, 0) As Integer
     
     On Error Resume Next
-    CorString.FromCharArray MultiDim
+    NewString MultiDim
     
     AssertRankException Err
 End Sub
@@ -467,7 +714,7 @@ Public Sub Join_WithLongArray_ReturnsJoined()
     Assert.That Actual, Iz.EqualTo("1,2,3,4")
 End Sub
 
-Public Sub Join_WihtLongsSubset_ReturnsJoined(ByVal StartIndex As Long, ByVal Count As Long, ByVal Expected As String)
+Public Sub Join_WithLongsSubset_ReturnsJoined(ByVal StartIndex As Long, ByVal Count As Long, ByVal Expected As String)
     Dim Longs() As Long
     Longs = NewLongs(1, 2, 3, 4, 5, 6, 7, 8, 9, 0)
     
@@ -701,6 +948,209 @@ Public Sub Equals_WithValues_ReturnsExpected(ByVal a As String, ByVal b As Strin
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
+Public Sub CopyTo_WithNullDestination_ThrowsArgumentNullException()
+    On Error Resume Next
+    
+    CorString.CopyTo "", 0, NullChars, 0, 0
+    
+    AssertArgumentNullException Err, "Destination"
+End Sub
+
+Public Sub CopyTo_WithSourceIndexLessThanZero_ThrowsArgumentOutOfRangeException()
+    On Error Resume Next
+    
+    CorString.CopyTo "", -1, NewChars(), 0, 0
+    
+    AssertArgumentOutOfRangeException Err, "SourceIndex"
+End Sub
+
+Public Sub CopyTo_WithDestinationIndexLessThanLBound_ThrowsArgumentOutOfRangeException()
+    Dim Dest(1 To 2) As Integer
+    On Error Resume Next
+    
+    CorString.CopyTo "a", 0, Dest, 0, 1
+    
+    AssertArgumentOutOfRangeException Err, "DestinationIndex"
+End Sub
+
+Public Sub CopyTo_WithCountLessThanZero_ThrowsArgumentOutOfRangeException()
+    Dim Dest(0) As Integer
+    On Error Resume Next
+    
+    CorString.CopyTo "a", 0, Dest, 0, -1
+    
+    AssertArgumentOutOfRangeException Err, "Count"
+End Sub
+
+Public Sub CopyTo_WithStartIndexPlusCountPassedEndOfString_ThrowsArgumentOutOfRangeException()
+    Dim Dest(10) As Integer
+    On Error Resume Next
+    
+    CorString.CopyTo "123", 0, Dest, 0, 4
+    
+    AssertArgumentOutOfRangeException Err, "SourceIndex"
+End Sub
+
+Public Sub CopyTo_WithDestinationIndexPlusCountPassedEndOfArray_ThrowsArgumentOutOfRangeException()
+    Dim Dest(10) As Integer
+    On Error Resume Next
+    
+    CorString.CopyTo "123", 0, Dest, 9, 3
+    
+    AssertArgumentOutOfRangeException Err, "DestinationIndex"
+End Sub
+
+Public Sub CopyTo_WhenCoveringEntireString_CopiesAllCharacters()
+    Dim Dest(3) As Integer
+    
+    CorString.CopyTo "1234", 0, Dest, 0, 4
+    
+    Assert.That Dest, Iz.EqualTo(NewChars("1", "2", "3", "4"))
+End Sub
+
+Public Sub CopyTo_WhenCoveringSubString_CopiesSubStringCharacters()
+    Dim Dest(3) As Integer
+    
+    CorString.CopyTo "1234", 1, Dest, 0, 2
+    
+    Assert.That Dest, Iz.EqualTo(NewChars("2", "3", 0, 0))
+End Sub
+
+Public Sub CopyTo_WhenCopyingToNonStartOfArray_CopiesToDestination()
+    Dim Dest(3) As Integer
+    
+    CorString.CopyTo "1234", 1, Dest, 2, 2
+    
+    Assert.That Dest, Iz.EqualTo(NewChars(0, 0, "2", "3"))
+End Sub
+
+Public Sub StartsWith_WithValues_ReturnsExpected(ByVal Source As String, ByVal Value As String, ByVal Expected As Boolean)
+    Dim Actual As Boolean
+    
+    Actual = CorString.StartsWith(Source, Value)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub StartsWith_WithValuesWhenIgnoringCase_ReturnsExpected(ByVal Source As String, ByVal Value As String, ByVal Expected As Boolean)
+    Dim Actual As Boolean
+    
+    Actual = CorString.StartsWith(Source, Value, StringComparison.OrdinalIgnoreCase)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub StartsWithEx_WithValue_ReturnsExpected(ByVal Source As String, ByVal Value As String, ByVal Expected As Boolean)
+    Dim Actual As Boolean
+    
+    Actual = CorString.StartsWithEx(Source, Value, False, CultureInfo.InvariantCulture)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub StartsWithEx_WithValueIgnoringCase_ReturnsExpected(ByVal Source As String, ByVal Value As String, ByVal Expected As Boolean)
+    Dim Actual As Boolean
+    
+    Actual = CorString.StartsWithEx(Source, Value, True, CultureInfo.InvariantCulture)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub EndsWith_WithValues_ReturnsExpected(ByVal Source As String, ByVal Value As String, ByVal Expected As Boolean)
+    Dim Actual As Boolean
+    
+    Actual = CorString.EndsWith(Source, Value)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub EndsWith_WithValuesWhenIgnoringCase_ReturnsExpected(ByVal Source As String, ByVal Value As String, ByVal Expected As Boolean)
+    Dim Actual As Boolean
+    
+    Actual = CorString.EndsWith(Source, Value, StringComparison.OrdinalIgnoreCase)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub EndsWithEx_WhenNotIgnoringCaseWithSourceAndValue_ReturnsExpected(ByVal Source As String, ByVal Value As String, ByVal Expected As Boolean)
+    Dim Actual As Boolean
+    
+    Actual = CorString.EndsWithEx(Source, Value, False, CultureInfo.InvariantCulture)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub EndsWithEx_WhenIgnoringCaseWithSourceAndValue_ReturnsExpected(ByVal Source As String, ByVal Value As String, ByVal Expected As Boolean)
+    Dim Actual As Boolean
+    
+    Actual = CorString.EndsWithEx(Source, Value, True, CultureInfo.InvariantCulture)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub Split_WithStringSeparators_ReturnsExpected(ByVal StringToSplit As String, ByRef Separators As Variant, ByRef Expected() As String)
+    Dim Actual() As String
+    
+    Actual = CorString.Split(StringToSplit, Separators)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub Split_WithCount_ReturnsLimitedNumberOfSubstrings(ByVal StringToSplit As String, ByRef Separators() As String, ByVal Count As Long, ByRef Expected() As String)
+    Dim Actual() As String
+    
+    Actual = CorString.Split(StringToSplit, Separators, Count)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub Split_WithRemoveEmptyEntries_ReturnsFilledStringsOnly(ByVal StringToSplit As String, ByRef Separators() As String, ByRef Expected() As String)
+    Dim Actual() As String
+    
+    Actual = CorString.Split(StringToSplit, Separators, , StringSplitOptions.RemoveEmptyEntries)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub Split_WithCharSeparators_ReturnsExpected(ByVal StringToSplit As String, ByRef Separators() As Integer, ByRef Expected() As String)
+    Dim Actual() As String
+    
+    Actual = CorString.Split(StringToSplit, Separators)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub CharAt_WhenCalled_ReturnsExpected()
+    Dim s As String
+    s = "abc"
+    
+    Assert.That CorString.CharAt(s, 0), Iz.EqualTo(97)
+    Assert.That CorString.CharAt(s, 2), Iz.EqualTo(99)
+End Sub
+
+Public Sub CharAt_WithEmptyStringAndZeroIndex_ThrowsArgumentOutOfRangeException()
+    On Error Resume Next
+    
+    CorString.CharAt "", 0
+    
+    AssertArgumentOutOfRangeException Err, "Index"
+End Sub
+
+Public Sub CharAt_WithNegativeIndex_ThrowsArgumentOutOfRangeException()
+    On Error Resume Next
+    
+    CorString.CharAt "abc", -1
+    
+    AssertArgumentOutOfRangeException Err, "Index"
+End Sub
+
+Public Sub CharAt_WithTooLargeIndex_ThrowsArgumentOutOfRangeException()
+    On Error Resume Next
+    
+    CorString.CharAt "abc", 3
+    
+    AssertArgumentOutOfRangeException Err, "Index"
+End Sub
 
 Private Property Get WhiteSpaces() As String
     WhiteSpaces = ChrW$(&H20) & ChrW$(&HD) & ChrW$(&H9) & ChrW$(&HA) & ChrW$(&HB) & ChrW$(&HC) & ChrW$(&H85) & ChrW$(&HA0) & ChrW$(&H1680) & ChrW$(&H180E) & _

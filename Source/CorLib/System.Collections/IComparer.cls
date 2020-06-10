@@ -36,28 +36,37 @@ Attribute VB_Exposed = True
 '
 
 ''
-' A standard interface used to implement custom comparers.
+' Exposes a method that compares two values.
 '
-' @remarks<br>
-' Use this interface to create a comparer that can be used in searching and sorting
-' functions in the collections. Generally, custom comparers are used for special-case
-' values to compare, such as user-defined types. In order to not have to write logic
-' to compare all types of values, the method could delegate general cases to the
-' default comparer, and compare only the specialized values.
-'
+' @remarks This interface is used in conjunction with the <a href="CorArray.Sort.html">CorArray.Sort</a> and <a href="CorArray.BinarySearch.html">CorArray.BinarySearch</a>
+' methods. It provides a way to customize the sort order of a collection. See the <a href="IComparer.Compare.html">Compare</a> method for notes on parameters and return value.
+' <p>The default implementation of this interface is the <a href="Comparer.html">Comparer</a> class.</p>
+' @see Comparer
+' @include "..\DocIncludes\IComparer.html"
 Option Explicit
 
 ''
-' Compares two elements and returns their relationship.
+' Compares two values and returns a value indicating whether one is less than, equal to, or greater than the other.
 '
-' @param a The left-hand-side of the equation.
-' @param b the right-hand-side of the equation.
-' @return Value indicating the relationships between the values.
-' @remarks <br>
-' Comparison guide:<br>
-' a is the same value as b returns a 0.<br>
-' a is less than the value b returns a negative value (-1).<br>
-' a is greater than the value b returns a positive value (1).<br>
+' @param a The first value to compare.
+' @param b The second value to compare.
+' @return A signed integer that indicates the relative values of <i>a</i> and <i>b</i>, as shown in the following table.
+' <table style="width: auto">
+'   <tr>
+'       <th>Value</th><th>Meaning</th>
+'   </tr>
+'   <tr>
+'       <td>Less than zero</td><td><i>a</i> is less than <i>b</i>.</td>
+'   </tr>
+'   <tr>
+'       <td>Zero</td><td><i>a</i> equals <i>b</i>.</td>
+'   </tr>
+'   <tr>
+'       <td>Greater than zero</td><td><i>a</i> is greater than <i>b</i>.</td>
+'   </tr>
+' </table>
+' @remarks Comparing <b>Null</b> with any type is allowed and does not generate an exception when using <a href="IComparable.html">IComparable</a>. When sorting, <b>Null</b> is considered to be less than any other value.
+' @see IComparable
 ' @include "..\DocIncludes\IComparer.Compare.html"
 Public Function Compare(ByRef a As Variant, ByRef b As Variant) As Long: End Function
 

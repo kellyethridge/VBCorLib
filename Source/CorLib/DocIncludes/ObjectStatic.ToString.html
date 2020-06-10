@@ -1,0 +1,55 @@
+@examples The following example uses <b>ToString</b> to display numeric values formatting.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    Debug.Print <span style="color: #a31515">&quot;Print values with default formatting.&quot;</span>
+    Debug.Print <span style="color: #2b91af">Object</span>.ToString(CorDateTime.Now)
+    Debug.Print <span style="color: #2b91af">Object</span>.ToString(1234)
+    Debug.Print <span style="color: #2b91af">Object</span>.ToString(1234.3254)
+
+    Debug.Print t(<span style="color: #a31515">&quot;\nPrint values with formatting.&quot;</span>)
+    Debug.Print <span style="color: #2b91af">Object</span>.ToString(1234, <span style="color: #a31515">&quot;g2&quot;</span>)
+    Debug.Print <span style="color: #2b91af">Object</span>.ToString(1234, <span style="color: #a31515">&quot;f2&quot;</span>)
+    Debug.Print <span style="color: #2b91af">Object</span>.ToString(1234, <span style="color: #a31515">&quot;n2&quot;</span>)
+    Debug.Print <span style="color: #2b91af">Object</span>.ToString(1234.3254, <span style="color: #a31515">&quot;n2&quot;</span>)
+    Debug.Print <span style="color: #2b91af">Object</span>.ToString(1234, <span style="color: #a31515">&quot;c2&quot;</span>)
+    Debug.Print <span style="color: #2b91af">Object</span>.ToString(1234.3254, <span style="color: #a31515">&quot;c2&quot;</span>)
+    
+    <span style="color: #0000ff">Dim</span> Provider <span style="color: #0000ff">As</span> <span style="color: #0000ff">New</span> NumberFormatInfo
+    Provider.CurrencySymbol = <span style="color: #a31515">&quot;!&quot;</span>
+    
+    Debug.Print t(<span style="color: #a31515">&quot;\nPrint values with custom provider.&quot;</span>)
+    Debug.Print <span style="color: #2b91af">Object</span>.ToString(1234, <span style="color: #a31515">&quot;c2&quot;</span>, Provider)
+    Debug.Print <span style="color: #2b91af">Object</span>.ToString(1234.3254, <span style="color: #a31515">&quot;c2&quot;</span>, Provider)
+    
+    <span style="color: #0000ff">Dim</span> FrProvider <span style="color: #0000ff">As</span> IFormatProvider
+    <span style="color: #0000ff">Set</span> FrProvider = NewCultureInfo(<span style="color: #a31515">&quot;FR-fr&quot;</span>)
+    
+    Debug.Print t(<span style="color: #a31515">&quot;\nPrint values with French provider.&quot;</span>)
+    Debug.Print <span style="color: #2b91af">Object</span>.ToString(CorDateTime.Now, Provider:=FrProvider)
+    Debug.Print <span style="color: #2b91af">Object</span>.ToString(1234, <span style="color: #a31515">&quot;c2&quot;</span>, FrProvider)
+    Debug.Print <span style="color: #2b91af">Object</span>.ToString(1234.3254, <span style="color: #a31515">&quot;c2&quot;</span>, FrProvider)
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; This example code produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    Print values with default formatting.</span>
+<span style="color: #008000">&#39;    4/21/2020 9:02:45 AM</span>
+<span style="color: #008000">&#39;    1234</span>
+<span style="color: #008000">&#39;    1234.3254</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    Print values with formatting.</span>
+<span style="color: #008000">&#39;    1.2e+03</span>
+<span style="color: #008000">&#39;    1234.00</span>
+<span style="color: #008000">&#39;    1,234.00</span>
+<span style="color: #008000">&#39;    1,234.33</span>
+<span style="color: #008000">&#39;    $1,234.00</span>
+<span style="color: #008000">&#39;    $1,234.33</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    Print values with custom provider.</span>
+<span style="color: #008000">&#39;    !1,234.00</span>
+<span style="color: #008000">&#39;    !1,234.33</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    Print values with French provider.</span>
+<span style="color: #008000">&#39;    21/04/2020 09:02:45</span>
+<span style="color: #008000">&#39;    1 234,00 &euro;</span>
+<span style="color: #008000">&#39;    1 234,33 &euro;</span>
+</pre></div>

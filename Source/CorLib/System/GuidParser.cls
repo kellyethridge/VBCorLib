@@ -58,7 +58,6 @@ End Sub
 
 Friend Function TryParse(ByRef InputString As String, ByRef Result As VBGUID) As Boolean
     Dim Trimmed As String
-    Dim Format  As Integer
     
     Trimmed = CorString.Trim(InputString)
     Init Trimmed

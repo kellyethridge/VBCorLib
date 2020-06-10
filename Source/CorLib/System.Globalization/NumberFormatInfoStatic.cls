@@ -62,11 +62,11 @@ Option Explicit
 ' @param AllowThousands Indicates that the numeric string can have group separators, such as symbols that separate hundreds from thousands. If the NumberStyles value includes the AllowCurrencySymbol flag and the string to be parsed includes a currency symbol, the valid group separator character is determined by the NumberFormatInfo.CurrencyGroupSeparator property, and the number of digits in each group is determined by the NumberFormatInfo.CurrencyGroupSizes property. Otherwise, the valid group separator character is determined by the NumberFormatInfo.NumberGroupSeparator property, and the number of digits in each group is determined by the NumberFormatInfo.NumberGroupSizes property.
 ' @param AllowTrailingSign Indicates that the numeric string can have a trailing sign. Valid trailing sign characters are determined by the NumberFormatInfo.PositiveSign and NumberFormatInfo.NegativeSign properties.
 ' @param AllowTrailingWhite Indicates that trailing white-space characters can be present in the parsed string. Valid white-space characters have the Unicode values U+0009, U+000A, U+000B, U+000C, U+000D, and U+0020. Note that this is a subset of the characters for which the Char.IsWhiteSpace method returns true.
-' @param Any Indicates that all styles except AllowHexSpecifier are used. This is a composite number style.
-' @param Currency Indicates that all styles except AllowExponent and AllowHexSpecifier are used. This is a composite number style.
+' @param [Any] Indicates that all styles except AllowHexSpecifier are used. This is a composite number style.
+' @param [Currency] Indicates that all styles except AllowExponent and AllowHexSpecifier are used. This is a composite number style.
 ' @param Float Indicates that the AllowLeadingWhite, AllowTrailingWhite, AllowLeadingSign, AllowDecimalPoint, and AllowExponent styles are used. This is a composite number style.
 ' @param HexNumber Indicates that the AllowLeadingWhite, AllowTrailingWhite, and AllowHexSpecifier styles are used. This is a composite number style.
-' @param Integer Indicates that the AllowLeadingWhite, AllowTrailingWhite, and AllowLeadingSign styles are used. This is a composite number style.
+' @param [Integer] Indicates that the AllowLeadingWhite, AllowTrailingWhite, and AllowLeadingSign styles are used. This is a composite number style.
 ' @param None Indicates that no style elements, such as leading or trailing white space, thousands separators, or a decimal separator, can be present in the parsed string. The string to be parsed must consist of integral decimal digits only.
 ' @param Number Indicates that the AllowLeadingWhite, AllowTrailingWhite, AllowLeadingSign, AllowTrailingSign, AllowDecimalPoint, and AllowThousands styles are used. This is a composite number style.
 Public Enum NumberStyles
@@ -88,6 +88,12 @@ Public Enum NumberStyles
     AllowHexSpecifier = 512
     HexNumber = 515
 End Enum
+
+Private mCurrencyPositivePatterns() As String
+Private mCurrencyNegativePatterns() As String
+Private mNumberNegativePatterns()   As String
+Private mPercentPositivePatterns()  As String
+Private mPercentNegativePatterns()  As String
 
 
 ''
@@ -143,3 +149,42 @@ Public Function ReadOnly(ByVal Info As NumberFormatInfo) As NumberFormatInfo
     End If
 End Function
 
+Friend Property Get NumberNegativePatterns(ByVal Index As Long) As String
+    NumberNegativePatterns = mNumberNegativePatterns(Index)
+End Property
+
+Friend Property Get CurrencyPositivePatterns(ByVal Index As Long) As String
+    CurrencyPositivePatterns = mCurrencyPositivePatterns(Index)
+End Property
+
+Friend Property Get CurrencyNegativePatterns(ByVal Index As Long) As String
+    CurrencyNegativePatterns = mCurrencyNegativePatterns(Index)
+End Property
+
+Friend Property Get PercentPositivePatterns(ByVal Index As Long) As String
+    PercentPositivePatterns = mPercentPositivePatterns(Index)
+End Property
+
+Friend Property Get PercentNegativePatterns(ByVal Index As Long) As String
+    PercentNegativePatterns = mPercentNegativePatterns(Index)
+End Property
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Constructors
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Sub Class_Initialize()
+    InitPatterns
+End Sub
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Helpers
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Sub InitPatterns()
+    mNumberNegativePatterns = Cor.NewStrings("(#)", "-#", "- #", "#-", "# -")
+    mCurrencyNegativePatterns = Cor.NewStrings("($#)", "-$#", "$-#", "$#-", "(#$)", "-#$", "#-$", "#$-", "-# $", "-$ #", "# $-", "$ #-", "$ -#", "#- $", "($ #)", "(# $)")
+    mCurrencyPositivePatterns = Cor.NewStrings("$#", "#$", "$ #", "# $")
+    mPercentNegativePatterns = Cor.NewStrings("-# %", "-#%", "-%#", "%-#", "%#-", "#-%", "#%-", "-% #", "# %-", "% #-", "% -#", "#- %")
+    mPercentPositivePatterns = Cor.NewStrings("# %", "#%", "%#", "% n")
+End Sub

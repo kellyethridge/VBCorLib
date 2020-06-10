@@ -1,0 +1,53 @@
+@remarks <a href="ArrayList.html">ArrayList</a> accepts allows duplicate elements.
+<p>This property provides the ability to access a specific element in the collection by using the following syntax: <code>MyCollection(index)</code>.</p>
+<p><a href="ArrayList.html">ArrayList</a> implements <b>Item</b> as the default property.</p>
+<p>Retrieving the value of this property is an O(1) operation; setting the property is also an O(1) operation.</p>
+@exceptions
+<table style="width: auto">
+    <tr>
+        <th>Exception</th><th>Condition</th>
+    </tr>
+    <tr>
+        <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+        <td>
+            <i>Index</i> is less than zero.<br/>
+            -or-<br/>
+            <i>Index</i> is equal to or greater than <a href="ArrayList.Get.Count.html">Count</a>.
+        </td>
+    </tr>
+</table>
+@examples The example demonstrates how to directly set a value in an <b>ArrayList</b>.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> List <span style="color: #0000ff">As</span> <span style="color: #0000ff">New</span> ArrayList
+    <span style="color: #0000ff">Dim</span> Item <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>
+    
+    List.AddRange Array(<span style="color: #a31515">&quot;My&quot;</span>, <span style="color: #a31515">&quot;name&quot;</span>, <span style="color: #a31515">&quot;is&quot;</span>, <span style="color: #a31515">&quot;Earl&quot;</span>)
+    
+    Debug.Print <span style="color: #a31515">&quot;Original list contents.&quot;</span>
+    PrintValues List
+    Debug.Print
+    
+    List(2) = <span style="color: #a31515">&quot;isn&#39;t&quot;</span>
+    
+    Debug.Print <span style="color: #a31515">&quot;Updated list contents.&quot;</span>
+    PrintValues List
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> PrintValues(<span style="color: #0000ff">ByVal</span> List <span style="color: #0000ff">As</span> IEnumerable)
+    <span style="color: #0000ff">Dim</span> Value <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>
+    
+    <span style="color: #0000ff">For</span> <span style="color: #0000ff">Each</span> Value <span style="color: #0000ff">In</span> List
+        Debug.Print Value &amp; <span style="color: #a31515">&quot; &quot;</span><span style="border: 1px solid #FF0000">;</span>
+    <span style="color: #0000ff">Next</span>
+    
+    Debug.Print
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; The example produces the following output.</span>
+<span style="color: #008000">&#39;    Original list contents.</span>
+<span style="color: #008000">&#39;    My Name Is Earl</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    Updated list contents.</span>
+<span style="color: #008000">&#39;    My name isn&#39;t Earl</span>
+</pre></div>
+

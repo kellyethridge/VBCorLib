@@ -58,7 +58,6 @@ Option Explicit
 '   the array size preceeding the
 '   array elements.
 
-Private Const CULTURE_FILENAME          As String = "vbcultures.nlp"
 Private Const CULTURE_COUNT_OFFSET      As Long = 0
 Private Const STRINGPOOL_OFFSET_OFFSET  As Long = 4
 Private Const INVARIANT_LCID            As Long = 127
@@ -97,9 +96,9 @@ Friend Function GetString(ByVal LCID As Integer, ByVal Index As Long) As String
     On Error GoTo Catch
     mCultureSA.pvData = mCulturesByLCID(LCID)
     
-    Dim Pos As Long
-    Pos = mStringPoolAddress + mCulture(0).Strings(Index)
-    GetString = SysAllocString(Pos)
+    Dim pos As Long
+    pos = mStringPoolAddress + mCulture(0).Strings(Index)
+    GetString = SysAllocString(pos)
     Exit Function
     
 Catch:
@@ -112,15 +111,15 @@ Friend Function GetStringArray(ByVal LCID As Integer, ByVal Index As Long) As St
                                                 ' since it will return Empty and fail to assign.
     ' Move to the start of the array elements.
     ' The first 2-bytes represent the number of elements.
-    Dim Pos As Long
-    Pos = mStringPoolAddress + mCulture(0).Strings(Index)
+    Dim pos As Long
+    pos = mStringPoolAddress + mCulture(0).Strings(Index)
     
     ' Get number of array elements
     Dim Count As Long
-    Count = MemWord(Pos)
+    Count = MemWord(pos)
     
     ' Move to next set of bytes
-    Pos = Pos + 2
+    pos = pos + 2
     
     Dim Ret() As String
     ReDim Ret(0 To Count - 1)
@@ -130,10 +129,10 @@ Friend Function GetStringArray(ByVal LCID As Integer, ByVal Index As Long) As St
     Dim i As Long
     For i = 0 To Count - 1
         ' Get the string. SysAllocString goes until it find a null character.
-        Ret(i) = SysAllocString(Pos)
+        Ret(i) = SysAllocString(pos)
         
         ' Skip the string characters plus 2 bytes for the terminating character.
-        Pos = Pos + LenB(Ret(i)) + 2
+        pos = pos + LenB(Ret(i)) + 2
     Next i
     
     GetStringArray = Ret
@@ -157,12 +156,12 @@ Friend Function GetNumberArray(ByVal LCID As Integer, ByVal Index As Long) As Lo
     On Error GoTo Catch
     mCultureSA.pvData = mCulturesByLCID(LCID)
     
-    Dim Pos As Long
-    Pos = mStringPoolAddress + mCulture(0).Strings(Index)
+    Dim pos As Long
+    pos = mStringPoolAddress + mCulture(0).Strings(Index)
     
     Dim Count As Long
-    Count = MemWord(Pos)
-    Pos = Pos + 2
+    Count = MemWord(pos)
+    pos = pos + 2
     
     Dim Ret() As Long
     ReDim Ret(0 To Count - 1)
@@ -173,9 +172,9 @@ Friend Function GetNumberArray(ByVal LCID As Integer, ByVal Index As Long) As Lo
         ' to retrieve it as a string and skip the appropriate
         ' number of characters to the next number.
         Dim s As String
-        s = SysAllocString(Pos)
+        s = SysAllocString(pos)
         Ret(i) = CLng(s)
-        Pos = Pos + LenB(s) + 2
+        pos = pos + LenB(s) + 2
     Next i
     
     GetNumberArray = Ret
@@ -185,16 +184,19 @@ Catch:
     UnsupportedLCIDError LCID
 End Function
 
-Friend Function GetCultureID(ByVal Name As String) As Long
+Friend Function GetCultureID(ByRef Name As String) As Long
     Dim ID As Variant
     
     If mNamesToLCID Is Nothing Then
-        Set mNamesToLCID = New Hashtable
+        Set mNamesToLCID = Cor.NewHashtable(EqualityComparer:=StringComparer.OrdinalIgnoreCase)
+        
         For Each ID In mCulturesByLCID.Keys
             mNamesToLCID.Add GetString(ID, SNAME), ID
         Next ID
     End If
+    
     ID = mNamesToLCID(Name)
+    
     If Not IsEmpty(ID) Then
         GetCultureID = ID
     End If

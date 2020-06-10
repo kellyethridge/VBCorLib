@@ -1,0 +1,42 @@
+@exceptions
+<table style="width: auto">
+  <tr>
+      <th>Exception</th>
+      <th>Condition</th>
+  </tr>
+  <tr>
+       <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+       <td>
+          <i>StartIndex</i> or <i>Length</i> is less than zero.<br/>
+          -or-<br/>
+          <i>StartIndex</i> plus <i>Length</i> is greater than the length of <i>s</i>.
+       </td>
+  </tr>
+</table>
+@examples
+The following example converts a substring within a string to an array of characters, then enumerates and displays the elements of the array.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Const</span> Str <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span> = <span style="color: #a31515">&quot;012wxyz789&quot;</span>
+    <span style="color: #0000ff">Dim</span> Arr() <span style="color: #0000ff">As</span> <span style="color: #2b91af">Integer</span>
+    
+    Arr = CorString.ToCharArray(Str, 3, 4)
+    
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;The letters in &#39;{0}&#39; are: &#39;{1}&#39;&quot;</span>, Str, NewString(Arr))
+    
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;Each letter in &#39;{0}&#39; is:&quot;</span>, Str)
+    
+    <span style="color: #0000ff">Dim</span> c <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>
+    <span style="color: #0000ff">For</span> <span style="color: #0000ff">Each</span> c <span style="color: #0000ff">In</span> Arr
+        Debug.Print ChrW$(c)
+    <span style="color: #0000ff">Next</span>
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; This code produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    The letters in &#39;012wxyz789&#39; are: &#39;wxyz&#39;</span>
+<span style="color: #008000">&#39;    Each letter in &#39;012wxyz789&#39; is:</span>
+<span style="color: #008000">&#39;    w</span>
+<span style="color: #008000">&#39;    x</span>
+<span style="color: #008000">&#39;    y</span>
+<span style="color: #008000">&#39;    z</span>
+</pre></div>

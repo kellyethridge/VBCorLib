@@ -1,67 +1,76 @@
-@remarks <h4>Example</h4>
-<pre>
-'' This example creates an array of unsorted integers
-'' then uses the <b>cArray.Sort</b> method to sort the
-'' array, displaying the results.
-Private Sub Main()
-    Dim ints(9) As Integer
-    Dim i As Long
+@remarks The <i>Comparer</i> parameter can be an <a href="IComparer.html">IComparer</a> interface or a
+callback address to a compare function using the <b>AddressOf</b> method. 
+<table style="width: auto">
+    <tr>
+        <th>Callback Method Signature</th>
+    </tr>
+    <tr>
+        <td>
+<!-- HTML generated using hilite.me --><div style="border: 0;background: #ffffff; overflow:auto;width:auto;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Function</span> SortCallback(<span style="color: #0000ff">ByRef</span> x <span style="color: #0000ff">As</span> &lt;Type&gt;, <span style="color: #0000ff">ByRef</span> y <span style="color: #0000ff">As</span> &lt;Type&gt;) <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
+    <span style="color: #008000">&#39; return less than zero if x is less than y.</span>
+    <span style="color: #008000">&#39; return greater than zero if x is greater than y.</span>
+    <span style="color: #008000">&#39; return zero if x equals y.</span>
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Function</span>
+</pre></div>
+        </td>
+    </tr>
+</table>
+The &lt;Type&gt; the type of element of the array. If the array is an array of <b>Variants</b>, then &lt;Type&gt; would be a <b>Variant</b>, not any specific sub-type within the variant elements of the array.</p>
+@examples This example creates an array of unsorted integers then uses the <b>CorArray.Sort</b> method to sort the array, displaying the results.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> ints(9) <span style="color: #0000ff">As</span> <span style="color: #2b91af">Integer</span>
+    <span style="color: #0000ff">Dim</span> i <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
     
-    '' Fill array with random values.
+    <span style="color: #008000">&#39; Fill array with random values.</span>
     Rnd -13
-    For i = 0 To UBound(ints)
+    <span style="color: #0000ff">For</span> i = 0 <span style="color: #0000ff">To</span> UBound(ints)
         ints(i) = Rnd * 10
-    Next i
+    <span style="color: #0000ff">Next</span> i
     
-    '' Display original unsorted array of integers.
-    Console.WriteLine "Unsorted Array of Integers."
+    <span style="color: #008000">&#39; Display original unsorted array of integers.</span>
+    Debug.Print <span style="color: #a31515">&quot;Unsorted Array of Integers.&quot;</span>
     DisplayInts ints
     
-    '' Sort array of integers.
-    cArray.Sort ints
+    <span style="color: #008000">&#39; Sort array of integers.</span>
+    CorArray.Sort ints
 
-    '' Display sorted array of integers.
-    Console.WriteLine
-    Console.WriteLine "Sorted Array of Integers."
+    <span style="color: #008000">&#39; Display sorted array of integers.</span>
+    Debug.Print t(<span style="color: #a31515">&quot;\nSorted Array of Integers.&quot;</span>)
     DisplayInts ints
-    
-    '' Wait for user to press enter.
-    Console.ReadLine
-    
-End Sub
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
 
-'' Displays an array of integers.
-Private Sub DisplayInts(ByRef ints() As Integer)
-    Dim i As Long
+<span style="color: #008000">&#39; Displays an array of integers.</span>
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> DisplayInts(<span style="color: #0000ff">ByRef</span> ints() <span style="color: #0000ff">As</span> <span style="color: #2b91af">Integer</span>)
+    <span style="color: #0000ff">Dim</span> i <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
     
-    For i = LBound(ints) To UBound(ints)
-        Console.WriteLine "ints({0}) = {1}", i, ints(i)
-    Next i
-End Sub
+    <span style="color: #0000ff">For</span> i = LBound(ints) <span style="color: #0000ff">To</span> UBound(ints)
+        Debug.Print CorString.Format(<span style="color: #a31515">&quot;ints({0}) = {1}&quot;</span>, i, ints(i))
+    <span style="color: #0000ff">Next</span> i
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
 
-'' This code produces the following output.
-''
-''Unsorted Array of Integers.
-''ints(0) = 6
-''ints(1) = 4
-''ints(2) = 0
-''ints(3) = 3
-''ints(4) = 9
-''ints(5) = 7
-''ints(6) = 1
-''ints(7) = 0
-''ints(8) = 4
-''ints(9) = 9
-''
-''Sorted Array of Integers.
-''ints(0) = 0
-''ints(1) = 0
-''ints(2) = 1
-''ints(3) = 3
-''ints(4) = 4
-''ints(5) = 4
-''ints(6) = 6
-''ints(7) = 7
-''ints(8) = 9
-''ints(9) = 9
-</pre>
+<span style="color: #008000">&#39; This code produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;  Unsorted Array of Integers.</span>
+<span style="color: #008000">&#39;  ints(0) = 6</span>
+<span style="color: #008000">&#39;  ints(1) = 4</span>
+<span style="color: #008000">&#39;  ints(2) = 0</span>
+<span style="color: #008000">&#39;  ints(3) = 3</span>
+<span style="color: #008000">&#39;  ints(4) = 9</span>
+<span style="color: #008000">&#39;  ints(5) = 7</span>
+<span style="color: #008000">&#39;  ints(6) = 1</span>
+<span style="color: #008000">&#39;  ints(7) = 0</span>
+<span style="color: #008000">&#39;  ints(8) = 4</span>
+<span style="color: #008000">&#39;  ints(9) = 9</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;  Sorted Array of Integers.</span>
+<span style="color: #008000">&#39;  ints(0) = 0</span>
+<span style="color: #008000">&#39;  ints(1) = 0</span>
+<span style="color: #008000">&#39;  ints(2) = 1</span>
+<span style="color: #008000">&#39;  ints(3) = 3</span>
+<span style="color: #008000">&#39;  ints(4) = 4</span>
+<span style="color: #008000">&#39;  ints(5) = 4</span>
+<span style="color: #008000">&#39;  ints(6) = 6</span>
+<span style="color: #008000">&#39;  ints(7) = 7</span>
+<span style="color: #008000">&#39;  ints(8) = 9</span>
+<span style="color: #008000">&#39;  ints(9) = 9</span>
+</pre></div>

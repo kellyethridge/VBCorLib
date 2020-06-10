@@ -39,51 +39,41 @@ Attribute VB_Exposed = True
 ' Provides default implementations of the IObject interface.
 '
 Option Explicit
-
-Private mCharBuffer     As CharBuffer
 Private mDateAsDateTime As CorDateTime
+Private mCharBuffer As SafeArray1d
+Private mChars()    As Integer
 
 
 ''
-' Returns a default hashcode for the specific value.
+' Generates a hashcode for a specified value.
 '
 ' @param Value The value to generate the hashcode for.
-' @return The hashcode value.
-' @remarks An object should never pass itself into this
-' function. Instead, the object should implement the default
-' hashcode by using MyBase.
-' <pre>
-' Public Function GetHashCode As Long
-'     GetHashCode = MyBase.GetHashCode(Me)
-' End Function
-' </pre>
-'
+' @return A 32-bit integer hashcode value.
+' @remarks A hash code is a numeric value that is used to identify an object during equality testing. It can also serve as an index for an object in a collection.
+' <p>The <b>GetHashCode</b> method is suitable for use in hashing algorithms and data structures such as a hash table.</p>
+' <p>The default implementation of the <b>GetHashCode</b> method does not guarantee unique return values for different values. Furthermore, VBCorLib
+' does not guarantee the default implementation of the <b>GetHashCode</b> method, and the value it returns will be the same between different versions of VBCorLib.
+' Consequently, the default implementation of this method must not be used as a unique object identifier for hashing purposes.</p>
 Public Function GetHashCode(ByRef Value As Variant) As Long
     Select Case VarType(Value)
         Case vbLong, vbInteger, vbByte, vbBoolean
             GetHashCode = CLng(Value)
-        
         Case vbString
             GetHashCode = HashString(Value)
-        
         Case vbDouble
             With AsDLong(CDbl(Value))
                 GetHashCode = .LoDWord Xor .HiDWord
             End With
-        
         Case vbSingle
             GetHashCode = AsLong(CSng(Value))
-        
         Case vbDate
             With AsDLong(CDate(Value))
                 GetHashCode = .LoDWord Xor .HiDWord
             End With
-        
         Case vbCurrency
             With AsDLong(CCur(Value))
                 GetHashCode = .LoDWord Xor .HiDWord
             End With
-        
         Case vbObject, vbDataObject
             If Value Is Nothing Then
                 Exit Function
@@ -96,7 +86,6 @@ Public Function GetHashCode(ByRef Value As Variant) As Long
             Else
                 GetHashCode = ObjPtr(CUnk(Value))
             End If
-        
         Case vbDecimal
             With AsDWord(Value)
                 GetHashCode = .HiWord
@@ -104,6 +93,8 @@ Public Function GetHashCode(ByRef Value As Variant) As Long
             With MemDLong(VarPtr(Value) + 8)
                 GetHashCode = GetHashCode Xor .LoDWord Xor .HiDWord
             End With
+        Case vbUserDefinedType
+            GetHashCode = HashUdt(Value)
     End Select
 End Function
 
@@ -112,15 +103,20 @@ End Function
 '
 ' @param ObjA The first value to compare with.
 ' @param ObjB The second value to compare.
-' @return Returns True if the value and the object are the same instance, False otherwise.
-'
+' @return <b>True</b> if the value and the object are the same instance; <b>False</b> otherwise.
+' @remarks The two values must be of the same type to successfully be compared. For example
+' a <b>vbLong</b> value of 1 will not be considered equal to a <b>vbInteger</b> value of 1.
+' <p>If objects are passed in, an attempt to access the <a href="IObject.html">IObject</a> interface is
+' made to allow objects perform their own equality check. If the object does not implement the
+' <a href="IObject.html">IObject</a> interface, object references are compared.</p>
+' @include "..\DocIncludes\ObjectStatic.Equals.html"
 Public Function Equals(ByRef ObjA As Variant, ByRef ObjB As Variant) As Boolean
     Dim Obj As IObject
     
     Select Case VarType(ObjA)
         Case vbString
             If VarType(ObjB) = vbString Then
-                Equals = CorString.EqualsV(ObjA, ObjB)
+                Equals = CorString.EqualsV(ObjA, ObjB, StringComparison.Ordinal)
             End If
         Case vbDate
             Equals = Statics.CorDateTime.Equals(ObjA, ObjB)
@@ -144,6 +140,10 @@ Public Function Equals(ByRef ObjA As Variant, ByRef ObjB As Variant) As Boolean
                     Equals = (ObjA Is ObjB)
                 End If
             End If
+        Case vbUserDefinedType
+            If VarType(ObjB) = vbUserDefinedType Then
+                Equals = UdtEquals(ObjA, ObjB)
+            End If
         Case vbNull
             Equals = IsNull(ObjB)
         Case vbEmpty
@@ -162,27 +162,23 @@ End Function
 ' @return A string representation of the value.
 ' @see IFormattable
 ' @see IFormatProvider
-'
+' @include "..\DocIncludes\ObjectStatic.ToString.html"
 Public Function ToString(ByRef Value As Variant, Optional ByRef Format As String, Optional ByVal Provider As IFormatProvider) As String
-    Dim ValueType As VbVarType
-    ValueType = VarType(Value)
-    
-    If ValueType = vbVariant Then
-        ValueType = MemLong(MemLong(VarPtr(Value) + VARIANTDATA_OFFSET)) And &HFF
-    End If
-    
-    Select Case ValueType
-        Case vbLong, vbInteger, vbByte, vbDouble, vbSingle
-            Dim NumberFormatter As NumberFormatInfo
-            Set NumberFormatter = NumberFormatInfo.GetInstance(Provider)
-            ToString = NumberFormatter.Format(Value, Format)
-            
+    Select Case VarType(Value)
+        Case vbVariant
+            ' when the datatype is a variant, it contains a reference to the
+            ' actual value, so we must dereference again to that value to
+            ' get the actual datatype.
+            Dim InnerVariant As Variant
+            VariantCopyInd InnerVariant, Value
+            ToString = ToString(InnerVariant, Format, Provider)
+        Case vbLong, vbInteger, vbByte, vbDouble, vbSingle, vbDecimal
+            ToString = NumberFormatter.Format(Value, Format, Provider)
         Case vbDate
             Dim DateFormatter As DateTimeFormatInfo
             Set DateFormatter = DateTimeFormatInfo.GetInstance(Provider)
             mDateAsDateTime.InitFromDate Value, UnspecifiedKind
             ToString = DateFormatter.Format(mDateAsDateTime, Format)
-            
         Case vbObject
             If Not Value Is Nothing Then
                 If TypeOf Value Is IFormattable Then
@@ -197,7 +193,12 @@ Public Function ToString(ByRef Value As Variant, Optional ByRef Format As String
                     ToString = TypeName(Value)
                 End If
             End If
-            
+        Case vbUserDefinedType
+            If IsInt64(Value) Then
+                ToString = CallFunc_T_T_T_String(AddressOf Int64ToString, DataPtr(Value), VarPtr(Format), VarPtr(Provider))
+            Else
+                ToString = TypeName(Value)
+            End If
         Case vbEmpty
             ToString = "Empty"
         Case vbNull
@@ -213,23 +214,72 @@ End Function
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function HashString(ByRef Value As Variant) As Long
-    Dim Ptr     As Long
-    Dim Length  As Long
-    
-    Ptr = StrPtr(Value)
-    
-    If Ptr = vbNullPtr Then
-        Exit Function
-    End If
-    
-    Length = MemLong(Ptr - 4) \ 2
-    mCharBuffer.Buffer.pvData = Ptr
-    mCharBuffer.Buffer.cElements = Length
+    mCharBuffer.cElements = Len(Value)
+    mCharBuffer.PVData = StrPtr(Value)
     
     Dim i As Long
-    For i = 0 To Length - 1
-        HashString = ((HashString * 16) + mCharBuffer.Chars(i)) And &H3FFFFFF
+    For i = 0 To UBound(mChars)
+        HashString = (HashString And &H3FFFFFF) * vbShift4Bits + mChars(i)
     Next
+End Function
+
+Private Function HashUdt(ByRef Value As Variant) As Long
+    Dim Record As IRecordInfo
+    Dim FieldNameCount  As Long
+    Dim Result As Long
+    
+    Set Record = GetRecordInfo(Value)
+    Record.GetFieldNames FieldNameCount, ByVal vbNullPtr
+    
+    If FieldNameCount > 0 Then
+        Dim FieldNames()    As String
+        Dim ValuePtr        As Long
+        
+        ReDim FieldNames(0 To FieldNameCount - 1)
+        Record.GetFieldNames FieldNameCount, FieldNames(0)
+        ValuePtr = DataPtr(Value)
+                                
+        Dim i As Long
+        For i = 0 To FieldNameCount - 1
+            Result = Result Xor GetHashCode(Record.GetField(ValuePtr, FieldNames(i)))
+        Next
+    End If
+    
+    HashUdt = Result
+End Function
+
+Private Function UdtEquals(ByRef ObjA As Variant, ByRef ObjB As Variant) As Boolean
+    Dim ObjARecord As IRecordInfo
+    Dim ObjBRecord As IRecordInfo
+    
+    Set ObjARecord = GetRecordInfo(ObjA)
+    Set ObjBRecord = GetRecordInfo(ObjB)
+    
+    If ObjARecord.IsMatchingType(ObjBRecord) Then
+        Dim FieldNameCount  As Long
+
+        ObjARecord.GetFieldNames FieldNameCount, ByVal vbNullPtr
+        
+        If FieldNameCount > 0 Then
+            Dim FieldNames()    As String
+            Dim ObjAPtr         As Long
+            Dim ObjBPtr         As Long
+            
+            ReDim FieldNames(0 To FieldNameCount - 1)
+            ObjARecord.GetFieldNames FieldNameCount, FieldNames(0)
+            ObjAPtr = DataPtr(ObjA)
+            ObjBPtr = DataPtr(ObjB)
+
+            Dim i As Long
+            For i = 0 To FieldNameCount - 1
+                If Not Equals(ObjARecord.GetField(ObjAPtr, FieldNames(i)), ObjARecord.GetField(ObjBPtr, FieldNames(i))) Then
+                    Exit Function
+                End If
+            Next
+        End If
+        
+        UdtEquals = True
+    End If
 End Function
 
 
@@ -237,6 +287,15 @@ End Function
 '   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_Initialize()
-    InitChars mCharBuffer
+    With mCharBuffer
+        .cDims = 1
+        .cbElements = 2
+    End With
+    
+    SAPtr(mChars) = VarPtr(mCharBuffer)
     Set mDateAsDateTime = New CorDateTime
+End Sub
+
+Private Sub Class_Terminate()
+    SAPtr(mChars) = vbNullPtr
 End Sub

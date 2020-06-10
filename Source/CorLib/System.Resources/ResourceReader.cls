@@ -214,6 +214,52 @@ End Sub
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+''
+' Attempts to create a Stream object based on the source.
+'
+' vbString:     Attempts to open a FileStream.
+' vbByte Array: Attempts to create a MemoryStream.
+' vbObject:     Attempts to cast the object to a Stream object.
+'
+Private Function GetStream(ByRef Source As Variant, ByVal Mode As FileMode, ByVal Access As FileAccess) As Stream
+    Select Case VarType(Source)
+        Case vbString
+            Set GetStream = Cor.NewFileStream(CStr(Source), Mode, Access, FileShare.ReadShare)
+        Case vbByteArray
+            Dim Bytes() As Byte
+            
+            If CorArray.IsNull(Source) Then _
+                Error.ArgumentNull "Source", ArgumentNull_Array
+            
+            On Error GoTo Catch
+            SAPtr(Bytes) = SAPtrV(Source)
+            Set GetStream = Cor.NewMemoryStream(Bytes, Writable:=False)
+        Case vbObject
+            If Source Is Nothing Then _
+                Error.ArgumentNull "Source", ArgumentNull_Stream
+            If TypeOf Source Is Stream Then
+                Set GetStream = Source
+            ElseIf TypeOf Source Is SafeFileHandle Then
+                Set GetStream = Cor.NewFileStreamWithHandle(Source, Access)
+            Else
+                Error.Argument Argument_StreamRequired
+            End If
+                
+        Case Else
+            Error.Argument Argument_StreamRequired
+    End Select
+    
+    GoSub Finally
+    Exit Function
+    
+Catch:
+    GoSub Finally
+    ThrowOrErr Err
+Finally:
+    SAPtr(Bytes) = vbNullPtr
+    Return
+End Function
+
 Private Sub VerifyReader()
     If mReader Is Nothing Then
         Throw Cor.NewInvalidOperationException("The Reader is closed and cannot be accessed.")

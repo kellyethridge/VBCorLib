@@ -5,7 +5,6 @@ Reference=*\G{1F852AFD-5C0A-46D0-8AA1-4319E8EF72C0}#3.0#0#..\..\TypeLibrary\CorT
 Class=Exception; System\Exception.cls
 Class=PublicFunctions; System\PublicFunctions.cls
 Class=SystemException; System\SystemException.cls
-Module=HelperFunctions; System\HelperFunctions.bas
 Class=Constructors; System\Constructors.cls
 Module=Startup; System\Startup.bas
 Class=ArgumentException; System\ArgumentException.cls
@@ -68,8 +67,6 @@ Class=HashtableKeyCollection; System.Collections\HashtableKeyCollection.cls
 Class=HashtableValueCollection; System.Collections\HashtableValueCollection.cls
 Class=NumberFormatInfo; System.Globalization\NumberFormatInfo.cls
 Class=NumberFormatInfoStatic; System.Globalization\NumberFormatInfoStatic.cls
-Class=WeakReference; System\WeakReference.cls
-Module=WeakReferenceTracking; System\WeakReferenceTracking.bas
 Class=BitConverter; System\BitConverter.cls
 Class=Random; System\Random.cls
 Class=Version; System\Version.cls
@@ -85,7 +82,7 @@ Module=Globalization; System\Globalization.bas
 Class=DateTimeFormatInfoStatic; System.Globalization\DateTimeFormatInfoStatic.cls
 Class=IOException; System.IO\IOException.cls
 Class=FileNotFoundException; System.IO\FileNotFoundException.cls
-Class=MemoryMappedFile; System.IO\MappedFile.cls
+Class=MemoryMappedFile; System.IO.MemoryMappedFiles\MemoryMappedFile.cls
 Class=CultureInfo; System.Globalization\CultureInfo.cls
 Class=CultureTable; System.Globalization\CultureTable.cls
 Class=CultureInfoStatic; System.Globalization\CultureInfoStatic.cls
@@ -181,7 +178,6 @@ Class=DriveInfo; System.IO\DriveInfo.cls
 Class=DriveInfoStatic; System.IO\DriveInfoStatic.cls
 Class=ConsoleKeyInfo; System\ConsoleKeyInfo.cls
 Class=CallbackSorter; System\CallbackSorter.cls
-Class=INIFile; System.IO\INIFile.cls
 Class=IniResourceWriter; System.IO\IniResourceWriter.cls
 Class=Ticker; System.Threading\Ticker.cls
 Module=TickerShared; System.Threading\TickerShared.bas
@@ -303,22 +299,19 @@ Class=Thread; System.Threading\Thread.cls
 Class=ThreadStatic; System.Threading\ThreadStatic.cls
 Class=StringBuilderCache; System\StringBuilderCache.cls
 Class=SafeFindHandle; Microsoft.Win32.SafeHandles\SafeFindHandle.cls
-Module=Conversion; System\Conversion.bas
+Module=ConversionMethods; Cor\ConversionMethods.bas
 Class=IEqualityComparer; System.Collections\IEqualityComparer.cls
 Class=EqualityComparer; System.Collections\EqualityComparer.cls
 Class=EqualityComparerStatic; System.Collections\EqualityComparerStatic.cls
 Class=Path; System.IO\Path.cls
-Class=IVersionableCollection; System.Collections\IVersionableCollection.cls
 Class=ObjectBase; System\ObjectBase.cls
 Class=Char; System\Char.cls
 Class=SafeFileHandle; Microsoft.Win32.SafeHandles\SafeFileHandle.cls
 Class=SafeHandle; Microsoft.Win32.SafeHandles\SafeHandle.cls
-Class=IWin32Api; Microsoft.Win32\IWin32Api.cls
 Module=CharAllocation; System\CharAllocation.bas
 Module=Delegation; System\Delegation.bas
 Module=ArrayHelpers; System\ArrayHelpers.bas
 Class=ErrorStatic; System\ErrorStatic.cls
-Class=NumberStatic; System\Number.cls
 Module=Validation; System\Validation.bas
 Class=CaseInsensitiveComparerStatic; System.Collections\CaseInsensitiveComparerStatic.cls
 Class=PathHelper; System.IO\PathHelper.cls
@@ -332,17 +325,15 @@ RelatedDoc=README.TXT
 Module=Randomization; System\Randomization.bas
 Class=StringComparer; System\StringComparer.cls
 Class=StringComparerStatic; System\StringComparerStatic.cls
-Class=OrdinalStringComparer; System\OrdinalStringComparer.cls
 Class=MD5Static; System.Security.Cryptography\MD5Static.cls
 Class=RSACryptoServiceProviderStatic; System.Security.Cryptography\RSACryptoServiceProviderStatic.cls
 Module=CharCallbacks; System\CharCallbacks.bas
-Class=Win32ApiW; Microsoft.Win32\Win32ApiW.cls
 Module=Interaction; Cor\Interaction.bas
 Class=DecoderFallbackBuffer; System.Text\DecoderFallbackBuffer.cls
 Class=DecoderFallback; System.Text\DecoderFallback.cls
 Class=DecoderReplacementFallback; System.Text\DecoderReplacementFallback.cls
 Class=DecoderReplacementFallbackBuffer; System.Text\DecoderReplacementFallbackBuffer.cls
-Class=DecoderFallbackStatic; ..\Tests\System.Text\DecoderFallbackStatic.cls
+Class=DecoderFallbackStatic; System.Text\DecoderFallbackStatic.cls
 Class=DecoderExceptionFallback; System.Text\DecoderExceptionFallback.cls
 Class=DecoderExceptionFallbackBuffer; System.Text\DecoderExceptionFallbackBuffer.cls
 Class=DecoderFallbackException; System.Text\DecoderFallbackException.cls
@@ -350,7 +341,6 @@ Class=EncoderFallback; System.Text\EncoderFallback.cls
 Class=EncoderFallbackBuffer; System.Text\EncoderFallbackBuffer.cls
 Class=EncoderReplacementFallbackBuffer; System.Text\EncoderReplacementFallbackBuffer.cls
 Module=CharMethods; System\CharMethods.bas
-Class=EncoderReplacementFallback; System.Text\EncoderReplacementFallback.cls
 Class=EncoderFallbackException; System.Text\EncoderFallbackException.cls
 Class=EncoderExceptionFallbackBuffer; System.Text\EncoderExceptionFallbackBuffer.cls
 Class=EncoderExceptionFallback; System.Text\EncoderExceptionFallback.cls
@@ -365,6 +355,26 @@ Module=BigNumberMath; System.Numerics\BigNumberMath.bas
 Module=Mathematics; System.Numerics\Mathematics.bas
 Class=DivideByZeroException; System\DivideByZeroException.cls
 Class=IconResourceEncoder; System.Resources\IconResourceEncoder.cls
+Class=TimeSpanFormatter; System\TimeSpanFormatter.cls
+Class=IniFile; System.IO\IniFile.cls
+Class=MemoryMappedFileStatic; System.IO.MemoryMappedFiles\MemoryMappedFileStatic.cls
+Class=MemoryMappedViewAccessor; System.IO.MemoryMappedFiles\MemoryMappedViewAccessor.cls
+Class=Int64Static; System\Int64Static.cls
+Module=Information; Cor\Information.bas
+Class=SafeMemoryMappedFileHandle; Microsoft.Win32.SafeHandles\SafeMemoryMappedFileHandle.cls
+Class=MemoryMappedViewStream; System.IO.MemoryMappedFiles\MemoryMappedViewStream.cls
+Class=IVersionable; System.Collections\IVersionable.cls
+Module=Int64Callbacks; System\Int64Callbacks.bas
+Class=Int64Parser; System\Int64Parser.cls
+Class=EncoderReplacementFallback; System.Text\EncoderReplacementFallback.cls
+Class=NumberFormatter; System.Globalization\NumberFormatter.cls
+Class=UTF32Encoding; System.Text\UTF32Encoding.cls
+Class=UTF32Encoder; System.Text\UTF32Encoder.cls
+Class=UTF32Decoder; System.Text\UTF32Decoder.cls
+Class=CultureAwareStringComparer; System\CultureAwareStringComparer.cls
+Class=OrdinalStringComparer; System\OrdinalStringComparer.cls
+Class=LegacyStringComparer; System\LegacyStringComparer.cls
+Class=Conversion; Cor\Conversion.cls
 ResFile32="CorLib.RES"
 Startup="Sub Main"
 HelpFile=""
@@ -376,7 +386,7 @@ Name="CorLib"
 HelpContextID="0"
 Description="VB.EXT: CorLib 3.0"
 CompatibleMode="1"
-CompatibleEXE32="..\..\Binaries\Compiled\VBCorLib3.dll"
+CompatibleEXE32="..\..\Binaries\Compatibility\VBCorLib3.bin"
 MajorVer=3
 MinorVer=0
 RevisionVer=0
@@ -390,7 +400,7 @@ VersionLegalCopyright="Copyright Kelly Ethridge"
 VersionProductName="VB.EXT: CorLib 3.0"
 CondComp="Release = 0"
 CompilationType=0
-OptimizationType=0
+OptimizationType=1
 FavorPentiumPro(tm)=0
 CodeViewDebugInfo=-1
 NoAliasing=-1
@@ -408,13 +418,14 @@ ThreadingModel=1
 DebugStartupOption=0
 
 [TaskList]
-Num=1
+Num=0
 
 [TASK1]
-Description=Add tests for FromBase64Transform.TransformFinalBlock
-Status=0
-Priority=1
-Comment=Add tests to exercise when mTermCount > 0 in TransformFinalBlock method.
+Description=
+Status=
+Priority=
+Comment=
+AssignedTo=
 
 [TASK2]
 Description=
@@ -434,8 +445,8 @@ AssignedTo=
 Description=
 Status=
 Priority=
-AssignedTo=
 Comment=
+AssignedTo=
 
 [TASK5]
 Description=
@@ -514,3 +525,48 @@ ReplaceIcon=0
 SendCommandArgs=0
 SymbDbgPref=0
 RevisionVersion=0
+
+[Rubberduck]
+ProjectId=f2a7fbaa-ee7b-481f-8d3a-8e2e11f4b57d
+
+[TASK14]
+Description=
+Status=
+Priority=
+AssignedTo=
+Comment=
+
+[TASK15]
+Description=
+Status=
+Priority=
+AssignedTo=
+Comment=
+
+[TASK16]
+Description=
+Status=
+Priority=
+AssignedTo=
+Comment=
+
+[TASK17]
+Description=
+Status=
+Priority=
+AssignedTo=
+Comment=
+
+[TASK18]
+Description=
+Status=
+Priority=
+AssignedTo=
+Comment=
+
+[TASK19]
+Description=
+Status=
+Priority=
+AssignedTo=
+Comment=

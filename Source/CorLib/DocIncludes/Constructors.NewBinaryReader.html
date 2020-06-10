@@ -1,0 +1,15 @@
+@examples The following example demonstrates the two ways to create a <a href="BinaryReader.html">BinaryReader</a> object using the <b>NewBinaryReader</b> constructor method.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> Source <span style="color: #0000ff">As</span> FileStream
+    <span style="color: #0000ff">Dim</span> Reader <span style="color: #0000ff">As</span> BinaryReader
+    
+    <span style="color: #0000ff">Set</span> Source = File.OpenFile(<span style="color: #a31515">&quot;MyFile.txt&quot;</span>, FileMode.OpenExisting)
+    
+    <span style="color: #008000">&#39; method one</span>
+    <span style="color: #0000ff">Set</span> Reader = NewBinaryReader(Source)
+    
+    <span style="color: #008000">&#39; method two</span>
+    <span style="color: #0000ff">Set</span> Reader = Cor.NewBinaryReader(Source)
+    
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+</pre></div>

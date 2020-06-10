@@ -42,9 +42,11 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use 0.0001@, NewBytes(1, 0, 0, 0, 0, 0, 0, 0)
             Test.Use -922337203685477.5807@, NewBytes(&H1, &H0, &H0, &H0, &H0, &H0, &H0, &H80)
             Test.Use 922337203685477.5807@, NewBytes(&HFF, &HFF, &HFF, &HFF, &HFF, &HFF, &HFF, &H7F)
-            Test.Use #1/2/2001 8:30:45 AM#, NewBytes(&H9A, &H99, &H99, &H59, &HAB, &H3, &HE2, &H40)
+            Test.Use #1/1/2001 8:30:00 AM#, NewBytes(&H0, &H34, &H1A, &H2A, &HE4, &H41, &HC2, &H8)
             Test.Use CDec("12345.678911"), NewBytes(&H3F, &H1C, &HDC, &HDF, &H2, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H6, &H0)
             Test.Use CDec("-12345.678911"), NewBytes(&H3F, &H1C, &HDC, &HDF, &H2, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H6, &H80)
+            Test.Use Int64.One, NewBytes(1, 0, 0, 0, 0, 0, 0, 0)
+            Test.Use Int64.MinusOne, NewBytes(&HFF, &HFF, &HFF, &HFF, &HFF, &HFF, &HFF, &HFF)
             
         Case "ToBoolean_WithValue_ReturnsExpected"
             Test.Use NewBytes(0), 0, False
@@ -97,30 +99,30 @@ End Sub
 
 Public Sub ToDate_WithValue_ReturnsExpected()
     Dim Bytes() As Byte
-    Bytes = NewBytes(&HCD, &HCC, &HCC, &HCC, &HCC, &HDC, &H5E, &H40)
+    Bytes = NewBytes(&H0, &H34, &H1A, &H2A, &HE4, &H41, &HC2, &H8)
 
     Dim Actual As Date
     Actual = BitConverter.ToDate(Bytes, 0)
     
-    Assert.That Actual, Iz.EqualTo(#5/2/1900 10:48:00 AM#)
+    Assert.That Actual, Iz.EqualTo(#1/1/2001 8:30:00 AM#)
 End Sub
 
-Public Sub ToInteger_WithValue_ReturnsExpected()
+Public Sub ToInt16_WithValue_ReturnsExpected()
     Dim Bytes() As Byte
     Bytes = NewBytes(&H55, &H66)
     
     Dim Actual As Integer
-    Actual = BitConverter.ToInteger(Bytes, 0)
+    Actual = BitConverter.ToInt16(Bytes, 0)
     
     Assert.That Actual, Iz.EqualTo(&H6655)
 End Sub
 
-Public Sub ToLong_WithValue_ReturnsExpected()
+Public Sub ToInt32_WithValue_ReturnsExpected()
     Dim Bytes() As Byte
     Bytes = NewBytes(&H55, &H66, &H77, &H88)
     
     Dim Actual As Long
-    Actual = BitConverter.ToLong(Bytes, 0)
+    Actual = BitConverter.ToInt32(Bytes, 0)
     
     Assert.That Actual, Iz.EqualTo(&H88776655)
 End Sub
@@ -195,3 +197,60 @@ Public Sub ToDecimal_WithValue_ReturnsExpected()
     Assert.That Actual, Iz.EqualTo(CDec("12345.678911"))
 End Sub
 
+Public Sub ToInt64_WithValue_ReturnsExpected()
+    Dim Actual As Int64
+    Dim Bytes() As Byte
+    Bytes = NewBytes(&HFF, &HFF, &HFF, &HFF, &HFF, &HFF, &HFF, &H7F)
+    
+    Actual = BitConverter.ToInt64(Bytes, 0)
+    
+    Assert.That Actual, Iz.EqualTo(Int64.MaxValue)
+End Sub
+
+Public Sub DoubleToInt64Bits_WhenCalled_ReturnsInt64Bits()
+    Dim Actual As Int64
+    
+    Actual = BitConverter.DoubleToInt64Bits(4294967295#)
+    
+    Assert.That Actual, Iz.EqualTo(CInt64("0x41EFFFFFFFE00000"))
+End Sub
+
+Public Sub Int64BitsToDouble_WhenCalled_ReturnsDouble()
+    Dim Actual As Double
+    
+    Actual = BitConverter.Int64BitsToDouble(CInt64("0x41EFFFFFFFE00000"))
+    
+    Assert.That Actual, Iz.EqualTo(4294967295#).Within(0.1)
+End Sub
+
+Public Sub CurrencyToInt64Bits_WhenCalled_ReturnsInt64Bits()
+    Dim Actual As Int64
+    
+    Actual = BitConverter.CurrencyToInt64Bits(858993.4593@)
+    
+    Assert.That Actual, Iz.EqualTo(CInt64("0x0000000200000001"))
+End Sub
+
+Public Sub Int64BitsToCurrency_WhenCalled_ReturnsCurrency()
+    Dim Actual As Currency
+    
+    Actual = BitConverter.Int64BitsToCurrency(CInt64("0x0000000200000001"))
+    
+    Assert.That Actual, Iz.EqualTo(858993.4593@)
+End Sub
+
+Public Sub SingleToInt32Bits_WhenCalled_ReturnsInt32Bits()
+    Dim Actual As Long
+    
+    Actual = BitConverter.SingleToInt32Bits(1.2)
+    
+    Assert.That Actual, Iz.EqualTo(1067030938)
+End Sub
+
+Public Sub Int32BitsToSingle_WhenCalled_ReturnsConvertedSingle()
+    Dim Actual As Single
+    
+    Actual = BitConverter.Int32BitsToSingle(1067030938)
+    
+    Assert.That Actual, Iz.EqualTo(CSng(1.2)).Strict
+End Sub

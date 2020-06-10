@@ -383,8 +383,7 @@ Private Function Encoding_GetBytesEx(Chars As Variant, ByVal CharIndex As Long, 
     
     On Error GoTo Catch
     ValidateGetBytesEx LocalChars, CharIndex, CharCount, Bytes, ByteIndex
-    
-    GetBytesCore LocalChars, CharIndex, CharCount, Bytes, ByteIndex
+    Encoding_GetBytesEx = GetBytesCore(LocalChars, CharIndex, CharCount, Bytes, ByteIndex)
     
     GoSub Finally
     Exit Function

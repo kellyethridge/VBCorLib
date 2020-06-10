@@ -1,124 +1,119 @@
-@remarks
-<h4>Example</h4>
-<pre>
-Option Explicit
+@examples
+This example demonstrates how an array can be sorted
+by using another array to determine the sort order for
+the original. This demonstration uses an array of type
+<b>vbLong</b> as the keys to sort the main <i>Values</i> array. Even
+though <i>Values</i> is a <b>vbString</b> type array, it will follow
+the <i>Keys</i> array when being sorted. Once the array is sorted
+using the <i>Keys</i> <b>vbLong</b> array, the <i>Values</i> array is displayed
+to show how the array did not sort using string text compare.
+The <b>Values</b> array is then sorted again using the standard
+sort method on the <i>Values</i> vbString type array and re-displayed.
+This will show the difference between sorting using a <i>Keys</i> array
+of a different type to sort an original array and how the
+original array itself would be sorted on its own.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> Values(14) <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+    <span style="color: #0000ff">Dim</span> Keys(14) <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
+    
+    <span style="color: #008000">&#39; Fill both arrays with random values.</span>
+    FillKeysAndValues Keys, Values
+    
+    <span style="color: #008000">&#39; Display the current order of the values array.</span>
+    DisplayValues <span style="color: #a31515">&quot;Unsorted Values Array.&quot;</span>, Values
+    
+    <span style="color: #008000">&#39; Sort the values array using the keys array</span>
+    <span style="color: #008000">&#39; to determine the sort order.</span>
+    CorArray.SortKey Keys, Values
+    
+    <span style="color: #008000">&#39; Display the new sorted values array.</span>
+    <span style="color: #008000">&#39; The values are sorted numerically because the</span>
+    <span style="color: #008000">&#39; keys array is a numeric array.</span>
+    DisplayValues t(<span style="color: #a31515">&quot;\nSorted Values array using Keys array for sort order.&quot;</span>), Values
+    
+    <span style="color: #008000">&#39; Re-sort the values array by itself.</span>
+    <span style="color: #008000">&#39; The values are sorted as strings.</span>
+    CorArray.Sort Values
+    
+    <span style="color: #008000">&#39; Display the re-sorted values array, showing</span>
+    <span style="color: #008000">&#39; the how string comparing affects sort order.</span>
+    DisplayValues t(<span style="color: #a31515">&quot;\nRe-sorted Values array using standard sorting with String compares.&quot;</span>), Values
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
 
-'' This example demonstrates how an array can be sorted
-'' by using another array to determine the sort order for
-'' the original. This demonstration uses an array of type
-'' vbLong as the keys to sort the main Values array. Even
-'' though Values is a vbString type array, it will follow
-'' the Keys array when being sorted. Once the array is sorted
-'' using the Keys vbLong array, the Values array is displayed
-'' to show how the array did not sort using String text compare.
-'' The Values array is then sorted again using the standard
-'' sort method on the Values vbString type array and redisplayed.
-'' This will show the difference between sorting using a Key array
-'' of a different type to sort an original array and how the
-'' original array itself would be sorted on its own.
-Private Sub Main()
-    Dim values(14) As String
-    Dim keys(14) As Long
-    
-    '' Fill both arrays with random values.
-    FillKeysAndValues keys, values
-    
-    '' Display the current order of the values array.
-    DisplayValues "Unsorted Values Array.", values
-    
-    '' Sort the values array using the keys array
-    '' to determine the sort order.
-    cArray.SortKey keys, values
-    
-    '' Display the new sorted values array.
-    '' The values are sorted numerically because the
-    '' keys array is a numeric array.
-    DisplayValues "Sorted Values array using Keys array for sort order.", values
-    
-    '' Re-sort the values array by itself.
-    '' The values are sorted as strings.
-    cArray.Sort values
-    
-    '' Display the re-sorted values array, showing
-    '' the how string comparing affects sort order.
-    DisplayValues "Re-sorted Values array using standard sorting with String compares.", values
-    
-    '' Wait for user to press enter
-    Console.ReadLine
-End Sub
-
-'' Fill Keys and Values array.
-Private Sub FillKeysAndValues(ByRef keys() As Long, ByRef values() As String)
-    Dim i As Long
+<span style="color: #008000">&#39; Fill Keys and Values array.</span>
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> FillKeysAndValues(<span style="color: #0000ff">ByRef</span> Keys() <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>, <span style="color: #0000ff">ByRef</span> Values() <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>)
+    <span style="color: #0000ff">Dim</span> i <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
     
     Rnd -13
-    For i = LBound(keys) To UBound(keys)
-        keys(i) = Rnd * i
-        values(i) = "Value " & keys(i)
-    Next i
-End Sub
+    <span style="color: #0000ff">For</span> i = LBound(Keys) <span style="color: #0000ff">To</span> UBound(Keys)
+        Keys(i) = Rnd * i
+        Values(i) = <span style="color: #a31515">&quot;Value &quot;</span> &amp; Keys(i)
+    <span style="color: #0000ff">Next</span> i
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
 
-'' Display Array
-Private Sub DisplayValues(ByVal title As String, ByRef values() As String)
-    Dim i As Long
+<span style="color: #008000">&#39; Display Array</span>
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> DisplayValues(<span style="color: #0000ff">ByVal</span> Title <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>, <span style="color: #0000ff">ByRef</span> Values() <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>)
+    <span style="color: #0000ff">Dim</span> i <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
     
-    Debug.Print title
-    For i = LBound(values) To UBound(values)
-        Debug.Print cString.Format("values({0}) = {1}", i, values(i))
-    Next i
-End Sub
+    Debug.Print Title
+    <span style="color: #0000ff">For</span> i = LBound(Values) <span style="color: #0000ff">To</span> UBound(Values)
+        Debug.Print CorString.Format(<span style="color: #a31515">&quot;  Values({0}) = {1}&quot;</span>, i, Values(i))
+    <span style="color: #0000ff">Next</span> i
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
 
-'' This code produces the following output.
-''
-'' Unsorted Values Array.
-'' values(0) = Value 0
-'' values(1) = Value 0
-'' values(2) = Value 0
-'' values(3) = Value 1
-'' values(4) = Value 4
-'' values(5) = Value 3
-'' values(6) = Value 1
-'' values(7) = Value 0
-'' values(8) = Value 3
-'' values(9) = Value 8
-'' values(10) = Value 8
-'' values(11) = Value 8
-'' values(12) = Value 10
-'' values(13) = Value 10
-'' values(14) = Value 6
-'' Sorted Values array using Keys array for sort order.
-'' values(0) = Value 0
-'' values(1) = Value 0
-'' values(2) = Value 0
-'' values(3) = Value 0
-'' values(4) = Value 1
-'' values(5) = Value 1
-'' values(6) = Value 3
-'' values(7) = Value 3
-'' values(8) = Value 4
-'' values(9) = Value 6
-'' values(10) = Value 8
-'' values(11) = Value 8
-'' values(12) = Value 8
-'' values(13) = Value 10
-'' values(14) = Value 10
-'' Re-sorted Values array using standard sorting with String compares.
-'' values(0) = Value 0
-'' values(1) = Value 0
-'' values(2) = Value 0
-'' values(3) = Value 0
-'' values(4) = Value 1
-'' values(5) = Value 1
-'' values(6) = Value 10
-'' values(7) = Value 10
-'' values(8) = Value 3
-'' values(9) = Value 3
-'' values(10) = Value 4
-'' values(11) = Value 6
-'' values(12) = Value 8
-'' values(13) = Value 8
-'' values(14) = Value 8
-</pre>
-As you can see, the Value string array sorted as if numeric when using the Keys array to
-be sorted by. When it was sorted alone, it was sorted as a String array and the 'Value 10'
+<span style="color: #008000">&#39; This code produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    Unsorted Values Array.</span>
+<span style="color: #008000">&#39;      Values(0) = Value 0</span>
+<span style="color: #008000">&#39;      Values(1) = Value 0</span>
+<span style="color: #008000">&#39;      Values(2) = Value 0</span>
+<span style="color: #008000">&#39;      Values(3) = Value 1</span>
+<span style="color: #008000">&#39;      Values(4) = Value 4</span>
+<span style="color: #008000">&#39;      Values(5) = Value 3</span>
+<span style="color: #008000">&#39;      Values(6) = Value 1</span>
+<span style="color: #008000">&#39;      Values(7) = Value 0</span>
+<span style="color: #008000">&#39;      Values(8) = Value 3</span>
+<span style="color: #008000">&#39;      Values(9) = Value 8</span>
+<span style="color: #008000">&#39;      Values(10) = Value 8</span>
+<span style="color: #008000">&#39;      Values(11) = Value 8</span>
+<span style="color: #008000">&#39;      Values(12) = Value 10</span>
+<span style="color: #008000">&#39;      Values(13) = Value 10</span>
+<span style="color: #008000">&#39;      Values(14) = Value 6</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    Sorted Values array using Keys array for sort order.</span>
+<span style="color: #008000">&#39;      Values(0) = Value 0</span>
+<span style="color: #008000">&#39;      Values(1) = Value 0</span>
+<span style="color: #008000">&#39;      Values(2) = Value 0</span>
+<span style="color: #008000">&#39;      Values(3) = Value 0</span>
+<span style="color: #008000">&#39;      Values(4) = Value 1</span>
+<span style="color: #008000">&#39;      Values(5) = Value 1</span>
+<span style="color: #008000">&#39;      Values(6) = Value 3</span>
+<span style="color: #008000">&#39;      Values(7) = Value 3</span>
+<span style="color: #008000">&#39;      Values(8) = Value 4</span>
+<span style="color: #008000">&#39;      Values(9) = Value 6</span>
+<span style="color: #008000">&#39;      Values(10) = Value 8</span>
+<span style="color: #008000">&#39;      Values(11) = Value 8</span>
+<span style="color: #008000">&#39;      Values(12) = Value 8</span>
+<span style="color: #008000">&#39;      Values(13) = Value 10</span>
+<span style="color: #008000">&#39;      Values(14) = Value 10</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    Re-sorted Values array using standard sorting with String compares.</span>
+<span style="color: #008000">&#39;      Values(0) = Value 0</span>
+<span style="color: #008000">&#39;      Values(1) = Value 0</span>
+<span style="color: #008000">&#39;      Values(2) = Value 0</span>
+<span style="color: #008000">&#39;      Values(3) = Value 0</span>
+<span style="color: #008000">&#39;      Values(4) = Value 1</span>
+<span style="color: #008000">&#39;      Values(5) = Value 1</span>
+<span style="color: #008000">&#39;      Values(6) = Value 10</span>
+<span style="color: #008000">&#39;      Values(7) = Value 10</span>
+<span style="color: #008000">&#39;      Values(8) = Value 3</span>
+<span style="color: #008000">&#39;      Values(9) = Value 3</span>
+<span style="color: #008000">&#39;      Values(10) = Value 4</span>
+<span style="color: #008000">&#39;      Values(11) = Value 6</span>
+<span style="color: #008000">&#39;      Values(12) = Value 8</span>
+<span style="color: #008000">&#39;      Values(13) = Value 8</span>
+<span style="color: #008000">&#39;      Values(14) = Value 8</span>
+</pre></div>
+As you can see, the <i>Values</i> string array sorted as if numeric when using the <i>Keys</i> array to
+be sorted by. When it was sorted alone, it was sorted as a string array and the 'Value 10'
 appears in its string compared index.

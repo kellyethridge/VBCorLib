@@ -38,17 +38,9 @@ Attribute VB_Exposed = True
 ''
 ' This class provides methods for copying manipulating arrays as byte arrays.
 '
-' @remarks<br>
-' Any array that is used in these methods are treated as byte arrays. No attention
+' @remarks Any array that is used in these methods are treated as byte arrays. No attention
 ' is paid to the type of the original array. They are manipulated as bytes.
-'
-' <br><H4>Usage:</H4><br>
-' This class cannot be instantiated. It represents a set of static methods that
-' are accessed through the name of the class; Buffer.*<br><br>
-' <pre>
-' Buffer.BlockCopy <i>SrcArray</i>, <i>SourceIndex</i>, <i>DstArray</i>, <i>DestinationIndex</i>, <i>Count</i><br>
-' </pre>
-'
+' @include "..\DocIncludes\Buffer.html"
 Option Explicit
 
 ''
@@ -59,29 +51,40 @@ Option Explicit
 ' @param Destination The array to receive the bytes.
 ' @param DestinationOffset The starting byte position to begin setting bytes.
 ' @param Count The number of bytes to be copied.
-' @remarks <p>The arrays are treated as byte arrays, so no datatype conversion
-' takes place. All indexes are in bytes, not in the datatype of the specific
-' array.</p>
-' <p>The lowerbound of the arrays is ignored. The first byte is at index 0.</p>
-'
+' @remarks <p>The arrays are treated as byte arrays, so no data-type conversion
+' takes place. All indexes are in bytes, not in the type of the specific array.</p>
+' <p>The lower-bound of the arrays is ignored. The first byte is at index 0.</p>
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th><th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ArgumentNullException.html">ArgumentNullException</a></td><td><i>Source</i> or <i>Destination</i> is uninitialized.</td>
+'   </tr>
+'    <tr>
+'        <td><a href="ArgumentException.html">ArgumentException</a></td>
+'        <td>
+'           <i>Source</i> or <i>Destination</i> is not an array.<br/>
+'           -or-<br/>
+'           The number of bytes in <i>Source</i> is less than <i>SourceOffset</i> plus <i>Count</i>.<br/>
+'           -or-<br/>
+'           The number of bytes in <i>Destination</i> is less than <i>DestinationOffset</i> plus <i>Count</i>.<br/>
+'        </td>
+'    </tr>
+'    <tr>
+'        <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td><td><i>Source</i>, <i>Destination</i>, or <i>Count</i> is less than zero.</td>
+'    </tr>
+' </table>
 Public Sub BlockCopy(ByRef Source As Variant, ByVal SourceOffset As Long, ByRef Destination As Variant, ByVal DestinationOffset As Long, ByVal Count As Long)
-    If Not IsArray(Source) Then _
-        Error.Argument Argument_ArrayRequired, "Source"
-    If Not IsArray(Destination) Then _
-        Error.Argument Argument_ArrayRequired, "Destination"
-    
     Dim SourcePtr           As Long
     Dim DestinationPtr      As Long
     Dim SourceLength        As Long
     Dim DestinationLength   As Long
     
-    SourcePtr = SAPtrV(Source)
-    DestinationPtr = SAPtrV(Destination)
+    SourcePtr = GetValidSAPtr(Source, NameOfSource)
+    DestinationPtr = GetValidSAPtr(Destination, NameOfDestination)
     
-    If SourcePtr = vbNullPtr Then _
-        Error.ArgumentNull "Source", ArgumentNull_Array
-    If DestinationPtr = vbNullPtr Then _
-        Error.ArgumentNull "Destination", ArgumentNull_Array
     If SourceOffset < 0 Then _
         Error.ArgumentOutOfRange "SourceOffset", ArgumentOutOfRange_NeedNonNegNum
     If DestinationOffset < 0 Then _
@@ -106,18 +109,23 @@ End Sub
 ' @param Arr The array to retrieve the size in bytes from.
 ' @return The size of the array in bytes.
 ' @remarks The size is calculated by taking the number of elements
-' in the array and multiply it by the number of bytes each element
-' is in length.
+' in the array and multiply it by the number of bytes each element is in length.
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th><th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ArgumentNullException.html">ArgumentNullException</a></td><td><i>Arr</i> is unintialized.</td>
+'   </tr>
+'    <tr>
+'        <td><a href="ArgumentException.html">ArgumentException</a></td><td><i>Arr</i> is not an array.</td>
+'    </tr>
+' </table>
 Public Function ByteLength(ByRef Arr As Variant) As Long
-    If Not IsArray(Arr) Then _
-        Error.Argument Argument_ArrayRequired, "Arr"
-    
     Dim ArrayPtr As Long
-    ArrayPtr = SAPtrV(Arr)
     
-    If ArrayPtr = vbNullPtr Then _
-        Error.ArgumentNull "Arr", ArgumentNull_Array
-    
+    ArrayPtr = GetValidSAPtr(Arr)
     ByteLength = SafeArrayGetElemsize(ArrayPtr) * CorArray.Length(Arr)
 End Function
 
@@ -129,18 +137,28 @@ End Function
 ' @return The byte value from within the array.
 ' @remarks The index is based on bytes, not the size of the actual array
 ' elements. For example: if getting the byte from a Long array at index
-' 3, then the upper 8bits of the first element will be returned.
-' <p>The lowerbound of the array is ignored. Index begins at 0.</p>
-'
+' 3, then the upper 8-bits of the first element will be returned.
+' <p>The lower-bound of the array is ignored. <i>Index</i> begins at 0.</p>
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th><th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ArgumentNullException.html">ArgumentNullException</a></td><td><i>Arr</i> is unintialized.</td>
+'   </tr>
+'    <tr>
+'        <td><a href="ArgumentException.html">ArgumentException</a></td><td><i>Arr</i> is not an array.</td>
+'    </tr>
+'    <tr>
+'        <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td><td><i>Index</i> is negative or greater than the length of <i>Arr</i>.</td>
+'    </tr>
+' </table>
 Public Function GetByte(ByRef Arr As Variant, ByVal Index As Long) As Byte
-    If Not IsArray(Arr) Then _
-        Error.Argument Argument_ArrayRequired, "Arr"
-    
     Dim ArrayPtr As Long
-    ArrayPtr = SAPtrV(Arr)
     
-    If ArrayPtr = vbNullPtr Then _
-        Error.ArgumentNull "Arr", ArgumentNull_Array
+    ArrayPtr = GetValidSAPtr(Arr)
+    
     If Index < 0 Or Index >= CorArray.Length(Arr) * SafeArrayGetElemsize(ArrayPtr) Then _
         Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_Index
 
@@ -150,23 +168,33 @@ End Function
 ''
 ' Sets the byte value at a given byte index within the array.
 '
-' @param arr The array to set the byte value in.
-' @param index The byte index into the array to set the byte at.
-' @param value The byte value to set.
+' @param Arr The array to set the byte value in.
+' @param Index The byte index into the array to set the byte at.
+' @param Value The byte value to set.
 ' @remarks The index is based on bytes, not the size of the actual array
 ' elements. For example: if setting the byte of a Long array at index 3
-' , then the upper 8bits of the first element will be set.
-' <p>The lowerbound of the array is ignored. Index begins at 0.</p>
-'
+' , then the upper 8-bits of the first element will be set.
+' <p>The lower-bound of the array is ignored. <i>Index</i> begins at 0.</p>
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th><th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ArgumentNullException.html">ArgumentNullException</a></td><td><i>Arr</i> is unintialized.</td>
+'   </tr>
+'    <tr>
+'        <td><a href="ArgumentException.html">ArgumentException</a></td><td><i>Arr</i> is not an array.</td>
+'    </tr>
+'    <tr>
+'        <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td><td><i>Index</i> is negative or greater than the length of <i>Arr</i>.</td>
+'    </tr>
+' </table>
 Public Sub SetByte(ByRef Arr As Variant, ByVal Index As Long, ByVal Value As Byte)
-    If Not IsArray(Arr) Then _
-        Error.Argument Argument_ArrayRequired, "Arr"
-    
     Dim ArrayPtr As Long
-    ArrayPtr = SAPtrV(Arr)
     
-    If ArrayPtr = vbNullPtr Then _
-        Error.ArgumentNull "Arr", ArgumentNull_Array
+    ArrayPtr = GetValidSAPtr(Arr)
+    
     If Index < 0 Or Index >= CorArray.Length(Arr) * SafeArrayGetElemsize(ArrayPtr) Then _
         Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_Index
 

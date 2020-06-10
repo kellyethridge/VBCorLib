@@ -51,14 +51,11 @@ Attribute VB_Exposed = True
 Option Explicit
 Implements IObject
 
-Private Const PATHTYPE_UNKNOWN  As Long = 0
 Private Const PATHTYPE_VOLUME   As Long = 1
 Private Const PATHTYPE_SHARE    As Long = 2
-
-Private Const PROP_NAME As String = "Name"
+Private Const PROP_NAME         As String = "Name"
 
 Private mName As String
-
 
 
 ''

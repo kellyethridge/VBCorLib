@@ -1,0 +1,12 @@
+@remarks <p>This method is not equivalent to checking the length of a string for zero using the <b>Len</b> method. The method checks if the pointer to a string is null. A null string is uninitialized.</p>
+@examples
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    Debug.Print CorString.IsNull(<span style="color: #a31515">&quot;&quot;</span>)
+    Debug.Print CorString.IsNull(vbNullString)
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39;&#39; The code produces the following output.</span>
+<span style="color: #008000">&#39;&#39;</span>
+<span style="color: #008000">&#39;&#39;    False</span>
+<span style="color: #008000">&#39;&#39;    True</span>
+</pre></div>

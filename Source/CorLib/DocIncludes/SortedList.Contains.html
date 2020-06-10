@@ -1,0 +1,49 @@
+@examples The following code example shows how to determine whether a <a href="SortedList.html">SortedList</a> object contains a specific element.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> List <span style="color: #0000ff">As</span> <span style="color: #0000ff">New</span> SortedList
+    <span style="color: #0000ff">Dim</span> TempArray() <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+    <span style="color: #0000ff">Dim</span> TargetArray() <span style="color: #0000ff">As</span> DictionaryEntry
+    <span style="color: #0000ff">Dim</span> i <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
+    
+    List.Add 2, <span style="color: #a31515">&quot;cats&quot;</span>
+    List.Add 3, <span style="color: #a31515">&quot;in&quot;</span>
+    List.Add 1, <span style="color: #a31515">&quot;napping&quot;</span>
+    List.Add 4, <span style="color: #a31515">&quot;the&quot;</span>
+    List.Add 0, <span style="color: #a31515">&quot;three&quot;</span>
+    List.Add 5, <span style="color: #a31515">&quot;barn&quot;</span>
+    
+    TempArray = NewStrings(<span style="color: #a31515">&quot;The&quot;</span>, <span style="color: #a31515">&quot;quick&quot;</span>, <span style="color: #a31515">&quot;brown&quot;</span>, <span style="color: #a31515">&quot;fox&quot;</span>, <span style="color: #a31515">&quot;jumped&quot;</span>, <span style="color: #a31515">&quot;over&quot;</span>, <span style="color: #a31515">&quot;the&quot;</span>, <span style="color: #a31515">&quot;lazy&quot;</span>, <span style="color: #a31515">&quot;dog&quot;</span>)
+    <span style="color: #0000ff">ReDim</span> TargetArray(0 <span style="color: #0000ff">To</span> 14)
+    
+    <span style="color: #0000ff">For</span> i = 0 <span style="color: #0000ff">To</span> UBound(TargetArray)
+        <span style="color: #0000ff">If</span> i &amp;lt<span style="border: 1px solid #FF0000">;</span>= UBound(TempArray) <span style="color: #0000ff">Then</span>
+            <span style="color: #0000ff">Set</span> TargetArray(i) = NewDictionaryEntry(i, TempArray(i))
+        <span style="color: #0000ff">Else</span>
+            <span style="color: #0000ff">Set</span> TargetArray(i) = NewDictionaryEntry(i, <span style="color: #a31515">&quot;&quot;</span>)
+        <span style="color: #0000ff">End</span> <span style="color: #0000ff">If</span>
+    <span style="color: #0000ff">Next</span>
+    
+    Debug.Print <span style="color: #a31515">&quot;The target Array contains the following (before and after copying):&quot;</span>
+    PrintValues TargetArray
+    
+    List.CopyTo TargetArray, 6
+    
+    PrintValues TargetArray
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> PrintValues(<span style="color: #0000ff">ByRef</span> Arr() <span style="color: #0000ff">As</span> DictionaryEntry)
+    <span style="color: #0000ff">Dim</span> i <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
+    
+    <span style="color: #0000ff">For</span> i = LBound(Arr) <span style="color: #0000ff">To</span> UBound(Arr)
+        Debug.Print <span style="color: #a31515">&quot; &quot;</span><span style="border: 1px solid #FF0000">;</span> Arr(i).Value<span style="border: 1px solid #FF0000">;</span>
+    <span style="color: #0000ff">Next</span>
+    
+    Debug.Print
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; The code produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    The target Array contains the following (before and after copying):</span>
+<span style="color: #008000">&#39;     The quick brown fox jumped over the lazy dog</span>
+<span style="color: #008000">&#39;     The quick brown fox jumped over three napping cats in the barn</span>
+</pre></div>

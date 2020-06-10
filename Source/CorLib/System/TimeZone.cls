@@ -11,29 +11,32 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
-'    CopyRight (c) 2004 Kelly Ethridge
+'The MIT License (MIT)
+'Copyright (c) 2020 Kelly Ethridge
 '
-'    This file is part of VBCorLib.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    VBCorLib is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Public License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    VBCorLib is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Public License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Public License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: TimeZone
+' Module: TimeZone
 '
 
 ''
-' Represents timezone information for the local machine.
+' Represents a time zone.
 '
 ' @see TimeZoneStatic
 '
@@ -42,7 +45,7 @@ Implements IObject
 
 Private Const FIND_LAST As Long = 5
 
-Private mDayLightName           As String
+Private mDaylightName           As String
 Private mStandardName           As String
 Private mUtcOffsetNoDLS         As TimeSpan
 Private mUtcOffsetWithDLS       As TimeSpan
@@ -51,11 +54,11 @@ Private mNotUsedDayLightTimes   As DayLightTime
 
 
 ''
-' Returns the name of the daylight savings period.
+' Returns the name of the daylight saving period.
 '
-' @return Daylight savings period name.
-Public Property Get DayLightName() As String
-    DayLightName = mDayLightName
+' @return Daylight saving period name.
+Public Property Get DaylightName() As String
+    DaylightName = mDaylightName
 End Property
 
 ''
@@ -67,21 +70,21 @@ Public Property Get StandardName() As String
 End Property
 
 ''
-' Returns the start and end of the daylight savings period.
+' Returns the start and end of the daylight saving period.
 '
-' @param Year The year which contains the daylight savings period.
-' @return The daylight savings period.
+' @param Year The year which contains the daylight saving period.
+' @return The daylight saving period.
 Public Function GetDayLightChanges(ByVal Year As Long) As DayLightTime
-    Set GetDayLightChanges = GetDayLightTimes(Year)
+    Set GetDayLightChanges = GetDaylightTimes(Year)
 End Function
 
 ''
-' Returns the offset from UTC to the current timezone, adjusting for daylight savings.
+' Returns the offset from UTC to the current timezone, adjusting for daylight saving.
 '
 ' @param time The time to get the offset for.
 ' @return The offset from the time to UTC.
 Public Function GetUtcOffset(ByRef Time As Variant) As TimeSpan
-    If IsDayLightSavingTime(Time) Then
+    If IsDaylightSavingTime(Time) Then
         Set GetUtcOffset = mUtcOffsetWithDLS
     Else
         Set GetUtcOffset = mUtcOffsetNoDLS
@@ -89,30 +92,16 @@ Public Function GetUtcOffset(ByRef Time As Variant) As TimeSpan
 End Function
 
 ''
-' Returns whether the time is currently in the daylight savings period.
+' Returns whether the time is currently in the daylight saving period.
 '
-' @param time The time to check if in the daylight savings period.
-' @param dayLightTimes the daylight period to check the time against.
-' @return Indicating if the time was in the daylight savings period.
-Public Function IsDayLightSavingTime(ByRef Time As Variant, Optional ByVal dayLightTimes As DayLightTime) As Boolean
+' @param Time The time to check if in the daylight saving period.
+' @return Indicating if the time was in the daylight saving period.
+Public Function IsDaylightSavingTime(ByRef Time As Variant) As Boolean
     Dim dt As CorDateTime
-    
+
     Set dt = Convert.ToDateTime(Time)
-    If dayLightTimes Is Nothing Then Set dayLightTimes = GetDayLightTimes(dt.Year)
-    
-    With dayLightTimes
-        If .Delta.Equals(TimeSpan.Zero) Then Exit Function
-        If .StartTime.LessThan(.EndTime) Then
-            ' northern hemisphere
-            If dt.LessThan(.StartTime) Then Exit Function
-            If dt.GreaterThanOrEqualTo(.EndTime) Then Exit Function
-        Else
-            ' southern hemisphere
-            If dt.GreaterThanOrEqualTo(.StartTime) Then Exit Function
-            If dt.LessThan(.EndTime) Then Exit Function
-        End If
-    End With
-    IsDayLightSavingTime = True
+
+    IsDaylightSavingTime = TimeZone.IsDaylightSavingTime(dt, GetDaylightTimes(dt.Year))
 End Function
 
 ''
@@ -122,6 +111,7 @@ End Function
 ' @return The local time converted from the UTC time.
 Public Function ToLocalTime(ByRef Time As Variant) As CorDateTime
     Dim d As CorDateTime
+    
     Set d = Convert.ToDateTime(Time)
     
     If d.Kind = LocalKind Then
@@ -138,6 +128,7 @@ End Function
 ' @return The UTC time converted from the local time.
 Public Function ToUniversalTime(ByRef Time As Variant) As CorDateTime
     Dim d As CorDateTime
+    
     Set d = Convert.ToDateTime(Time)
     
     If d.Kind = UtcKind Then
@@ -175,17 +166,18 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_Initialize()
-    Dim R As Long
+    Dim r As Long
     
-    R = GetTimeZoneInformation(mTimeZoneInfo)
-    If R = TIME_ZONE_ID_UNKNOWN Or mTimeZoneInfo.DaylightBias = 0 Then
+    r = GetTimeZoneInformation(mTimeZoneInfo)
+    
+    If r = TIME_ZONE_ID_UNKNOWN Or mTimeZoneInfo.DaylightBias = 0 Then
         Set mNotUsedDayLightTimes = Cor.NewDayLightTime(CorDateTime.MinValue, CorDateTime.MinValue, TimeSpan.Zero)
     End If
     
-    mDayLightName = SysAllocString(VarPtr(mTimeZoneInfo.DayLightName(0)))
+    mDaylightName = SysAllocString(VarPtr(mTimeZoneInfo.DaylightName(0)))
     mStandardName = SysAllocString(VarPtr(mTimeZoneInfo.StandardName(0)))
     Set mUtcOffsetNoDLS = TimeSpan.FromMinutes(-(mTimeZoneInfo.Bias + mTimeZoneInfo.StandardBias))
     Set mUtcOffsetWithDLS = TimeSpan.FromMinutes(-(mTimeZoneInfo.Bias + mTimeZoneInfo.DaylightBias))
@@ -193,40 +185,49 @@ End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
+'   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Function GetDayLightTimes(ByVal Year As Long) As DayLightTime
+Private Function GetDaylightTimes(ByVal Year As Long) As DayLightTime
     Dim StartTime As CorDateTime
     Dim EndTime As CorDateTime
     
     If mNotUsedDayLightTimes Is Nothing Then
         Set StartTime = GetCrossOverPoint(Year, mTimeZoneInfo.DaylightDate)
         Set EndTime = GetCrossOverPoint(Year, mTimeZoneInfo.StandardDate)
-        Set GetDayLightTimes = Cor.NewDayLightTime(StartTime, EndTime, TimeSpan.FromMinutes(mTimeZoneInfo.Bias))
+        Set GetDaylightTimes = Cor.NewDayLightTime(StartTime, EndTime, TimeSpan.FromMinutes(mTimeZoneInfo.Bias))
     Else
-        Set GetDayLightTimes = mNotUsedDayLightTimes
+        Set GetDaylightTimes = mNotUsedDayLightTimes
     End If
 End Function
 
 Private Function GetCrossOverPoint(ByVal Year As Long, ByRef Time As SYSTEMTIME) As CorDateTime
-    Dim Ret As CorDateTime
-    Dim mydow As DayOfWeek
-    Dim targetdow As DayOfWeek
+    Dim Ret         As CorDateTime
+    Dim MyDow       As DayOfWeek
+    Dim TargetDow   As DayOfWeek
     
     If Time.wDay = FIND_LAST Then
         ' find last dayofweek in month
         Set Ret = Cor.NewDateTime(Year, Time.wMonth + 1, 1, Time.wHour)
-        mydow = Ret.DayOfWeek
-        targetdow = mydow - Time.wDayOfWeek
-        If targetdow < 0 Then targetdow = targetdow + 7
-        Set Ret = Ret.AddDays(-targetdow)
+        MyDow = Ret.DayOfWeek
+        TargetDow = MyDow - Time.wDayOfWeek
+        
+        If TargetDow < 0 Then
+            TargetDow = TargetDow + 7
+        End If
+        
+        Set Ret = Ret.AddDays(-TargetDow)
     Else
         ' find nth dayofweek of month
         Set Ret = Cor.NewDateTime(Year, Time.wMonth, 1, Time.wHour)
-        mydow = Ret.DayOfWeek
-        targetdow = Time.wDayOfWeek
-        If targetdow < mydow Then targetdow = targetdow + 7
-        Set Ret = Ret.AddDays(targetdow - mydow)
+        MyDow = Ret.DayOfWeek
+        TargetDow = Time.wDayOfWeek
+        
+        If TargetDow < MyDow Then
+            TargetDow = TargetDow + 7
+        End If
+        
+        Set Ret = Ret.AddDays(TargetDow - MyDow)
+        
         If Time.wDay > 1 Then
             Set Ret = Ret.AddDays((Time.wDay - 1) * 7)
         End If
@@ -237,7 +238,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)

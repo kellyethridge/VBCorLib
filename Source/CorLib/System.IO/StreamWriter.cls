@@ -38,20 +38,20 @@ Attribute VB_Exposed = True
 ''
 ' Writes characters to a byte stream using the specific encoding.
 '
-' @remarks The default encoding used is UTF8Encoding. If the writer is
-' not appending to the stream, then an encoding preamble is written to
-' the stream.
-'
+' @remarks <b>StreamWriter</b> defaults to using an instance of <a href="UTF8Encoding.html">UTF8Encoding</a> unless specified otherwise.
+' This instance of <a href="UTF8Encoding.html">UTF8Encoding</a> is constructed without a byte order mark (BOM), so its
+' <a href="UTF8Encoding.GetPreamble.html">GetPreamble</a> method returns an empty byte array. To create a <b>StreamWriter</b>
+' using UTF-8 encoding and a BOM, consider using a constructor that specifies encoding, such as <a href="Constructors.NewStreamWriter.html">NewStreamWriter(String, Boolean, Encoding)</a>.
+
 ' @see Constructors
 ' @see StreamReader
 ' @see TextWriter
-'
+' @include "..\DocIncludes\StreamWriter.html"
 Option Explicit
 Implements IObject
 Implements TextWriter
 
 Private Const MIN_BUFFERSIZE As Long = 128
-
 
 Private mStream         As Stream
 Private mAutoFlush      As Boolean
@@ -63,7 +63,8 @@ Private mByteBuffer()   As Byte
 Private mBufferSize     As Long
 Private mPosition       As Long
 Private mIsOpen         As Boolean
-
+Private mPreambleWritten As Boolean
+Private mLeaveOpen      As Boolean
 
 
 ''
@@ -82,6 +83,10 @@ End Property
 '
 Public Property Let AutoFlush(ByVal Value As Boolean)
     mAutoFlush = Value
+    
+    If mAutoFlush Then
+        InternalFlush True, False
+    End If
 End Property
 
 ''
@@ -135,9 +140,20 @@ End Property
 Public Sub CloseWriter()
     If mIsOpen Then
         Flush
-        mStream.CloseStream
-        mIsOpen = False
+        
+        If Not mLeaveOpen Then
+            On Error GoTo Finally
+            mStream.CloseStream
+        End If
     End If
+    
+Finally:
+    Set mStream = Nothing
+    Set mEncoder = Nothing
+    Set mEncoding = Nothing
+    Erase mCharBuffer
+    Erase mByteBuffer
+    mIsOpen = False
 End Sub
 
 ''
@@ -153,10 +169,26 @@ End Sub
 '
 ' @param value The value to be written to the stream.
 ' @param args The arguments to be used in formatting the Value.
-' @remarks The <i>args</i> are used when argument indexes are supplied
-' in the value to be written. Indexes are indicate by enclosing the
+' @remarks The <i>Args</i> are used when argument indexes are supplied
+' in the value to be written. Indexes are indicated by enclosing the
 ' specific index in curly braces {}. The indexes start at 0.
-'
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th><th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ObjectDisposedException.html">ObjectDisposedException</a></td><td>The writer is closed.</td>
+'   </tr>
+'    <tr>
+'        <td><a href="FormatException.html">FormatException</a></td>
+'        <td>
+'           The format specification in format is invalid.<br/>
+'           -or-<br/>
+'           The number indicating an argument to be formatted is less than zero, or larger than or equal to the number of provided objects to be formatted.
+'        </td>
+'    </tr>
+' </table>
 Public Sub WriteValue(ByRef Value As Variant, ParamArray Args() As Variant)
     VerifyIsOpen
 
@@ -173,14 +205,33 @@ Public Sub WriteValue(ByRef Value As Variant, ParamArray Args() As Variant)
     End If
 End Sub
 
-Public Sub WriteChars(ByRef Chars() As Integer, Optional ByRef Index As Variant, Optional ByRef Count As Variant)
+''
+' Writes a subarray of characters to the stream.
+'
+' @param Buffer A character array containing the data to write.
+' @param Index The character position in <i>Buffer</i> at which to start reading data.
+' @param Count The maximum number of characters to write.
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th><th>Condition</th>
+'   </tr>
+'    <tr>
+'        <td><a href="ArgumentNullException.html">ArgumentNullException</a></td><td><i>Buffer</i> is uninitialized.</td>
+'    </tr>
+'   <tr>
+'        <td><a href="ObjectDisposedException.html">ObjectDisposedException</a></td><td>The writer is closed.</td>
+'   </tr>
+' </table>
+Public Sub WriteChars(ByRef Buffer() As Integer, Optional ByRef Index As Variant, Optional ByRef Count As Variant)
+    Dim Output As String
+    
     VerifyIsOpen
     
-    If SAPtr(Chars) = vbNullPtr Then _
-        Error.ArgumentNull "Chars", ArgumentNull_Array
-        
-    Dim Output As String
-    Output = CorString.FromCharArray(Chars, Index, Count)
+    If SAPtr(Buffer) = vbNullPtr Then _
+        Error.ArgumentNull "Buffer", ArgumentNull_Array
+    
+    Output = Cor.NewString(Buffer, Index, Count)
     WriteCore Output
     
     If mAutoFlush Then
@@ -188,17 +239,32 @@ Public Sub WriteChars(ByRef Chars() As Integer, Optional ByRef Index As Variant,
     End If
 End Sub
 
-
 ''
 ' Writes the value, then appends the new-line string.
 '
 ' @param value The value to be written.
-' @remarks The first argument in <i>value</i> is the output to the
+' @remarks The first argument in <i>Value</i> is the output to the
 ' string. Any additional arguments are used as formatting information.
 ' An argument can be refered to through formatting indexes. A
 ' formatting index is an integer enclosed in curly braces {}. The
 ' indexes start at 0.
-'
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th><th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ObjectDisposedException.html">ObjectDisposedException</a></td><td>The writer is closed.</td>
+'   </tr>
+'    <tr>
+'        <td><a href="FormatException.html">FormatException</a></td>
+'        <td>
+'           The format specification in format is invalid.<br/>
+'           -or-<br/>
+'           The number indicating an argument to be formatted is less than zero, or larger than or equal to the number of provided objects to be formatted.
+'        </td>
+'    </tr>
+' </table>
 Public Sub WriteLine(ParamArray Value() As Variant)
     VerifyIsOpen
     
@@ -215,10 +281,25 @@ Public Sub WriteLine(ParamArray Value() As Variant)
     End If
 End Sub
 
-Public Sub WriteLineChars(ByRef Chars() As Integer, Optional ByRef Index As Variant, Optional ByRef Count As Variant)
+''
+' Writes a subarray of characters to the text stream, followed by a line terminator.
+'
+' @param Buffer The character array from which data is read.
+' @param Index The character position in <i>Buffer</i> at which to start reading data.
+' @param Count The maximum number of characters to write.
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th><th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ObjectDisposedException.html">ObjectDisposedException</a></td><td>The writer is closed.</td>
+'   </tr>
+' </table>
+Public Sub WriteLineChars(ByRef Buffer() As Integer, Optional ByRef Index As Variant, Optional ByRef Count As Variant)
     VerifyIsOpen
     
-    WriteCore CorString.FromCharArray(Chars, Index, Count)
+    WriteCore Cor.NewString(Buffer, Index, Count)
     WriteCore mNewLine
     
     If mAutoFlush Then
@@ -252,13 +333,17 @@ Public Function GetHashCode() As Long
     GetHashCode = MyBase.GetHashCode(Me)
 End Function
 
+' this is to allow Console to force the prevention
+' of writting a preamble since it makes no sense.
+Friend Sub HaveWrittenPreamble()
+    mPreambleWritten = True
+End Sub
+
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByRef Source As Variant, ByVal Append As Boolean, ByVal Encoding As Encoding, ByVal BufferSize As Long)
-    Dim EmitBOM As Boolean
-    
+Friend Sub Init(ByRef Source As Variant, ByVal Append As Boolean, ByVal Encoding As Encoding, ByVal BufferSize As Long, ByVal LeaveOpen As Boolean)
     If BufferSize < 0 Then _
         Error.ArgumentOutOfRange "BufferSize", ArgumentOutOfRange_NeedNonNegNum
     
@@ -268,47 +353,34 @@ Friend Sub Init(ByRef Source As Variant, ByVal Append As Boolean, ByVal Encoding
                 Error.ArgumentNull "Source", ArgumentNull_Stream
             If Not TypeOf Source Is Stream Then _
                 Error.Argument Argument_StreamRequired, "Source"
-                
+            
             Set mStream = Source
-        
+            mLeaveOpen = LeaveOpen
+            
         Case vbString
             Dim Mode As FileMode
             
-            If Append Then
-                Mode = FileMode.Append
-            Else
-                Mode = FileMode.Create
-                EmitBOM = True
-            End If
-            
+            Mode = IIfLong(Append, FileMode.Append, FileMode.Create)
             Set mStream = Cor.NewFileStream(CStr(Source), Mode, FileAccess.WriteAccess, FileShare.ReadShare)
-        
+            
         Case Else
             Error.Argument Argument_InvalidStreamSource, "Source"
     End Select
-        
-    If Encoding Is Nothing Then
-        Set mEncoding = Cor.NewUTF8Encoding(False, True)
-    Else
-        Set mEncoding = Encoding
-    End If
-    Set mEncoder = mEncoding.GetEncoder
     
+    If mStream.CanSeek Then
+        If mStream.Position > 0 Then
+            HaveWrittenPreamble
+        End If
+    End If
+    
+    Set mEncoding = IfObject(Encoding, Stream.UTF8NoBOMAndThrows)
+    Set mEncoder = mEncoding.GetEncoder
     mNewLine = Environment.NewLine
     mIsOpen = True
-    
-    If BufferSize < MIN_BUFFERSIZE Then
-        mBufferSize = MIN_BUFFERSIZE
-    Else
-        mBufferSize = BufferSize
-    End If
+    mBufferSize = CorMath.Max(BufferSize, MIN_BUFFERSIZE)
     
     ReDim mCharBuffer(0 To mBufferSize - 1)
     ReDim mByteBuffer(0 To mEncoding.GetMaxByteCount(mBufferSize) - 1)
-    
-    If EmitBOM Then
-        WritePreamble
-    End If
 End Sub
 
 Private Sub Class_Terminate()
@@ -376,7 +448,7 @@ Private Sub WriteCore(ByRef Value As String)
         
         ' Copy the characters to the buffer
         CopyMemory mCharBuffer(mPosition), ByVal CharPtr, CharsToCopy * 2
-        
+
         ' Calculate the remaining characters to write.
         CharCount = CharCount - CharsToCopy
         CharPtr = CharPtr + CharsToCopy * 2
@@ -393,17 +465,21 @@ End Sub
 Private Sub WritePreamble()
     Dim Bytes() As Byte
     
-    If Not mStream.CanSeek Then _
-        Exit Sub
-    If mStream.Length > 0 Then _
-        Exit Sub
-    
-    Bytes = mEncoding.GetPreamble
-    mStream.WriteBlock Bytes, LBound(Bytes), Len1D(Bytes)
+    If Not mPreambleWritten Then
+        Bytes = mEncoding.GetPreamble
+        
+        If Len1D(Bytes) > 0 Then
+            mStream.WriteBlock Bytes, LBound(Bytes), Len1D(Bytes)
+        End If
+        
+        mPreambleWritten = True
+    End If
 End Sub
 
 Private Sub InternalFlush(ByVal FlushStream As Boolean, ByVal FlushEncoder As Boolean)
     Dim Size As Long
+    
+    WritePreamble
     
     If mPosition > 0 Then
         Size = mEncoder.GetBytes(mCharBuffer, 0, mPosition, mByteBuffer, 0, FlushEncoder)

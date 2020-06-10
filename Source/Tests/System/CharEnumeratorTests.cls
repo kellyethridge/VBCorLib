@@ -48,19 +48,6 @@ Public Sub MoveNext_WhenCalled_MovesToNextCharactor()
     Loop
 End Sub
 
-Public Sub ForEach_WhenCalled_MovesToNextCharactor()
-    Dim Count       As Long
-    Dim Actual      As Variant
-    Dim Expected    As Integer
-    
-    For Each Actual In Cor.NewCharEnumerator("hello")
-        Count = Count + 1
-        Expected = Choose(Count, 104, 101, 108, 108, 111)
-        
-        Assert.That Actual, Iz.EqualTo(Expected)
-    Next
-End Sub
-
 Public Sub MoveNext_AfterLastCharacter_ReturnsFalse()
     Dim Enumerator As CharEnumerator
     Set Enumerator = Cor.NewCharEnumerator("a")
@@ -106,4 +93,17 @@ Public Sub Current_BeforeStartingEnumeration_ThrowsInvalidOperationException()
     Value = Enumerator.Current
     
     AssertInvalidOperationException Err
+End Sub
+
+Public Sub ForEach_WhenCalled_EnumeratesCharacters()
+    Dim s As String
+    Dim sb As New StringBuilder
+    Dim Ch As Variant
+    
+    s = "Hello"
+    For Each Ch In Cor.NewCharEnumerator(s)
+        sb.AppendChar Ch
+    Next
+    
+    Assert.That sb.ToString, Iz.EqualTo(s)
 End Sub

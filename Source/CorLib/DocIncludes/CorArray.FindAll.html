@@ -1,0 +1,31 @@
+@examples The following example will search a given array for all ages that are over 25.
+<p>The result will return an array of <b>Long</b>s containing the matched values.</p>
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> Ages() <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
+    <span style="color: #0000ff">Dim</span> AgesOver25() <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
+    <span style="color: #0000ff">Dim</span> Age <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>
+    
+    Ages = NewLongs(14, 22, 31, 27, 18)
+    
+    <span style="color: #008000">&#39; To find all ages over 25, pass the array and</span>
+    <span style="color: #008000">&#39; address of the callback method to CorArray.FindAll.</span>
+    AgesOver25 = CorArray.FindAll(Ages, <span style="color: #0000ff">AddressOf</span> AgeOver25)
+    
+    <span style="color: #008000">&#39; Dispay all the ages found.</span>
+    Debug.Print <span style="color: #a31515">&quot;All ages over 25: &quot;</span>
+    
+    <span style="color: #0000ff">For</span> <span style="color: #0000ff">Each</span> Age <span style="color: #0000ff">In</span> AgesOver25
+        Debug.Print Age
+    <span style="color: #0000ff">Next</span>
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; The method accepts a ByRef parameter of the array element type.</span>
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Function</span> AgeOver25(<span style="color: #0000ff">ByRef</span> Age <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>) <span style="color: #0000ff">As</span> <span style="color: #2b91af">Boolean</span>
+    AgeOver25 = Age &gt; 25
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Function</span>
+
+<span style="color: #008000">&#39; This code example produces the following output.</span>
+<span style="color: #008000">&#39;  All ages over 25:</span>
+<span style="color: #008000">&#39;   31</span>
+<span style="color: #008000">&#39;   27</span>
+</pre></div>

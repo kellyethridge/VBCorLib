@@ -39,12 +39,10 @@ Attribute VB_Exposed = True
 ' Provides the base functionality to perfrom Hash Message Authentication Code operations.
 '
 ' @remarks This base implementation manages many of the aspects utilized with HMAC implementations.
-' Usually, any class that implements the <b>HashAlgorithm</b> interface can easily be used to
+' Usually, any class that implements the <a href="HashAlgorithm.html">HashAlgorithm</a> interface can easily be used to
 ' provide HMAC capabilities by simply initializing an instance of <b>HMACBase</b> with an instance
 ' of the hash object.
-' <p>The HMAC set of classes provided in <b>VBCorLib</b> utilize the <b>HMACBase</b> class to provide
-' consistent HMAC operations.</p>
-'
+' <p>The HMAC set of classes provided in VBCorLib utilize the <b>HMACBase</b> class to provide consistent HMAC operations.</p>
 ' @see HMACMD5
 ' @see HMACRIPEMD160
 ' @see HMACSHA1
@@ -52,7 +50,6 @@ Attribute VB_Exposed = True
 ' @see HMACSHA384
 ' @see HMACSHA512
 ' @see Constructors
-'
 Option Explicit
 
 Private mHashAlgorithm  As HashAlgorithm
@@ -160,11 +157,10 @@ End Sub
 ' @param OutputBuffer The array to place the processed data.
 ' @param OutputOffset The starting index to begin placing the processed data.
 ' @return The number of bytes processed.
-' @remarks The OutputBuffer will not contain a hashed value. The data processed in the
-' InputBuffer will be copied to the OutputBuffer. The data will not be copied if the
-' OutputBuffer is a null array or the OutputBuffer and InputBuffer are the same array and
-' the InputOffset and OutputOffset are the same.
-'
+' @remarks <i>OutputBuffer</i> will not contain a hashed value. The data processed in
+' <i>InputBuffer</i> will be copied to <i>OutputBuffer</i>. The data will not be copied if
+' <i>OutputBuffer</i> is an uninitialized array or <i>OutputBuffer</i> and <i>InputBuffer</i> are the same array and
+' <i>InputOffset</i> and <i>OutputOffset</i> are the same.
 Public Function TransformBlock(ByRef InputBuffer() As Byte, ByVal InputOffset As Long, ByVal InputCount As Long, ByRef OutputBuffer() As Byte, ByVal OutputOffset As Long) As Long
     VerifyNotDisposed
     StartHash
@@ -178,9 +174,8 @@ End Function
 ' @param InputOffset The starting index of the data to be processed.
 ' @param InputCount The number of bytes to be processed.
 ' @return The processed data. This is a copy of the InputBuffer data.
-' @remarks The returned array is a copy of the InputBuffer with a length the same as InputCount. To retrieve the
-' hash value, call the Hash property.
-'
+' @remarks The returned array is a copy of <i>InputBuffer</i> with a length the same as <i>InputCount</i>. To retrieve the
+' hash value, call the <a href="HMACBase.Get.Hash.html">Hash</a> property.
 Public Function TransformFinalBlock(ByRef InputBuffer() As Byte, ByVal InputOffset As Long, ByVal InputCount As Long) As Byte()
     VerifyNotDisposed
     StartHash

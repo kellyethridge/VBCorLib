@@ -36,12 +36,11 @@ Public Property Get InDebugger() As Boolean
 End Property
 
 Private Sub Main()
+    InitHelper
     SetInIDE
     SetInDebugger
     InitMissing
-    InitHelper
-    InitWin32Api
-    InitPublicFunctions
+    InitMathematics
     InitGlobalization
     InitEncoding
 End Sub
@@ -56,16 +55,13 @@ End Sub
 ' class can disable the exit button if we are running in an IDE.
 '
 Private Sub SetInDebugger()
+    Const BufferSize As Long = 512
     Dim Result As String
-    Result = String$(1024, 0)
+    Dim Length As Long
     
-    GetModuleFileName vbNullPtr, Result, Len(Result)
-    
-    Dim i As Long
-    i = InStr(Result, vbNullChar)
-    
-    Result = Left$(Result, i - 1)
-    
+    Result = String$(BufferSize, 0)
+    Length = GetModuleFileNameW(vbNullPtr, Result, BufferSize)
+    Result = Left$(Result, Length)
     mInDebugger = (UCase$(Right$(Result, 8)) = "\VB6.EXE")
 End Sub
 

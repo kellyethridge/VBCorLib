@@ -36,22 +36,22 @@ Attribute VB_Exposed = True
 '
 
 ''
-' Provides a common base of functionality for SymmetricAlgorithm derived classes.
+' Provides a common base of functionality for <a href="SymmetricAlgorithm.html">SymmetricAlgorithm</a> derived classes.
 '
 ' @remarks The base class implements many of the details necessary for implementing
 ' a Symmetric Cryptographic Algorithm. By utilizing the base class the implementor
 ' can quickly provide a new implementation that is consistent with the existing
 ' implementations without the need to manage lower level details.
-'
+' @see SymmetricAlgorithm
 Option Explicit
 
 ''
 ' Used for implementations that must check for some kind of weak or semi-weak key.
 '
 ' @param RgbKey The key to be checked for weakness.
-' @param Ex The return of an exception indicating the key is weak and the specified
-' exception should be thrown if appropriate.
-'
+' @param Ex The exception indicating the key is weak and should be thrown.
+' @remarks If the <i>RgbKey</i> is considered weak by the current symmetric algorithm, it should set <i>Ex</i>
+' to an appropriate <a href="Exception.html">Exception</a> object. Typically a <a href="CryptographicException.html">CryptographicException</a> is set.
 Public Event CheckForWeakKey(ByRef RgbKey() As Byte, ByRef Ex As Exception)
 
 Private mLegalBlockSizes()  As KeySizes
@@ -67,17 +67,16 @@ Private mKey()              As Byte
 
 
 ''
-' Adds a new KeySizes object with the supplied values to the list of legal block sizes.
+' Adds a new <a href="KeySizes.html">KeySizes</a> object with the specified values to the list of legal block sizes.
 '
 ' @param MinSize The mininum block size in bits the algorithm can process.
 ' @param MaxSize The maximum block size in bits the algorithm can process.
 ' @param SkipSize The number of bits the block size can change from minimum to maximum.
 ' @remarks A derived class uses this to add the set of legal block sizes the implementing algorithm can process.
-' <p>As an example, the RijndaelManaged class would be to call this method as such:
+' <p>As an example, the <a href="RijndaelManaged.html">RijndaelManaged</a> class calls this method in <b>Class_Initialize</b>.
 ' <pre>
 ' mBase.AddLegalBlockSize 128, 256, 64
 ' </pre>
-'
 Public Sub AddLegalBlockSize(ByVal MinSize As Long, ByVal MaxSize As Long, ByVal SkipSize As Long)
     AddKeySize mLegalBlockSizes, MinSize, MaxSize, SkipSize
 End Sub
@@ -115,18 +114,17 @@ Public Property Let BlockSize(ByVal Value As Long)
 End Property
 
 ''
-' Adds a new KeySizes object with the supplied values to the list of legal key sizes.
+' Adds a new <a href="KeySizes.html">KeySizes</a> object with the supplied values to the list of legal key sizes.
 '
 ' @param MinSize The mininum key size in bits the algorithm can use.
 ' @param MaxSize The maximum key size in bits the algorithm can use.
 ' @param SkipSize The number of bits used to step from the minimum to maximum key size. All
 ' intermediate sizes are also legal sizes.
 ' @remarks A derived class uses this to add the set of legal block sizes the implementing algorithm can process.
-' <p>As an example, the RijndaelManaged class would be to call this method as such:
+' <p>As an example, the <a href="RijndaelManaged.html">RijndaelManaged</a> class calls this method in <b>Class_Initialize</b>.
 ' <pre>
 ' mBase.AddLegalKeySize 128, 256, 64
 ' </pre>
-'
 Public Sub AddLegalKeySize(ByVal MinSize As Long, ByVal MaxSize As Long, ByVal SkipSize As Long)
     AddKeySize mLegalKeySizes, MinSize, MaxSize, SkipSize
 End Sub

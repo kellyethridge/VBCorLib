@@ -53,8 +53,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = MyBase.Equals(Me, Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = MyBase.GetHashCode(Me)
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = MyBase.GetHashCode(Me)
 End Function
 
 Private Function IObject_ToString() As String
@@ -110,6 +110,10 @@ Private Sub Stream_CloseStream()
 ' do nothing
 End Sub
 
+Private Sub Stream_CopyTo(ByVal Destination As Stream, Optional ByVal BufferSize As Long = 81920)
+' do nothing
+End Sub
+
 Private Function Stream_EndRead(ByVal AsyncResult As IAsyncResult) As Long
     Dim Result As StreamAsyncResult
     
@@ -158,7 +162,7 @@ Private Sub Stream_Flush()
 End Sub
 
 Private Function Stream_GetHashCode() As Long
-    Stream_GetHashCode = IObject_GetHashcode
+    Stream_GetHashCode = IObject_GetHashCode
 End Function
 
 Private Property Get Stream_Length() As Currency

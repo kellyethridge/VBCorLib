@@ -38,11 +38,12 @@ Attribute VB_Exposed = True
 ''
 ' Provides a standard interface for utilizing symmetric algorithms.
 '
-' @remarks A symmetric algorithm is one that uses the same Key and Initialization Vector to both
-' encrypt and decrypt data.
+' @remarks A symmetric algorithm is one that uses the same Key and Initialization Vector to both encrypt and decrypt data.
 ' <p>For one of the symmetric algorithms to work, a Key and Initialization Vector needs to be supplied
 ' to the Crypto Service Provider.</p>
-'
+' <p><a href="RijndaelManaged.html">RijndaelManaged</a>, <a href="DESCryptoServiceProvider.html">DESCryptoServiceProvider</a>,
+' <a href="RC2CryptoServiceProvider.html">RC2CryptoServiceProvider</a>, and <a href="TripleDESCryptoServiceProvider.html">TripleDESCryptoServiceProvider</a> are implementations of symmetric algorithms.</p>
+' @see SymmetricAlgorithmBase
 Option Explicit
 
 ''
@@ -63,7 +64,6 @@ Option Explicit
 ' the corrisponding plain text bit is also corrupted until the corrupted bit is finally shifted out of the register.
 ' @param CTS The Cipher Text Stealing (CTS) mode handles any length of plain text and produces cipher text whose length matches
 ' the plain text length. This mode behaves like the CBC mode for all but the last two blocks of the plain text.
-'
 Public Enum CipherMode
     CBC = 1
     ECB = 2
@@ -107,36 +107,42 @@ End Enum
 
 
 ''
-' Returns the block size, in bits, used by the cryptographic operation.
+' Gets the block size, in bits, used by the cryptographic operation.
 '
 ' @Return The block size in bits.
-' @remarks A block size is the basic unit size of data that can be encrypted or decrypted in a single operation. Data that is
-' larger than a block size are processed by splitting the data into multiple blocks the same size as the block size then
-' operating of the multiple blocks.
-' <p>A list of legal block sizes can be obtained through the <b>LegalBlockSizes</b> property.</p>
-'
+' @remarks The block size is the basic unit of data that can be encrypted or decrypted in one operation.
+' Messages longer than the block size are handled as successive blocks; messages shorter than the block size
+' must be padded with extra bits to reach the size of a block. Valid block sizes are determined by the symmetric algorithm used.
+' <p>A list of valid block sizes can be obtained through the <a href="SymmetricAlgorithm.Get.LegalBlockSizes.html">LegalBlockSizes</a> property.</p>
+' @see #LegalBlockSizes
 Public Property Get BlockSize() As Long: End Property
-
 
 ''
 ' Sets the block size, in bits, used by the cryptographic operation.
 '
 ' @param Value The block size in bits.
-' @remarks A block size is the basic unit size of data that can be encrypted or decrypted in a single operation. Data that is
-' larger than a block size are processed by splitting the data into multiple blocks the same size as the block size then
-' operating of the multiple blocks.
-' <p>An invalid block size will cause a <b>CryptographicException</b>.
-' <p>A list of legal block sizes can be obtained through the <b>LegalBlockSizes</b> property.</p>
-'
+' @remarks The block size is the basic unit of data that can be encrypted or decrypted in one operation.
+' Messages longer than the block size are handled as successive blocks; messages shorter than the block size
+' must be padded with extra bits to reach the size of a block. Valid block sizes are determined by the symmetric algorithm used.
+' <p>A list of valid block sizes can be obtained through the <a href="SymmetricAlgorithm.Get.LegalBlockSizes.html">LegalBlockSizes</a> property.</p>
+' @see #LegalBlockSizes
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th><th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="CryptographicException.html">CryptographicException</a></td><td>The block size is invalid.</td>
+'   </tr>
+' </table>
 Public Property Let BlockSize(ByVal Value As Long): End Property
 
 ''
-' Returns the feedback size, in bits, used by the cryptographic operation.
+' Gets the feedback size, in bits, used by the cryptographic operation.
 '
-' @return Returns the feedback size in bits.
+' @return The feedback size in bits.
 ' @remarks The feedback size determines the amount of data that is fed back to successive encryption or decryption operations.
 ' The feedback size cannot be greater than the block size.
-'
 Public Property Get FeedbackSize() As Long: End Property
 
 ''
@@ -145,139 +151,204 @@ Public Property Get FeedbackSize() As Long: End Property
 ' @param Value The feedback size in bits.
 ' @remarks The feedback size determines the amount of data that is fed back to successive encryption or decryption operations.
 ' The feedback size cannot be greater than the block size.
-'
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th><th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="CryptographicException.html">CryptographicException</a></td><td>The feedback size is larger than the block size.</td>
+'   </tr>
+' </table>
 Public Property Let FeedbackSize(ByVal Value As Long): End Property
 
 ''
-' Returns the Initialization Vector used by the cryptographic operation.
+' Gets the initialization vector (<b>IV</b>) for the symmetric algorithm.
 '
-' @return Returns an array of bytes representing an Initialization Vector.
+' @return The initialization vector.
 ' @remarks If several blocks of same plain text are encrypted, the ciphered data could all be the same aswell. Using an
 ' Initialization Vector can prevent same plain text blocks to reproduce the same ciphered blocks.
-' <p>This can be generated using the <b>GenerateIV</b> method, or a new one will be generated if one hasn't been set when
+' <p>This can be generated using <a href="SymmetricAlgorithm.GenerateIV.html">GenerateIV</a>, or a new one will be generated if one hasn't been set when
 ' this property is accessed.</p>
-'
+' <p>This must be set to an array the same size as the block size divided by 8.</p>
 Public Property Get IV() As Byte(): End Property
 
 ''
-' Sets the Initialization Vector used by the cryptographic operation.
+' Sets the initialization vector (<b>IV</b>) for the symmetric algorithm.
 '
-' @param Value The new Initialization Vector.
+' @param Value The initialization vector.
 ' @remarks If several blocks of same plain text are encrypted, the ciphered data could all be the same aswell. Using an
 ' Initialization Vector can prevent same plain text blocks to reproduce the same ciphered blocks.
-' <p>This can be generated using the <b>GenerateIV</b> method, or a new one will be generated if one hasn't been set when
+' <p>This can be generated using the <a href="SymmetricAlgorithm.GenerateIV.html">GenerateIV</a> method, or a new one will be generated if one hasn't been set when
 ' this property is accessed.</p>
-' <p>This must be set to an array the same size as the block size.</p>
-'
+' <p>This must be set to an array the same size as the block size divided by 8.</p>
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th><th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ArgumentNullException.html">ArgumentNullException</a></td><td>An attempt was made to set the initialization vector to an unitialized array.</td>
+'   </tr>
+'    <tr>
+'        <td><a href="CryptographicException.html">CryptographicException</a></td><td>An attempt was made to set the initialization vector to an invalid size.</td>
+'    </tr>
+' </table>
 Public Property Let IV(ByRef Value() As Byte): End Property
 
 ''
-' Returns the secret key used by the cryptographic operation.
+' Gets the secret key for the symmetric algorithm.
 '
-' @return Returns the secret key.
-' @remarks Valid key sizes are determined by the individual algorithms. A list of valid sizes can be obtained
-' through the <b>LegalKeySizes</b> property.
-' <p>If a key has not been set, then a new key will be generated automatically.</p>
-'
+' @return The secret key to use for the symmetric algorithm.
+' @remarks The secret key is used both for encryption and for decryption. For a symmetric algorithm to be successful, the secret
+' key must be known only to the sender and the receiver. The valid key sizes are specified by the particular symmetric algorithm
+' implementation and are listed in the <a href="SymmetircAlgorithm.Get.LegalKeySizes.html">LegalKeySizes</a> property.
+' <p>If a key has not been set, the <a href="SymmetricAlgorithm.GenerateKey.html">GenerateKey</a> method will be called to create a new random value.</p>
 Public Property Get Key() As Byte(): End Property
 
 ''
-' Sets the secret key to be used by the cryptographic operation.
+' Gets the secret key for the symmetric algorithm.
 '
-' @param Value The new secret key to be used.
-' @remarks Valid key sizes are determined by the individual algorithms. A list of valid sizes can be obtained
-' through the <b>LegalKeySizes</b> property.
-'
+' @param Value The secret key to use for the symmetric algorithm.
+' @remarks The secret key is used both for encryption and for decryption. For a symmetric algorithm to be successful, the secret
+' key must be known only to the sender and the receiver. The valid key sizes are specified by the particular symmetric algorithm
+' implementation and are listed in the <a href="SymmetircAlgorithm.Get.LegalKeySizes.html">LegalKeySizes</a> property.
+' <p>If a key has not been set, the <a href="SymmetricAlgorithm.GenerateKey.html">GenerateKey</a> method will be called to create a new random value.</p>
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th><th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ArgumentNullException.html">ArgumentNullException</a></td><td>An attempt was made to set the key to an uninitialized array.</td>
+'   </tr>
+'    <tr>
+'        <td><a href="CryptographicException.html">CryptographicException</a></td><td>The key size is invalid.</td>
+'    </tr>
+' </table>
 Public Property Let Key(ByRef Value() As Byte): End Property
 
 ''
-' Returns the size of the key, in bits, used by the cryptographic operation.
+' Gets the size of the key, in bits, used by the symmetric algorithm.
 '
-' @return The size of the key in bits.
-'
+' @return The size, in bits, of the secret key used by the symmetric algorithm.
+' @remarks The valid key sizes are specified by the particular symmetric algorithm implementation and are listed in the <a href="SymmetircAlgorithm.Get.LegalKeySizes.html">LegalKeySizes</a> property.
 Public Property Get KeySize() As Long: End Property
 
 ''
-' Sets the size of the key, in bits.
+' Gets the size of the key, in bits, used by the symmetric algorithm.
 '
-' @param Value The size of the key in bits.
-' @remarks This will cause the <b>Key</b> property to reset and regenerate when needed.
-'
+' @param Value The size, in bits, of the secret key used by the symmetric algorithm.
+' @remarks The valid key sizes are specified by the particular symmetric algorithm implementation and are listed in the <a href="SymmetircAlgorithm.Get.LegalKeySizes.html">LegalKeySizes</a> property.
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th><th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="CryptographicException.html">CryptographicException</a></td><td>The key size is not valid.</td>
+'   </tr>
+' </table>
 Public Property Let KeySize(ByVal Value As Long): End Property
 
 ''
-' Returns a list of legal block sizes.
+' Gets the block sizes, in bits, that are supported by the symmetric algorithm.
 '
-' @return A list of legal block sizes the cryptographic operation supports.
-'
+' @return An array that contains the block sizes supported by the algorithm.
+' @remarks The symmetric algorithm supports only block sizes that match an entry in this array.
 Public Property Get LegalBlockSizes() As KeySizes(): End Property
 
 ''
-' Returns a list of legal key sizes.
+' Gets the key sizes, in bits, that are supported by the symmetric algorithm.
 '
-' @return A list of legal key sizes the cryptographic operation supports.
-'
+' @return An array that contains the key sizes supported by the algorithm.
+' @remarks The symmetric algorithm supports only key sizes that match an entry in this array.
 Public Property Get LegalKeySizes() As KeySizes(): End Property
 
 ''
-' Returns the mode the current algoritm is set to.
+' Gets the mode for operation of the symmetric algorithm.
 '
-' @return Returns a <b>CipherMode</b> value.
-' @remarks The algoritm can operate in several modes. The modes determine how the data
-' is processed from one block to the next.
-'
+' @return The mode for operation of the symmetric algorithm. The default is <a href="SymmetricAlgorithm.CipherMode.html">CipherMode.CBC</a>.
+' @remarks See <a href="SymmetricAlgorithm.CipherMode.html">CipherMode</a> enumeration for a description of specific modes.
 Public Property Get Mode() As CipherMode: End Property
 
 ''
-' Sets the mode the current algorithm is set to.
+' Sets the mode for operation of the symmetric algorithm.
 '
-' @param Value The new mode for the algorithm.
-' @remarks The algoritm can operate in several modes. The modes determine how the data
-' is processed from one block to the next.
-'
+' @param Value The mode for operation of the symmetric algorithm. The default is <a href="SymmetricAlgorithm.CipherMode.html">CipherMode.CBC</a>.
+' @remarks See <a href="SymmetricAlgorithm.CipherMode.html">CipherMode</a> enumeration for a description of specific modes.
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th><th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="CryptographicException.html">CryptographicException</a></td><td>The cipher mode is not one of the <a href="SymmetricAlgorithm.CipherMode.html">CipherMode</a> values.</td>
+'   </tr>
+' </table>
 Public Property Let Mode(ByVal Value As CipherMode): End Property
 
 ''
-' Returns the padding to be used by the algorithm.
+' Gets the padding mode used in the symmetric algorithm.
 '
-' @return A current padding being used.
-' @remarks Padding is added to the end of plain text data to make the data length
-' an even multiple of the block size.
-'
+' @return The padding mode used in the symmetric algorithm. The default is <a href="SymmetricAlgorithm.PaddingMode.html">PaddingMode.PKCS7</a>.
+' @remarks Most plain text messages do not consist of a number of bytes that completely fill blocks. Often, there are not enough bytes
+' to fill the last block. When this happens, a padding string is added to the text. For example, if the block length is 64 bits and
+' the last block contains only 40 bits, 24 bits of padding are added. See the <a href="SymmetricAlgorithm.PaddingMode.html">PaddingMode</a> enumeration for a description of specific modes.
 Public Property Get Padding() As PaddingMode: End Property
 
 ''
-' Sets the padding to be used by the algorithm.
+' Gets the padding mode used in the symmetric algorithm.
 '
-' @param Value The new padding value to be used.
-' @remarks Padding is added to the end of plain text data to make the data length
-' an even multiple of the block size.
-'
+' @param Value The padding mode used in the symmetric algorithm. The default is <a href="SymmetricAlgorithm.PaddingMode.html">PaddingMode.PKCS7</a>.
+' @remarks Most plain text messages do not consist of a number of bytes that completely fill blocks. Often, there are not enough bytes
+' to fill the last block. When this happens, a padding string is added to the text. For example, if the block length is 64 bits and
+' the last block contains only 40 bits, 24 bits of padding are added. See the <a href="SymmetricAlgorithm.PaddingMode.html">PaddingMode</a> enumeration for a description of specific modes.
 Public Property Let Padding(ByVal Value As PaddingMode): End Property
 
 ''
-' Releases all resources.
+' Releases all resources used by the <a href="SymmetricAlgorithm.html">SymmetricAlgorithm</a> class.
 '
 Public Sub Clear(): End Sub
 
 ''
-' Creates a new decryptor using the Triple Data Encryption Standard algorithm.
+' When implemented by a class, creates a symmetric decryptor object with the specified
+' <a href="SymmetricAlgorithm.Get.Key.html">Key</a> property and initialization vector (<a href="SymmetricAlgorithm.Get.IV.html">IV</a>).
 '
-' @param RgbKey The secret key to be used to decrypt the ciphered text back into plain text.
-' @param RgbIV The Initialization Vector to begin the feedback with.
-' @return A new <b>ICryptoTransform</b> used to decrypt ciphered text.
-' @remarks Though both parameters are optional, if only one parameter is supplied, an exception will be thrown.
-'
+' @param RgbKey The secret key to use for the symmetric algorithm.
+' @param RgbIV The initialization vector to use for the symmetric algorithm.
+' @return A symmetric decryptor object.
+' @remarks This method decrypts an encrypted message created using the <a href="SymmetricAlgorithm.CreateEncryptor.html">CreateEncryptor</a> with the same parameters.
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th><th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ArgumentException.html">ArgumentException</a></td><td>Only <i>RgbKey</i> or <i>RgbIV</i> was specified.</td>
+'   </tr>
+' </table>
+' @see #CreateEncryptor
 Public Function CreateDecryptor(Optional ByRef RgbKey As Variant, Optional ByRef RgbIV As Variant) As ICryptoTransform: End Function
 
 ''
-' Creates a new encryptor using the Triple Data Ecryption Standard algorithm.
+' When implemented by a class, creates a symmetric encryptor object with the specified
+' <a href="SymmetricAlgorithm.Get.Key.html">Key</a> property and initialization vector (<a href="SymmetricAlgorithm.Get.IV.html">IV</a>).
 '
-' @param RgbKey The secret key to be used to encrypt the plain text into ciphered text.
-' @param RgbIV The Initialization Vector to begin the feedback with.
-' @return A new <b>ICryptoTransform</b> used to encrypt plain text.
-' @remarks Though both parameters are optional, if only one parameter is supplied, an exception will be thrown.
-'
+' @param RgbKey The secret key to use for the symmetric algorithm.
+' @param RgbIV The initialization vector to use for the symmetric algorithm.
+' @return A symmetric encryptor object.
+' @remarks Use the <a href="SymmetricAlgorithm.CreateDecryptor.html">CreateDecryptor</a> overload with the same parameters to decrypt the result of this method.
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th><th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ArgumentException.html">ArgumentException</a></td><td>Only <i>RgbKey</i> or <i>RgbIV</i> was specified.</td>
+'   </tr>
+' </table>
+' @see #CreateDecryptor
 Public Function CreateEncryptor(Optional ByRef RgbKey As Variant, Optional ByRef RgbIV As Variant) As ICryptoTransform: End Function
 
 ''
@@ -289,13 +360,17 @@ Public Function CreateEncryptor(Optional ByRef RgbKey As Variant, Optional ByRef
 Public Function Equals(ByRef Value As Variant) As Boolean: End Function
 
 ''
-' Generates a new Initialization Vector array.
+' When implemented by a class, generates a random initialization vector (<a href="SymmetricAlgorithm.Get.IV.html">IV</a>) to use for the algorithm.
 '
+' @remarks In general, there is no reason to use this method, because <code>CreateEncryptor()</code> automatically generates both an initialization vector and a key.
+' However, you may want to use the <b>GenerateIV()</b> method to reuse a symmetric algorithm instance with a different initialization vector.
 Public Sub GenerateIV(): End Sub
 
 ''
-' Generates a new Key based on the key size.
+' When implemented ba a class, generates a random key (<a href="SymmetricAlgorithm.Get.Key.html">Key</a>) to use for the algorithm.
 '
+' @remarks In general, there is no reason to use this method, because <code>CreateEncryptor()</code> automatically generates both an initialization vector and a key.
+' However, you may want to use the <b>GenerateKey()</b> method to reuse a symmetric algorithm instance with a different key.
 Public Sub GenerateKey(): End Sub
 
 ''
@@ -313,12 +388,9 @@ Public Function GetHashCode() As Long: End Function
 Public Function ToString() As String: End Function
 
 ''
-' Checks if the specific number of bits is a valid key size.
+' Determines whether the specified key size is valid for the current algorithm.
 '
-' @param BitLength A value to determine if is a legal key size.
-' @return Returns True if the bit length is a valid key size, False otherwise.
-'
+' @param BitLength The length, in bits, to check for a valid key size.
+' @return <b>True</b> if the specified key size is valid for the current algorithm; otherwise, <b>False</b>.
 Public Function ValidKeySize(ByVal BitLength As Long) As Boolean: End Function
-
-
 

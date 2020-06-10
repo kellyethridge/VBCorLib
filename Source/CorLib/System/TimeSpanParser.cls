@@ -11,25 +11,28 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
-'    CopyRight (c) 2008 Kelly Ethridge
+'The MIT License (MIT)
+'Copyright (c) 2019 Kelly Ethridge
 '
-'    This file is part of VBCorLib.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    VBCorLib is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Public License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    VBCorLib is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Public License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Public License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: TimeSpanParser
+' Module: TimeSpanParser
 '
 
 Option Explicit
@@ -48,9 +51,9 @@ Public Enum ParseError
     FormatError
 End Enum
 
-Private mBuffer     As CharBuffer
+Private mChars()    As Integer
 Private mIndex      As Long
-Private mChar       As Long
+Private mChar       As Integer
 Private mError      As ParseError
 
 
@@ -59,31 +62,34 @@ Friend Property Get Error() As ParseError
 End Property
 
 Friend Function TryParse(ByRef s As String, ByRef RetVal As TimeSpan) As Boolean
+    Dim Sign    As Long
+    Dim Result  As Currency
+    
     Init s
     NextChar
     SkipBlanks
     
-    Dim Sign As Currency
     If Char = vbMinusChar Then
-        Sign = -1@
+        Sign = -1
         NextChar
     Else
-        Sign = 1@
+        Sign = 1
     End If
     
-    Dim Result As Currency
     Select Case NextNonDigit()
         Case vbColonChar
             If Not TryParseTime(Result) Then
-                Exit Function
+                GoTo Finally
             End If
     
         Case vbZeroChar To vbNineChar, vbPeriodChar, vbNullPtr
             Const MaxDays As Long = 10675199
             Dim DaysParsed As Long
+            
             If Not TryParseNumber(MaxDays, DaysParsed) Then
-                Exit Function
+                GoTo Finally
             End If
+            
             Result = Result + DaysParsed * MilliSecondsPerDay
             
             If Char = vbPeriodChar Then
@@ -91,7 +97,7 @@ Friend Function TryParse(ByRef s As String, ByRef RetVal As TimeSpan) As Boolean
                 
                 Dim TimeParsed As Currency
                 If Not TryParseTime(TimeParsed) Then
-                    Exit Function
+                    GoTo Finally
                 End If
                 
                 Result = Result + TimeParsed
@@ -99,37 +105,32 @@ Friend Function TryParse(ByRef s As String, ByRef RetVal As TimeSpan) As Boolean
             
         Case Else
             mError = FormatError
-            Exit Function
+            GoTo Finally
     End Select
     
     SkipBlanks
     
-    If mIndex < mBuffer.Buffer.cElements - 1 Then
+    If mIndex < UBound(mChars) Then
         If mError = ParseError.None Then
             mError = ParseError.FormatError
         End If
         
-        Exit Function
+        GoTo Finally
     End If
     
     Set RetVal = TimeSpan.FromMilliseconds(Result * Sign)
     TryParse = True
+    
+Finally:
+    FreeChars mChars
 End Function
-
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Constructors
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub Class_Initialize()
-    InitChars mBuffer
-End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Init(ByRef s As String)
-    SetChars mBuffer, s
+    mChars = AllocChars(s)
     mIndex = -1
     mError = ParseError.None
     mChar = 0
@@ -142,8 +143,8 @@ End Property
 Private Sub NextChar()
     mIndex = mIndex + 1
     
-    If mIndex < mBuffer.Buffer.cElements Then
-        mChar = mBuffer.Chars(mIndex)
+    If mIndex <= UBound(mChars) Then
+        mChar = mChars(mIndex)
     Else
         mIndex = mIndex - 1
         mChar = 0
@@ -159,12 +160,12 @@ End Sub
 Private Function NextNonDigit() As Integer
     Dim i As Long
     
-    If mBuffer.Buffer.cElements > 0 Then
-        For i = mIndex To mBuffer.Buffer.cElements - 1
-            Select Case mBuffer.Chars(i)
+    If UBound(mChars) >= 0 Then
+        For i = mIndex To UBound(mChars)
+            Select Case mChars(i)
                 Case vbZeroChar To vbNineChar
                 Case Else
-                    NextNonDigit = mBuffer.Chars(i)
+                    NextNonDigit = mChars(i)
                     Exit Function
             End Select
         Next

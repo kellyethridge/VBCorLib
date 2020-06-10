@@ -1,0 +1,35 @@
+@remarks The <b>PadRight(String,Int32, Char)</b> method pads the end of the returned string.
+<p><i>PaddingChar</i> can accept either <b>AscW</b> or <b>ChrW$</b> values.</p>
+<table style="width: auto">
+  <tr>
+      <th>Note</th>
+      <td>This method does not modify the <i>s</i> parameter. Instead, it returns a new string that is padded with trailing <i>PaddingChar</i> characters so that its total length is <i>TotalWidth</i> characters.</td>  </tr>
+</table>
+@exceptions
+<table style="width: auto">
+	<tr>
+		<th>Exception</th><th>Condition</th>
+	</tr>
+	<tr>
+		<td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+		<td><i>TotalWidth</i> is less than zero.</td>
+	</tr>
+</table>
+@examples
+The following example demonstrates the <b>PadRight</b> method.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Const</span> Str <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span> = <span style="color: #a31515">&quot;Forty-Two&quot;</span>
+    <span style="color: #0000ff">Const</span> StrPad <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span> = <span style="color: #a31515">&quot;.&quot;</span>
+    <span style="color: #0000ff">Const</span> CharPad <span style="color: #0000ff">As</span> <span style="color: #2b91af">Integer</span> = 46
+    
+    Debug.Print CorString.PadRight(Str, 15, StrPad)
+    Debug.Print CorString.PadRight(Str, 15, CharPad)
+    Debug.Print CorString.PadRight(Str, 2, StrPad)
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; The previous code outputs the following.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    Forty-Two......</span>
+<span style="color: #008000">&#39;    Forty-Two......</span>
+<span style="color: #008000">&#39;    Forty-Two</span>
+</pre></div>

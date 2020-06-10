@@ -25,8 +25,6 @@ Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollecto
 End Sub
 
 Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseCollector)
-    Dim Col As New Collection
-    
     Select Case Test.MethodName
         Case "LessThan_WithValues_ReturnsExpected"
             Test.Use 1, 2, True
@@ -63,37 +61,37 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
 End Sub
 
 Public Sub Setup()
-    Set mComparer = CaseInsensitiveComparer.Default
+    Set mComparer = CaseInsensitiveComparer.DefaultInvariant
 End Sub
 
-Public Sub LessThan_WithValues_ReturnsExpected(ByRef X As Variant, ByRef Y As Variant, ByVal Expected As Boolean)
+Public Sub LessThan_WithValues_ReturnsExpected(ByRef x As Variant, ByRef y As Variant, ByVal Expected As Boolean)
     Dim Actual As Boolean
     
-    Actual = mComparer.Compare(X, Y) < 0
+    Actual = mComparer.Compare(x, y) < 0
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub GreaterThan_WithValues_ReturnsExpected(ByRef X As Variant, ByRef Y As Variant, ByVal Expected As Boolean)
+Public Sub GreaterThan_WithValues_ReturnsExpected(ByRef x As Variant, ByRef y As Variant, ByVal Expected As Boolean)
     Dim Actual As Boolean
     
-    Actual = mComparer.Compare(X, Y) > 0
+    Actual = mComparer.Compare(x, y) > 0
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub Equal_WithValues_ReturnsExpected(ByRef X As Variant, ByRef Y As Variant, ByVal Expected As Boolean)
+Public Sub Equal_WithValues_ReturnsExpected(ByRef x As Variant, ByRef y As Variant, ByVal Expected As Boolean)
     Dim Actual As Boolean
     
-    Actual = mComparer.Compare(X, Y) = 0
+    Actual = mComparer.Compare(x, y) = 0
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub Compare_WithDifferentDataTypes_ThrowsArgumentException(ByRef X As Variant, ByRef Y As Variant)
+Public Sub Compare_WithDifferentDataTypes_ThrowsArgumentException(ByRef x As Variant, ByRef y As Variant)
     On Error Resume Next
     
-    mComparer.Compare X, Y
+    mComparer.Compare x, y
 
     AssertArgumentException Err
 End Sub

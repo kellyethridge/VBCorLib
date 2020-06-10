@@ -1,0 +1,14 @@
+@examples The following code displays the absolute value of a give value.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    PrintAbsolute CInt64(100)
+    PrintAbsolute CInt64(-200)
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> PrintAbsolute(<span style="color: #0000ff">ByRef</span> Value <span style="color: #0000ff">As</span> Int64)
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;The absolute value of {0} is {1}.&quot;</span>, Value, Int64.Absolute(Value))
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39;This code produces the following.</span>
+<span style="color: #008000">&#39;    The absolute value of 100 is 100.</span>
+<span style="color: #008000">&#39;    The absolute value of -200 is 200.</span>
+</pre></div>

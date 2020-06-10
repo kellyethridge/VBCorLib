@@ -156,40 +156,40 @@ Public Sub AddMethods_WhenCalled_ReturnsExpected()
     Assert.That Calendar.AddWeeks(d, -5), Equals(#11/27/2899#), "AddWeeks #2"
 End Sub
 
-Public Sub AddMilliseconds_WhenResultIsLessThanMinSupported_ThrowsArgumentException()
+Public Sub AddMilliseconds_WhenResultIsLessThanMinSupported_ThrowsArgumentOutOfRangeException()
     Dim Calendar As New TaiwanCalendar
     
     On Error Resume Next
     Calendar.AddMilliseconds Calendar.MinSupportedDateTime, -1
     
-    AssertArgumentException Err
+    AssertArgumentOutOfRangeException Err
 End Sub
 
-Public Sub AddMilliseconds_WhenResultGreaterThanMaxSupported_ThrowsArgumentException()
+Public Sub AddMilliseconds_WhenResultGreaterThanMaxSupported_ThrowsArgumentOutOfRangeException()
     Dim Calendar As New TaiwanCalendar
     
     On Error Resume Next
     Calendar.AddMilliseconds Calendar.MaxSupportedDateTime, 1
     
-    AssertArgumentException Err
+    AssertArgumentOutOfRangeException Err
 End Sub
 
-Public Sub AddMonths_WhenResultIsLessThanMinSupported_ThrowsArgumentException()
+Public Sub AddMonths_WhenResultIsLessThanMinSupported_ThrowsArgumentOutOfRangeException()
     Dim Calendar As New TaiwanCalendar
     
     On Error Resume Next
     Calendar.AddMonths Calendar.MinSupportedDateTime, -1
     
-    AssertArgumentException Err
+    AssertArgumentOutOfRangeException Err
 End Sub
 
-Public Sub AddMonths_WhenResultGreaterThanMaxSupported_ThrowsArgumentException()
+Public Sub AddMonths_WhenResultGreaterThanMaxSupported_ThrowsArgumentOutOfRangeException()
     Dim Calendar As New TaiwanCalendar
     
     On Error Resume Next
     Calendar.AddMonths Calendar.MaxSupportedDateTime, 1
     
-    AssertArgumentException Err
+    AssertArgumentOutOfRangeException Err
 End Sub
 
 Public Sub GetProperties_WhenCalled_ReturnsExpected()

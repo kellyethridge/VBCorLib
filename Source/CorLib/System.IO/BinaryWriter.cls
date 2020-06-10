@@ -38,15 +38,12 @@ Attribute VB_Exposed = True
 ''
 ' Provides methods to write typed information to a stream.
 '
-' @remarks
-' <p>The datatypes that are written to the stream are written in their binary
-' form. The value are written as they are represented in memory. For example, as datatype
-' of vbLong is written as 4 bytes, regardless of the actual value of the vbLong
-' variable.</p>
+' @remarks The data types that are written to the stream are written in their binary
+' form. The values are written as they are represented in memory. For example, as data type
+' of vbLong is written as 4 bytes, regardless of the actual value of the vbLong variable.
 '
 ' @see Constructors
 ' @see BinaryReader
-'
 Option Explicit
 Implements IObject
 
@@ -88,7 +85,7 @@ End Sub
 ' @return The final position in the stream.
 '
 Public Function SeekPosition(ByVal Offset As Currency, ByVal Origin As SeekOrigin) As Currency
-    mOutStream.SeekPosition Offset, Origin
+    SeekPosition = mOutStream.SeekPosition(Offset, Origin)
 End Function
 
 ''
@@ -99,7 +96,7 @@ End Function
 ' @param Count The number of elements or characters to be written to the stream.
 ' @remarks <i>Index</i> and <i>vCount</i> are only valid when writing Byte arrays,
 ' Integer array, and Strings. For all other types, these parameters are ignored.
-'<p>Simple datatypes such as vbLong and vbDouble are written out exactly as they
+' <p>Simple datatypes such as vbLong and vbDouble are written out exactly as they
 ' appear in memory. Each individual byte of that datatype is written. For example, a vbLong
 ' is 4 bytes in memory, even if its value is 0. The 4 bytes are written to the stream, not
 ' one byte with a value of 0. A vbDouble is 8 bytes, so all 8 bytes are written as is to
@@ -150,29 +147,31 @@ Public Sub WriteValue(ByRef Value As Variant, Optional ByRef Index As Variant, O
         ValidateArrayRange Value, Index, Count, NameOfValue
         WriteArray Value, Index, Count
     Else
-        WriteIntrinsic Value, Index, Count
+        WriteIntrinsic Value
     End If
 End Sub
 
 ''
 ' Writes a character to the underlying stream.
 '
-' @param Value The character to be written. This can be a string or numeric value.
-' @remarks The character is encoded and the byte array is written to the Stream.
+' @param Value The character to be written. This can be a string or a numeric value.
+' @remarks The character is encoded and the byte array is written to the stream.
 '
 Public Sub WriteChar(ByRef Value As Variant)
+    Dim Bytes() As Byte
+    
     Select Case VarType(Value)
         Case vbString
+            If Len(Value) = 0 Then _
+                Error.Argument Argument_StringZeroLength
+            
             mSingleChar(0) = AscW(CStr(Value))
-            
         Case vbLong, vbInteger, vbByte
-            mSingleChar(0) = CInt(Value)
-            
+            mSingleChar(0) = AsWord(CLng(Value))
         Case Else
             Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidValueType, "String or Integer"), "Value")
     End Select
     
-    Dim Bytes() As Byte
     Bytes = mEncoding.GetBytes(mSingleChar, 0, 1)
     mOutStream.WriteBlock Bytes, 0, Len1D(Bytes)
 End Sub
@@ -220,6 +219,7 @@ Friend Sub Init(ByVal Output As Stream, ByVal Encoding As Encoding)
         Error.Argument Argument_StreamNotWritable
     
     Set mOutStream = Output
+    
     If Encoding Is Nothing Then
         Set mEncoding = Cor.NewUTF8Encoding(False, True)
     Else
@@ -233,30 +233,51 @@ End Sub
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub WriteStringLength(ByVal Length As Long)
     Dim LengthRemaining As Long
+    
     LengthRemaining = Length
     
     Do While LengthRemaining > &H80
         WriteByte (LengthRemaining And &H7F) Or &H80
         LengthRemaining = (LengthRemaining And &HFFFFFF80) \ &H80
     Loop
+    
     WriteByte LengthRemaining
 End Sub
 
-Private Sub WriteIntrinsic(ByRef Value As Variant, ByRef Index As Variant, ByRef Count As Variant)
+Private Sub WriteIntrinsic(ByRef Value As Variant)
     Select Case VarType(Value)
-        Case vbBoolean:     WriteBoolean Value
-        Case vbByte:        WriteByte Value
-        Case vbLong:        WriteInt32 Value
-        Case vbSingle:      WriteSingle Value
-        Case vbInteger:     WriteInt16 Value
-        Case vbDouble:      WriteDouble Value
-        Case vbDate:        WriteDate Value
-        Case vbCurrency:    WriteCurrency Value
-        Case vbString:      WriteString CStr(Value)
-        Case vbDecimal:     WriteDecimal Value
+        Case vbBoolean
+            WriteBoolean Value
+        Case vbByte
+            WriteByte Value
+        Case vbLong
+            WriteInt32 Value
+        Case vbSingle
+            WriteSingle Value
+        Case vbInteger
+            WriteInt16 Value
+        Case vbDouble
+            WriteDouble Value
+        Case vbDate
+            WriteDate Value
+        Case vbCurrency
+            WriteCurrency Value
+        Case vbString
+            WriteString CStr(Value)
+        Case vbDecimal
+            WriteDecimal Value
         Case Else
-            Error.Argument Argument_NeedIntrinsicType, "Value"
+            If IsInt64(Value) Then
+                WriteInt64 Value
+            Else
+                Error.Argument Argument_NeedIntrinsicType, "Value"
+            End If
     End Select
+End Sub
+
+Private Sub WriteInt64(ByRef Value As Variant)
+    WriteInt32 Value.LowPart
+    WriteInt32 Value.HighPart
 End Sub
 
 Private Sub WriteBoolean(ByVal Value As Boolean)
@@ -288,7 +309,10 @@ Private Sub WriteDouble(ByVal Value As Double)
 End Sub
 
 Private Sub WriteDate(ByVal Value As Date)
-    mOutStream.WriteBlock AsOByteArr(Value).Bytes, 0, vbSizeOfDate
+    Dim Milliseconds As Currency
+    
+    Milliseconds = CorDateTime.GetTotalMilliseconds(Value)
+    WriteCurrency Milliseconds
 End Sub
 
 Private Sub WriteCurrency(ByVal Value As Currency)
@@ -296,7 +320,7 @@ Private Sub WriteCurrency(ByVal Value As Currency)
 End Sub
 
 Private Sub WriteDecimal(ByRef Value As Variant)
-    mOutStream.WriteBlock BitConverter.GetBytes(CDec(Value)), 0, vbSizeOfDecimal
+    mOutStream.WriteBlock BitConverter.GetBytes(Value), 0, vbSizeOfDecimal
 End Sub
 
 Private Sub WriteString(ByRef Value As String)

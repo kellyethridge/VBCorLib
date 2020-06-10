@@ -30,7 +30,6 @@ Option Explicit
 
 Private Const E_NOINTERFACE             As Long = &H80004002
 Private Const ENUM_FINISHED             As Long = 1
-Private Const OffsetToFirstFunction     As Long = 8
 Private Const IID_IUnknown_Data1        As Long = 0
 Private Const IID_IEnumVariant_Data1    As Long = &H20404
 
@@ -65,9 +64,9 @@ End Function
 Public Function GetCollectionVersion(ByVal Obj As Object) As Long
     On Error GoTo TypeMismatch
     
-    Dim Versioned As IVersionableCollection
+    Dim Versioned As IVersionable
     Set Versioned = Obj
-    GetCollectionVersion = Versioned.CurrentVersion
+    GetCollectionVersion = Versioned.Version
     
 TypeMismatch:
 End Function

@@ -85,7 +85,7 @@ Public Function Decode(ByVal Key As ResourceKey, ByRef Bytes() As Byte) As Long
     ' building the block of 16 strings from the table.
     Do While ByteIndex <= MaxByteIndex
         Dim StringLength As Long
-        StringLength = BitConverter.ToInteger(Bytes, ByteIndex)
+        StringLength = BitConverter.ToInt16(Bytes, ByteIndex)
         ByteIndex = ByteIndex + 2
         
         ' We have a string, so append all the characters.

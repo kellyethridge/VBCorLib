@@ -347,3 +347,25 @@ Public Sub Parse_WithTooLargeIntegers_ThrowsOverflowExeption(ByVal s As String)
     AssertOverflowException Err
 End Sub
 
+Public Sub MinorRevision_WhenCalled_ReturnsLower16BitsOfRevision()
+    Dim Actual As Integer
+    Dim v As Version
+    
+    Set v = NewVersion(2, 4, 128, LShift(100, 16) + 2)
+    
+    Actual = v.MinorRevision
+    
+    Assert.That Actual, Iz.EqualTo(2)
+End Sub
+
+Public Sub MajorRevision_WhenCalled_ReturnsUpper16BitsOfRevision()
+    Dim Actual As Integer
+    Dim v As Version
+    
+    Set v = NewVersion(2, 4, 128, LShift(100, 16) + 2)
+    
+    Actual = v.MajorRevision
+    
+    Assert.That Actual, Iz.EqualTo(100)
+End Sub
+

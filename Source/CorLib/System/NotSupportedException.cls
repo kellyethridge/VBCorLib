@@ -52,9 +52,7 @@ Implements IObject
 Implements Exception
 Implements SystemException
 
-Private Const PropBase     As String = "Base"
-Private Const DEF_MESSAGE   As String = "Object doesn't support this property or method."
-Private Const DEF_HRESULT   As Long = COR_E_NOTSUPPORTED
+Private Const PropBase As String = "Base"
 
 Private mBase As ExceptionBase
 

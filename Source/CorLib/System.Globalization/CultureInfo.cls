@@ -301,9 +301,9 @@ End Function
 ' @return The format provider, or Nothing if a provider was not found.
 '
 Public Function GetFormat(ByRef FormatType As String) As Object
-    If CorString.Equals(FormatType, vbNumberFormatInfo, OrdinalIgnoreCase) Then
+    If CorString.Equals(FormatType, vbNumberFormatInfo, StringComparison.OrdinalIgnoreCase) Then
         Set GetFormat = NumberFormat
-    ElseIf CorString.Equals(FormatType, vbDateTimeFormatInfo, OrdinalIgnoreCase) Then
+    ElseIf CorString.Equals(FormatType, vbDateTimeFormatInfo, StringComparison.OrdinalIgnoreCase) Then
         Set GetFormat = DateTimeFormat
     End If
 End Function
@@ -427,7 +427,7 @@ Friend Sub Init(ByRef NameOrLCID As Variant, ByVal UseUserOverride As Boolean)
         Case vbString
             If Len(NameOrLCID) > 0 Then
                 If CultureTable.IsLoaded Then
-                    ID = CultureTable.GetCultureID(NameOrLCID)
+                    ID = CultureTable.GetCultureID(CStr(NameOrLCID))
                 End If
             Else
                 ID = INVARIANT_LCID

@@ -38,8 +38,7 @@ Attribute VB_Exposed = True
 ''
 ' Provides static methods used to retrieve existing encodings and convert between encodings.
 '
-' @remarks This class cannot be directly instantiated. To access the methods, use the
-' variable name directly.
+' @remarks This class cannot be directly instantiated. To access the methods, use the variable name directly.
 ' <pre>
 ' Dim en As Encoding
 ' Set en = Encoding.UTF8
@@ -49,6 +48,7 @@ Attribute VB_Exposed = True
 '
 Option Explicit
 
+Private mUTF32              As UTF32Encoding
 Private mUTF8               As UTF8Encoding
 Private mUTF7               As UTF7Encoding
 Private mASCII              As ASCIIEncoding
@@ -73,11 +73,11 @@ Public Property Get Default() As Encoding
 End Property
 
 ''
-' Returns a UnicodeEncoding object that encodes using BigEndian byte ordering.
+' Gets an encoding for the UTF-16 format that uses the big endian byte order.
 '
-' @return A single instance of UnicodeEncoding with BigEndian encoding.
-' @remarks This encoding is declared as Cor.NewUnicodeEncoding(True, True).
-'
+' @return An encoding object for the UTF-16 format that uses the big endian byte order.
+' @remarks This encoding is constructed using <a href="Constructors.NewUnicodeEncoding.html">Cor.NewUnicodeEncoding(True, True)</a>
+' and may not be appropriate for your application.
 Public Property Get BigEndianUnicode() As UnicodeEncoding
     If mBigEndianUnicode Is Nothing Then
         Set mBigEndianUnicode = Cor.NewUnicodeEncoding(True, True)
@@ -87,11 +87,11 @@ Public Property Get BigEndianUnicode() As UnicodeEncoding
 End Property
 
 ''
-' Returns a UnicodeEncoding object that encodes using LittleEndian byte ordering.
+' Gets an encoding for the UTF-16 format using the little endian byte order.
 '
-' @return A single instance of UnicodeEncoding with LittleEndian encoding.
-' @remarks This encoding is declared as Cor.NewUnicodeEncoding(False, True).
-'
+' @return An encoding for the UTF-16 format using the little endian byte order.
+' @remarks This encoding is constructed using <a href="Constructors.NewUnicodeEncoding.html">Cor.NewUnicodeEncoding(False, True)</a>
+' and may not be appropriate for your application.
 Public Property Get Unicode() As UnicodeEncoding
     If mUnicode Is Nothing Then
         Set mUnicode = Cor.NewUnicodeEncoding(False, True)
@@ -101,11 +101,10 @@ Public Property Get Unicode() As UnicodeEncoding
 End Property
 
 ''
-' Returns a shared ASCIIEncoding object.
+' Gets an encoding for the ASCII (7-bit) character set.
 '
-' @return A single instance of an ASCIIEncoding.
+' @return An encoding for the ASCII (7-bit) character set.
 ' @remarks This encoding is declared as New ASCIIEncoding.
-'
 Public Property Get ASCII() As ASCIIEncoding
     If mASCII Is Nothing Then
         Set mASCII = New ASCIIEncoding
@@ -115,11 +114,10 @@ Public Property Get ASCII() As ASCIIEncoding
 End Property
 
 ''
-' Returns a shared UTF7Encoding object.
+' Gets an encoding for the UTF-7 format.
 '
-' @return A single instance of a UTF7Encoding object
+' @return An encoding for the UTF-7 format.
 ' @remarks This encoding is declared as New UTF7Encoding.
-'
 Public Property Get UTF7() As UTF7Encoding
     If mUTF7 Is Nothing Then
         Set mUTF7 = New UTF7Encoding
@@ -129,17 +127,35 @@ Public Property Get UTF7() As UTF7Encoding
 End Property
 
 ''
-' Returns a shared UTF8Encoding object.
+' Gets an encoding for the UTF-8 format.
 '
-' @return A single instance of UTF8Encoding object.
-' @remarks This encoding is declared as Cor.NewUTF8Encoding(True)
-'
+' @return An encoding for the UTF-8 format.
+' @remarks This encoding is constructed using <a href="Constructors.NewUTF8Encoding.html">Cor.NewUTF8Encoding(True)</a>
+' and may not be appropriate for your application.
 Public Property Get UTF8() As UTF8Encoding
     If mUTF8 Is Nothing Then
         Set mUTF8 = Cor.NewUTF8Encoding(True)
     End If
     
     Set UTF8 = mUTF8
+End Property
+
+''
+' Gets an encoding for the UTF-32 format using the little endian byte order.
+'
+' @return An encoding object for the UTF-32 format using the little endian byte order.
+' @remarks The <a href="UTF32Encoding.html">UTF32Encoding</a> object that is returned by this property
+' may not have the appropriate behavior for your app. It uses replacement fallback to replace each
+' string that it cannot encode and each byte that it cannot decode with the Unicode REPLACEMENT CHARACTER (U+FFFE).
+' Instead, you can call the <a href="Cor.NewUTF32Encoding.html">NewUTF32Encoding(Boolean, Boolean, Boolean)</a>
+' constructor to instantiate a <a href="UTF32Encoding.html">UTF32Encoding</a> object whose fallback is either an
+' <a href="EncoderFallbackException.html">EncoderFallbackException</a> or a <a href="DecoderFallbackException.html">DecoderFallbackException</a>.
+Public Property Get UTF32() As UTF32Encoding
+    If mUTF32 Is Nothing Then
+        Set mUTF32 = Cor.NewUTF32Encoding(False, True)
+    End If
+    
+    Set UTF32 = mUTF32
 End Property
 
 ''
@@ -166,37 +182,47 @@ End Function
 ''
 ' Returns an encoding for a specified codepage.
 '
-' @param CodePageOrName The codepage number or name to encode with.
+' @param CodePageOrName The codepage number or name to encode with or 0 (zero) to use the default encoding.
+' @param EncoderFallback An object that provides an error-handling procedure when a character cannot be encoded with the current encoding.
+' @param DecoderFallback An object that provides an error-handling procedure when a byte sequence cannot be decoded with the current encoding.
 ' @return An encoding for a specific codepage or name.
-'
 Public Function GetEncoding(ByRef CodePageOrName As Variant, Optional ByVal EncoderFallback As EncoderFallback, Optional ByVal DecoderFallback As DecoderFallback) As Encoding
-    Dim cp As Long
+    Dim CodePage As Long
     
     Select Case VarType(CodePageOrName)
         Case vbString
-            cp = mEncodingTable.GetCodePage(CStr(CodePageOrName))
+            CodePage = mEncodingTable.GetCodePage(CStr(CodePageOrName))
         Case vbLong, vbInteger, vbByte
-            cp = CodePageOrName
+            CodePage = CodePageOrName
         Case Else
             Throw Cor.NewArgumentException("A Code Page or Encoding Name is required.", "CodePageOrName")
     End Select
     
-    If cp = 0 Then
-        cp = GetACP
+    If CodePage = 0 Then
+        CodePage = GetACP
     End If
     
-    Select Case cp
-        Case 1200:      Set GetEncoding = Me.Unicode
-        Case 1201:      Set GetEncoding = Me.BigEndianUnicode
-        Case 20127:     Set GetEncoding = Me.ASCII
-        Case 65000:     Set GetEncoding = Me.UTF7
-        Case 65001:     Set GetEncoding = Me.UTF8
+    Select Case CodePage
+        Case 1200
+            Set GetEncoding = Me.Unicode
+        Case 1201
+            Set GetEncoding = Me.BigEndianUnicode
+        Case 20127
+            Set GetEncoding = Me.ASCII
+        Case 65000
+            Set GetEncoding = Me.UTF7
+        Case 65001
+            Set GetEncoding = Me.UTF8
+        Case 12000
+            Set GetEncoding = Me.UTF32
+        Case 12001
+            Set GetEncoding = Cor.NewUTF32Encoding(True, True)
         Case Else
-            If mEncodings.Contains(cp) Then
-                Set GetEncoding = mEncodings(cp)
+            If mEncodings.Contains(CodePage) Then
+                Set GetEncoding = mEncodings(CodePage)
             Else
-                Set GetEncoding = NewCodePageEncoding(cp)
-                mEncodings.Add cp, GetEncoding
+                Set GetEncoding = NewCodePageEncoding(CodePage)
+                mEncodings.Add CodePage, GetEncoding
             End If
     End Select
     

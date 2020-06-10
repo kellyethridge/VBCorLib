@@ -70,8 +70,7 @@ Private mBytesUnknown(0)    As Byte
 ''
 ' When implemented in a derived class, gets a value indicating whether the current encoding is read-only.
 '
-' @return <b>true</b> if the current <a href="Encoding.html">Encoding</a> is read-only; otherwise, <b>false</b>. The default is <b>true</b>.
-'
+' @return <b>True</b> if the current <a href="Encoding.html">Encoding</a> is read-only; otherwise, <b>False</b>.
 Public Property Get IsReadOnly() As Boolean
     IsReadOnly = mIsReadOnly
 End Property
@@ -79,20 +78,18 @@ End Property
 ''
 ' Creates a clone of the current Encoding instance.
 '
-' @return A cloned instance of a ASCIIEncoding object.
+' @return A cloned version of this instance.
 ' @remarks A cloned instance will have the read-only limitations removed.
-'
 Public Function Clone() As ASCIIEncoding
     Set Clone = New ASCIIEncoding
     Clone.InitClone Me
 End Function
 
 ''
-' Returns the current EncoderFallback instance used by the encoding.
+' Gets the current <a href="EncoderFallback.html">EncoderFallback</a> instance used by the encoding.
 '
 ' @return An object derived from <a href="EncoderFallback.html">EncoderFallback</a>.
 ' @remarks The default will return an instance of <a href="EncoderReplacementFallback.html">EncoderReplacementFallback</a>.
-'
 Public Property Get EncoderFallback() As EncoderFallback
     Set EncoderFallback = mEncoderFallback
 End Property
@@ -116,7 +113,7 @@ Public Property Set EncoderFallback(ByVal Value As EncoderFallback)
 End Property
 
 ''
-' Returns the current DecoderFallback instance used by the encoding.
+' Gets the current <a href="DecoderFallback.html">DecoderFallback</a> instance used by the encoding.
 '
 ' @return An object derived from <a href="DecoderFallback.html">DecoderFallback</a>.
 ' @remarks The default will return an instance of <a href="DecoderReplacementFallback.html">DecoderReplacementFallback</a>.
@@ -145,7 +142,7 @@ End Property
 
 
 ''
-' Returns if the current encoding uses single-byte code points.
+' Gets if the current encoding uses single-byte code points.
 '
 ' @return Returns True for single-byte, False for multi-byte code points.
 Public Property Get IsSingleByte() As Boolean
@@ -153,102 +150,92 @@ Public Property Get IsSingleByte() As Boolean
 End Property
 
 ''
-' Returns the encoding name to be used in with the mail agent body tags.
+' Gets the encoding name to be used in with the mail agent body tags.
 '
 ' @return The body tag compatible encoding name.
 ' @see Encoding
-'
 Public Property Get BodyName() As String
     BodyName = Table.BodyName(CodePage)
 End Property
 
 ''
-' Returns the code page identifier for this encoding.
+' Gets the code page identifier for this encoding.
 '
 ' @return Code page identifier.
 ' @see Encoding
-'
 Public Property Get CodePage() As Long
     CodePage = 20127
 End Property
 
 ''
-' The name of this encoding.
+' Gets the name of this encoding.
 '
 ' @return The encoding's name.
 ' @see Encoding
-'
 Public Property Get EncodingName() As String
     EncodingName = Table.EncodingName(CodePage)
 End Property
 
 ''
-' Returns the encoding name to be used in with the mail agent header tags.
+' Gets the encoding name to be used in with the mail agent header tags.
 '
 ' @return The header tag compatible encoding name.
 ' @see Encoding
-'
 Public Property Get HeaderName() As String
     HeaderName = Table.HeaderName(CodePage)
 End Property
 
 ''
-' Indicates if this encoding can be used by browsers to display text.
+' Gets if this encoding can be used by browsers to display text.
 '
 ' @return The indication for browser display capable.
 ' @see Encoding
-'
 Public Property Get IsBrowserDisplay() As Boolean
     IsBrowserDisplay = Table.IsBrowserDisplay(CodePage)
 End Property
 
 ''
-' Indicates if this encoding can be used to save data with this encoding.
+' Gets if this encoding can be used to save data with this encoding.
 '
 ' @return The indication for the browser saving capable.
 ' @see Encoding
-'
 Public Property Get IsBrowserSave() As Boolean
     IsBrowserSave = Table.IsBrowserSave(CodePage)
 End Property
 
 ''
-' Indicates if this encoding can be used to display mail and news by
+' Gets if this encoding can be used to display mail and news by
 ' mail and news clients.
 '
 ' @return Indication for mail and news client capable.
 ' @see Encoding
-'
 Public Property Get IsMailNewsDisplay() As Boolean
     IsMailNewsDisplay = Table.IsMailNewsDisplay(CodePage)
 End Property
 
 ''
-' Indicates if this encoding can be used to save date by mail and news clients.
+' Gets if this encoding can be used to save date by mail and news clients.
 '
 ' @return Indication for the mail and news clients to use this encoding for saving.
 ' @see Encoding
-'
 Public Property Get IsMailNewsSave() As Boolean
     IsMailNewsSave = Table.IsMailNewsSave(CodePage)
 End Property
 
 ''
-' Returns the encoding name registered with the Internet Assigned Numbers Authority.
+' Gets the encoding name registered with the Internet Assigned Numbers Authority.
 '
 ' @return The registered encoding name.
 ' @see Encoding
-'
 Public Property Get WebName() As String
     WebName = Table.WebName(CodePage)
 End Property
 
 ''
-' Returns the Windows Operating System's code page for this encoding.
+' Gets the Windows Operating System's code page for this encoding.
 '
 ' @return The Windows code page for this encoding.
 ' @see Encoding
-'
 Public Property Get WindowsCodePage() As Long
     WindowsCodePage = Table.WindowsCodePage(CodePage)
 End Property
@@ -263,7 +250,6 @@ End Property
 ' @remarks The <i>Chars</i> parameter will accept either a String or an Integer array.
 ' <p>If a string is passed in, then the Index and Count parameters are ignored.</p>
 ' @see Encoding
-'
 Public Function GetByteCount(ByRef Chars As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Long
     Dim LocalChars()    As Integer
     Dim Range           As ListRange
@@ -296,7 +282,6 @@ End Function
 ' @remarks The <i>Chars</i> parameter will accept either a String or an Integer array. The Index
 ' is zero based for both the String and Integer array, not 1 based like Mid$.
 ' @see Encoding
-'
 Public Function GetBytes(ByRef Chars As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Byte()
     Dim LocalChars()    As Integer
     Dim Range           As ListRange
@@ -334,12 +319,11 @@ End Function
 ' @param ByteIndex The index of the first byte stored in the destination array.
 ' @return The number of bytes produce by the encoding.
 ' @remarks The <i>Bytes</i> array cannot be null and must be large enough to hold the encoded
-' set of characters. To obtain the size required, use GetByteCount to find the necessary size.
-' Or, use GetMaxByteCount to get the largest size that could be produced. The largest size is not
+' set of characters. To obtain the size required, use <a href="ASCIIEncoding.GetByteCount.html">GetByteCount</a> to find the necessary size.
+' Or, use <a href="ASCIIEncoding.GetMaxByteCount.html">GetMaxByteCount</a> to get the largest size that could be produced. The largest size is not
 ' the perfect size, only the maximum number of bytes that could ever be produced by a number of
 ' characters. Resizing of the resultant <i>Bytes</i> array may be necessary.
 ' @see Encoding
-'
 Public Function GetBytesEx(ByRef Chars As Variant, ByVal CharIndex As Long, ByVal CharCount As Long, ByRef Bytes() As Byte, ByVal ByteIndex As Long) As Long
     Dim LocalChars() As Integer
     
@@ -371,7 +355,6 @@ End Function
 ' @param Count The number of bytes to be used in the calculation.
 ' @return The number of characters that would be decoded from the set of bytes.
 ' @see Encoding
-'
 Public Function GetCharCount(ByRef Bytes() As Byte, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Long
     Dim Range As ListRange
     
@@ -388,9 +371,7 @@ End Function
 ' @param Count The number of bytes to be used in decoding.
 ' @return An array of characters decoded from the set of bytes.
 ' @see Encoding
-'
 Public Function GetChars(ByRef Bytes() As Byte, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Integer()
-    Dim Chars()     As Integer
     Dim Range       As ListRange
     Dim CharCount   As Long
     
@@ -411,10 +392,9 @@ End Function
 ' @param CharIndex The first index to begin storing decoded bytes in <i>Chars</i>.
 ' @return The number of characters decoded from the array of bytes.
 ' @remarks The <i>Chars</i> array must be large enough to handle all the bytes that will
-' be decoded. To ensure the <i>Chars</i> array is large enough, use either GetCharCount or
-' GetMaxCharCount to determine a size that will hold the decoded bytes.
+' be decoded. To ensure the <i>Chars</i> array is large enough, use either <a href="ASCIIEncoding.GetCharCount.html">GetCharCount</a> or
+' <a href="ASCII.Encoding.GetMaxCharCount.html">GetMaxCharCount</a> to determine a size that will hold the decoded bytes.
 ' @see Encoding
-'
 Public Function GetCharsEx(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, ByRef Chars() As Integer, ByVal CharIndex As Long) As Long
     ValidateGetCharsEx Bytes, ByteIndex, ByteCount, Chars, CharIndex
     GetCharsEx = GetCharsCore(Bytes, ByteIndex, ByteCount, Chars, CharIndex)
@@ -425,8 +405,22 @@ End Function
 '
 ' @param ByteCount The number of bytes to be decoded.
 ' @return The maximum number of characters that can be decoded from the specified number of bytes.
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+'        <td>
+'           <i>ByteCount</i> is less than zero.<br/>
+'           -or-<br/>
+'           The resulting number of bytes is greater than the maximum number that can be returned as an integer.
+'        </td>
+'   </tr>
+' </table>
 ' @see Encoding
-'
 Public Function GetMaxCharCount(ByVal ByteCount As Long) As Long
     Dim Result As Currency
     
@@ -451,50 +445,54 @@ End Function
 ' @param CharCount The number of characters to be encoded.
 ' @return The maximum number of bytes that can be generated from the specified number of characters.
 ' @see Encoding
-'
 Public Function GetMaxByteCount(ByVal CharCount As Long) As Long
-    Dim Result As Currency
+    Dim ByteCount As Currency
     
     If CharCount < 0 Then _
         Error.ArgumentOutOfRange "CharCount", ArgumentOutOfRange_NeedNonNegNum
     
-    Result = CharCount + 1@
+    ' Add one to account for a possible high surrogate being cached in
+    ' an encoder waiting to be used in the next GetBytes call using that
+    ' encoder. If the next character is a low surrogate then the two will
+    ' count as a single character, however, if the cached high surrogate
+    ' is left hanging, then it needs to be counted on its own. We do that here.
+    ByteCount = CharCount + 1
     
     If mEncoderFallback.MaxCharCount > 1 Then
-        Result = Result * mEncoderFallback.MaxCharCount
+        ByteCount = ByteCount * mEncoderFallback.MaxCharCount
     End If
     
-    If Result > &H7FFFFFFF Then _
+    If ByteCount > CCur(&H7FFFFFFF) Then _
         Error.ArgumentOutOfRange "CharCount", ArgumentOutOfRange_GetByteCountOverflow
     
-    GetMaxByteCount = Result
+    GetMaxByteCount = ByteCount
 End Function
 
 ''
-' Returns an encoder that maintains state.
+' Obtains an encoder that converts a sequence of Unicode characters into an ASCII encoded sequence of bytes.
 '
-' @return The stateful encoder.
-' @remarks Since encoding Unicode characters equates to exactly 2 bytes per
-' character, there is no state that is maintained between calls. This method
-' functions identically to GetBytes.
+' @return An <a href="Encoder.html">Encoder</a> that converts a sequence of Unicode characters into an ASCII encoded sequence of bytes.
+' @remarks The <a href="Encoder.GetBytes.html">Encoder.GetBytes</a> method converts sequential blocks of characters into sequential blocks of bytes,
+' in a manner similar to the <a href="ASCIIEncoding.GetBytes.html">GetBytes</a> method of this class. However, an <a href="Encoder.html">Encoder</a> maintains state information between
+' calls so it can correctly encode character sequences that span blocks. The <a href="Encoder.html">Encoder</a> also preserves trailing characters
+' at the end of data blocks and uses the trailing characters in the next encoding operation. For example, a data block might
+' end with an unmatched high surrogate, and the matching low surrogate might be in the next data block. Therefore, <a href="ASCIIEncoding.GetDecoder.html>GetDecoder</a>
+' and <b>GetEncoder</b> are useful for network transmission and file operations, because those operations often deal with blocks of data instead of a complete data stream.
 ' @see Encoding
-'
 Public Function GetEncoder() As Encoder
     Set GetEncoder = Cor.NewDefaultEncoder(Me)
 End Function
 
 ''
-' Returns a decoder that maintains state.
+' Obtains a decoder that converts an ASCII encoded sequence of bytes into a sequence of Unicode characters.
 '
-' @return The stateful decoder.
-' @remarks Unlike UnicodeEncoding, the decoder maintains state between decoding calls.
-' Since a single unicode character required exactly 2 bytes to be decoded, it is possible
-' that an odd number of bytes may be attempted to be decoding, creating an orphaned byte
-' which represents only half of a unicode character. The remaining byte is held until
-' the next decoding call, and the byte is then inserted at the beginning of the next set
-' of bytes to be decoded, picking up byte decoding where the orphaned byte left off.
+' @return A <a href="Decoder.html">Decoder</a> that converts an ASCII encoded sequence of bytes into a sequence of Unicode characters.
+' @remarks The <a href="Decoder.GetChars.html">Decoder.GetChars</a> method converts sequential blocks of bytes into sequential blocks of characters,
+' in a manner similar to the <a href="ASCIIEncoding.GetChars.html">GetChars</a> method of this class. However, a <a href="Decoder.html">Decoder</a> maintains state information between calls
+' so it can correctly decode byte sequences that span blocks. The Decoder also preserves trailing bytes at the end of data blocks
+' and uses the trailing bytes in the next decoding operation. Therefore, <b>GetDecoder</b> and <a href="ASCIIEncoding.GetEncoder.html">GetEncoder</a> are useful for network transmission
+' and file operations, because those operations often deal with blocks of data instead of a complete data stream.
 ' @see Encoding
-'
 Public Function GetDecoder() As Decoder
     Set GetDecoder = Cor.NewDefaultDecoder(Me)
 End Function
@@ -502,26 +500,51 @@ End Function
 ''
 ' Returns an array of bytes that represents this encoding.
 '
-' @return A byte array containg the bytes to be used to identify this encoding type.
-' @remarks <p>If the encoding was created setting the <i>BigEndian</i> paramter
-' to true, then this will return the Unicode byte array identifer &HFEFF otherwise
-' &hFFFE for a non-bigEndian encoding. If no identifier is to be emitted, then an
-' empty byte array is returned (not a null array).
+' @return A byte array containing a sequence of bytes that specifies the encoding used.<br/>
+' -or-<br/>
+' A byte array of length zero, if a preamble is not required.
+' <p>See <a href="Encoding.GetPreamble.html">Encoding.GetPreamble</a> for additional information.</p>
 ' @see Encoding
-'
 Public Function GetPreamble() As Byte()
     GetPreamble = Cor.NewBytes()
 End Function
 
 ''
-' Decodes a set of bytes into a String.
+' Decodes a range of bytes into a String.
 '
 ' @param Bytes The set of bytes to be decoded into a string.
 ' @param Index The index of the first byte to be decoded.
 ' @param Count The number of bytes to be used in the decoding.
 ' @return A string containing the decoded set of bytes.
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ArgumentNullException.html">ArgumentNullException</a></td><td><i>Bytes</i> is <b>null</b>.</td>
+'   </tr>
+'    <tr>
+'        <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+'        <td>
+'           <i>Index</i> is less than the lower-bound of <i>Bytes</i>.<br/>
+'           -or-<br/>
+'           <i>Count</i> is less than zero.<br/>
+'           -or-<br/>
+'           <i>Index</i> and <i>Count</i> do not denote a valid range in <i>Bytes</i>.
+'        </td>
+'    </tr>
+'    <tr>
+'        <td><a href="DecoderFallbackException.html">DecoderFallbackException</a></td>
+'        <td>
+'           A fallback occurred<br/>
+'           -and-<br/>
+'           <a href="Encoding.Get.DecoderFallback.html">DecoderFallback</a> is set to <a href="DecoderExceptionFallback.html">DecoderExceptionFallback</a>.
+'        </td>
+'    </tr>
+' </table>
 ' @see Encoding
-'
 Public Function GetString(ByRef Bytes() As Byte, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As String
     Dim Chars() As Integer
     Dim Range   As ListRange
@@ -784,7 +807,6 @@ End Function
 Private Function GetCharsCore(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, ByRef Chars() As Integer, ByVal CharIndex As Long) As Long
     Dim b           As Byte
     Dim ByteEnd     As Long
-    Dim CharCount   As Long
     Dim Fallback    As DecoderFallbackBuffer
     
     ByteEnd = ByteIndex + ByteCount

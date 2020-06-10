@@ -1,0 +1,42 @@
+@remarks The <i>Format</i> parameter can be either a standard or a custom numeric format string. All standard numeric format strings other than
+"R" (or "r") are supported, as are all custom numeric format characters. If <i>Format</i> is not provided or an empty string (""), the return value for 
+this instance is formatted with the general numeric format specifier ("G").
+<p>The <i>Provider</i> parameter is an object that implements the <a href="IFormatProvider.html">IFormatProvider</a> interface. Its <a href="IFormatProvider.GetFormat.html">GetFormat</a>
+method returns a <a href="NumberFormatInfo.html">NumberFormatInfo</a> object that provides culture-specific information about the format of the string that is returned by this method. 
+The object that implements <a href="IFormatProvider.html">IFormatProvider</a> can be any of the following:</p>
+<ul>
+	<li>A <a href="CultureInfo.html">CultureInfo</a> object that represents the culture whose formatting rules are to be used.</li>
+	<li>A <a href="NumberFormatInfo.html">NumberFormatInfo</a> object that contains specific numeric formatting information for this value.</li>
+	<li>A custom object that implements <a href="IFormatProvider.html">IFormatProvider</a> and whose <a href="IFormatProvider.GetFormat.html">GetFormat</a> method returns a <a href="NumberFormatInfo.html">NumberFormatInfo</a> object that provides formatting information.</li>
+</ul>
+<p>If <i>Provider</i> is <b>Nothing</b> or a <a href="NumberFormatInfo.html">NumberFormatInfo</a> object cannot be obtained from provider, the return value for this instance is formatted with the <a href="NumberFormatInfo.html">NumberFormatInfo</a> for the current culture.</p>
+@exceptions
+<table style="width: auto">
+  <tr>
+      <th>Exception</th>
+      <th>Condition</th>
+  </tr>
+  <tr>
+       <td><a href="FormatException.html">FormatException</a></td><td><i>Format</i> is invalid or not supported.</td>
+  </tr>
+</table>
+@examples The following example displays an <a href="Int64Static.Int64.html">Int64</a> value using the default <b>ToString()</b> method. 
+It also displays the string representations of the <a href="Int64Static.Int64.html">Int64</a> value that results from using a number of standard format specifiers. 
+The examples are displayed using the formatting conventions of the en-US culture.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> Value <span style="color: #0000ff">As</span> Int64
+    
+    Value = CInt64(-16325091)
+    
+    <span style="color: #008000">&#39; Display value with default ToString method.</span>
+    Debug.Print Int64.ToString(Value) <span style="color: #008000">&#39;&#39; Displays -16325091</span>
+    
+    <span style="color: #008000">&#39; Display value using some standard format specifiers.</span>
+    Debug.Print Int64.ToString(Value, <span style="color: #a31515">&quot;G&quot;</span>)  <span style="color: #008000">&#39;&#39; Displays -16325091</span>
+    Debug.Print Int64.ToString(Value, <span style="color: #a31515">&quot;C&quot;</span>)  <span style="color: #008000">&#39;&#39; Displays ($16,325,091.00)</span>
+    Debug.Print Int64.ToString(Value, <span style="color: #a31515">&quot;D&quot;</span>)  <span style="color: #008000">&#39;&#39; Displays -16325091</span>
+    Debug.Print Int64.ToString(Value, <span style="color: #a31515">&quot;F&quot;</span>)  <span style="color: #008000">&#39;&#39; Displays -16325091.00</span>
+    Debug.Print Int64.ToString(Value, <span style="color: #a31515">&quot;N&quot;</span>)  <span style="color: #008000">&#39;&#39; Displays -16,325,091.00</span>
+    Debug.Print Int64.ToString(Value, <span style="color: #a31515">&quot;X&quot;</span>)  <span style="color: #008000">&#39;&#39; Displays FFFFFFFFFF06E61D</span>
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+</pre></div>

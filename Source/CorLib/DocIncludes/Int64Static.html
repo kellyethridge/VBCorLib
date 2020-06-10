@@ -1,0 +1,32 @@
+@examples The example demonstrates mathematical operations using <a href="Int64Static.Int64.html">Int64</a>.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> x <span style="color: #0000ff">As</span> Int64
+    <span style="color: #0000ff">Dim</span> y <span style="color: #0000ff">As</span> Int64
+    <span style="color: #0000ff">Dim</span> r <span style="color: #0000ff">As</span> Int64
+    
+    x = CInt64(55)
+    y = CInt64(500)
+    
+    r = Int64.Add(x, y)
+    PrintOutput <span style="color: #a31515">&quot;+&quot;</span>, x, y, r
+    
+    r = Int64.Subtract(x, y)
+    PrintOutput <span style="color: #a31515">&quot;-&quot;</span>, x, y, r
+    
+    r = Int64.Multiply(x, y)
+    PrintOutput <span style="color: #a31515">&quot;*&quot;</span>, x, y, r
+    
+    r = Int64.Divide(y, x)
+    PrintOutput <span style="color: #a31515">&quot;/&quot;</span>, y, x, r
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> PrintOutput(<span style="color: #0000ff">ByVal</span> Op <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>, <span style="color: #0000ff">ByRef</span> x <span style="color: #0000ff">As</span> Int64, <span style="color: #0000ff">ByRef</span> y <span style="color: #0000ff">As</span> Int64, <span style="color: #0000ff">ByRef</span> r <span style="color: #0000ff">As</span> Int64)
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;{1} {0} {2} = {3}&quot;</span>, Op, x, y, r)
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; This code produces the following.</span>
+<span style="color: #008000">&#39;    55 + 500 = 555</span>
+<span style="color: #008000">&#39;    55 - 500 = -445</span>
+<span style="color: #008000">&#39;    55 * 500 = 27500</span>
+<span style="color: #008000">&#39;    500 / 55 = 9</span>
+</pre></div>

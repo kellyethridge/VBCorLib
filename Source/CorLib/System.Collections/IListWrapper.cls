@@ -42,7 +42,7 @@ Implements ICollection
 Implements IEnumerable
 Implements ICloneable
 Implements IList
-Implements IVersionableCollection
+Implements IVersionable
 
 Private mList       As IList
 Private mComparer   As IComparer
@@ -546,15 +546,15 @@ End Function
 '   IObject Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
-    IObject_Equals = Object.Equals(Me, Value)
+    IObject_Equals = MyBase.Equals(Me, Value)
 End Function
 
 Private Function IObject_GetHashCode() As Long
-    IObject_GetHashCode = ObjPtr(CUnk(Me))
+    IObject_GetHashCode = MyBase.GetHashCode(Me)
 End Function
 
 Private Function IObject_ToString() As String
-    IObject_ToString = Object.ToString(mList, App)
+    IObject_ToString = MyBase.ToString(Me, App)
 End Function
 
 
@@ -661,6 +661,6 @@ End Sub
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   IVersionableCollection
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Property Get IVersionableCollection_CurrentVersion() As Long
-    IVersionableCollection_CurrentVersion = GetCollectionVersion(mList)
+Private Property Get IVersionable_Version() As Long
+    IVersionable_Version = GetCollectionVersion(mList)
 End Property

@@ -1,0 +1,49 @@
+@exceptions
+<table style="width: auto">
+  <tr>
+      <th>Exception</th>
+      <th>Condition</th>
+  </tr>
+  <tr>
+       <td><a href="EndOfStreamException.html">EndOfStreamException</a></td><td>The end of the stream is reached.</td>
+  </tr>
+   <tr>
+       <td><a href="ObjectDisposedException.html">ObjectDisposedException</a></td><td>The stream is closed.</td>
+   </tr>
+   <tr>
+       <td><a href="IOException.html">IOException</a></td><td>An I/O error occurs.</td>
+   </tr>
+</table>
+@examples The following example writes a 32-bit integer value then reads it back one byte at a time using <b>ReadByte</b>.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> Source <span style="color: #0000ff">As</span> <span style="color: #0000ff">New</span> MemoryStream
+    <span style="color: #0000ff">Dim</span> Reader <span style="color: #0000ff">As</span> BinaryReader
+    <span style="color: #0000ff">Dim</span> Writer <span style="color: #0000ff">As</span> BinaryWriter
+    
+    <span style="color: #0000ff">Set</span> Writer = NewBinaryWriter(Source, <span style="color: #0000ff">New</span> UnicodeEncoding)
+    Writer.WriteValue &amp;H80706050    
+    
+    Source.Position = 0
+    
+    <span style="color: #0000ff">Set</span> Reader = NewBinaryReader(Source)
+    
+    PrintByte Reader.ReadByte
+    PrintByte Reader.ReadByte
+    PrintByte Reader.ReadByte
+    PrintByte Reader.ReadByte
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> PrintByte(<span style="color: #0000ff">ByVal</span> Value <span style="color: #0000ff">As</span> <span style="color: #2b91af">Byte</span>)
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;&amp;h{0:X2}&quot;</span>, Value)
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+
+<span style="color: #008000">&#39; This example code produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;   &amp;h50</span>
+<span style="color: #008000">&#39;   &amp;h60</span>
+<span style="color: #008000">&#39;   &amp;h70</span>
+<span style="color: #008000">&#39;   &amp;h80</span>
+</pre></div>
+@see CorString
+@see Constructors

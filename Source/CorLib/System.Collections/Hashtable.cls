@@ -54,19 +54,17 @@ Implements IDictionary
 Implements ICollection
 Implements IEnumerable
 Implements ICloneable
-Implements IVersionableCollection
+Implements IVersionable
 
 Private Const PropCount                 As String = "Count"
 Private Const PropKey                   As String = "Key"
 Private Const PropValueSubtype          As String = "ValueSubType"
 Private Const PropValue                 As String = "Value"
-Private Const PropProvider              As String = "Provider"
 Private Const PropComparer              As String = "Comparer"
 Private Const PropUseDefaultComparer    As String = "UseDefaultComparer"
 Private Const SubtypeNormal             As Long = 0
 Private Const SubtypeEmpty              As Long = 1
 Private Const SubtypeNothing            As Long = 2
-Private Const DefaultCapacity           As Long = 32
 Private Const DefaultLoadFactor         As Single = 1!
 
 Private mLoadFactor     As Single
@@ -892,6 +890,6 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   IVersionableCollection
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Property Get IVersionableCollection_CurrentVersion() As Long
-    IVersionableCollection_CurrentVersion = mVersion
+Private Property Get IVersionable_Version() As Long
+    IVersionable_Version = mVersion
 End Property

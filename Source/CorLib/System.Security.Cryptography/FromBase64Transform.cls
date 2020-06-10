@@ -38,8 +38,8 @@ Attribute VB_Exposed = True
 ''
 ' Transforms data from base-64 to plain text.
 '
-' @remarks This class is used primarily in conjunction with the <b>CryptoStream</b> class and shouldn't
-' be used to process large amounts of data manually. For that use the <b>Convert.FromBase64String</b> method.
+' @remarks This class is used primarily in conjunction with the <a href="CryptoStream.html">CryptoStream</a> class and shouldn't
+' be used to process large amounts of data manually. For that use the <a href="Convert.FromBase64String.html">Convert.FromBase64String</a> method.
 '
 Option Explicit
 Implements IObject

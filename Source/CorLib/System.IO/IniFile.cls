@@ -6,7 +6,7 @@ BEGIN
   DataSourceBehavior  = 0  'vbNone
   MTSTransactionMode  = 0  'NotAnMTSObject
 END
-Attribute VB_Name = "INIFile"
+Attribute VB_Name = "IniFile"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
@@ -52,8 +52,8 @@ Attribute VB_Exposed = True
 ' be created in the Windows directory. In order to specify the current
 ' directory, preceed the file name with a current directory symbol ".".
 ' <pre>
-' Dim ini As IniFile
-' Set ini = NewIniFile(".\local.ini")
+' Dim Ini As IniFile
+' Set Ini = NewIniFile(".\local.ini")
 ' </pre>
 ' </p>
 '
@@ -65,18 +65,12 @@ Implements IObject
 Private mFileName   As String
 Private mAutoFlush  As Boolean
 
-#If False Then
-    Dim IniFile
-#End If
-
 
 ''
 ' Returns the auto-flush state of the object.
 '
-' @Return Returns True if AutoFlush is active, False otherwise.
-' @remarks When AutoFlush is set to True, the object will call Flush
-' after any method that writes to the INI file.
-'
+' @Return <b>True</> if <b>AutoFlush</b> is active, <b>False</b> otherwise.
+' @remarks When <b>AutoFlush</b> is set to <b>True</b>, the object will call <a href="IniFile.Flush.html">Flush</a> after any method that writes to the INI file.
 Public Property Get AutoFlush() As Boolean
     AutoFlush = mAutoFlush
 End Property
@@ -85,16 +79,13 @@ End Property
 ' Sets the auto-flush state of the object.
 '
 ' @param Value The new auto-flush state of the object.
-' @remarks When AutoFlush is set to True, the object will call Flush
-' after any method that writes to the INI file.
-'
+' @remarks When <b>AutoFlush</b> is set to <b>True</b>, the object will call <a href="IniFile.Flush.html">Flush</a> after any method that writes to the INI file.
 Public Property Let AutoFlush(ByVal Value As Boolean)
     mAutoFlush = Value
 End Property
 
 ''
 ' Flushes any cached updates to the INI file.
-'
 Public Sub Flush()
     WritePrivateProfileStringW vbNullString, vbNullString, vbNullString, vbNullString
 End Sub
@@ -103,7 +94,6 @@ End Sub
 ' Returns the name of the INI file being manipulated.
 '
 ' @return The INI file name.
-'
 Public Property Get FileName() As String
     FileName = mFileName
 End Property
@@ -114,10 +104,8 @@ End Property
 ' @param Section The INI section within the file to set the value.
 ' @param Key The name of the value to be set.
 ' @param Value The value to be set in the INI file.
-' @remarks If an object is passed in, then it must implement the <b>cObject</b>
-' interface or an exception will be thrown. All other datatypes will be converted
-' to their normal string value.
-'
+' @remarks If an object is passed in, then it must implement the <a href="IObject.html">IObject</a>
+' interface or an exception will be thrown. All other datatypes will be converted to their normal string value.
 Public Sub SetValue(ByRef Section As String, ByRef Key As String, ByRef Value As Variant)
     If Len(Section) = 0 Then _
         Error.Argument Argument_EmptyIniSection
@@ -143,9 +131,7 @@ End Sub
 ' @param Section The section within the INI file to search for the key.
 ' @param Key The key in the section of an INI file to retrieve the value of.
 ' @param Default The default value to return if the key is not found in the section.
-' <p>An empty string is a valid value in an INI file. Testing for an empty string
-' does not mean the value was not found.</p>
-'
+' <p>An empty string is a valid value in an INI file. Testing for an empty string does not mean the value was not found.</p>
 Public Function GetString(ByRef Section As String, ByRef Key As String, Optional ByVal Default As String) As String
     If Len(Section) = 0 Then _
         Error.Argument Argument_EmptyIniSection
@@ -170,15 +156,13 @@ Public Function GetString(ByRef Section As String, ByRef Key As String, Optional
 End Function
 
 ''
-' Returns a Long value from the specified key in the specified section of an INI file.
+' Returns a <b>Long</b> value from the specified key in the specified section of an INI file.
 '
 ' @param Section The section within the INI file to search for the key.
 ' @param Key The key in the section of an INI file to retrieve the value of.
-' @param Default The default value to return if the key is not found in the section, or
-' the value could not be converted to a Long.
-' @remarks An INI file contains all values as Strings. The value is converted back
-' into a Long using the CLng function. If an error happens, then the default is returned.
-'
+' @param Default The default value to return if the key is not found in the section, or the value could not be converted to a <b>Long</b>.
+' @remarks An INI file contains all values as strings. The value is converted back
+' into a <b>Long</b> using the <b>CLng</b> function. If an error occurs, then the default is returned.
 Public Function GetInt32(ByRef Section As String, ByRef Key As String, Optional ByVal Default As Long) As Long
     On Error GoTo Catch
     GetInt32 = CLng(GetString(Section, Key))
@@ -189,15 +173,13 @@ Catch:
 End Function
 
 ''
-' Returns a Integer value from the specified key in the specified section of an INI file.
+' Returns a <b>Integer</b> value from the specified key in the specified section of an INI file.
 '
 ' @param Section The section within the INI file to search for the key.
 ' @param Key The key in the section of an INI file to retrieve the value of.
-' @param Default The default value to return if the key is not found in the section, or
-' the value could not be converted to an Integer.
-' @remarks An INI file contains all values as Strings. The value is converted back
-' into an Integer using the CInt function. If an error happens, then the default is returned.
-'
+' @param Default The default value to return if the key is not found in the section, or the value could not be converted to an <b>Integer</b>.
+' @remarks An INI file contains all values as strings. The value is converted back
+' into an <b>Integer</b> using the <b>CInt</b> function. If an error occurs, then the default is returned.
 Public Function GetInt16(ByRef Section As String, ByRef Key As String, Optional ByVal Default As Integer) As Integer
     On Error GoTo Catch
     GetInt16 = CInt(GetString(Section, Key))
@@ -208,15 +190,13 @@ Catch:
 End Function
 
 ''
-' Returns a Byte value from the specified key in the specified section of an INI file.
+' Returns a <b>Byte</b> value from the specified key in the specified section of an INI file.
 '
 ' @param Section The section within the INI file to search for the key.
 ' @param Key The key in the section of an INI file to retrieve the value of.
-' @param Default The default value to return if the key is not found in the section, or
-' the value could not be converted to a Byte.
-' @remarks An INI file contains all values as Strings. The value is converted back
-' into a Byte using the CByte function. If an error happens, then the default is returned.
-'
+' @param Default The default value to return if the key is not found in the section, or the value could not be converted to a <b>Byte</b>.
+' @remarks An INI file contains all values as strings. The value is converted back
+' into a <b>Byte</b> using the <b>CByte</b> function. If an error occurs, then the default is returned.
 Public Function GetByte(ByRef Section As String, ByRef Key As String, Optional ByVal Default As Byte) As Byte
     On Error GoTo Catch
     GetByte = CByte(GetString(Section, Key))
@@ -227,15 +207,13 @@ Catch:
 End Function
 
 ''
-' Returns a Boolean value from the specified key in the specified section of an INI file.
+' Returns a <b>Boolean</b> value from the specified key in the specified section of an INI file.
 '
 ' @param Section The section within the INI file to search for the key.
 ' @param Key The key in the section of an INI file to retrieve the value of.
-' @param Default The default value to return if the key is not found in the section, or
-' the value could not be converted to a Boolean.
-' @remarks An INI file contains all values as Strings. The value is converted back
-' into a Boolean using the CBool function. If an error happens, then the default is returned.
-'
+' @param Default The default value to return if the key is not found in the section, or the value could not be converted to a <b>Boolean</b>.
+' @remarks An INI file contains all values as strings. The value is converted back
+' into a <b>Boolean</b> using the <b>CBool</b> function. If an error occurs, then the default is returned.
 Public Function GetBoolean(ByRef Section As String, ByRef Key As String, Optional ByVal Default As Boolean) As Boolean
     On Error GoTo Catch
     GetBoolean = CBool(GetString(Section, Key))
@@ -246,15 +224,13 @@ Catch:
 End Function
 
 ''
-' Returns a Date value from the specified key in the specified section of an INI file.
+' Returns a <b>Date</b> value from the specified key in the specified section of an INI file.
 '
 ' @param Section The section within the INI file to search for the key.
 ' @param Key The key in the section of an INI file to retrieve the value of.
-' @param Default The default value to return if the key is not found in the section, or
-' the value could not be converted to a Date.
-' @remarks An INI file contains all values as Strings. The value is converted back
-' into a Date using the CDate function. If an error happens, then the default is returned.
-'
+' @param Default The default value to return if the key is not found in the section, or the value could not be converted to a <b>Date</b>.
+' @remarks An INI file contains all values as strings. The value is converted back
+' into a <b>Date</b> using the <b>CDate</b> function. If an error occurs, then the default is returned.
 Public Function GetDate(ByRef Section As String, ByRef Key As String, Optional ByVal Default As Date) As Date
     On Error GoTo Catch
     GetDate = CDate(GetString(Section, Key))
@@ -265,15 +241,13 @@ Catch:
 End Function
 
 ''
-' Returns a Double value from the specified key in the specified section of an INI file.
+' Returns a <b>Double</b> value from the specified key in the specified section of an INI file.
 '
 ' @param Section The section within the INI file to search for the key.
 ' @param Key The key in the section of an INI file to retrieve the value of.
-' @param Default The default value to return if the key is not found in the section, or
-' the value could not be converted to a Double.
-' @remarks An INI file contains all values as Strings. The value is converted back
-' into a Double using the CDbl function. If an error happens, then the default is returned.
-'
+' @param Default The default value to return if the key is not found in the section, or the value could not be converted to a <b>Double</b>.
+' @remarks An INI file contains all values as strings. The value is converted back
+' into a <b>Double</b> using the <b>CDbl</b> function. If an error occurs, then the default is returned.
 Public Function GetDouble(ByRef Section As String, ByRef Key As String, Optional ByVal Default As Double) As Double
     On Error GoTo Catch
     GetDouble = CDbl(GetString(Section, Key))
@@ -284,15 +258,13 @@ Catch:
 End Function
 
 ''
-' Returns a Single value from the specified key in the specified section of an INI file.
+' Returns a <b>Single</b> value from the specified key in the specified section of an INI file.
 '
 ' @param Section The section within the INI file to search for the key.
 ' @param Key The key in the section of an INI file to retrieve the value of.
-' @param Default The default value to return if the key is not found in the section, or
-' the value could not be converted to a Single.
-' @remarks An INI file contains all values as Strings. The value is converted back
-' into a Single using the CSng function. If an error happens, then the default is returned.
-'
+' @param Default The default value to return if the key is not found in the section, or the value could not be converted to a <b>Single</b>.
+' @remarks An INI file contains all values as strings. The value is converted back
+' into a <b>Single</b> using the <b>CSng</b> function. If an error occurs, then the default is returned.
 Public Function GetSingle(ByRef Section As String, ByRef Key As String, Optional ByVal Default As Single) As Single
     On Error GoTo Catch
     GetSingle = CSng(GetString(Section, Key))
@@ -303,15 +275,13 @@ Catch:
 End Function
 
 ''
-' Returns a Currency value from the specified key in the specified section of an INI file.
+' Returns a <b>Currency</b> value from the specified key in the specified section of an INI file.
 '
 ' @param Section The section within the INI file to search for the key.
 ' @param Key The key in the section of an INI file to retrieve the value of.
-' @param Default The default value to return if the key is not found in the section, or
-' the value could not be converted to a Currency.
-' @remarks An INI file contains all values as Strings. The value is converted back
-' into a Currency using the CCur function. If an error happens, then the default is returned.
-'
+' @param Default The default value to return if the key is not found in the section, or the value could not be converted to a <b>Currency</b>.
+' @remarks An INI file contains all values as strings. The value is converted back
+' into a <b>Currency</b> using the <b>CCur</b> function. If an error occurs, then the default is returned.
 Public Function GetCurrency(ByVal Section As String, ByVal Key As String, Optional ByVal Default As Currency) As Currency
     On Error GoTo Catch
     GetCurrency = CCur(GetString(Section, Key))
@@ -322,15 +292,13 @@ Catch:
 End Function
 
 ''
-' Returns a Decimal value from the specified key in the specified section of an INI file.
+' Returns a <b>Decimal</b> value from the specified key in the specified section of an INI file.
 '
 ' @param Section The section within the INI file to search for the key.
 ' @param Key The key in the section of an INI file to retrieve the value of.
-' @param Default The default value to return if the key is not found in the section, or
-' the value could not be converted to a Decimal.
-' @remarks An INI file contains all values as Strings. The value is converted back
-' into a Decimal using the CDec function. If an error happens, then the default is returned.
-'
+' @param Default The default value to return if the key is not found in the section, or the value could not be converted to a <b>Decimal</b>.
+' @remarks An INI file contains all values as strings. The value is converted back
+' into a <b>Decimal</b> using the <b>CDec</b> function. If an error occurs, then the default is returned.
 Public Function GetDecimal(ByRef Section As String, ByRef Key As String, Optional ByRef Default As Variant) As Variant
     Dim DecimalDefault As Variant
     
@@ -349,16 +317,14 @@ Catch:
 End Function
 
 ''
-' Returns a CorDateTime value from the specified key in the specified section of an INI file.
+' Returns a <a href="CorDateTime.html">CorDateTime</a> value from the specified key in the specified section of an INI file.
 '
 ' @param Section The section within the INI file to search for the key.
 ' @param Key The key in the section of an INI file to retrieve the value of.
-' @param Default The default value to return if the key is not found in the section, or
-' the value could not be converted to a CorDateTime.
-' @remarks An INI file contains all values as Strings. The value is converted back
-' into a CorDateTime using the Cor.NewDate function. If an error happens, then the default is returned.
-' </p>Passing in Nothing as the default will return a <b>CorDateTime</b> of #12:00:00 AM# for the default.</p>
-'
+' @param Default The default value to return if the key is not found in the section, or the value could not be converted to a <a href="CorDateTime.html">CorDateTime</a>.
+' @remarks An INI file contains all values as strings. The value is converted back
+' into a <a href="CorDateTime.html">CorDateTime</a> using the <a href="CorDateTimeStatic.TryParse.html">CorDateTime.TryParse</a> function. If an error occurs, then the default is returned.
+' </p>Passing in <b>Nothing</b> as the default will return <a href="CorDateTimeStatic.get.MinValue.html">CorDateTime.MinValue</a>.</p>
 Public Function GetDateTime(ByRef Section As String, ByRef Key As String, Optional ByVal Default As CorDateTime) As CorDateTime
     Dim s As String
     s = GetString(Section, Key)
@@ -369,25 +335,22 @@ Public Function GetDateTime(ByRef Section As String, ByRef Key As String, Option
 End Function
 
 ''
-' Returns a TimeSpan value from the specified key in the specified section of an INI file.
+' Returns a <a href="TimeSpan.html">TimeSpan</a> value from the specified key in the specified section of an INI file.
 '
 ' @param Section The section within the INI file to search for the key.
 ' @param Key The key in the section of an INI file to retrieve the value of.
-' @param Default The default value to return if the key is not found in the section, or
-' the value could not be converted to a TimeSpan.
-' @remarks An INI file contains all values as Strings. The value is converted back
-' into a TimeSpan by first testing if the string is a date and taking the Time
-' portion, otherwise, the normal TimeSpan.Parse method is used. This expects the
-' string to be in the TimeSpan format. If an error happens, then the default is returned.
-' <p>Passing in Nothing for the default will return <b>TimeSpan.Zero</b> for the default.</p>
-'
+' @param Default The default value to return if the key is not found in the section, or the value could not be converted to a <a href="TimeSpan.html">TimeSpan</a>.
+' @remarks An INI file contains all values as strings. The value is converted back
+' into a <a href="TimeSpan.html">TimeSpan</a> by first attempting to parse the string as a <a href="TimeSpan.html">TimeSpan</a> object. If that
+' fails, an attempt is made by testing for a <b>Date</b> value and retrieving the time portion. If an error occurs, then the default is returned.
+' <p>Passing in <b>Nothing</b> for the default will return <a href="TimeSpanStatic.get.Zero.html">TimeSpan.Zero</b> for the default.</p>
 Public Function GetTimeSpan(ByRef Section As String, ByRef Key As String, Optional ByVal Default As TimeSpan) As TimeSpan
     Dim s As String
     s = GetString(Section, Key)
     
     If Not TimeSpan.TryParse(s, GetTimeSpan) Then
         If IsDate(s) Then
-            Set GetTimeSpan = TimeSpan.FromDate(s)
+            Set GetTimeSpan = TimeSpan.FromDate(CDate(s))
         Else
             Set GetTimeSpan = IfObject(Default, TimeSpan.Zero)
         End If
@@ -398,7 +361,6 @@ End Function
 ' Returns a list of section names in an INI file.
 '
 ' @return An array of section names, or a zero-length array if no sections exist.
-'
 Public Function GetSectionNames() As String()
     GetSectionNames = GetList(vbNullString)
 End Function
@@ -408,7 +370,6 @@ End Function
 '
 ' @param Section The section within an INI file to retrieve key names.
 ' @return An array of key names from a section, or a zero-length array if no keys exist in the section.
-'
 Public Function GetKeyNames(ByRef Section As String) As String()
     If Len(Section) = 0 Then _
         Error.Argument Argument_EmptyIniSection
@@ -421,7 +382,6 @@ End Function
 '
 ' @param Section The section the key-value pair is to be deleted from.
 ' @param Key The key of the key-value pair to be deleted.
-'
 Public Sub DeleteKey(ByRef Section As String, ByRef Key As String)
     If Len(Section) = 0 Then _
         Error.Argument Argument_EmptyIniSection
@@ -440,7 +400,6 @@ End Sub
 ' Deletes an entire section from an INI file, including all key-value pairs.
 '
 ' @param Section The name of the section to be deleted from an INI file.
-'
 Public Sub DeleteSection(ByRef Section As String)
     If Len(Section) = 0 Then _
         Error.Argument Argument_EmptyIniSection
@@ -454,17 +413,18 @@ Public Sub DeleteSection(ByRef Section As String)
 End Sub
 
 ''
-' Returns an IDictionary object containing the key-value pairs from a section in an INI file.
+' Returns an <a href="IDictionary.html">IDictionary</a> object containing the key-value pairs from a section in an INI file.
 '
 ' @param Section The section to retrieve all the key-value pairs from.
-' @return An IDictionary object containing zero or more key-value pairs.
-'
+' @return An <a href="IDictionary.html">IDictionary</a> object containing zero or more key-value pairs.
 Public Function GetValues(ByRef Section As String) As IDictionary
     If Len(Section) = 0 Then _
         Error.Argument Argument_EmptyIniSection
     
     Dim Buf     As String
     Dim Size    As Long
+    Dim Values  As Hashtable
+    
     Size = 16384
     
     Do
@@ -473,7 +433,6 @@ Public Function GetValues(ByRef Section As String) As IDictionary
         Size = GetPrivateProfileSectionW(Section, Buf, Size, mFileName)
     Loop While Size = Len(Buf) - 2
     
-    Dim Values As Hashtable
     Set Values = Cor.NewHashtable(EqualityComparer:=StringComparer.OrdinalIgnoreCase)
     
     If Size > 0 Then
@@ -515,8 +474,7 @@ Public Function ToString() As String
 End Function
 
 ''
-' Returns a boolean indicating if the value and this object
-' instance are the same instance.
+' Returns a boolean indicating if the value and this object instance are the same instance.
 '
 ' @param value The value to compare equalit to.
 ' @return Boolean indicating equality.

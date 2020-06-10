@@ -83,6 +83,7 @@ Public Enum ResourceStringKey
     Arg_InvalidSearchPattern = 244
     Arg_MustBeDateTime = 245
     Arg_UnsupportedResourceType = 246
+    Arg_TypeNotSupported = 247
     
     Argument_MultiDimNotSupported = 105
     Argument_InvalidOffLen = 800
@@ -158,6 +159,13 @@ Public Enum ResourceStringKey
     Argument_StringZeroLength = 879
     Argument_EmptyIniSection = 880
     Argument_EmptyIniKey = 881
+    Argument_MapNameEmptyString = 882
+    Argument_NewMMFAppendModeNotAllowed = 883
+    Argument_NewMMFWriteAccessNotAllowed = 884
+    Argument_EmptyFile = 885
+    Argument_NotEnoughBytesToRead = 886
+    Argument_InvalidStructure = 887
+    Argument_ReadAccessWithLargeCapacity = 888
     
     ArgumentNull_Array = 900
     ArgumentNull_Buffer = 901
@@ -214,6 +222,15 @@ Public Enum ResourceStringKey
     ArgumentOutOfRange_BadYearMonthDay = 744
     ArgumentOutOfRange_AddValue = 745
     ArgumentOutOfRange_Era = 746
+    ArgumentOutOfRange_PositiveOrDefaultCapacityRequired = 747
+    ArgumentOutOfRange_CapacityGEFileSizeRequired = 748
+    ArgumentOutOfRange_PositiveOrDefaultSizeRequired = 749
+    ArgumentOutOfRange_CapacityLargerThanLogicalAddressSpaceNotAllowed = 750
+    ArgumentOutOfRange_PositionLessThanCapacityRequired = 751
+    ArgumentOutOfRange_StreamLength = 752
+    ArgumentOutOfRange_NegativeCount = 753
+    ArgumentOutOfRange_OffsetLength = 754
+    ArgumentOutOfRange_InvalidUTF32 = 755
     
     IOException_Exception = 400 '?
     IO_AlreadyExists_Name = 401 '?
@@ -255,11 +272,16 @@ Public Enum ResourceStringKey
     Format_GuidUnrecognized = 605
     Format_UnrecognizedEscapeSequence = 606
     Format_ParseBigInteger = 607
+    Format_BadQuote = 608
+    Format_IndexOutOfRange = 609
+    Format_BadFormatSpecifier = 610
     
     IndexOutOfRange_Dimension = 300
     IndexOutOfRange_ArrayBounds = 301
     
     InvalidCast_FromTo = 1400
+    InvalidCast_DownCastArrayElement = 1401
+    InvalidCast_IComparer = 1402
     
     InvalidOperation_EmptyStack = 1100
     InvalidOperation_EnumNotStarted = 1101
@@ -283,6 +305,10 @@ Public Enum ResourceStringKey
     NotSupported_UnreadableStream = 1004
     NotSupported_UnseekableStream = 1005
     NotSupported_FileStreamOnNonFiles = 1006
+    NotSupported_Reading = 1007
+    NotSupported_Writing = 1008
+    NotSupported_MMViewStreamsFixedLength = 1009
+    NotSupported_StringComparison = 1010
     
     ObjectDisposed_StreamClosed = 1200
     ObjectDisposed_FileNotOpen = 1201
@@ -292,6 +318,7 @@ Public Enum ResourceStringKey
     ObjectDisposed_RegKeyClosed = 1205
     
     Overflow_TimeSpan = 1300
+    Overflow_Int64 = 1301
     
     UnknownError_Num = 1500
     
@@ -381,11 +408,14 @@ Public Enum ParameterName
     NameOfRgb = 2038
     NameOfKeyBlob = 2039
     NameOfArrayIndex = 2040
+    NameOfDestination = 2041
+    NameOfa = 2042
+    NameOfb = 2043
 End Enum
 
 Private Declare Function DeleteObject Lib "gdi32.dll" (ByVal hObject As Long) As Long
-Private Declare Function GetDC Lib "user32.dll" (ByVal Hwnd As Long) As Long
-Private Declare Function ReleaseDC Lib "user32.dll" (ByVal Hwnd As Long, ByVal hdc As Long) As Long
+Private Declare Function GetDC Lib "user32.dll" (ByVal hwnd As Long) As Long
+Private Declare Function ReleaseDC Lib "user32.dll" (ByVal hwnd As Long, ByVal hdc As Long) As Long
 Private Declare Function GetDIBits Lib "gdi32.dll" (ByVal aHDC As Long, ByVal hBitmap As Long, ByVal nStartScan As Long, ByVal nNumScans As Long, ByRef lpBits As Any, ByRef lpBI As BITMAPINFO, ByVal wUsage As Long) As Long
 
 Public Type BITMAPINFOHEADER

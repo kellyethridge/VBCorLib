@@ -64,113 +64,150 @@ Private mRevision   As Long
 
 
 ''
-' Returns the major version number of this instance.
+' Gets the value of the major component of the version number for the current <a href="Version.html">Version</a> object.
 '
-' @return The major version number. This is a non-negative number.
-'
+' @return The major version number.
 Public Property Get Major() As Long
     Major = mMajor
 End Property
 
 ''
-' Returns the minor version number of this instance.
+' Gets the value of the minor component of the version number for the current <a href="Version.html">Version</a> object.
 '
-' @return The minor version number. This is a non-negative number.
-'
+' @return The minor version number.
 Public Property Get Minor() As Long
     Minor = mMinor
 End Property
 
 ''
-' Returns the build version number of this instance.
+' Gets the value of the build component of the version number for the current <a href="Version.html">Version</a> object.
 '
-' @return The build version number.
-' @remarks The build version is an optional tracking number. If the number
-' was not used when this instance was created, then -1 is returned.
-'
+' @return The build number, or -1 if the build number is undefined.
+' @remarks For example, if the version number is 6.2.1.3, the build number is 1. If the version number is 6.2, the build number is undefined.
 Public Property Get Build() As Long
     Build = mBuild
 End Property
 
 ''
-' Returns the revision version number of this instance.
+' Gets the value of the revision component of the version number for the current <a href="Version.html">Version</a> object.
 '
-' @return The revision version number.
-' @remarks The build version is an optional tracking number. If the number
-' was not used when this instance was created, then -1 is returned.
-'
+' @return The revision number, or -1 if the revision number is undefined.
+' @remarks For example, if the version number is 6.2.1.3, the revision number is 3. If the version number is 6.2, the revision number is undefined.
 Public Property Get Revision() As Long
     Revision = mRevision
 End Property
 
 ''
-' Returns a minor revision value.
+' Gets the low 16 bits of the revision number.
 '
-' @return Minor revision number.
-' @remarks The minor revision is the lower 16-bits of the
-' standard revision value.
-'
-Public Property Get MinorRevision() As Long
-    MinorRevision = mRevision And &HFFFF&
+' @return A 16-bit signed integer.
+Public Property Get MinorRevision() As Integer
+    MinorRevision = AsWord(mRevision)
 End Property
 
 ''
-' Returns the major revision value.
+' Gets the high 16 bits of the revision number.
 '
-' @return Major revision number.
-' @remarks The major revision number is the upper 16-bits
-' of the standard revision value.
-'
-Public Property Get MajorRevision() As Long
+' @return A 16-bit signed integer.
+Public Property Get MajorRevision() As Integer
     MajorRevision = Helper.ShiftRight(mRevision, 16)
 End Property
 
 ''
-' Returns a cloned object of this instance.
+' Returns a new <a href="Version.html">Version</a> object whose value is the same as the current <a href="Version.html">Version</a> object.
 '
-' @return The cloned version of this instanced.
-'
+' @return A new object whose values are a copy of the current <a href="Version.html">Version</a> object.
 Public Function Clone() As Version
     Set Clone = New Version
     Clone.InitClone mMajor, mMinor, mBuild, mRevision
 End Function
 
 ''
-' Compares this instance to a passed in value.
+' Compares the current <a href="Version.html">Version</a> object to a specified <a href="Version.html">Version</a> object and returns an indication of their relative values.
 '
-' @param value The value to compare this instance against.
-' @return Value indicating the relation of this instance to the passed in value.
-' @remarks A negative number indicates this instance is less than the value.
-' A positive number indicates this instance is greater than the value.
-' Zero indicates this instance is equal to the value.
-'
-Public Function CompareTo(ByRef Value As Variant) As Long
-    If Not IsObject(Value) Then _
-        Error.Argument Argument_VersionRequired, "Value"
-        
+' @param value A <a href="Version.html">Version</a> object to compare to the current <a href="Version.html">Version</a> object, or <b>Nothing</b>.
+' @return A signed integer that indicates the relative values of the two objects, as shown in the following table.
+' <table style="width: auto">
+'   <tr>
+'       <th>Value</th>
+'       <th>Meaning</th>
+'   </tr>
+'   <tr>
+'        <td>Less than zero</td><td>The current <a href="Version.html">Version</a> object is a version before <i>Value</i>.</td>
+'   </tr>
+'    <tr>
+'        <td>Zero</td><td>The current <a href="Version.html">Version</a> object is the same version as <i>Value</i>.</td>
+'    </tr>
+'    <tr>
+'        <td>
+'           Greater than zero</td><td>The current <a href="Version.html">Version</a> object is a version subsequent to <i>Value</i>.<br/>
+'           -or-<br/>
+'           <i>Value</i> is <b>Nothing</b>.
+'        </td>
+'    </tr>
+' </table>
+' @remarks The components of <b>Version</b> in decreasing order of importance are: major, minor, build, and revision. An unknown component is assumed to be older than any known component. For example:
+' <ul>
+'   <li>Version 1.1 is older than version 1.1.0.</li>
+'   <li>Version 1.1 is older than version 1.1.1.</li>
+'   <li>Version 1.1 is older than version 1.1.2.3.</li>
+'   <li>Version 1.1.2 is older than version 1.1.2.4.</li>
+'   <li>Version 1.2.5 is newer than version 1.2.3.4.</li>
+' </ul>
+Public Function CompareTo(ByVal Value As Version) As Long
     If Value Is Nothing Then
         CompareTo = 1
         Exit Function
     End If
     
-    If Not TypeOf Value Is Version Then _
-        Error.Argument Argument_VersionRequired, "Value"
-
-    Dim Other As Version
-    Set Other = Value
-    
-    If Not EqualFields(mMajor, Other.Major, CompareTo) Then Exit Function
-    If Not EqualFields(mMinor, Other.Minor, CompareTo) Then Exit Function
-    If Not EqualFields(mBuild, Other.Build, CompareTo) Then Exit Function
-    If Not EqualFields(mRevision, Other.Revision, CompareTo) Then Exit Function
+    If Not EqualFields(mMajor, Value.Major, CompareTo) Then Exit Function
+    If Not EqualFields(mMinor, Value.Minor, CompareTo) Then Exit Function
+    If Not EqualFields(mBuild, Value.Build, CompareTo) Then Exit Function
+    If Not EqualFields(mRevision, Value.Revision, CompareTo) Then Exit Function
 End Function
 
 ''
-' Returns a string representation of this object instance.
+' Converts the value of the current <a href="Version.html">Version</a> object to its equivalent string representation. A specified count indicates the number of components to return.
 '
-' @param FieldCount The number of fields to be included in the result string.
-' @return String representing this instance in the form of Major.Minor[.Build[.Revision]]
-'
+' @param FieldCount The number of components to return. The <i>FieldCount</i> ranges from 0 to 4.
+' @return The string representation of the values of the major, minor, build, and revision components of the current <a href="Version.html">Version</a> object, each separated by a period character ('.'). The <i>FieldCount</i> parameter determines how many components are returned.
+' <table style="width: auto">
+'   <tr>
+'       <th>FieldCount</th>
+'       <th>Return Value</th>
+'   </tr>
+'   <tr>
+'        <td>0</td><td>An empty string ("").</td>
+'   </tr>
+'    <tr>
+'        <td>1</td><td>Major</td>
+'    </tr>
+'    <tr>
+'        <td>2</td><td>Major.Minor</td>
+'    </tr>
+'    <tr>
+'        <td>3</td><td>Major.Minor.Build</td>
+'    </tr>
+'    <tr>
+'        <td>4</td><td>Major.Minor.Build.Revision</td>
+'    </tr>
+' </table>
+' For example, if you create <a href="Version.html">Version</a> object using the constructor <code>Version(1,3,5)</code>, <code>ToString(2)</code> returns "1.3" and <code>ToString(4)</code> throws an exception.
+' <h4>Exceptions</h4>
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ArgumentException.html">ArgumentException</a></td>
+'        <td>
+'           <i>FieldCount</i> is less than zero, or more than four.<br/>
+'           -or-<br/>
+'           <i>FieldCount</i> is more than the number of components defined in the current <a href="Version.html">Version</a> object.
+'        </td>
+'   </tr>
+' </table>
 Public Function ToString(Optional ByRef FieldCount As Variant) As String
     Dim Count       As Long
     Dim MaxCount    As Long
@@ -199,12 +236,10 @@ Public Function ToString(Optional ByRef FieldCount As Variant) As String
 End Function
 
 ''
-' Returns a boolean indicating if the value and this object
-' instance are the same instance.
+' Returns a value indicating whether the current <a href="Version.html">Version</a> object and a specified <a href="Version.html">Version</a> object represent the same value.
 '
-' @param value The value to compare equality to.
-' @return Boolean indicating equality.
-'
+' @param value A <a href="Version.html">Version</a> object to compare to the current <a href="Version.html">Version</a> object, or <b>Nothing</b>.
+' @return <b>True</b> if every component of the current <a href="Version.html">Version</a> object matches the corresponding component of the <i>Value</i> parameter; otherwise, <b>False</b>.
 Public Function Equals(ByRef Value As Variant) As Boolean
     If IsObject(Value) Then
         If Value Is Nothing Then
@@ -218,10 +253,9 @@ Public Function Equals(ByRef Value As Variant) As Boolean
 End Function
 
 ''
-' Returns a pseudo-unique number identifying this instance.
+' Returns a hash code for the current <a href="Version.html">Version</a> object.
 '
-' @return Pseudo-unique number identifying this instance.
-'
+' @return A 32-bit signed integer hash code.
 Public Function GetHashCode() As Long
     Dim Result As Long
     Result = Helper.ShiftLeft(mMajor, 24)
@@ -230,26 +264,56 @@ Public Function GetHashCode() As Long
     GetHashCode = Result Or (mRevision And &HFF&)
 End Function
 
+''
+' Determines whether two specified Version objects are equal.
+'
+' @param Value The <a href="Version.html">Version</a> object to test equality against.
+' @return <b>True</b> if every component of the current <a href="Version.html">Version</a> object matches the corresponding component of the <i>Value</i> parameter; otherwise, <b>False</b>.
 Public Function EqualTo(ByVal Value As Version) As Boolean
     EqualTo = (CompareTo(Value) = 0)
 End Function
 
+''
+' Determines whether the current <a href="Version.html">Version</a> object is less than the specified <a href="Version.html">Version</a> object.
+'
+' @param Value The <a href="Version.html">Version</a> object to test the relationship against.
+' @return <b>True</b> if the current <a href="Version.html">Version</a> object is less than <i>Value</i>; otherwise, <b>False</b>.
 Public Function LessThan(ByVal Value As Version) As Boolean
     LessThan = (CompareTo(Value) < 0)
 End Function
 
+''
+' Determines whether the current <a href="Version.html">Version</a> object is less than or equal to the specified <a href="Version.html">Version</a> object.
+'
+' @param Value The <a href="Version.html">Version</a> object to test the relationship against.
+' @return <b>True</b> if the current <a href="Version.html">Version</a> object is less than or equal to <i>Value</i>; otherwise, <b>False</b>.
 Public Function LessThanOrEqualTo(ByVal Value As Version) As Boolean
     LessThanOrEqualTo = (CompareTo(Value) <= 0)
 End Function
 
+''
+' Determines whether the current <a href="Version.html">Version</a> object is greater than the specified <a href="Version.html">Version</a> object.
+'
+' @param Value The <a href="Version.html">Version</a> object to test the relationship against.
+' @return <b>True</b> if the current <a href="Version.html">Version</a> object is greater than <i>Value</i>; otherwise, <b>False</b>.
 Public Function GreaterThan(ByVal Value As Version) As Boolean
     GreaterThan = Not LessThanOrEqualTo(Value)
 End Function
 
+''
+' Determines whether the current <a href="Version.html">Version</a> object is greater than or equal to the specified <a href="Version.html">Version</a> object.
+'
+' @param Value The <a href="Version.html">Version</a> object to test the relationship against.
+' @return <b>True</b> if the current <a href="Version.html">Version</a> object is greater than or equal to <i>Value</i>; otherwise, <b>False</b>.
 Public Function GreaterThanOrEqualTo(ByVal Value As Version) As Boolean
     GreaterThanOrEqualTo = Not LessThan(Value)
 End Function
 
+''
+' Determines whether the current <a href="Version.html">Version</a> object is not equal to the specified <a href="Version.html">Version</a> object.
+'
+' @param Value The <a href="Version.html">Version</a> object to test the relationship against.
+' @return <b>True</b> if the current <a href="Version.html">Version</a> object is not equal to <i>Value</i>; otherwise, <b>False</b>.
 Public Function NotEqualTo(ByVal Value As Version) As Boolean
     NotEqualTo = Not EqualTo(Value)
 End Function

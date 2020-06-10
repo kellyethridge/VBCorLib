@@ -556,9 +556,8 @@ End Function
 ' Calculates the leap month for a specified year and era.
 '
 ' @param Year A year.
-' @param An era.
+' @param Era An era.
 ' @return A positive integer that indicates the leap month in the specified year and era. The return value is 7 if the <i>Year</i> and <i>Era</i> parameters specify a leap year, or 0 if the year is not a leap year.
-'
 Public Function GetLeapMonth(ByVal Year As Long, Optional ByRef Era As Variant) As Long
     If IsLeapYear(Year, Era) Then
         GetLeapMonth = 7
@@ -686,15 +685,15 @@ Private Function GetDaysToHebrewYear(ByVal Year As Long) As Long
     Dim Hours       As Long
     Dim Days        As Long
     Dim TotalDays   As Long
-    Dim R           As Long
+    Dim r           As Long
     
     ' months before the specified year.
     Months = ((Year * 235 - 234) \ 19)
     
     ' get the day and parts of a day in the remaining month.
     Days = Months \ PartsPerHour
-    R = Months - (Days * PartsPerHour)
-    Parts = (R * 793) + 204
+    r = Months - (Days * PartsPerHour)
+    Parts = (r * 793) + 204
     
     ' calculate the total days
     Hours = (Months * 12) + 11 + (Days * 793) + (Parts \ PartsPerHour)
@@ -840,12 +839,6 @@ Private Sub GetDateParts(ByVal ms As Currency, ByVal DatePart As DatePartPrecisi
     
     DayOfYear = FixedDays - GetFixedDaysFromParts(Year, 7, 1) + 1
 End Sub
-
-Private Function GetFixedDays(ByRef Time As Variant) As Long
-    Dim ms As Currency
-    ms = CorDateTime.GetTotalMilliseconds(Time)
-    GetFixedDays = Int(ms / MilliSecondsPerDay) + 1
-End Function
 
 Private Function GetFixedDaysFromParts(ByVal Year As Long, ByVal Month As Long, ByVal Day As Long) As Long
     Dim i           As Long

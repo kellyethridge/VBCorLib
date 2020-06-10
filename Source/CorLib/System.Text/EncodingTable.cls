@@ -151,7 +151,7 @@ Private Sub LoadData()
     Dim Reader          As BinaryReader
     Dim NumEncodings    As Long
     
-    Data = LoadResData(101, "ENCODINGDATA")
+    Data = LoadResData(101, "ENCODINGINFO")
     Set ms = Cor.NewMemoryStream(Data, Writable:=False)
     Set Reader = Cor.NewBinaryReader(ms)
     NumEncodings = Reader.ReadInt32

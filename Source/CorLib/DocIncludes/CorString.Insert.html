@@ -1,0 +1,44 @@
+@remarks If <i>StartIndex</i> is equal to the length of <i>s</i>, value is appended to the end of <i>s</i>.
+<table style="width: auto">
+	<tr>
+		<th>Note</th>
+	</tr>
+	<td>This method does not modify the value of <i>s</i>. Instead, it returns a new string in which <i>Value</i> is inserted into <i>s</i>.</td>
+</table>
+<p>For example, the return value of <code>CorString.Insert("abc", 2, "XYZ")</code> is "abXYZc".</p>
+@exceptions
+<table style="width: auto">
+	<tr>
+		<th>Exception</th><th>Condition</th>
+	</tr>
+	<tr>
+		<td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+		<td><i>StartIndex</i> is negative or greater than the length of <i>s</i>.</td>
+	</tr>
+</table>
+@examples The following console application provides a simple demonstration of the <b>Insert</b> method.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Const</span> Animal1   <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span> = <span style="color: #a31515">&quot;fox&quot;</span>
+    <span style="color: #0000ff">Const</span> Animal2   <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span> = <span style="color: #a31515">&quot;dog&quot;</span>
+    <span style="color: #0000ff">Const</span> Adj1      <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span> = <span style="color: #a31515">&quot;bold &quot;</span>
+    <span style="color: #0000ff">Const</span> Adj2      <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span> = <span style="color: #a31515">&quot;lazy &quot;</span>
+    <span style="color: #0000ff">Dim</span> Target      <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+    
+    Target = CorString.Format(<span style="color: #a31515">&quot;The {0} jumped over the {1}.&quot;</span>, Animal1, Animal2)
+    
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;The original string is: {0}{1}&quot;</span>, vbCrLf, Target)
+    
+    Target = CorString.Insert(Target, InStr(Target, Animal1) - 1, Adj1)
+    Target = CorString.Insert(Target, InStr(Target, Animal2) - 1, Adj2)
+    
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;{0}The final string is: {0}{1}&quot;</span>, vbCrLf, Target)
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; This example produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    The original string is:</span>
+<span style="color: #008000">&#39;    The fox jumped over the dog.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    The final string is:</span>
+<span style="color: #008000">&#39;    The bold fox jumped over the lazy dog.</span>
+</pre></div>

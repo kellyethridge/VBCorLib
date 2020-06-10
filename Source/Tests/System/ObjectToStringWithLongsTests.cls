@@ -121,12 +121,27 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use -1, "x", "ffffffff"
             Test.Use &H8000, "x", "ffff8000"
             
+            ' Char Format
+            Test.Use 48, "$", "0"
+            Test.Use 163, "$", ChrW$(163)
+            Test.Use &H10031, "$", "1"
+            
+            ' Custom Format
+            Test.Use 48, "k00", "k48"
+            Test.Use 48, "$00", "$48"
+                        
         Case "ToString_WithLongsUsingDefaultFormat_ReturnsExpected"
             Test.Use 0&, "0"
             Test.Use 1&, "1"
             Test.Use -1&, "-1"
             Test.Use &H7FFFFFFF, "2147483647"
             Test.Use &H80000000, "-2147483648"
+            
+        Case "ToString_WithCustomNegativeFormat_ReturnsExpected"
+            Test.Use -12, "0", "^12"
+            Test.Use -12, "0.00", "^12.00"
+            Test.Use -12, "0;(#)", "(12)"
+            
     End Select
 End Sub
 
@@ -148,23 +163,34 @@ End Sub
 
 Public Sub ToString_WithLongUsingModifiedGroupSize_ReturnsExpected()
     Dim Actual As String
-    Dim info As NumberFormatInfo
-    Set info = Cor.NewCultureInfo("en-US", False).NumberFormat
-    info.CurrencyGroupSizes = NewLongs(1, 2, 3)
+    Dim Info As NumberFormatInfo
+    Set Info = Cor.NewCultureInfo("en-US", False).NumberFormat
+    Info.CurrencyGroupSizes = NewLongs(1, 2, 3)
     
-    Actual = Object.ToString(12345678, "c", info)
+    Actual = Object.ToString(12345678, "c", Info)
     
     Assert.That Actual, Iz.EqualTo("$12,345,67,8.00")
 End Sub
 
 Public Sub ToString_WithLongUsingModifiedGroupSize_ReturnsExpected2()
     Dim Actual As String
-    Dim info As NumberFormatInfo
-    Set info = Cor.NewCultureInfo("en-US", False).NumberFormat
-    info.NumberGroupSizes = NewLongs(2, 3)
+    Dim Info As NumberFormatInfo
+    Set Info = Cor.NewCultureInfo("en-US", False).NumberFormat
+    Info.NumberGroupSizes = NewLongs(2, 3)
     
-    Actual = Object.ToString(1, "n", info)
+    Actual = Object.ToString(1, "n", Info)
     
     Assert.That Actual, Iz.EqualTo("1.00")
+End Sub
+
+Public Sub ToString_WithCustomNegativeFormat_ReturnsExpected(ByVal Value As Long, ByVal Format As String, ByVal Expected As String)
+    Dim Actual As String
+    Dim Info As NumberFormatInfo
+    Set Info = Cor.NewCultureInfo("en-US").NumberFormat
+    Info.NegativeSign = "^"
+    
+    Actual = Object.ToString(Value, Format, Info)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 

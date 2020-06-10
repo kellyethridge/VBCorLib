@@ -40,7 +40,7 @@ Implements IDictionaryEnumerator
 Implements IEnumerator
 Implements ICloneable
 
-Private mTable      As IVersionableCollection
+Private mTable      As IVersionable
 Private mBuckets()  As HashBucket
 Private mEnumType   As EnumerationType
 Private mIndex      As Long
@@ -61,7 +61,7 @@ End Function
 '   Private Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub VerifyValidEnum()
-    If mTable.CurrentVersion <> mVersion Then
+    If mTable.Version <> mVersion Then
         Error.InvalidOperation InvalidOperation_VersionError
     End If
     If mIndex < 0 Then
@@ -81,14 +81,14 @@ Friend Sub Init(ByVal Table As Hashtable, ByRef Buckets() As HashBucket, ByVal E
     SAPtr(mBuckets) = SAPtr(Buckets)
     mEnumType = EnumType
     mIndex = -1
-    mVersion = mTable.CurrentVersion
+    mVersion = mTable.Version
     mCount = Table.Count
     mCapacity = UBound(mBuckets) + 1
 End Sub
 
 Friend Sub InitClone(ByVal Table As Hashtable, ByRef Buckets() As HashBucket, ByVal EnumType As EnumerationType, ByVal Index As Long, ByVal Entries As Long, ByVal Capacity As Long)
     Set mTable = Table
-    mVersion = mTable.CurrentVersion
+    mVersion = mTable.Version
     SAPtr(mBuckets) = SAPtr(Buckets)
     mEnumType = EnumType
     mIndex = Index

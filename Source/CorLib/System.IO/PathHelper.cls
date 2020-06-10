@@ -101,7 +101,7 @@ Friend Function StartsWith(ByRef CompareTo As String) As Boolean
     
     Dim s As String
     s = SysAllocStringLen(VarPtr(mFinalBuffer(mPrefixSize)), Len(CompareTo))
-    StartsWith = CorString.Equals(CompareTo, s, OrdinalIgnoreCase)
+    StartsWith = CorString.Equals(CompareTo, s, StringComparison.OrdinalIgnoreCase)
 End Function
 
 Friend Function TryExpandShortFileName() As Boolean

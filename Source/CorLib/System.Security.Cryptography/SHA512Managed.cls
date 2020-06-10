@@ -563,12 +563,12 @@ Private Function RRotateLo(ByVal xh As Long, ByVal xl As Long, ByVal Count As Lo
     End If
 End Function
 
-Private Function Choice(ByVal x As Long, ByVal y As Long, ByVal z As Long) As Long
-    Choice = (x And y) Xor ((Not x) And z)
+Private Function Choice(ByVal X As Long, ByVal Y As Long, ByVal z As Long) As Long
+    Choice = (X And Y) Xor ((Not X) And z)
 End Function
 
-Private Function Maj(ByVal x As Long, ByVal y As Long, ByVal z As Long) As Long
-    Maj = (x And y) Xor (x And z) Xor (y And z)
+Private Function Maj(ByVal X As Long, ByVal Y As Long, ByVal z As Long) As Long
+    Maj = (X And Y) Xor (X And z) Xor (Y And z)
 End Function
 
 Private Function BigSIG0Hi(ByVal xh As Long, ByVal xl As Long) As Long

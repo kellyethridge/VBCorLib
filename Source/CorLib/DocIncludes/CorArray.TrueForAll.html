@@ -1,0 +1,42 @@
+@exceptions
+<table style="width: auto">
+	<tr>
+		<th>Exception</th><th>Conditioni</th>
+	</tr>
+	<tr>
+		<td><a href="ArgumentNullException.html">ArgumentNullException</a></td>
+		<td><i>Arr</i> is uninitialized</td>
+	</tr>
+	<tr>
+		<td><a href="RankException.html">RankException</a></td>
+		<td><i>Arr</i> has more than one dimension.</td>
+	</tr>
+</table>
+@examples The following code example checks two arrays for containing only ages 18 or older.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> Adults() <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
+    <span style="color: #0000ff">Dim</span> Mixed() <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
+        
+    Adults = NewLongs(22, 45, 37, 62, 18)
+    Mixed = NewLongs(29, 33, 16, 49, 13)
+    
+    Debug.Print <span style="color: #a31515">&quot;Adults array has only adults:&quot;</span>
+    Debug.Print CorArray.TrueForAll(Adults, <span style="color: #0000ff">AddressOf</span> Age18OrOlder)
+    
+    Debug.Print t(<span style="color: #a31515">&quot;\nMixed array has only adults:&quot;</span>)
+    Debug.Print CorArray.TrueForAll(Mixed, <span style="color: #0000ff">AddressOf</span> Age18OrOlder)
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; The method accepts a ByRef parameter of the array element type.</span>
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Function</span> Age18OrOlder(<span style="color: #0000ff">ByRef</span> Age <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>) <span style="color: #0000ff">As</span> <span style="color: #2b91af">Boolean</span>
+    Age18OrOlder = Age &gt;= 18
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Function</span>
+
+<span style="color: #008000">&#39; This code example produces the following output.</span>
+<span style="color: #008000">&#39;    Adults array has only adults:</span>
+<span style="color: #008000">&#39;    True</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    Mixed array has only adults:</span>
+<span style="color: #008000">&#39;    False</span>
+</pre></div>
+

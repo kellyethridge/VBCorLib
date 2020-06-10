@@ -33,20 +33,14 @@ Attribute VB_Exposed = True
 '
 
 ''
-' Provides a collections that maintains a list of items in a First-in-First-Out
-' sequence.
-'
-' @see Constructors
-' @see ICollection
-' @see IEnumerable
-' @see ICloneable
+' Provides a collections that maintains a list of items in a First-in-First-Out sequence.
 '
 Option Explicit
 Implements IObject
 Implements ICloneable
 Implements ICollection
 Implements IEnumerable
-Implements IVersionableCollection
+Implements IVersionable
 
 Private Const DefaultCapacity       As Long = 16
 Private Const ItemPropertyFormat    As String = "Item{0}"
@@ -66,8 +60,7 @@ Private mVersion    As Long
 ''
 ' Clears the contents of the queue
 '
-' @remarks Even though the contents are cleared, the capacity
-' of the queue is unchanged.
+' @remarks Even though the contents are cleared, the capacity of the queue is unchanged.
 '
 Public Sub Clear()
     mCount = 0
@@ -469,6 +462,6 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   IVersionableCollection
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Property Get IVersionableCollection_CurrentVersion() As Long
-    IVersionableCollection_CurrentVersion = mVersion
+Private Property Get IVersionable_Version() As Long
+    IVersionable_Version = mVersion
 End Property

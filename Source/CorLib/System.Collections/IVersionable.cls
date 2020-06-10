@@ -6,7 +6,7 @@ BEGIN
   DataSourceBehavior  = 0  'vbNone
   MTSTransactionMode  = 0  'NotAnMTSObject
 END
-Attribute VB_Name = "IVersionableCollection"
+Attribute VB_Name = "IVersionable"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
@@ -36,13 +36,13 @@ Attribute VB_Exposed = True
 '
 
 ''
-' Use this interface to
+' This interface is used to inspect classes that have changed, like a collection class.
+'
 Option Explicit
 
 ''
-' Returns the current version of the instance.
+' Returns the current version of an object.
 '
-' @return Version count.
-' @remarks This is used to track if a collection has been modified.
-'
+' @return Returns a count that represents the current version of an object.
+' @remarks This is primarily used to track if a collection has been modified.
 Public Property Get Version() As Long: End Property

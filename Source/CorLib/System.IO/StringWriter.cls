@@ -264,7 +264,7 @@ Private Sub WriteCore(ByRef Value As Variant, ByRef Args() As Variant)
     If Len1D(Args) = 0 Then
         mOutput.AppendString s
     Else
-        mOutput.InternalAppendFormat FormatProvider, s, Args
+        mOutput.AppendFormatArrayEx FormatProvider, s, Args
     End If
 End Sub
 

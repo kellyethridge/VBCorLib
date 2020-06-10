@@ -41,13 +41,13 @@ Implements ICollection
 Implements IEnumerable
 Implements ICloneable
 Implements IList
-Implements IVersionableCollection
+Implements IVersionable
 
 Private mList As ArrayList
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByVal List As ArrayList)
     Set mList = List
@@ -55,7 +55,7 @@ End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   ArrayList Interface
+'   ArrayList
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function ArrayList_Add(Value As Variant) As Long
     Throw Cor.NewNotSupportedException(Environment.GetResourceString(NotSupported_FixedSizeCollection))
@@ -343,8 +343,8 @@ End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IVersionableCollection
+'   IVersionable
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Property Get IVersionableCollection_CurrentVersion() As Long
-    IVersionableCollection_CurrentVersion = GetCollectionVersion(mList)
+Private Property Get IVersionable_Version() As Long
+    IVersionable_Version = GetCollectionVersion(mList)
 End Property

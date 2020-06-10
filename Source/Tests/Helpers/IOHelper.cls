@@ -45,21 +45,24 @@ Public Function CreateFile(Optional ByVal FileName As String = "File.txt", Optio
 End Function
 
 Public Function CreateBinaryFile(Optional ByVal FileName As String = "File.txt", Optional ByRef Data As Variant) As String
+    Dim FileNumber As Long
+    
     CreateBinaryFile = Path.Combine(mTempFolder, FileName)
-    If Not FileExists(CreateBinaryFile) Then
-        Dim FileNumber As Long
-        FileNumber = FreeFile
-                
-        Open CreateBinaryFile For Binary As #FileNumber
-        
-        If Not IsMissing(Data) Then
-            Dim Bytes() As Byte
-            Bytes = Data
-            Put #FileNumber, , Bytes
-        End If
-        
-        Close #FileNumber
+    
+    If FileExists(CreateBinaryFile) Then
+        File.Delete CreateBinaryFile
     End If
+    
+    FileNumber = FreeFile
+    Open CreateBinaryFile For Binary As #FileNumber
+    
+    If Not IsMissing(Data) Then
+        Dim Bytes() As Byte
+        Bytes = Data
+        Put #FileNumber, , Bytes
+    End If
+    
+    Close #FileNumber
 End Function
 
 Public Function CreateFolder(Optional ByVal SubFolder As String = "SubFolder") As String

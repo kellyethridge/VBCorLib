@@ -1,0 +1,37 @@
+@remarks <p>The <b>IObject</b> interface is a low-level interface utilized by <b>VBCorLib</b> to provide basic services when interacting with objects. Many of the classes in <b>VBCorLib</b> implement this interface. By implementing this interface in new classes, those classes can be better serviced by the <b>VBCorLib</b> eco-system.</p>
+<p>If this interface is implemented, then the same methods should be implemented in the normal public interface to maintain consistency.</p>
+<p>If a class is not expected to be used by <b>VBCorLib</b>, then implementing this interface is not necessary.</p>
+@examples
+<p>The following code example shows a common default implementation of the <b>IObject</b> interface. It simply forwards calls to default method implementations through the <a href="StaticClasses.Get.MyBase.html">MyBase</a> global property.</p>
+<p>Override the individual methods for custom functionality.</p>
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Implements</span> IObject
+
+
+<span style="color: #0000ff">Public</span> <span style="color: #0000ff">Function</span> Equals(<span style="color: #0000ff">ByRef</span> Value <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>) <span style="color: #0000ff">As</span> <span style="color: #2b91af">Boolean</span>
+    Equals = <span style="color: #0000ff">MyBase</span>.Equals(<span style="color: #0000ff">Me</span>, Value)
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Function</span>
+
+<span style="color: #0000ff">Public</span> <span style="color: #0000ff">Function</span> GetHashCode() <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
+    GetHashCode = <span style="color: #0000ff">MyBase</span>.GetHashCode(<span style="color: #0000ff">Me</span>)
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Function</span>
+
+<span style="color: #0000ff">Public</span> <span style="color: #0000ff">Function</span> ToString() <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+    ToString = <span style="color: #0000ff">MyBase</span>.ToString(<span style="color: #0000ff">Me</span>, App)
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Function</span>
+
+
+<span style="color: #008000">&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;</span>
+<span style="color: #008000">&#39; Object Interface</span>
+<span style="color: #008000">&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;</span>
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Function</span> IObject_Equals(Value <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>) <span style="color: #0000ff">As</span> <span style="color: #2b91af">Boolean</span>
+    IObject_Equals = Equals(Value)
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Function</span>
+
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Function</span> IObject_GetHashCode() <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
+    IObject_GetHashCode = GetHashCode
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Function</span>
+
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Function</span> IObject_ToString() <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+    IObject_ToString = ToString
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Function</span>
+</pre></div>

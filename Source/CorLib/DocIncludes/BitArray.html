@@ -1,0 +1,120 @@
+@examples The following code example shows how to create and initialize a <b>BitArray</b> and how to print out its values.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Const</span> CountFormatter <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span> = <span style="color: #a31515">&quot;   Count:    {0}&quot;</span>
+    <span style="color: #0000ff">Const</span> LengthFormatter <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span> = <span style="color: #a31515">&quot;   Length:   {0}&quot;</span>
+    <span style="color: #0000ff">Dim</span> MyBA1 <span style="color: #0000ff">As</span> BitArray
+    <span style="color: #0000ff">Dim</span> MyBA2 <span style="color: #0000ff">As</span> BitArray
+    <span style="color: #0000ff">Dim</span> MyBA3 <span style="color: #0000ff">As</span> BitArray
+    <span style="color: #0000ff">Dim</span> MyBA4 <span style="color: #0000ff">As</span> BitArray
+    <span style="color: #0000ff">Dim</span> MyBA5 <span style="color: #0000ff">As</span> BitArray
+    
+    <span style="color: #008000">&#39; Creates and initializes several BitArrays.</span>
+    <span style="color: #0000ff">Set</span> MyBA1 = NewBitArray(5)
+    <span style="color: #0000ff">Set</span> MyBA2 = NewBitArray(5, <span style="color: #0000ff">True</span>)
+    <span style="color: #0000ff">Set</span> MyBA3 = BitArray.FromBytes(NewBytes(1, 2, 3, 4, 5))
+    <span style="color: #0000ff">Set</span> MyBA4 = BitArray.FromBooleans(NewBooleans(<span style="color: #0000ff">True</span>, <span style="color: #0000ff">False</span>, <span style="color: #0000ff">True</span>, <span style="color: #0000ff">True</span>, <span style="color: #0000ff">False</span>))
+    <span style="color: #0000ff">Set</span> MyBA5 = BitArray.FromLongs(NewLongs(6, 7, 8, 9, 10))
+    
+    <span style="color: #008000">&#39; Displays the properties and values of the BitArrays.</span>
+    Debug.Print <span style="color: #a31515">&quot;MyBA1&quot;</span>
+    Debug.Print CorString.Format(CountFormatter, MyBA1.Count)
+    Debug.Print CorString.Format(CountFormatter, MyBA1.Length)
+    Debug.Print <span style="color: #a31515">&quot;   Values:&quot;</span>
+    PrintValues MyBA1, 8
+    
+    Debug.Print <span style="color: #a31515">&quot;MyBA2&quot;</span>
+    Debug.Print CorString.Format(CountFormatter, MyBA2.Count)
+    Debug.Print CorString.Format(CountFormatter, MyBA2.Length)
+    Debug.Print <span style="color: #a31515">&quot;   Values:&quot;</span>
+    PrintValues MyBA2, 8
+    
+    Debug.Print <span style="color: #a31515">&quot;MyBA3&quot;</span>
+    Debug.Print CorString.Format(CountFormatter, MyBA3.Count)
+    Debug.Print CorString.Format(CountFormatter, MyBA3.Length)
+    Debug.Print <span style="color: #a31515">&quot;   Values:&quot;</span>
+    PrintValues MyBA3, 8
+
+    Debug.Print <span style="color: #a31515">&quot;MyBA4&quot;</span>
+    Debug.Print CorString.Format(CountFormatter, MyBA4.Count)
+    Debug.Print CorString.Format(CountFormatter, MyBA4.Length)
+    Debug.Print <span style="color: #a31515">&quot;   Values:&quot;</span>
+    PrintValues MyBA4, 8
+
+    Debug.Print <span style="color: #a31515">&quot;MyBA5&quot;</span>
+    Debug.Print CorString.Format(CountFormatter, MyBA5.Count)
+    Debug.Print CorString.Format(CountFormatter, MyBA5.Length)
+    Debug.Print <span style="color: #a31515">&quot;   Values:&quot;</span>
+    PrintValues MyBA5, 8
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> PrintValues(<span style="color: #0000ff">ByVal</span> MyList <span style="color: #0000ff">As</span> IEnumerable, <span style="color: #0000ff">ByVal</span> MyWidth <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>)
+    <span style="color: #0000ff">Dim</span> i <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
+    <span style="color: #0000ff">Dim</span> Value <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>
+    
+    i = MyWidth
+    
+    <span style="color: #0000ff">For</span> <span style="color: #0000ff">Each</span> Value <span style="color: #0000ff">In</span> MyList
+        <span style="color: #0000ff">If</span> i &lt;= 0 <span style="color: #0000ff">Then</span>
+            i = MyWidth
+            Debug.Print
+        <span style="color: #0000ff">End</span> <span style="color: #0000ff">If</span>
+        
+        i = i - 1
+        Debug.Print CorString.Format(<span style="color: #a31515">&quot;{0,8}&quot;</span>, Value);
+    <span style="color: #0000ff">Next</span>
+    
+    Debug.Print
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+
+<span style="color: #008000">&#39; This code produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    MyBA1</span>
+<span style="color: #008000">&#39;       Count:    5</span>
+<span style="color: #008000">&#39;       Count:    5</span>
+<span style="color: #008000">&#39;    Values:</span>
+<span style="color: #008000">&#39;       False   False   False   False   False</span>
+<span style="color: #008000">&#39;    MyBA2</span>
+<span style="color: #008000">&#39;       Count:    5</span>
+<span style="color: #008000">&#39;       Count:    5</span>
+<span style="color: #008000">&#39;    Values:</span>
+<span style="color: #008000">&#39;       True    True    True    True    True</span>
+<span style="color: #008000">&#39;    MyBA3</span>
+<span style="color: #008000">&#39;       Count:    40</span>
+<span style="color: #008000">&#39;       Count:    40</span>
+<span style="color: #008000">&#39;    Values:</span>
+<span style="color: #008000">&#39;        True   False   False   False   False   False   False   False</span>
+<span style="color: #008000">&#39;       False    True   False   False   False   False   False   False</span>
+<span style="color: #008000">&#39;        True    True   False   False   False   False   False   False</span>
+<span style="color: #008000">&#39;       False   False    True   False   False   False   False   False</span>
+<span style="color: #008000">&#39;        True   False    True   False   False   False   False   False</span>
+<span style="color: #008000">&#39;    MyBA4</span>
+<span style="color: #008000">&#39;       Count:    5</span>
+<span style="color: #008000">&#39;       Count:    5</span>
+<span style="color: #008000">&#39;    Values:</span>
+<span style="color: #008000">&#39;        True   False    True    True   False</span>
+<span style="color: #008000">&#39;    MyBA5</span>
+<span style="color: #008000">&#39;       Count:    160</span>
+<span style="color: #008000">&#39;       Count:    160</span>
+<span style="color: #008000">&#39;    Values:</span>
+<span style="color: #008000">&#39;       False    True    True   False   False   False   False   False</span>
+<span style="color: #008000">&#39;       False   False   False   False   False   False   False   False</span>
+<span style="color: #008000">&#39;       False   False   False   False   False   False   False   False</span>
+<span style="color: #008000">&#39;       False   False   False   False   False   False   False   False</span>
+<span style="color: #008000">&#39;        True    True    True   False   False   False   False   False</span>
+<span style="color: #008000">&#39;       False   False   False   False   False   False   False   False</span>
+<span style="color: #008000">&#39;       False   False   False   False   False   False   False   False</span>
+<span style="color: #008000">&#39;       False   False   False   False   False   False   False   False</span>
+<span style="color: #008000">&#39;       False   False   False    True   False   False   False   False</span>
+<span style="color: #008000">&#39;       False   False   False   False   False   False   False   False</span>
+<span style="color: #008000">&#39;       False   False   False   False   False   False   False   False</span>
+<span style="color: #008000">&#39;       False   False   False   False   False   False   False   False</span>
+<span style="color: #008000">&#39;        True   False   False    True   False   False   False   False</span>
+<span style="color: #008000">&#39;       False   False   False   False   False   False   False   False</span>
+<span style="color: #008000">&#39;       False   False   False   False   False   False   False   False</span>
+<span style="color: #008000">&#39;       False   False   False   False   False   False   False   False</span>
+<span style="color: #008000">&#39;       False    True   False    True   False   False   False   False</span>
+<span style="color: #008000">&#39;       False   False   False   False   False   False   False   False</span>
+<span style="color: #008000">&#39;       False   False   False   False   False   False   False   False</span>
+<span style="color: #008000">&#39;       False   False   False   False   False   False   False   False</span>
+</pre></div>

@@ -150,6 +150,10 @@ Private Sub Stream_CloseStream()
     mCanWrite = False
 End Sub
 
+Private Sub Stream_CopyTo(ByVal Destination As Stream, Optional ByVal BufferSize As Long = 81920)
+    Statics.Stream.CopyTo Me, Destination, BufferSize
+End Sub
+
 Private Function Stream_EndRead(ByVal AsyncResult As IAsyncResult) As Long
     Dim Result As StreamAsyncResult
     

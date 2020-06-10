@@ -1,0 +1,87 @@
+@remarks This method will attempt to convert various data types to an <a href="Int64Static.Int64.html">Int64</a> value.
+<table style="width: auto">
+	<tr>
+		<th>Type</th><th>Operation</th>
+	</tr>
+	<tr>
+		<td><a href="Int64Static.Int64.html">Int64</a></td>
+		<td>Returns value.</td>
+	</tr>
+	<tr>
+		<td><b>String</b></td>
+		<td>Attemps to parse the string expression using <a href="Int64Static.Parse.html">Int64.Parse</a>.</td>
+	</tr>
+	<tr>
+		<td>
+			<b>Long</b><br/>
+			-or-<br/>
+			<b>Integer</b><br/>
+			-or-<br/>
+			<b>Byte</b>
+		</td>
+		<td>
+			Directly assigns to <b>LowPart</b> in the <a href="Int64Static.Int64.html">Int64</a> and
+			sets the <b>HighPart</b> to -1 if the value is negative.
+		</td>		
+	</tr>
+	<tr>
+		<td>
+			<b>Double</b><br/>
+			-or-<br/>
+			<b>Single</b><br/>
+			-or-<br/>
+			<b>Currency</b><br/>
+			-or-<br/>
+			<b>Decimal</b>
+		</td>
+		<td>Assigns the value rounding off any fractions using <b>Round</b>.</td>
+	</tr>
+</table>
+@exceptions
+<table style="width: auto">
+	<tr>
+		<th>Exception</th><th>Condition</th>
+	</tr>
+	<tr>
+		<td><a href="InvalidCastException.html">InvalidCastException</a></td>
+		<td>Count not convert from specified type.</td>
+	</tr>
+	<tr>
+		<td><a href="OverflowException.html">OverflowException</a></td>
+		<td><i>Value</i> represented a value outside the <a href="Int64Static.Int64.html">Int64</a> valid range from <a href="Int64Static.Get.MinValue.html">MinValue</a>
+			to <a href="Int64Static.Get.MaxValue.html">MaxValue</a>.
+		</td>
+	</tr>
+</table>
+@examples The following code demonstrates the various types that can be converted.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    ConvertValue <span style="color: #a31515">&quot;80278098&quot;</span>
+    ConvertValue <span style="color: #a31515">&quot;0xffff&quot;</span>
+    ConvertValue <span style="color: #0000ff">CLng</span>(-223432)
+    ConvertValue <span style="color: #0000ff">CInt</span>(23214)
+    ConvertValue <span style="color: #0000ff">CByte</span>(255)
+    ConvertValue <span style="color: #0000ff">CDbl</span>(1234.4323)
+    ConvertValue <span style="color: #0000ff">CSng</span>(1234.43)
+    ConvertValue CCur(492398.724)
+    ConvertValue <span style="color: #0000ff">CDec</span>(492398.724)
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> ConvertValue(<span style="color: #0000ff">ByRef</span> Value <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>)
+    <span style="color: #0000ff">Dim</span> x <span style="color: #0000ff">As</span> Int64
+    
+    x = CInt64(Value)
+    
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;{0} of {1} = {2}&quot;</span>, TypeName(Value), Value, x)
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; This code produces the following output.</span>
+<span style="color: #008000">&#39;    String of 80278098 = 80278098</span>
+<span style="color: #008000">&#39;    String of 0xffff = 65535</span>
+<span style="color: #008000">&#39;    Long of -223432 = -223432</span>
+<span style="color: #008000">&#39;    Integer of 23214 = 23214</span>
+<span style="color: #008000">&#39;    Byte of 255 = 255</span>
+<span style="color: #008000">&#39;    Double of 1234.4323 = 1234</span>
+<span style="color: #008000">&#39;    Single of 1234.43 = 1234</span>
+<span style="color: #008000">&#39;    Currency of 492398.724 = 492399</span>
+<span style="color: #008000">&#39;    Decimal of 492398.724 = 492399</span>
+</pre></div>

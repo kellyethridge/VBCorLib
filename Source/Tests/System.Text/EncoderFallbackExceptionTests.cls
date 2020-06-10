@@ -32,7 +32,7 @@ Public Sub Constructor_WithCharUnknownAndIndex_StoresParameters()
     Dim Ex As EncoderFallbackException
     
     Set Ex = Cor.NewEncoderFallbackException2("Hello", 1, 2)
-    
+     
     Assert.That Ex.Message, Iz.EqualTo("Hello")
     Assert.That Ex.CharUnknown, Iz.EqualTo(1)
     Assert.That Ex.CharUnknownHigh, Iz.EqualTo(0)

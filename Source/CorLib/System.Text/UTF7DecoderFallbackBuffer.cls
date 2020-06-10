@@ -54,6 +54,10 @@ End Sub
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   DecoderFallbackBuffer
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Function DecoderFallbackBuffer_Equals(Value As Variant) As Boolean
+    DecoderFallbackBuffer_Equals = IObject_Equals(Value)
+End Function
+
 Private Function DecoderFallbackBuffer_Fallback(BytesUnknown() As Byte, ByVal Index As Long) As Boolean
     mFallbackChar = BytesUnknown(0)
     
@@ -62,6 +66,10 @@ Private Function DecoderFallbackBuffer_Fallback(BytesUnknown() As Byte, ByVal In
         mSize = 1
         DecoderFallbackBuffer_Fallback = True
     End If
+End Function
+
+Private Function DecoderFallbackBuffer_GetHashCode() As Long
+    DecoderFallbackBuffer_GetHashCode = IObject_GetHashCode
 End Function
 
 Private Function DecoderFallbackBuffer_GetNextChar() As Integer
@@ -88,6 +96,10 @@ End Property
 Private Sub DecoderFallbackBuffer_Reset()
     mCount = -1
 End Sub
+
+Private Function DecoderFallbackBuffer_ToString() As String
+    DecoderFallbackBuffer_ToString = IObject_ToString
+End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

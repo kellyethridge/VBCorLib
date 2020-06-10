@@ -99,7 +99,7 @@ Public Sub Copy(ByRef SourceFileName As String, ByRef DestFileName As String, Op
     SourceFullName = Path.GetFullPath(SourceFileName)
     DestFullName = Path.GetFullPath(DestFileName)
     
-    If CorString.Equals(SourceFullName, DestFullName, OrdinalIgnoreCase) Then
+    If CorString.Equals(SourceFullName, DestFullName, StringComparison.OrdinalIgnoreCase) Then
         Exit Sub
     End If
     
@@ -173,6 +173,10 @@ Public Function Exists(ByRef Path As String) As Boolean
     Dim Data        As WIN32_FILE_ATTRIBUTE_DATA
     Dim FullPath    As String
     
+    If Len(Path) = 0 Then
+        Exit Function
+    End If
+    
     FullPath = Statics.Path.GetFullPath(Path)
     
     If GetFileData(FullPath, Data) = NO_ERROR Then
@@ -197,7 +201,7 @@ Public Function GetAttributes(ByRef Path As String) As FileAttributes
     Dim FullPath As String
     FullPath = Statics.Path.GetFullPath(Path)
     
-    GetAttributes = Api.GetFileAttributes(FullPath)
+    GetAttributes = GetFileAttributesW(FullPath)
     If GetAttributes = INVALID_FILE_ATTRIBUTES Then
         IOError.WinIOError Err.LastDllError, FullPath
     End If
@@ -304,7 +308,7 @@ End Sub
 ' @param Share The access allowed for other processes.
 ' @return A FileStream object of the specified file.
 '
-Public Function OpenFile(ByRef Path As String, ByVal Mode As FileMode, Optional ByVal Access As FileAccess = -1, Optional ByVal Share As FileShare = FileShare.None) As FileStream
+Public Function OpenFile(ByRef Path As String, ByVal Mode As FileMode, Optional ByVal Access As FileAccess, Optional ByVal Share As FileShare = FileShare.None) As FileStream
     Set OpenFile = Cor.NewFileStream(Path, Mode, Access, Share)
 End Function
 
@@ -357,7 +361,7 @@ Public Sub SetAttributes(ByRef Path As String, ByVal Attributes As FileAttribute
     Dim FullPath As String
     FullPath = Statics.Path.GetFullPath(Path)
     
-    If Api.SetFileAttributes(FullPath, Attributes) = BOOL_FALSE Then
+    If SetFileAttributesW(FullPath, Attributes) = BOOL_FALSE Then
         IOError.WinIOError Err.LastDllError, FullPath
     End If
 End Sub
@@ -618,12 +622,6 @@ Private Sub SetFileTimeCore(ByRef Path As String, ByVal CreationTimePtr As Long,
         End If
     End With
 End Sub
-
-Private Function GetFileTimePtr(ByRef Time As Variant) As Long
-    If Not IsEmpty(Time) Then
-        GetFileTimePtr = VarPtr(Time) + 8
-    End If
-End Function
 
 Private Sub FillFileData(ByRef Path As String, ByRef Data As WIN32_FILE_ATTRIBUTE_DATA)
     If Len(Path) = 0 Then _

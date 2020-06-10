@@ -1,7 +1,7 @@
 Type=OleDll
 Reference=*\G{00020430-0000-0000-C000-000000000046}#2.0#0#..\..\..\..\..\..\..\Windows\SysWOW64\stdole2.tlb#OLE Automation
 Reference=*\G{1F852AFD-5C0A-46D0-8AA1-4319E8EF72C0}#3.0#0#..\..\TypeLibrary\CorType.tlb#VB.EXT: VBCorLib Type Library 3.0
-Reference=*\G{C017035A-D8F3-49B1-9543-AE83A16E78C0}#1.0#0#..\..\Binaries\Compiled\VBCorLib3.dll#VB.EXT: CorLib 3.0
+Reference=*\G{E67787FD-71D6-4C37-837D-0300A1E31B5A}#1.0#0#..\..\Binaries\Compiled\VBCorLib3.dll#VB.EXT: CorLib 3.0
 Class=FakeCustomFormatter; FakeCustomFormatter.cls
 Class=Int32; Int32.cls
 Class=Int32Formattable; Int32Formattable.cls
@@ -18,6 +18,9 @@ Class=Count; Count.cls
 Class=NullEncoderFallbackBuffer; NullEncoderFallbackBuffer.cls
 Class=NullEncoderFallback; NullEncoderFallback.cls
 Class=FakePictureResourceInfo; FakePictureResourceInfo.cls
+Class=FakeStructures; FakeStructures.cls
+Class=FakeTypes; FakeTypes.cls
+Class=TerminateEventCount; TerminateEventCount.cls
 Startup="(None)"
 Command32=""
 Name="Fakes"
@@ -57,3 +60,6 @@ ReplaceIcon=0
 SendCommandArgs=0
 SymbDbgPref=0
 RevisionVersion=0
+
+[Rubberduck]
+ProjectId=2a145b46-c1f5-44e0-97ba-a4bd731c5a25

@@ -592,6 +592,37 @@ Public Sub SetLength_WithTrucateThenExpand_OverwritesContentsWithZeros()
     Assert.That ms.ToArray, Iz.EqualTo(NewBytes(1, 2, 0, 0, 0))
 End Sub
 
+Public Sub Position_WhenSetWithClosedStream_ThrowsObjectDisposedException()
+    Dim ms As New MemoryStream
+        
+    ms.CloseStream
+    
+    On Error Resume Next
+    ms.Position = 1
+    
+    AssertObjectDisposedException Err
+End Sub
+
+Public Sub Position_WhenSetLargerThanMaxInt32Value_ThrowsArgumentOutOfRangeException()
+    Dim ms As New MemoryStream
+    
+    On Error Resume Next
+    ms.Position = 2147483648@
+    
+    AssertArgumentOutOfRangeException Err, "Value"
+End Sub
+
+Public Sub Position_WhenReadWithClosedStream_ThrowsObjectDisposedException()
+    Dim ms As New MemoryStream
+    Dim p As Long
+    
+    ms.CloseStream
+    
+    On Error Resume Next
+    p = ms.Position
+    
+    AssertObjectDisposedException Err
+End Sub
 
 
 Private Function MakeMemoryStream() As MemoryStream
@@ -625,4 +656,20 @@ Public Sub EndWrite_WithAsyncCallback_ExecutesCallback()
     Set Result = ms.BeginWrite(NewBytes(1, 2, 3), 0, 3, Callback)
 
     Assert.That Callback.Called, Iz.True
+End Sub
+
+Public Sub CopyTo_WhenCalled_WritesToDestinationStream()
+    Dim Src As New MemoryStream
+    Dim Dst As New MemoryStream
+    Dim Data() As Byte
+    
+    ReDim Data(0 To 100000)
+    Data(0) = 1
+    Data(100000) = 2
+    Src.WriteBlock Data, 0, CorArray.Length(Data)
+    Src.Position = 0
+    
+    Src.CopyTo Dst
+    
+    Assert.That Dst.ToArray, Iz.EqualTo(Data)
 End Sub

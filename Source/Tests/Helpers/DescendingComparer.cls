@@ -14,10 +14,10 @@ Attribute VB_Exposed = False
 Option Explicit
 Implements CorLib.IComparer
 
-Private Function IComparer_Compare(X As Variant, Y As Variant) As Long
-    If X < Y Then
+Private Function IComparer_Compare(x As Variant, y As Variant) As Long
+    If x < y Then
         IComparer_Compare = 1
-    ElseIf X > Y Then
+    ElseIf x > y Then
         IComparer_Compare = -1
     End If
 End Function

@@ -49,8 +49,6 @@ Implements SystemException
 Implements ArithmeticException
 
 Private Const BaseProperty     As String = "Base"
-Private Const DefaultMessage   As String = "Division by zero."
-Private Const DefaultHResult   As Long = COR_E_ARITHMETIC
 
 Private mBase As ExceptionBase
 

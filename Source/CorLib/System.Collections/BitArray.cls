@@ -36,28 +36,18 @@ Attribute VB_Exposed = True
 '
 
 ''
-' Manages a compact array of bit values. Each bit represents
-' a boolean, where True = 1, and False = 0.
+' Manages a compact array of bit values. Each bit represents a boolean, where True = 1, and False = 0.
 '
-' @remarks The default BitArray size is 32 bits unless a constructor is used
-' to define a custom size.
-' <p>The following are some of the available methods to create a <b>BitArray</b>.
-' <pre>
-' Set Bits = New BitArray()
-'
-' Set Bits = NewBitArray(128)
-'
-' Set Bits = BitArray.FromBooleans(BooleanArray)
-' </pre></p>
+' @remarks The default <b>BitArray</b> size is 32 bits unless a constructor is used to define a custom size.
 ' @see Constructors
 ' @see BitArrayStatic
-'
+' @include "..\DocIncludes\BitArray.html"
 Option Explicit
 Implements IObject
 Implements IEnumerable
 Implements ICollection
 Implements ICloneable
-Implements IVersionableCollection
+Implements IVersionable
 
 Private Const PropUBound        As String = "Ubound"
 Private Const PropLength        As String = "Length"
@@ -73,10 +63,10 @@ Private mUBound     As Long
 Private mVersion    As Long
 
 ''
-' Performs a bitwise AND on the current instance of BitArray using the
-' bits in another instance of BitArray.
+' Performs a bitwise AND on the current instance of <b>BitArray</b> using the
+' bits in another instance of <b>BitArray</b>.
 '
-' @param Bits The BitArray object with which to perform the bitwise
+' @param Bits The <b>BitArray</b> object with which to perform the bitwise
 ' AND operation with.
 ' @return The internal set of bits is modified based on the operation,
 ' however, the object returns itself for ease of concatenated operations.
@@ -109,9 +99,9 @@ End Function
 '
 ' @param Arr The array to copy the values to.
 ' @param Index The starting position in the array to begin copying to.
-' @remarks CopyTo supports the copying to three array types: Long, Byte
+' @remarks This method supports the copying to three array types: Long, Byte
 ' and Boolean. When copying to Long or Byte type arrays, the bits in the
-' elements are equivalents to the bits in the BitArray. When copying to
+' elements are equivalents to the bits in the <b>BitArray</b>. When copying to
 ' a Boolean array, each boolean element represents a single bit in the array.
 '
 Public Sub CopyTo(ByRef Arr As Variant, ByVal Index As Long)
@@ -153,12 +143,10 @@ Public Sub CopyTo(ByRef Arr As Variant, ByVal Index As Long)
 End Sub
 
 ''
-' Returns the number of bits being represented in the array.
+' Gets the number of bits being represented in the array.
 '
 ' @return The number of bits represented.
-' @remarks This returns the same value as Length, however, this
-' property is read-only.
-'
+' @remarks This returns the same value as Length, however, this property is read-only.
 Public Property Get Count() As Long
     EnsureInited
     Count = mLength
@@ -199,7 +187,7 @@ Public Function GetHashCode() As Long
 End Function
 
 ''
-' Returns if the instance is a read-only instance.
+' Gets if the instance is a read-only instance.
 '
 ' @return Value indicating if the instance is read-only.
 '
@@ -208,21 +196,23 @@ Public Property Get IsReadOnly() As Boolean
 End Property
 
 ''
-' Returns the value of a specific bit in the array.
+' Gets the value of a specific bit in the array.
 '
 ' @param Index The specific bit to return.
 ' @return Value of the specified bit.
-' @remarks The index is zero based.
+' @remarks <i>Index</i> is zero based.
 '
 Public Property Get Item(ByVal Index As Long) As Boolean
 Attribute Item.VB_UserMemId = 0
+    Dim Bit As Long
+    
     EnsureInited
+    
     If Index < 0 Or Index >= mLength Then _
         Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_Index
     
-    Dim bit As Long
-    Index = GetBitIndex(Index, bit)
-    Item = CBool(mBits(Index) And bit)
+    Index = GetBitIndex(Index, Bit)
+    Item = CBool(mBits(Index) And Bit)
 End Property
 
 ''
@@ -230,25 +220,29 @@ End Property
 '
 ' @param Index The specific bit to set.
 ' @param Value The value to set the specified bit to.
-' @remarks The index is zero based.'
+' @remarks <i>Index</i> is zero based.
 '
 Public Property Let Item(ByVal Index As Long, ByVal Value As Boolean)
+    Dim Bit As Long
+    
     EnsureInited
+    
     If Index < 0 Or Index >= mLength Then _
         Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_Index
 
-    Dim bit As Long
-    Index = GetBitIndex(Index, bit)
+    Index = GetBitIndex(Index, Bit)
+    
     If Value Then
-        mBits(Index) = mBits(Index) Or bit
+        mBits(Index) = mBits(Index) Or Bit
     Else
-        mBits(Index) = mBits(Index) And (Not bit)
+        mBits(Index) = mBits(Index) And (Not Bit)
     End If
+    
     mVersion = mVersion + 1
 End Property
 
 ''
-' Returns the number of bits represented in the array.
+' Gets the number of bits represented in the array.
 '
 ' @return The number of bits represented.
 '
@@ -266,15 +260,16 @@ End Property
 '
 Public Property Let Length(ByVal Value As Long)
     EnsureInited
+    
     If Value < 0 Then _
         Error.ArgumentOutOfRange "Value", ArgumentOutOfRange_NeedNonNegNum
     
     If Value <> mLength Then
-        Dim LastElementIndex As Long
         mUBound = (Value - 1) \ BitsPerLong
         ReDim Preserve mBits(0 To mUBound)
         mLength = Value
     End If
+    
     mVersion = mVersion + 1
 End Property
 
@@ -292,30 +287,31 @@ End Function
 ''
 ' Performs bitwise negate operation on the internal array.
 '
-' @return The instance returns a reference to itself to allow
-' for concatenated operations.
+' @return Returns a reference to itself to allow for concatenated operations.
 '
 Public Function NotBits() As BitArray
-    EnsureInited
     Dim i As Long
+    
+    EnsureInited
+    
     For i = 0 To mUBound
         mBits(i) = Not mBits(i)
     Next i
+    
     mVersion = mVersion + 1
     Set NotBits = Me
 End Function
 
 ''
-' Performs a bitwise OR on the current instance of BitArray using the
-' bits in another instance of BitArray.
+' Performs a bitwise OR on the current instance of <b>BitArray</b> using the
+' bits in another instance of <b>BitArray</b>.
 '
-' @param bits The BitArray object with which to perform the bitwise
-' OR operation with.
+' @param bits The <b>BitArray</b> object with which to perform the bitwise OR operation with.
 ' @return The internal set of bits is modified based on the operation,
 ' however, the object returns itself for ease of concatenated operations.
-'
 Public Function OrBits(ByVal Bits As BitArray) As BitArray
     EnsureInited
+    
     If Bits Is Nothing Then _
         Error.ArgumentNull "Bits", ArgumentNull_Array
     If Bits.Length <> mLength Then _
@@ -354,11 +350,10 @@ Public Function ToString() As String
 End Function
 
 ''
-' Performs a bitwise XOR on the current instance of BitArray using the
-' bits in another instance of BitArray.
+' Performs a bitwise XOR on the current instance of <b>BitArray</b> using the
+' bits in another instance of <b>BitArray</b>.
 '
-' @param Bits The BitArray object with which to perform the bitwise
-' XOR operation with.
+' @param Bits The <b>BitArray</b> object with which to perform the bitwise XOR operation with.
 ' @return The internal set of bits is modified based on the operation,
 ' however, the object returns itself for ease of concatenated operations.
 '
@@ -408,12 +403,14 @@ Friend Sub Init(ByVal Length As Long, ByVal Value As Boolean)
 End Sub
 
 Friend Sub InitFromBooleans(ByRef Values() As Boolean)
-    ValidateArray Values, Parameter_Values
-    
     Dim i   As Long
     Dim lb  As Long
-    Me.Length = CorArray.Length(Values, 1)
+    
+    ValidateArray Values, Parameter_Values
+    
+    Me.Length = CorArray.Length(Values)
     lb = LBound(Values)
+    
     For i = 0 To mLength - 1
         Item(i) = Values(lb + i)
     Next i
@@ -483,9 +480,9 @@ Private Function GetMask(ByVal LastMaskBit As Long) As Long
     GetMask = Mask
 End Function
 
-Private Function GetBitIndex(ByVal Index As Long, ByRef bit As Long) As Long
+Private Function GetBitIndex(ByVal Index As Long, ByRef Bit As Long) As Long
     GetBitIndex = Index \ BitsPerLong
-    bit = Powers(Index - GetBitIndex * BitsPerLong)
+    Bit = Powers(Index - GetBitIndex * BitsPerLong)
 End Function
 
 
@@ -574,6 +571,6 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   IVersionableCollection
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Property Get IVersionableCollection_CurrentVersion() As Long
-    IVersionableCollection_CurrentVersion = mVersion
+Private Property Get IVersionable_Version() As Long
+    IVersionable_Version = mVersion
 End Property

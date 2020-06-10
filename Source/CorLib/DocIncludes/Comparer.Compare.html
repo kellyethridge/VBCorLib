@@ -1,0 +1,40 @@
+@exceptions
+<table style="width: auto">
+    <tr>
+        <th>Exception</th><th>Condition</th>
+    </tr>
+    <tr>
+        <td><a href="ArgumentException.html">ArgumentException</a></td>
+        <td>
+            Neither <i>a</i> nor <i>b</i> implements the <a href="IComparable.html">IComparable</a> interface.<br/>
+            -or-<br/>
+            <i>a</i> and <i>b</i> are of different types and cannot be compared.
+        </td>
+    </tr>
+</table>
+@examples The following code example shows how <a href="Comparer.Compare.html">Compare</a> returns different values depending on the culture associated with the <b>Comparer</b>.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Const</span> Str1 <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span> = <span style="color: #a31515">&quot;Apple&quot;</span>
+    <span style="color: #0000ff">Const</span> Str2 <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span> = <span style="color: #a31515">&quot;Æble&quot;</span>
+    
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;Comparing &quot;&quot;{0}&quot;&quot; and &quot;&quot;{1}&quot;&quot; ...&quot;</span>, Str1, Str2)
+    
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;          Invariant Comparer: {0}&quot;</span>, Comparer.DefaultInvariant.Compare(Str1, Str2))
+    
+    <span style="color: #0000ff">Dim</span> CompUS <span style="color: #0000ff">As</span> Comparer
+    <span style="color: #0000ff">Set</span> CompUS = NewComparer(NewCultureInfo(<span style="color: #a31515">&quot;en-US&quot;</span>, <span style="color: #0000ff">False</span>))
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;English (United States) Sort: {0}&quot;</span>, CompUS.Compare(Str1, Str2))
+    
+    <span style="color: #0000ff">Dim</span> CompDK <span style="color: #0000ff">As</span> Comparer
+    <span style="color: #0000ff">Set</span> CompDK = NewComparer(NewCultureInfo(<span style="color: #a31515">&quot;da-DK&quot;</span>, <span style="color: #0000ff">False</span>))
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;        dansk (Danmark) Sort: {0}&quot;</span>, CompDK.Compare(Str1, Str2))
+    
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; This code produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    Comparing &quot;Apple&quot; and &quot;Æble&quot; ...</span>
+<span style="color: #008000">&#39;              Invariant Comparer: 1</span>
+<span style="color: #008000">&#39;    English (United States) Sort: 1</span>
+<span style="color: #008000">&#39;            dansk (Danmark) Sort: -1</span>
+</pre></div>

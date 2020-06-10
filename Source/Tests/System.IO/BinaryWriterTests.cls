@@ -34,15 +34,22 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use CDec(1.1), NewBytes(&HB, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H1, &H0)
             Test.Use "hello", NewBytes(&H5, &H68, &H65, &H6C, &H6C, &H6F)
             Test.Use "", NewBytes(0)
-            Test.Use #1/1/2001 8:30:00 AM#, NewBytes(&H55, &H55, &H55, &H55, &H8B, &H3, &HE2, &H40)
+            Test.Use #1/1/2001 8:30:00 AM#, NewBytes(&H0, &H34, &H1A, &H2A, &HE4, &H41, &HC2, &H8)
             Test.Use True, NewBytes(1)
             Test.Use False, NewBytes(0)
             Test.Use NewBytes(1, 2, 3), NewBytes(1, 2, 3)
             Test.Use NewIntegers(Asc("a"), &H2030, Asc("c")), NewBytes(&H61, &HE2, &H80, &HB0, &H63)
+            Test.Use NewInt64(&H4030201, &H8070605), NewBytes(1, 2, 3, 4, 5, 6, 7, 8)
             
         Case "WriteChar_WithValues_WritesExpected"
             Test.Use ChrW(&H2030), NewBytes(&HE2, &H80, &HB0)
+            Test.Use &H2030, NewBytes(&HE2, &H80, &HB0)
+            Test.Use &H12030, NewBytes(&HE2, &H80, &HB0)
             Test.Use "Hello", NewBytes(Asc("H"))
+            Test.Use CByte(49), NewBytes(49)
+            Test.Use CInt(49), NewBytes(49)
+            Test.Use CLng(49), NewBytes(49)
+            Test.Use &H10031, NewBytes(49)
             
         Case "WriteValue_WithBytesIndexAndCount_WritesExpected"
             Test.Use 0, 10, NewBytes(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
@@ -98,6 +105,17 @@ Public Sub WriteChar_WithValues_WritesExpected(ByRef Value As Variant, ByVal Exp
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
+Public Sub WriteChar_WhenEmptyString_ThrowsArgumentException()
+    Dim Output As New MemoryStream
+    Dim Writer As BinaryWriter
+    Set Writer = Cor.NewBinaryWriter(Output)
+
+    On Error Resume Next
+    Writer.WriteChar ""
+    
+    AssertArgumentException Err
+End Sub
+
 Public Sub WriteValue_WithNullByteArray_ThrowsArgumentNullException()
     Dim NullArray() As Byte
     Dim Writer As BinaryWriter
@@ -117,6 +135,17 @@ Public Sub WriteValue_WithUnsupportArrayType_ThrowsArgumentException()
     On Error Resume Next
     Writer.WriteValue UnsupportedArray
 
+    AssertArgumentException Err
+End Sub
+
+Public Sub WriteValue_WithUnsupportedUDT_ThrowsArgumentException()
+    Dim Unsupported As SimpleStructure
+    Dim Writer As BinaryWriter
+    Set Writer = Cor.NewBinaryWriter(New MemoryStream)
+    
+    On Error Resume Next
+    Writer.WriteValue Unsupported
+    
     AssertArgumentException Err
 End Sub
 
@@ -245,4 +274,15 @@ Public Sub WriteChars_WithIndexAndCountExtendingPassedUBount_ThrowsArgumentExcep
     Writer.WriteValue Chars, 0, 11
 
     AssertArgumentException Err
+End Sub
+
+Public Sub SeekPosition_WhenCalled_ReturnsNewPosition()
+    Dim Writer As BinaryWriter
+    Set Writer = Cor.NewBinaryWriter(New MemoryStream)
+    Writer.WriteValue NewBytes(1, 2, 3, 4, 5)
+    
+    Dim Actual As Long
+    Actual = Writer.SeekPosition(1, FromEnd)
+    
+    Assert.That Actual, Iz.EqualTo(6)
 End Sub
