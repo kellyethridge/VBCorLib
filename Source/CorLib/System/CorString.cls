@@ -1079,7 +1079,7 @@ End Function
 ' @param StrB The second string to compare.
 ' @param Culture The culture that supplies culture-specific comparison information.
 ' @param Options Options to use when performing the comparison (such as ignoring case or symbols).
-' @return A 32-bit signed integer that indicates the lexical relationship between strA and strB, as shown in the following table
+' @return A 32-bit signed integer that indicates the lexical relationship between <i>StrA</i> and <i>StrB</i>, as shown in the following table
 ' <table style="width: auto">
 '   <tr>
 '       <th>Value</th>
@@ -1147,7 +1147,7 @@ End Function
 '
 ' @param StrA The first string to compare.
 ' @param StrB The second string to compare.
-' @return A 32-bit signed integer that indicates the lexical relationship between strA and strB, as shown in the following table
+' @return A 32-bit signed integer that indicates the lexical relationship between <i>StrA</i> and <i>StrB</i>, as shown in the following table
 ' <table style="width: auto">
 '   <tr>
 '       <th>Value</th>

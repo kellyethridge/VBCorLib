@@ -40,8 +40,7 @@ Attribute VB_Exposed = True
 '
 ' @remarks This base implementation manages many of the aspects utilized with HMAC implementations.
 ' Usually, any class that implements the <a href="HashAlgorithm.html">HashAlgorithm</a> interface can easily be used to
-' provide HMAC capabilities by simply initializing an instance of <b>HMACBase</b> with an instance
-' of the hash object.
+' provide HMAC capabilities by simply initializing an instance of <b>HMACBase</b> with an instance of the hash object.
 ' <p>The HMAC set of classes provided in VBCorLib utilize the <b>HMACBase</b> class to provide consistent HMAC operations.</p>
 ' @see HMACMD5
 ' @see HMACRIPEMD160

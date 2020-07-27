@@ -1,0 +1,56 @@
+@remarks The <a href="FileStream.html">FileStream</a> object created by this method has a default <a href="FileStream.FileShare.html">FileShare</a> value of <a href="FileStream.FileShare.html">None</a>; no other process or code can access the created file until the original file handle is closed.
+<p>The <i>Path</i> parameter is permitted to specify relative or absolute path information. Relative path information is interpreted as relative to the current working directory. To obtain the current working directory, see <a href="Directory.GetCurrentDirectory.html">GetCurrentDirectory</a>.</p>
+<p>This method is equivalent to the <a href="Constructors.NewFileStream.html">NewFileStream(String, FileMode, FileAccess, FileShare, Int32)</a> constructor. If the specified file does not exist, it is created; if it does exist and it is not read-only, the contents are overwritten.</p>
+<p>By default, full read/write access to new files is granted to all users. The file is opened with read/write access and must be closed before it can be opened by another application.</p>
+@exceptions
+<table style="width: auto">
+	<tr>
+		<th>Exception</th><th>Condition</th>
+	</tr>
+	<tr>
+		<td><a href="ArgumentException.html">ArgumentException</a></td>
+		<td><i>Path</i> is a zero-length string, contains only white space, or contains one or more invalid characters as defined by <a href="Path.GetInvalidPathChars.html">GetInvalidPathChars</a>.</td>
+	</tr>
+	<tr>
+		<td><a href="PathTooLongException">PathTooLongException</a></td>
+		<td>The specified path, file name, or both exceed the system-defined maximum length. On Windows-based platforms, paths must be less than 248 characters, and file names must be less than 260 characters.</td>
+	</tr>
+	<tr>
+		<td><a href="DirectoryNotFoundException.html">DirectoryNotFoundException</a></td>
+		<td>The specified path is invalid (for example, it is on an unmapped drive).</td>
+	</tr>
+	<tr>
+		<td><a href="NotSupportedException.html">NotSupportedException</a></td>
+		<td><i>Path</i> is in an invalid format.</td>
+</table>
+@examples The following example creates a file with the specified buffer size.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Const</span> Path <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span> = <span style="color: #a31515">&quot;c:\temp\MyTest.txt&quot;</span>
+
+    <span style="color: #008000">&#39; Delete the file if it exists.</span>
+    <span style="color: #0000ff">If</span> File.Exists(Path) <span style="color: #0000ff">Then</span>
+        File.Delete Path
+    <span style="color: #0000ff">End</span> <span style="color: #0000ff">If</span>
+
+    <span style="color: #008000">&#39; Create the file.</span>
+    <span style="color: #0000ff">Dim</span> fs <span style="color: #0000ff">As</span> FileStream
+    <span style="color: #0000ff">Dim</span> Info() <span style="color: #0000ff">As</span> <span style="color: #2b91af">Byte</span>
+
+    <span style="color: #0000ff">Set</span> fs = File.Create(Path, 1024)
+    Info = NewUTF8Encoding(<span style="color: #0000ff">True</span>).GetBytes(<span style="color: #a31515">&quot;This is some text in the file.&quot;</span>)
+    
+    <span style="color: #008000">&#39; Add some information to the file.</span>
+    fs.WriteBlock Info, 0, CorArray.Length(Info)
+    fs.CloseStream
+
+    <span style="color: #008000">&#39; Open the stream and read it back.</span>
+    <span style="color: #0000ff">Dim</span> sr <span style="color: #0000ff">As</span> StreamReader
+    <span style="color: #0000ff">Set</span> sr = File.OpenText(Path)
+    
+    <span style="color: #0000ff">Do</span> <span style="color: #0000ff">While</span> sr.Peek() &gt;= 0
+        Debug.Print sr.ReadLine
+    <span style="color: #0000ff">Loop</span>
+    
+    sr.CloseReader
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+</pre></div>

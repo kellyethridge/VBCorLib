@@ -31,7 +31,7 @@
   </tr>
 </table>
 @examples The following code example illustrates the use of several <b>BitConverter</b> class methods.
-<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> Main()
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
     <span style="color: #0000ff">Const</span> Formatter <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span> = <span style="color: #a31515">&quot;{0,25}{1,30}&quot;</span>
     <span style="color: #0000ff">Const</span> ADouble   <span style="color: #0000ff">As</span> <span style="color: #2b91af">Double</span> = 0.111111111111111
     <span style="color: #0000ff">Const</span> ASingle   <span style="color: #0000ff">As</span> <span style="color: #0000ff">Single</span> = 0.1111111!
@@ -42,17 +42,27 @@
     
     AnInt64 = CInt64(<span style="color: #a31515">&quot;1111111111111111111&quot;</span>)
     
-    Debug.Print t(<span style="color: #a31515">&quot;This example of methods of the BitConverter class&quot;</span> &amp; _
-        <span style="color: #a31515">&quot;\ngenerates the following output.\n&quot;</span>)
+    Debug.Print t(<span style="color: #a31515">&quot;This example of methods of the BitConverter class\ngenerates the following output.\n&quot;</span>)
     Debug.Print CorString.Format(Formatter, <span style="color: #a31515">&quot;Argument&quot;</span>, <span style="color: #a31515">&quot;Byte array&quot;</span>)
     Debug.Print CorString.Format(Formatter, <span style="color: #a31515">&quot;--------&quot;</span>, <span style="color: #a31515">&quot;----------&quot;</span>)
     
-    Debug.Print CorString.Format(Formatter, ADouble, BitConverter.ToString(BitConverter.GetBytes(ADouble)))
-    Debug.Print CorString.Format(Formatter, ASingle, BitConverter.ToString(BitConverter.GetBytes(ASingle)))
-    Debug.Print CorString.Format(Formatter, AnInt64, BitConverter.ToString(BitConverter.GetBytes(AnInt64)))
-    Debug.Print CorString.Format(Formatter, ALong, BitConverter.ToString(BitConverter.GetBytes(ALong)))
-    Debug.Print CorString.Format(Formatter, AnInt, BitConverter.ToString(BitConverter.GetBytes(AnInt)))
-    Debug.Print CorString.Format(Formatter, ABool, BitConverter.ToString(BitConverter.GetBytes(ABool)))
+    PrintValue ADouble
+    PrintValue ASingle
+    PrintValue AnInt64
+    PrintValue ALong
+    PrintValue AnInt
+    PrintValue ABool
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> PrintValue(<span style="color: #0000ff">ByRef</span> Value <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>)
+    <span style="color: #0000ff">Const</span> Formatter <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span> = <span style="color: #a31515">&quot;{0,25}{1,30}&quot;</span>
+    <span style="color: #0000ff">Dim</span> Bytes() <span style="color: #0000ff">As</span> <span style="color: #2b91af">Byte</span>
+    <span style="color: #0000ff">Dim</span> Contents <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+    
+    Bytes = BitConverter.GetBytes(Value)
+    Contents = BitConverter.ToString(Bytes)
+    
+    Debug.Print CorString.Format(Formatter, Value, Contents)
 <span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
 
 <span style="color: #008000">&#39; This code produces the following output.</span>

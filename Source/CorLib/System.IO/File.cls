@@ -36,44 +36,32 @@ Attribute VB_Exposed = True
 '
 
 ''
-' Provides methods for manipulating and retrieving file information.
+' Provides static methods for the creation, copying, deletion, moving, and opening of files, and aids in the creation of <a href="FileStream.html">FileStream</a> objects.
 '
-' @remarks This class cannot be directly created. To access the methods
-' use the variable name directly.
-'
-' <pre>
-' Debug.Print File.Exists("MyFile.txt")
-' </pre>
-'
+' @include "..\DocIncludes\File.html"
 Option Explicit
 
 Private mDirectorySeparators() As Integer
 
 
 ''
-' Opens a file to be written to starting at the end of the file.
+' Creates a <a href="StreamWriter.html">StreamWriter</a> that appends UTF-8 encoded text to an existing file.
 '
-' @param Path The name of the file to be appended to.
-' @return A StreamWriter object used to write to the file.
-' @remarks The StreamWriter uses a UTF8Encoding declared as Cor.NewUTF8Encoding(False, True).
+' @param Path The path to the file to append to.
+' @return A <a href="StreamWriter.html">StreamWriter</a> that appends UTF-8 encoded text to an existing file.
 ' @see StreamWriter
-'
+' @include "..\DocIncludes\File.AppendText.html"
 Public Function AppendText(ByRef Path As String) As StreamWriter
     Set AppendText = Cor.NewStreamWriter(Path, True)
 End Function
 
 ''
-' Append a text string to the end of a specified file using the supplied encoding.
+' Appends the specified string to the file, creating the file if it does not already exist.
 '
-' @param Path The file to append the text to.
+' @param Path The file to append the specified string to.
 ' @param Contents The string to append to the file.
-' @param Encoding The encoding used to encode the contents (Default UTF8).
-' @remarks This method opens a file, appends the contents then closes the
-' file in the call. If multiple lines need to be appended, then using this
-' method may have performance problems.
-' <p>If the file doesn't exist it will be created. If the file already
-' exists, it will be overwritten.</p>
-'
+' @param Encoding The character encoding to use (Default UTF8).
+' @include "..\DocIncludes\File.AppendAllText.html"
 Public Sub AppendAllText(ByRef Path As String, ByRef Contents As String, Optional ByVal Encoding As Encoding)
     With Cor.NewStreamWriter(Path, True, Encoding)
         .WriteValue Contents
@@ -81,12 +69,12 @@ Public Sub AppendAllText(ByRef Path As String, ByRef Contents As String, Optiona
 End Sub
 
 ''
-' Copies a file.
+' Copies an existing file to a new file. Overwriting a file of the same name is allowed.
 '
-' @param SourceFileName The file to be copied.
-' @param DestFileName The location and name of the copied file.
-' @param OverWrite Indicates if the file already exists it should be overwritten.
-'
+' @param SourceFileName The file to copy.
+' @param DestFileName The name of the destination file. This cannot be a directory.
+' @param OverWrite <b>True</b> if the destination file can be overwritten; otherwise, <b>False</b>.
+' @include "..\DocIncludes\File.Copy.html"
 Public Sub Copy(ByRef SourceFileName As String, ByRef DestFileName As String, Optional ByVal OverWrite As Boolean = False)
     If Len(SourceFileName) = 0 Then _
         Error.Argument Argument_EmptyFileName, "SourceFileName"
@@ -117,34 +105,31 @@ Public Sub Copy(ByRef SourceFileName As String, ByRef DestFileName As String, Op
 End Sub
 
 ''
-' Creates a file. If the file already exists, it is overwritten.
+' Creates or overwrites the specified file.
 '
-' @param Path The new file to be created.
-' @param BufferSize The size of the internal buffer used byte the FileStream object.
-' @return A FileStream object to be used for reading and writing to the file.
-' @remarks The FileStream is declared as Cor.NewFileStream(Path, FileMode.Create, FileAccess.ReadWriteAccess, FileShare.None, BufferSize).
-' @see FileStream
-'
+' @param Path The name of the file.
+' @param BufferSize The number of bytes buffered for reads and writes to the file.
+' @return A <a href="FileStream.html">FileStream</a> with the specified buffer size that provides read/write access to the file specified in <i>Path</i>.
+' @include "..\DocIncludes\File.Create.html"
 Public Function Create(ByRef Path As String, Optional ByVal BufferSize As Long = 4096) As FileStream
     Set Create = Cor.NewFileStream(Path, FileMode.Create, FileAccess.ReadWriteAccess, FileShare.None, BufferSize)
 End Function
 
 ''
-' Creates a file using a UTF8Encoding. If the file already exists, then it is overwritten.
+' Creates or opens a file for writing UTF-8 encoded text.
 '
-' @param Path The new file to be created.
-' @return A StreamWriter to be used to write to the new file.
-' @remarks The StreamWriter is declared as Cor.NewStreamWriter(Path).
+' @param Path The file to be opened for writing.
+' @return A <a href="StreamWriter.html">StreamWriter</a> that writes to the specified file using UTF-8 encoding.
 ' @see StreamWriter
-'
+' @include "..\DocIncludes\File.CreateText.html"
 Public Function CreateText(ByRef Path As String) As StreamWriter
     Set CreateText = Cor.NewStreamWriter(Path)
 End Function
 
 ''
-' Deletes a file.
+' Deletes the specified file.
 '
-' @param Path The file to be deleted.
+' @param Path The name of the file to be deleted. Wildcard characters are not supported.
 ' @remarks If the file did not exist, nothing happens.
 '
 Public Sub Delete(ByRef Path As String)
@@ -196,7 +181,6 @@ End Function
 '     ''... file is readonly
 ' End If
 ' </pre>
-'
 Public Function GetAttributes(ByRef Path As String) As FileAttributes
     Dim FullPath As String
     FullPath = Statics.Path.GetFullPath(Path)

@@ -46,7 +46,7 @@ Attribute VB_Exposed = True
 ' <table>
 '   <tr><th>Note</th></tr>
 '   <tr>
-'       <td>The VBCorLib Guid conflicts with a hidden type in Visual Basic. In order to specific the VBCorLib version of Guid,
+'       <td>The VBCorLib Guid conflicts with a hidden type in Visual Basic. In order to specify the VBCorLib version of Guid,
 '           a variable can be defined as CorLib.Guid instead of just Guid. Alternatively, moving the reference priority for the
 '           VBCorLib library above OLE Automation will give CorLib.Guid priority when a variable is declared.</td>
 '   </tr>
