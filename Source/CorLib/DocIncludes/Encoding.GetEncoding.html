@@ -1,0 +1,121 @@
+@remarks <table style="width: auto">
+	<tr>
+		<th>Note</th>
+	</tr>
+	<tr>
+		<td>Some unsupported code pages cause the exception <a href="ArgumentException.html">ArgumentException</a> to be thrown, whereas others cause <a href="NotSupportedException.html">NotSupportedException</a>. Therefore, your code must catch all exceptions indicated in the Exceptions section.</td>
+	</tr>
+</table>
+<p>The <b>GetEncoding</b> method relies on the underlying platform to support most code pages. However, VBCorLib natively supports some encodings.</p>
+<table style="width: auto">
+	<tr>
+		<th>Note</th>
+	</tr>
+	<td>The ANSI code pages can be different on different computers, or can be changed for a single computer, leading to data corruption. For this reason, we do not recommend encoding and decoding data by using the default code page returned by <b>Encoding.GetEncoding(0)</b>. For the most consistent results, use Unicode, such as UTF-8 (code page 65001) or UTF-16, instead of a specific code page.</td>
+</table>
+<p>To get the encoding associated with the default ANSI code page in the operating system's regional and language settings, you can either use a setting of 0 for the codepage parameter or use the Default property. To determine the default code pages used on the system, use the Windows <b>GetSystemDefaultLangID</b> function. To determine the current ANSI code page, use the Windows <b>GetACP</b> function.</p>
+<p><b>GetEncoding</b> returns a cached instance with default settings. The application should use the constructors of derived classes to get an instance with different settings. For example, the <a href="UTF32Encoding.html">UTF32Encoding</a> class provides a constructor that lets you enable error detection.</p>
+@exceptions
+<table style="width: auto">
+	<tr>
+		<th>Exception</th><th>Condition</th>
+	</tr>
+	<tr>
+		<td><a href="ArgumentException.html">ArgumentException</a></td>
+		<td><i>CodePageOrName</i> is not a valid code page.<br>
+			-or-<br>
+			The code page indicated by <i>CodePageOrName</i> is not supported by the underlying platform.
+		</td>
+	</tr>
+</table>
+@examples The following example demonstrates the <b>Encoding.GetEncoding(String, EncoderFallback, DecoderFallback)</b> method.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> ae              <span style="color: #0000ff">As</span> Encoding
+    <span style="color: #0000ff">Dim</span> InputString     <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+    <span style="color: #0000ff">Dim</span> EncodedBytes()  <span style="color: #0000ff">As</span> <span style="color: #2b91af">Byte</span>
+    <span style="color: #0000ff">Dim</span> DecodedString   <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+    <span style="color: #0000ff">Dim</span> NumBytes        <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
+    <span style="color: #0000ff">Dim</span> b               <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>
+    <span style="color: #0000ff">Dim</span> c               <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>
+    <span style="color: #0000ff">Dim</span> ix              <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
+    
+    <span style="color: #0000ff">Set</span> Console.OutputEncoding = Encoding.UTF8
+    
+    <span style="color: #008000">&#39; Create an encoding, which is equivalent to calling the</span>
+    <span style="color: #008000">&#39; ASCIIEncoding class constructor.</span>
+    <span style="color: #008000">&#39; The EncoderReplacementFallback parameter specifies that the</span>
+    <span style="color: #008000">&#39; string, &quot;(unknown)&quot;, replace characters that cannot be encoded.</span>
+    <span style="color: #008000">&#39; A decoder replacement fallback is also specified, but in this</span>
+    <span style="color: #008000">&#39; code example the decoding operation cannot fail.</span>
+    <span style="color: #0000ff">Set</span> ae = Encoding.GetEncoding(<span style="color: #a31515">&quot;us-ascii&quot;</span>, NewEncoderReplacementFallback(<span style="color: #a31515">&quot;(unknown)&quot;</span>), NewDecoderReplacementFallback(<span style="color: #a31515">&quot;(error)&quot;</span>))
+    
+    <span style="color: #008000">&#39; The input string consists of the Unicode characters LEFT POINTING</span>
+    <span style="color: #008000">&#39; DOUBLE ANGLE QUOTATION MARK (U+00AB), &#39;X&#39; (U+0058), and RIGHT POINTING</span>
+    <span style="color: #008000">&#39; DOUBLE ANGLE QUOTATION MARK (U+00BB).</span>
+    <span style="color: #008000">&#39; The encoding can only encode characters in the US-ASCII range of U+0000</span>
+    <span style="color: #008000">&#39; through U+007F. Consequently, the characters bracketing the &#39;X&#39; character</span>
+    <span style="color: #008000">&#39; are replaced with the fallback replacement string, &quot;(unknown)&quot;.</span>
+    InputString = t(<span style="color: #a31515">&quot;\u00abX\u00bb&quot;</span>)
+    
+    <span style="color: #0000ff">ReDim</span> EncodedBytes(0 <span style="color: #0000ff">To</span> ae.GetByteCount(InputString) - 1)
+    
+    <span style="color: #008000">&#39; Display the name of encoding.</span>
+    Console.WriteLine <span style="color: #a31515">&quot;The name of the encoding is &quot;&quot;{0}&quot;&quot;.{1}&quot;</span>, ae.WebName, vbCrLf
+    
+    <span style="color: #008000">&#39; Display the input string text.</span>
+    Console.WriteLine <span style="color: #a31515">&quot;Input string ({0} characters): &quot;&quot;{1}&quot;&quot;&quot;</span>, Len(InputString), InputString
+    
+    <span style="color: #008000">&#39; Display the input string in hexadecimal.</span>
+    Console.WriteValue <span style="color: #a31515">&quot;Input string in hexadecimal: &quot;</span>
+        
+    <span style="color: #0000ff">For</span> <span style="color: #0000ff">Each</span> c <span style="color: #0000ff">In</span> CorString.ToCharArray(InputString)
+        Console.WriteValue <span style="color: #a31515">&quot;0x{0:X2} &quot;</span>, c
+    <span style="color: #0000ff">Next</span>
+    
+    <span style="color: #008000">&#39; Encode the input string.</span>
+    Console.WriteLine <span style="color: #a31515">&quot;Encode the input string...&quot;</span>
+    NumBytes = ae.GetBytesEx(InputString, 0, Len(InputString), EncodedBytes, 0)
+    
+    <span style="color: #008000">&#39; Display the encoded bytes.</span>
+    Console.WriteLine <span style="color: #a31515">&quot;Encoded bytes in hexadecimal ({0} bytes):{1}&quot;</span>, NumBytes, vbCrLf
+    
+    <span style="color: #0000ff">For</span> <span style="color: #0000ff">Each</span> b <span style="color: #0000ff">In</span> EncodedBytes
+        Console.WriteValue <span style="color: #a31515">&quot;0x{0:X2} &quot;</span>, b
+        ix = ix + 1
+        
+        <span style="color: #0000ff">If</span> ix <span style="color: #0000ff">Mod</span> 6 = 0 <span style="color: #0000ff">Then</span>
+            Console.WriteLine
+        <span style="color: #0000ff">End</span> <span style="color: #0000ff">If</span>
+    <span style="color: #0000ff">Next</span>
+    
+    Console.WriteLine vbCrLf
+    
+    <span style="color: #008000">&#39; Decode the encoded bytes, yielding a reconstituted string.</span>
+    DecodedString = ae.GetString(EncodedBytes)
+    
+    <span style="color: #008000">&#39; Display then input string and the decoded string for comparison</span>
+    Console.WriteLine <span style="color: #a31515">&quot;Input string: &quot;&quot;{0}&quot;&quot;&quot;</span>, InputString
+    Console.WriteLine <span style="color: #a31515">&quot;Decoded string: &quot;&quot;{0}&quot;&quot;&quot;</span>, DecodedString
+    
+    Console.ReadKey
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; This code produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    The name of the encoding is &quot;us-ascii&quot;.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    Input string (3 characters): &quot;&#171;X&#187;&quot;</span>
+<span style="color: #008000">&#39;    Input string in hexadecimal: 0xAB 0x58 0xBB</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    Encode the input string...</span>
+<span style="color: #008000">&#39;    Encoded bytes in hexadecimal (19 bytes):</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    0x28 0x75 0x6E 0x6B 0x6E 0x6F</span>
+<span style="color: #008000">&#39;    0x77 0x6E 0x29 0x58 0x28 0x75</span>
+<span style="color: #008000">&#39;    0x6E 0x6B 0x6E 0x6F 0x77 0x6E</span>
+<span style="color: #008000">&#39;    0x29</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    Decode the encoded bytes...</span>
+<span style="color: #008000">&#39;    Input string:  &quot;&#171;X&#187;&quot;</span>
+<span style="color: #008000">&#39;    Decoded string:&quot;(unknown)X(unknown)&quot;</span>
+</pre></div>

@@ -399,7 +399,7 @@ Private Function DecryptFinalBlock(ByRef InputBuffer() As Byte, ByVal InputOffse
 
     ' If there is something in the InputBuffer to be processed, then
     ' add it to the working buffer, too.
-    If InputCount > 0 Then Call CopyMemory(OutputBuffer(OutputOffset), InputBuffer(InputOffset), InputCount)
+    If InputCount > 0 Then CopyMemory OutputBuffer(OutputOffset), InputBuffer(InputOffset), InputCount
 
     ' Have the decryption routine work on the bytes in the output buffer. The decrypted bytes
     ' will be placed back into the same buffer.

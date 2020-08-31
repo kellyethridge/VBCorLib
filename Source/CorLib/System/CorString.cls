@@ -39,11 +39,7 @@ Attribute VB_Exposed = True
 ' Provides static functions to format and manipulate string values.
 '
 ' @remarks This class cannot be directly instantiated. The methods are accessed through the class name itself.
-' @examples
-' <pre>
-' s = CorString.Trim(s, "\")
-' </pre>
-'
+' @include "..\DocIncludes\CorString.html"
 Option Explicit
 
 ''

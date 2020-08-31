@@ -1,0 +1,21 @@
+@examples The following example code creates and displays a <b>CorDateTime</b> object with various output formats.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> dt <span style="color: #0000ff">As</span> CorDateTime
+    
+    <span style="color: #0000ff">Set</span> dt = NewDateTime(2003, 2, 3, 8, 0, 0)
+    
+    Debug.Print dt.ToString
+    Debug.Print dt.ToShortDateString
+    Debug.Print dt.ToLongDateString
+    Debug.Print dt.ToShortTimeString
+    Debug.Print dt.ToLongTimeString
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; This code produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    2/3/2003 8:00:00 AM</span>
+<span style="color: #008000">&#39;    2/3/2003</span>
+<span style="color: #008000">&#39;    Monday, February 3, 2003</span>
+<span style="color: #008000">&#39;    8:00 AM</span>
+<span style="color: #008000">&#39;    8:00:00 AM</span>
+</pre></div>

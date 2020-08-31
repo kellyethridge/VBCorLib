@@ -38,16 +38,12 @@ Attribute VB_Exposed = True
 ''
 ' A set of functions to be used to convert character arrays to and from byte arrays.
 '
-' @remarks <p>UTF-8 is an encoding scheme that is fully compatible with the existing
-' ASCII set of characters (0-127). It also supports Unicode characters, including the
-' UTF-16 character set.</p>
-' <p>UTF-8 is useful because it will have a size ratio of 1:1 for pure ASCII characters.
-' The ratio will increase during the encoding for characters outside ASCII.</p>
-' <p>Additional information about UTF-8 encoding scheme can be found at "http://www.faqs.org/rfcs/rfc2279.html".</p>
-'
-' @see Constructors
 ' @see Encoding
-'
+' @see ASCIIEncoding
+' @see UTF7Encoding
+' @see UTF32Encoding
+' @see UnicodeEncoding
+' @include "..\DocIncludes\UTF8Encoding.html"
 Option Explicit
 Implements IObject
 Implements Encoding
@@ -142,10 +138,9 @@ Public Property Get WindowsCodePage() As Long
 End Property
 
 ''
-' Gets the name of this encoding.
+' Gets the human-readable description of the current encoding.
 '
-' @return The encoding's name.
-'
+' @include "..\DocIncludes\Encoding.EncodingName.html"
 Public Property Get EncodingName() As String
     EncodingName = Table.EncodingName(CodePage)
 End Property
@@ -244,15 +239,16 @@ Public Property Set EncoderFallback(ByVal Value As EncoderFallback)
 End Property
 
 ''
-' Returns the number of bytes that would be produced from the set of characters using this encoding.
+' Calculates the number of bytes produced by encoding the characters in the specified String or Integer().
 '
-' @param Chars A set of characters used to calculated the number of bytes once encoded with this encoding.
-' @param Index The starting index of the first character to be used.
-' @param Count The number of characters to include in the calculation.
-' @return The number of bytes that would be produced by encoding the set of characters.
-' @remarks The <i>Chars</i> parameter will accept either a String or an Integer array. The Index
-' is zero based for <b>String</b>, not 1 based like Mid$.
-'
+' @param Chars The Integer() or String containing the set of characters to encode.
+' @param Index The index of the first character to encode.
+' @param Count The number of characters to encode.
+' @return The number of bytes produced by encoding the specified of characters.
+' @include "..\DocIncludes\UTF8Encoding.GetByteCount.html"
+' @see #GetBytes
+' @see #GetMaxByteCount
+' @see #GetEncoder
 Public Function GetByteCount(ByRef Chars As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Long
     Dim NullBytes()     As Byte
     Dim LocalChars()    As Integer

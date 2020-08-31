@@ -1,0 +1,110 @@
+@remarks <p>To calculate the exact array size required by <a href="Encoding.GetBytesEx.html">GetBytesEx</a> to store the resulting bytes, the application should use <b>GetByteCount</b>. To calculate the maximum array size, the application should use <a href="Encoding.GetMaxByteCount.html">GetMaxByteCount</a>. The <b>GetByteCount</b> method generally allows allocation of less memory, while the <a href="Encoding.GetMaxByteCount.html">GetMaxByteCount</a> method generally executes faster.</p>
+<p>If the data to be converted is available only in sequential blocks (such as data read from a stream) or if the amount of data is so large that it needs to be divided into smaller blocks, the application should use the <a href="Decoder.html">Decoder</a> or the <a href="Encoder.html">Encoder</a> provided by the <a href="Encoding.GetDecoder.html">GetDecoder</a> method or the <a href="Encoding.GetEncoder.html">GetEncoder</a> method, respectively, of an implemented class.</p>
+<p>The <b>GetByteCount</b> method determines how many bytes result in encoding a set of Unicode characters, and the <b>GetBytesEx</b> method performs the actual encoding. The <a href="Encoding.GetBytesEx.html">Encoding.GetBytesEx</a> method expects discrete conversions, in contrast to the <a href="Encoder.GetBytes.html">Encoder.GetBytes</a> method, which handles multiple conversions on a single input stream.</p>
+@exceptions
+<table style="width: auto">
+	<tr>
+		<th>Exception</th><th>Condition</th>
+	</tr>
+	<tr>
+		<td><a href="ArgumentNullException.html">ArgumentNullException</a></td>
+		<td>
+			<i>Chars</i> is a <b>null</b> array.<br>
+			-or-<br>
+			<i>Bytes</i> is a <b>null</b> array.
+		</td>
+	</tr>
+	<tr>
+		<td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+		<td>
+			<i>CharIndex</i> is less than the lower-bound of <i>Chars</i> for an array or less than zero for a string.<br>
+			-or-<br>
+			<i>CharCount</i> is less than zero.<br>
+			-or-<br>
+			<i>CharIndex</i> and <i>CharCount</i> do not denote a valid range in <i>Chars</i>.<br>
+			-or-<br>
+			<i>ByteIndex</i> is not a valid index in <i>Bytes</i>.
+		</td>
+	</tr>
+	<tr>
+		<td><a href="ArgumentException.html">ArgumentException</a></td>
+		<td><i>Bytes</i> does not have enough capacity from <i>ByteIndex</i> to the end of the array to accommodate the resulting bytes.</td>
+	</tr>
+	<tr>
+		<td><a href="EncoderFallbackException.html">EncoderFallbackException</a></td>
+		<td>
+			A fallback occurred<br>
+			-and-<br>
+			<a href="Encoding.Get.EncoderFallback.html">EncoderFallback</a> is set to <a href="EncoderExceptionFallback.html">EncoderExceptionFallback</a>.
+		</td>
+	</tr>	
+</table>
+@example The following example determines the number of bytes required to encode three characters from a character array, encodes the characters, and displays the resulting bytes.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> MyChars() <span style="color: #0000ff">As</span> <span style="color: #2b91af">Integer</span>
+    <span style="color: #0000ff">Dim</span> U7      <span style="color: #0000ff">As</span> Encoding
+    <span style="color: #0000ff">Dim</span> U8      <span style="color: #0000ff">As</span> Encoding
+    <span style="color: #0000ff">Dim</span> U16LE   <span style="color: #0000ff">As</span> Encoding
+    <span style="color: #0000ff">Dim</span> U16BE   <span style="color: #0000ff">As</span> Encoding
+    <span style="color: #0000ff">Dim</span> U32     <span style="color: #0000ff">As</span> Encoding
+    
+    MyChars = NewChars(<span style="color: #a31515">&quot;z&quot;</span>, <span style="color: #a31515">&quot;a&quot;</span>, &amp;H306, &amp;H1FD, &amp;H3B2, &amp;HD8FF, &amp;HDCFF)
+    
+    <span style="color: #0000ff">Set</span> U7 = Encoding.UTF7
+    <span style="color: #0000ff">Set</span> U8 = Encoding.UTF8
+    <span style="color: #0000ff">Set</span> U16LE = Encoding.Unicode
+    <span style="color: #0000ff">Set</span> U16BE = Encoding.BigEndianUnicode
+    <span style="color: #0000ff">Set</span> U32 = Encoding.UTF32
+    
+    Console.WriteLine <span style="color: #a31515">&quot;Encoding the characters from index 4 through 6:&quot;</span>
+    PrintCountsAndBytes MyChars, 4, 3, U7
+    PrintCountsAndBytes MyChars, 4, 3, U8
+    PrintCountsAndBytes MyChars, 4, 3, U16LE
+    PrintCountsAndBytes MyChars, 4, 3, U16BE
+    PrintCountsAndBytes MyChars, 4, 3, U32
+    
+    Console.ReadKey
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> PrintCountsAndBytes(<span style="color: #0000ff">ByRef</span> Chars() <span style="color: #0000ff">As</span> <span style="color: #2b91af">Integer</span>, <span style="color: #0000ff">ByVal</span> Index <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>, <span style="color: #0000ff">ByVal</span> Count <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>, <span style="color: #0000ff">ByVal</span> Enc <span style="color: #0000ff">As</span> Encoding)
+    <span style="color: #0000ff">Dim</span> IBC     <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
+    <span style="color: #0000ff">Dim</span> IMBC    <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
+    <span style="color: #0000ff">Dim</span> Bytes() <span style="color: #0000ff">As</span> <span style="color: #2b91af">Byte</span>
+    
+    Console.WriteValue <span style="color: #a31515">&quot;{0,-30} :&quot;</span>, Enc.ToString
+    
+    IBC = Enc.GetByteCount(Chars, Index, Count)
+    Console.WriteValue <span style="color: #a31515">&quot; {0,-3}&quot;</span>, IBC
+    
+    IMBC = Enc.GetMaxByteCount(Count)
+    Console.WriteValue <span style="color: #a31515">&quot; {0,-3} :&quot;</span>, IMBC
+    
+    <span style="color: #0000ff">ReDim</span> Bytes(0 <span style="color: #0000ff">To</span> IBC - 1)
+    Enc.GetBytesEx Chars, Index, Count, Bytes, 0
+    
+    PrintHexBytes Bytes
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> PrintHexBytes(<span style="color: #0000ff">ByRef</span> Bytes() <span style="color: #0000ff">As</span> <span style="color: #2b91af">Byte</span>)
+    <span style="color: #0000ff">Dim</span> i <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
+    
+    <span style="color: #0000ff">If</span> CorArray.IsNullOrEmpty(Bytes) <span style="color: #0000ff">Then</span>
+        Console.WriteLine <span style="color: #a31515">&quot;&lt;none&gt;&quot;</span>
+    <span style="color: #0000ff">Else</span>
+        <span style="color: #0000ff">For</span> i = LBound(Bytes) <span style="color: #0000ff">To</span> UBound(Bytes)
+            Console.WriteValue <span style="color: #a31515">&quot;{0:X2} &quot;</span>, Bytes(i)
+        <span style="color: #0000ff">Next</span>
+        
+        Console.WriteLine
+    <span style="color: #0000ff">End</span> <span style="color: #0000ff">If</span>
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; This example code produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    Encoding the characters from index 4 through 6:</span>
+<span style="color: #008000">&#39;    CorLib.UTF7Encoding            : 10  11  :2B 41 37 4C 59 2F 39 7A 2F 2D</span>
+<span style="color: #008000">&#39;    CorLib.UTF8Encoding            : 6   12  :CE B2 F1 8F B3 BF</span>
+<span style="color: #008000">&#39;    CorLib.UnicodeEncoding         : 6   8   :B2 03 FF D8 FF DC</span>
+<span style="color: #008000">&#39;    CorLib.UnicodeEncoding         : 6   8   :03 B2 D8 FF DC FF</span>
+<span style="color: #008000">&#39;    CorLib.UTF32Encoding           : 8   16  :B2 03 00 00 FF FC 04 00</span>
+</pre></div>

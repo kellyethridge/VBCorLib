@@ -625,7 +625,7 @@ Private Function SaveHICONtoArray(ByVal hIcon As Long, OutArray() As Byte, ByVal
                             CopyMemory OutArray(62), Bits(x), .biSizeImage
                         Else
                             ' we can loop & transfer 3 of 4 bytes for each pixel or just call the API one more time
-                            Call GetDIBits(tDC, ICI.hbmColor, 0&, .biHeight, OutArray(62), BHI, 0&)
+                            GetDIBits tDC, ICI.hbmColor, 0&, .biHeight, OutArray(62), BHI, 0&
                         End If
                     End If
                     Erase Bits()

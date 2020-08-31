@@ -1,0 +1,48 @@
+@remarks <p>Encoding is the process of transforming a set of Unicode characters into a sequence of bytes. Decoding is the process of transforming a sequence of encoded bytes into a set of Unicode characters.</p>
+<p>UTF-8 encoding represents each code point as a sequence of one to four bytes.</p>
+<p>The <a href="UTF8Encoding.GetByteCount.html">GetByteCount</a> method determines how many bytes result in encoding a set of Unicode characters, and the <a href="UTF8Encoding.GetBytes.html">GetBytes</a> method performs the actual encoding.</p>
+<p>Likewise, the <a href="UTF8Encoding.GetCharCount.html">GetCharCount</a> method determines how many characters result in decoding a sequence of bytes, and the <a href="UTF8Encoding.GetChars.html">GetChars</a> and <a href="UTF8Encoding.GetString.html">GetString</a> methods perform the actual decoding.</p>
+<p><b>UTF8Encoding</b> corresponds to the Windows code page 65001.</p>
+<p>Optionally, the <b>UTF8Encoding</b> object provides a preamble, which is an array of bytes that can be prefixed to the sequence of bytes resulting from the encoding process. If the preamble contains a byte order mark (BOM), it helps the decoder determine the byte order and the transformation format or UTF. The <a href="UTF8Encoding.GetPreamble.html">GetPreamble</a> method retrieves an array of bytes that can include the BOM. For more information on byte order and the byte order mark, see The Unicode Standard at the <a href="https://home.unicode.org/">Unicode home page</a>.</p>
+<table style="width: auto">
+	<tr>
+		<th>Note</th>
+	</tr>
+	<tr>
+		<td>To enable error detection and to make the class instance more secure, the application should use the <a href="Constructors.NewUTF8Encoding.html">UTF8Encoding constructor</a> that takes a <i>ThrowOnInvalidBytes</i> parameter and set that parameter to true. With error detection, a method that detects an invalid sequence of characters or bytes throws a <a href="ArgumentException.html">ArgumentException</a>. Without error detection, no exception is thrown, and the invalid sequence is generally ignored.</td>
+	</tr>
+</table>
+@examples The following example demonstrates how to use a <b>UTF8Encoding</b> to encode a string of Unicode characters and store them in a byte array. Notice that when encodedBytes is decoded back to a string there is no loss of data.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> UTF8            <span style="color: #0000ff">As</span> <span style="color: #0000ff">New</span> UTF8Encoding
+    <span style="color: #0000ff">Dim</span> UnicodeString   <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+    <span style="color: #0000ff">Dim</span> EncodedBytes()  <span style="color: #0000ff">As</span> <span style="color: #2b91af">Byte</span>
+    <span style="color: #0000ff">Dim</span> DecodedString   <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+    <span style="color: #0000ff">Dim</span> b               <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>
+    
+    <span style="color: #0000ff">Set</span> Console.OutputEncoding = Encoding.UTF8
+    
+    <span style="color: #008000">&#39; A Unicode string with two characters outside an 8-bit code range.</span>
+    UnicodeString = t(<span style="color: #a31515">&quot;This unicode string contains two characters with codes outside an 8-bit code range, Pi (\u03a0) and Sigma (\u03a3).&quot;</span>)
+    Console.WriteLine <span style="color: #a31515">&quot;Original string:&quot;</span>
+    Console.WriteLine UnicodeString
+    
+    <span style="color: #008000">&#39; Encode the string.</span>
+    EncodedBytes = UTF8.GetBytes(UnicodeString)
+    Console.WriteLine
+    Console.WriteLine <span style="color: #a31515">&quot;Encoded bytes:&quot;</span>
+    
+    <span style="color: #0000ff">For</span> <span style="color: #0000ff">Each</span> b <span style="color: #0000ff">In</span> EncodedBytes
+        Console.WriteValue <span style="color: #a31515">&quot;[{0}]&quot;</span>, b
+    <span style="color: #0000ff">Next</span>
+    Console.WriteLine
+    
+    <span style="color: #008000">&#39; Decode bytes back to string.</span>
+    <span style="color: #008000">&#39; Notice Pi and Sigma characters are still present.</span>
+    DecodedString = UTF8.GetString(EncodedBytes)
+    Console.WriteLine
+    Console.WriteLine <span style="color: #a31515">&quot;Decoded bytes:&quot;</span>
+    Console.WriteLine DecodedString
+    Console.ReadKey
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+</pre></div>

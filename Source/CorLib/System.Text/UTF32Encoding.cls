@@ -38,23 +38,11 @@ Attribute VB_Exposed = True
 ''
 ' Represents a UTF-32 encoding of Unicode characters.
 '
-' @remarks The <b>UTF32Encoding</b> class represents a UTF-32 encoding. The encoder can use the big endian byte order (most significant byte first) or
-' the little endian byte order (least significant byte first). For example, the Latin Capital Letter A (code point U+0041) is serialized as follows (in hexadecimal):
-' <ul>
-'   <li>Big endian byte order: 00 00 00 41</li>
-'   <li>Little endian byte order: 41 00 00 00</li>
-' </ul>
-' <p><b>UTF32Encoding</b> corresponds to the Windows code pages 12000 (little endian byte order) and 12001 (big endian byte order).</p>
-' <pre>
-'    words   bits    UTF-32 representation
-'    -----   ----    -----------------------------------
-'    1       16      00000000 00000000 xxxxxxxx xxxxxxxx
-'    2       21      00000000 000xxxxx hhhhhhll llllllll
-'    -----   ----    -----------------------------------
-'
-'   Surrogate:
-'       Real Unicode value = (HighSurrogate - 0xD800) * 0x400 + (LowSurrogate - 0xDC00) + 0x10000
-' </pre>
+' @see ASCIIEncoding
+' @see UTF7Encoding
+' @see UTF8Encoding
+' @see UnicodeEncoding
+' @include "..\DocIncludes\UTF32Encoding.html"
 Option Explicit
 Implements IObject
 Implements Encoding

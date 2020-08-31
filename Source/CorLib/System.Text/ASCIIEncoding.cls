@@ -38,19 +38,12 @@ Attribute VB_Exposed = True
 ''
 ' Provides a set of methods used to encode and decode chars to and from bytes in ASCII format.
 '
-' @remarks
-' Encoding characters to bytes using ASCII encoding will produce a 1:1 ratio for each
-' character-to-byte encoding. If the character is greater than 127, then it will be
-' replaced with character 63 (?).
-' <p>To create a new <b>ASCIIEncoding</b> use the New function.
-' <pre>
-' Set en = New ASCIIEncoding
-' </pre></p>
 ' @see Encoding
 ' @see UTF8Encoding
 ' @see UTF7Encoding
+' @see UTF32Encoding
 ' @see UnicodeEncoding
-'
+' @include "..\DocIncludes\ASCIIEncoding.html"
 Option Explicit
 Implements IObject
 Implements Encoding
@@ -241,15 +234,17 @@ Public Property Get WindowsCodePage() As Long
 End Property
 
 ''
-' Returns the number of bytes that would be produced from the set of characters using this encoding.
+' Calculates the number of bytes produced by encoding the characters in the specified string or character array.
 '
-' @param Chars A set of characters used to calculated the number of bytes once encoded with this encoding.
-' @param Index The starting index of the first character to be used.
-' @param Count The number of characters to include in the calculation.
-' @return The number of bytes that would be produced by encoding the set of characters.
-' @remarks The <i>Chars</i> parameter will accept either a String or an Integer array.
-' <p>If a string is passed in, then the Index and Count parameters are ignored.</p>
+' @param Chars The string or character array containg the characters to encode.
+' @param Index The index of the first character to encode.
+' @param Count The number of characters to encode.
+' @return The number of bytes produced by encoding the specified characters.
+' @include "..\DocIncludes\ASCIIEncoding.GetByteCount.html"
 ' @see Encoding
+' @see #GetBytes
+' @see #GetMaxByteCount
+' @see #GetEncoder
 Public Function GetByteCount(ByRef Chars As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Long
     Dim LocalChars()    As Integer
     Dim Range           As ListRange
@@ -274,20 +269,21 @@ End Function
 ''
 ' Encodes a set of characters into an array of bytes.
 '
-' @param Chars The set of characters to be encoded into an array of bytes. This can
-' be either an Integer array or a String.
-' @param Index The index of the first character to begin encoding from.
-' @param Count The number of characters to be encoded.
-' @return A byte array containing the encoded characters as bytes.
-' @remarks The <i>Chars</i> parameter will accept either a String or an Integer array. The Index
-' is zero based for both the String and Integer array, not 1 based like Mid$.
+' @param Chars The Integer array or String containing the set of characters to encode.
+' @param Index The index of the first character to encode.
+' @param Count The number of characters to encode.
+' @return A byte array containing the results of encoding the specified set of characters.
+' @include "..\DocIncludes\Encoding.GetBytes.html"
 ' @see Encoding
+' @see #GetBytesEx
+' @see #GetEncoder
+' @see #GetByteCount
+' @see #GetMaxByteCount
 Public Function GetBytes(ByRef Chars As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Byte()
     Dim LocalChars()    As Integer
     Dim Range           As ListRange
     Dim ByteCount       As Long
-    
-    
+        
     LocalChars = AsChars(Chars)
     
     On Error GoTo Catch

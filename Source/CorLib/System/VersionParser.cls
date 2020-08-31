@@ -109,7 +109,7 @@ Private Function TryParseComponent(ByVal Component As Long, ByRef Result As Long
     If Result < 0 Then
         Dim ParamName As String
         ParamName = Choose(Component + 1, "Major", "Minor", "Build", "Revision")
-        mException = Cor.NewArgumentOutOfRangeException(ParamName, Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
+        Set mException = Cor.NewArgumentOutOfRangeException(ParamName, Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
     Else
         TryParseComponent = True
     End If

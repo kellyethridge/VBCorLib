@@ -41,12 +41,12 @@ Attribute VB_Exposed = True
 ' encoded characters in certain situations without integerity loss.
 '
 ' @see EncodingStatic
-' @see UTF8Encoding
-' @see UTF7Encoding
-' @see UnicodeEncoding
 ' @see ASCIIEncoding
+' @see UTF7Encoding
+' @see UTF8Encoding
 ' @see UTF32Encoding
-'
+' @see UnicodeEncoding
+' @include "..\DocIncludes\Encoding.html"
 Option Explicit
 
 
@@ -81,10 +81,9 @@ Public Property Get BodyName() As String: End Property
 Public Property Get CodePage() As Long: End Property
 
 ''
-' The name of this encoding.
+' When overridden in a derived class, gets the human-readable description of the current encoding.
 '
-' @return The encoding's name.
-'
+' @include "..\DocIncludes\Encoding.EncodingName.html"
 Public Property Get EncodingName() As String: End Property
 
 ''
@@ -140,54 +139,60 @@ Public Property Get WindowsCodePage() As Long: End Property
 ''
 ' Returns the number of bytes that would be produced from the set of characters using this encoding.
 '
-' @param Chars A set of characters used to calculated the number of bytes once encoded with this encoding.
-' @param Index The starting index of the first character to be used.
-' @param Count The number of characters to include in the calculation.
-' @return The number of bytes that would be produced by encoding the set of characters.
-' @remarks The <i>Chars</i> parameter will accept either a String or an Integer array. The Index
-' is zero based for both the String and Integer array, not 1 based like Mid$.
-'
+' @param Chars The Integer() or String containing the set of characters to encode.
+' @param Index The index of the first character to encode.
+' @param Count The number of characters to encode.
+' @return The number of bytes produced by encoding the specified of characters.
+' @include "..\DocIncludes\Encoding.GetByteCount.html"
+' @see #GetBytesEx
+' @see #GetMaxByteCount
+' @see #GetEncoder
 Public Function GetByteCount(ByRef Chars As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Long: End Function
 
 ''
 ' Encodes a set of characters into an array of bytes.
 '
-' @param Chars The set of characters to be encoded into an array of bytes. This can
-' be either an Integer array or a String.
-' @param Index The index of the first character to begin encoding from.
-' @param Count The number of characters to be encoded.
-' @return A byte array containing the encoded characters as bytes.
-' @remarks The <i>Chars</i> parameter will accept either a String or an Integer array. The Index
-' is zero based for both the String and Integer array, not 1 based like Mid$.
-'
+' @param Chars The Integer array or String containing the set of characters to encode.
+' @param Index The index of the first character to encode.
+' @param Count The number of characters to encode.
+' @return A byte array containing the results of encoding the specified set of characters.
+' @include "..\DocIncludes\Encoding.GetBytes.html"
+' @see Encoding
+' @see #GetBytesEx
+' @see #GetEncoder
+' @see #GetByteCount
+' @see #GetMaxByteCount
 Public Function GetBytes(ByRef Chars As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Byte(): End Function
 
 ''
 ' Encodes a set of characters into an array of bytes, returning the number of bytes produced.
 '
-' @param Chars the set of characters to be encoded into bytes. This can
-' be either an Integer array or a String.
-' @param CharIndex The index of the first character to begin encoding from.
-' @param CharCount The number of characters to be encoded.
-' @param Bytes The destination for the encoded characters.
-' @param ByteIndex The index of the first byte stored in the destination array.
+' @param Chars The Integer array or String containing the set of characters to encode.
+' @param CharIndex The index of the first character to encode.
+' @param CharCount The number of characters to encode.
+' @param Bytes The byte array to contain the resulting sequence of bytes.
+' @param ByteIndex The index as which to start writing the resulting sequence of bytes.
 ' @return The number of bytes produce by the encoding.
-' @remarks The <i>Bytes</i> array cannot be null and must be large enough to hold the encoded
-' set of characters. To obtain the size required, use GetByteCount to find the necessary size.
-' Or, use GetMaxByteCount to get the largest size that could be produced. The largest size is not
-' the perfect size, only the maximum number of bytes that could ever be produced by a number of
-' characters. Resizing of the resultant <i>Bytes</i> array may be necessary.
-'
+' @include "..\DocIncludes\Encoding.GetBytesEx.html"
+' @see Encoding
+' @see #GetBytes
+' @see #GetEncoder
+' @see #GetByteCount
+' @see #GetMaxByteCount
 Public Function GetBytesEx(ByRef Chars As Variant, ByVal CharIndex As Long, ByVal CharCount As Long, ByRef Bytes() As Byte, ByVal ByteIndex As Long) As Long: End Function
 
 ''
-' Returns the number of characters that would be produced by decoding a byte array.
+' When implemented in a derived class, calculates the number of characters produced by decoding a sequence of bytes from the specified byte array.
 '
-' @param Bytes The bytes to use when calculating the number of characters.
-' @param Index The starting index in <i>Bytes</i> to being calculating from.
-' @param Count The number of bytes to be used in the calculation.
-' @return The number of characters that would be decoded from the set of bytes.
-'
+' @param Bytes The byte array containing the sequence of bytes to decode.
+' @param Index The index of the first byte to decode.
+' @param Count The number of bytes to decode.
+' @return The number of characters produced by decoding the specified sequence of bytes.
+' @include "..\DocIncludes\Encoding.GetCharCount.html"
+' @see Encoding
+' @see #GetCharsEx
+' @see #GetMaxCharCount
+' @see #GetDecoder
 Public Function GetCharCount(ByRef Bytes() As Byte, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Long: End Function
 
 ''

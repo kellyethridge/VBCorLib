@@ -1,0 +1,71 @@
+@remarks <p>Encoding is the process of transforming a set of Unicode characters into a sequence of bytes. Decoding is the process of transforming a sequence of encoded bytes into a set of Unicode characters.</p>
+<p>The UTF-32 encoding represents each code point as a 32-bit integer.</p>
+<p>The <a href="UTF32Encoding.GetByteCount.html">GetByteCount</a> method determines how many bytes result in encoding a set of Unicode characters, and the <a href="UTF32Encoding.GetBytes.html">GetBytes</a> method performs the actual encoding.</p>
+<p>Likewise, the <a href="UTF32Encoding.GetCharCount.html">GetCharCount</a> method determines how many characters result in decoding a sequence of bytes, and the <a href="UTF32Encoding.GetChars.html">GetChars</a> and <a href="UTF32Encoding.GetString.html">GetString</a> methods perform the actual decoding.</p>
+<p><b>UTF32Encoding</b> corresponds to the Windows code pages 12000 (little endian byte order) and 12001 (big endian byte order).</p>
+The encoder can use the big endian byte order (most significant byte first) or the little endian byte order (least significant byte first). For example, the Latin Capital Letter A (code point U+0041) is serialized as follows (in hexadecimal):
+<ul>
+  <li>Big endian byte order: 00 00 00 41</li>
+  <li>Little endian byte order: 41 00 00 00</li>
+</ul>
+<p>It is generally more efficient to store Unicode characters using the native byte order. For example, it is better to use the little endian byte order on little endian platforms, such as Intel computers.</p>
+<p>The <a href="UTF32Encoding.GetPreamble.html">GetPreamble</a> method retrieves an array of bytes that can include the byte order mark (BOM). If this byte array is prefixed to an encoded stream, it helps the decoder to identify the encoding format used.</p>
+<p>For more information on byte order and the byte order mark, see The Unicode Standard at the <a href="https://home.unicode.org/">Unicode home page</a>.</p>
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> U32LE       <span style="color: #0000ff">As</span> UTF32Encoding
+    <span style="color: #0000ff">Dim</span> U32withED   <span style="color: #0000ff">As</span> UTF32Encoding
+    <span style="color: #0000ff">Dim</span> U32noED     <span style="color: #0000ff">As</span> UTF32Encoding
+    <span style="color: #0000ff">Dim</span> MyStr       <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+    <span style="color: #0000ff">Dim</span> MyBytes()   <span style="color: #0000ff">As</span> <span style="color: #2b91af">Byte</span>
+    
+    <span style="color: #0000ff">Set</span> Console.OutputEncoding = Encoding.UTF8
+    
+    <span style="color: #008000">&#39; Create an instance of UTF32Encoding using little-endian byte order.</span>
+    <span style="color: #008000">&#39; This will be used for encoding.</span>
+    <span style="color: #0000ff">Set</span> U32LE = NewUTF32Encoding(<span style="color: #0000ff">False</span>, <span style="color: #0000ff">True</span>)
+    
+    <span style="color: #008000">&#39; Create two instances of UTF32Encoding using big-endian byte order: one with error detection and one without.</span>
+    <span style="color: #008000">&#39; These will be used for decoding.</span>
+    <span style="color: #0000ff">Set</span> U32withED = NewUTF32Encoding(<span style="color: #0000ff">True</span>, <span style="color: #0000ff">True</span>, <span style="color: #0000ff">True</span>)
+    <span style="color: #0000ff">Set</span> U32noED = NewUTF32Encoding(<span style="color: #0000ff">True</span>, <span style="color: #0000ff">True</span>, <span style="color: #0000ff">False</span>)
+    
+    <span style="color: #008000">&#39; Create byte arrays from the same string containing the following characters:</span>
+    <span style="color: #008000">&#39;    Latin Small Letter Z (U+007A)</span>
+    <span style="color: #008000">&#39;    Latin Small Letter A (U+0061)</span>
+    <span style="color: #008000">&#39;    Combining Breve (U+0306)</span>
+    <span style="color: #008000">&#39;    Latin Small Letter AE With Acute (U+01FD)</span>
+    <span style="color: #008000">&#39;    Greek Small Letter Beta (U+03B2)</span>
+    <span style="color: #008000">&#39;    a high-surrogate value (U+D8FF)</span>
+    <span style="color: #008000">&#39;    a low-surrogate value (U+DCFF)</span>
+    MyStr = t(<span style="color: #a31515">&quot;za\u0306\u01FD\u03B2\uD8FF\uDCFF&quot;</span>)
+    
+    <span style="color: #008000">&#39; Encode the string using little-endian byte order.</span>
+    <span style="color: #0000ff">ReDim</span> MyBytes(0 <span style="color: #0000ff">To</span> U32LE.GetByteCount(MyStr) - 1)
+    U32LE.GetBytesEx MyStr, 0, Len(MyStr), MyBytes, 0
+    
+    <span style="color: #008000">&#39; Decode the byte array with error detection.</span>
+    Console.WriteLine <span style="color: #a31515">&quot;Decoding with error detection:&quot;</span>
+    PrintDecodedString MyBytes, U32withED
+    
+    <span style="color: #008000">&#39; Decode the byte array without error detection.</span>
+    Console.WriteLine <span style="color: #a31515">&quot;Decoding without error detection:&quot;</span>
+    PrintDecodedString MyBytes, U32noED
+    
+    Console.ReadKey
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> PrintDecodedString(<span style="color: #0000ff">ByRef</span> Bytes() <span style="color: #0000ff">As</span> <span style="color: #2b91af">Byte</span>, <span style="color: #0000ff">ByVal</span> Enc <span style="color: #0000ff">As</span> Encoding)
+    <span style="color: #0000ff">On</span> <span style="color: #0000ff">Error</span> <span style="color: #0000ff">GoTo</span> <span style="color: #0000ff">Catch</span>
+    
+    Console.WriteLine <span style="color: #a31515">&quot;  Decoded string: {0}&quot;</span>, Enc.GetString(Bytes)
+    
+    <span style="color: #0000ff">GoTo</span> <span style="color: #0000ff">Finally</span>
+    
+<span style="color: #0000ff">Catch</span>:
+    <span style="color: #0000ff">Dim</span> Ex <span style="color: #0000ff">As</span> Exception
+    <span style="color: #0000ff">Catch</span> Ex, Err
+    Console.WriteLine Ex.ToString
+<span style="color: #0000ff">Finally</span>:
+    Console.WriteLine
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+</pre></div>

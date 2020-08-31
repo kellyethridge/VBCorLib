@@ -700,7 +700,7 @@ Friend Function GetBytesCore(ByRef Chars() As Integer, ByVal CharIndex As Long, 
     GetBytesCore = ByteIndex - ByteStart
 End Function
 
-Private Function InsertEncoderFallback(ByVal Ch As Long, ByRef Chars() As Integer, ByVal CharIndex As Long, ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByRef Fallback As EncoderFallbackBuffer, ByVal Encoder As Encoder)
+Private Function InsertEncoderFallback(ByVal Ch As Long, ByRef Chars() As Integer, ByVal CharIndex As Long, ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByRef Fallback As EncoderFallbackBuffer, ByVal Encoder As Encoder) As Long
     If Fallback Is Nothing Then
         If Encoder Is Nothing Then
             Set Fallback = mEncoderFallback.CreateFallbackBuffer

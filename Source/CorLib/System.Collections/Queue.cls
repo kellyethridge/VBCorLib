@@ -454,7 +454,7 @@ End Function
 '   ICollection
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub ICollection_CopyTo(Arr As Variant, ByVal Index As Long)
-    Call CopyTo(Arr, Index)
+    CopyTo Arr, Index
 End Sub
 
 Private Property Get ICollection_Count() As Long

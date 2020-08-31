@@ -1,0 +1,48 @@
+@remarks <p>To calculate the exact array size required by <a href="ASCIIEncoding.GetBytes.html">GetBytes</a> to store the resulting bytes, the application uses <b>GetByteCount</b>. To calculate the maximum array size, the application should use <a href="ASCIIEncoding.GetMaxByteCount.html">GetMaxByteCount</a>. The <b>GetByteCount</b> method generally allows allocation of less memory, while the <a href="ASCIIEncoding.GetMaxByteCount.html">GetMaxByteCount</a> method generally executes faster.</p>
+<table style="width: auto">
+	<tr>
+		<th>Exception</th><th>Condition</th>
+	</tr>
+	<tr>
+		<td><a href="ArgumentNullException.html">ArgumentNullException</a></td>
+		<td><i>Chars</i> is <b>null</b>.</td>
+	</tr>
+	<tr>
+		<td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+		<td><i>Index</i> is less than the <b>LBound</b> of a character array or less than zero for a string.<br>
+			-or-<br>
+			<i>Count</i> is less than zero.
+			-or-<br>
+			<i>Index</i> and <i>Count</i> do not denote a valid range in <i>Chars</i>.<br>
+		</td>
+	</tr>
+	<tr>
+		<td><a href="EncoderFallbackException.html">EncoderFallbackException</a></td>
+		<td>A fallback occurred<br>
+			-and-<br>
+			<a href="Encoding.Set.EncoderFallback.html">EncoderFallback</a> is set to <a href="EncoderExceptionFallback.html">EncoderExceptionFallback</a>.
+		</td>
+	</tr>
+</table>
+@examples The following example demonstrates how to use the <b>GetByteCount</b> method to return the number of bytes required to encode an array of Unicode characters using <a href="ASCIIEncoding.html">ASCIIEncoding</a>.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">    <span style="color: #0000ff">Dim</span> s           <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+    <span style="color: #0000ff">Dim</span> Chars()     <span style="color: #0000ff">As</span> <span style="color: #2b91af">Integer</span>
+    <span style="color: #0000ff">Dim</span> ASCII       <span style="color: #0000ff">As</span> <span style="color: #0000ff">New</span> ASCIIEncoding
+    <span style="color: #0000ff">Dim</span> ByteCount   <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
+    
+    s = <span style="color: #a31515">&quot;ASCII Encoding Example&quot;</span>
+    ByteCount = ASCII.GetByteCount(s)
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;{0} bytes needed to encode string.&quot;</span>, ByteCount)
+    Debug.Print
+    
+    Chars = NewChars(ChrW$(&amp;H23), ChrW$(&amp;H25), ChrW$(&amp;H3A0), ChrW$(&amp;H3A3))
+    ByteCount = ASCII.GetByteCount(Chars, 1, 2)
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;{0} bytes need to encode characters.&quot;</span>, ByteCount)
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; This code produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;   22 bytes needed to encode string.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;   2 bytes need to encode characters.</span>
+</pre></div>

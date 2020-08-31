@@ -515,7 +515,7 @@ Private Property Let KeyedHashAlgorithm_Key(Value() As Byte)
 End Property
 
 Private Property Get KeyedHashAlgorithm_Key() As Byte()
-    KeyedHashAlgorithm = Key
+    KeyedHashAlgorithm_Key = Key
 End Property
 
 Private Property Get KeyedHashAlgorithm_CanReuseTransform() As Boolean
