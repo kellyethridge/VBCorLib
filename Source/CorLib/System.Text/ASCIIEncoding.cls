@@ -240,11 +240,11 @@ End Property
 ' @param Index The index of the first character to encode.
 ' @param Count The number of characters to encode.
 ' @return The number of bytes produced by encoding the specified characters.
-' @include "..\DocIncludes\ASCIIEncoding.GetByteCount.html"
 ' @see Encoding
 ' @see #GetBytes
 ' @see #GetMaxByteCount
 ' @see #GetEncoder
+' @include "..\DocIncludes\ASCIIEncoding.GetByteCount.html"
 Public Function GetByteCount(ByRef Chars As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Long
     Dim LocalChars()    As Integer
     Dim Range           As ListRange
@@ -273,12 +273,12 @@ End Function
 ' @param Index The index of the first character to encode.
 ' @param Count The number of characters to encode.
 ' @return A byte array containing the results of encoding the specified set of characters.
-' @include "..\DocIncludes\Encoding.GetBytes.html"
 ' @see Encoding
 ' @see #GetBytesEx
 ' @see #GetEncoder
 ' @see #GetByteCount
 ' @see #GetMaxByteCount
+' @include "..\DocIncludes\Encoding.GetBytes.html"
 Public Function GetBytes(ByRef Chars As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Byte()
     Dim LocalChars()    As Integer
     Dim Range           As ListRange

@@ -93,7 +93,7 @@ Public Function t(ByRef Text As String) As String
     Dim Chars() As Integer
     
     mTextOut.Length = 0
-    mTextOut.Capacity = LenB(Text)
+    mTextOut.EnsureCapacity LenB(Text)
     Chars = AllocChars(Text)
     
     Dim i       As Long

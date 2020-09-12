@@ -268,6 +268,7 @@ End Property
 ' @remarks <p><i>Index</i> is zero-based.</p>
 ' <p>Setting a character can only replace an existing character. A character cannot be appended using this method.
 ' To append a character use <a href="StringBuilder.AppendChar.html">StringBuilder.AppendChar</a>.</p>
+' @see #AppendChar
 Public Property Let Chars(ByVal Index As Long, ByVal Char As Integer)
     If Index < 0 Or Index >= mLength Then _
         Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_Index

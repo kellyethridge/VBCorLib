@@ -143,10 +143,10 @@ Public Property Get WindowsCodePage() As Long: End Property
 ' @param Index The index of the first character to encode.
 ' @param Count The number of characters to encode.
 ' @return The number of bytes produced by encoding the specified of characters.
-' @include "..\DocIncludes\Encoding.GetByteCount.html"
 ' @see #GetBytesEx
 ' @see #GetMaxByteCount
 ' @see #GetEncoder
+' @include "..\DocIncludes\Encoding.GetByteCount.html"
 Public Function GetByteCount(ByRef Chars As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Long: End Function
 
 ''
@@ -156,12 +156,12 @@ Public Function GetByteCount(ByRef Chars As Variant, Optional ByRef Index As Var
 ' @param Index The index of the first character to encode.
 ' @param Count The number of characters to encode.
 ' @return A byte array containing the results of encoding the specified set of characters.
-' @include "..\DocIncludes\Encoding.GetBytes.html"
 ' @see Encoding
 ' @see #GetBytesEx
 ' @see #GetEncoder
 ' @see #GetByteCount
 ' @see #GetMaxByteCount
+' @include "..\DocIncludes\Encoding.GetBytes.html"
 Public Function GetBytes(ByRef Chars As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Byte(): End Function
 
 ''
@@ -173,12 +173,12 @@ Public Function GetBytes(ByRef Chars As Variant, Optional ByRef Index As Variant
 ' @param Bytes The byte array to contain the resulting sequence of bytes.
 ' @param ByteIndex The index as which to start writing the resulting sequence of bytes.
 ' @return The number of bytes produce by the encoding.
-' @include "..\DocIncludes\Encoding.GetBytesEx.html"
 ' @see Encoding
 ' @see #GetBytes
 ' @see #GetEncoder
 ' @see #GetByteCount
 ' @see #GetMaxByteCount
+' @include "..\DocIncludes\Encoding.GetBytesEx.html"
 Public Function GetBytesEx(ByRef Chars As Variant, ByVal CharIndex As Long, ByVal CharCount As Long, ByRef Bytes() As Byte, ByVal ByteIndex As Long) As Long: End Function
 
 ''
@@ -188,36 +188,43 @@ Public Function GetBytesEx(ByRef Chars As Variant, ByVal CharIndex As Long, ByVa
 ' @param Index The index of the first byte to decode.
 ' @param Count The number of bytes to decode.
 ' @return The number of characters produced by decoding the specified sequence of bytes.
-' @include "..\DocIncludes\Encoding.GetCharCount.html"
 ' @see Encoding
 ' @see #GetCharsEx
 ' @see #GetMaxCharCount
 ' @see #GetDecoder
+' @include "..\DocIncludes\Encoding.GetCharCount.html"
 Public Function GetCharCount(ByRef Bytes() As Byte, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Long: End Function
 
 ''
-' Decodes a set of bytes into a set of characters.
+' When implemented in a derived class, decodes all the bytes in the specified byte array into a set of characters.
 '
-' @param Bytes The set of bytes to be decoded into characters.
-' @param Index The index of the first byte to be used in decoding.
-' @param Count The number of bytes to be used in decoding.
-' @return An array of characters decoded from the set of bytes.
-'
+' @param Bytes The byte array containing the sequence of bytes to decode.
+' @param Index The index of the first byte to decode.
+' @param Count The number of bytes to decode.
+' @return A character array containing the results of decoding the specified sequence of bytes.
+' @see #GetCharsEx
+' @see #GetCharCount
+' @see #GetMaxCharCount
+' @see #GetDecoder
+' @see #GetString
+' @include "..\DocIncludes\Encoding.GetChars.html"
 Public Function GetChars(ByRef Bytes() As Byte, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Integer(): End Function
 
 ''
-' Decodes a set of bytes into the supplied Integer array.
+' When implemented in a derived class, decodes a sequence of bytes from the specified byte array into the specified character array.
 '
-' @param Bytes The set of bytes to be decoded into characters.
-' @param ByteIndex The index of the first byte to begin decoding from.
-' @param ByteCount The number of bytes to be used in decoding.
-' @param Chars The destination character array for the decoded bytes.
-' @param CharIndex The first index to begin storing decoded bytes in <i>Chars</i>.
-' @return The number of characters decoded from the array of bytes.
-' @remarks The <i>Chars</i> array must be large enough to handle all the bytes that will
-' be decoded. To ensure the <i>Chars</i> array is large enough, use either GetCharCount or
-' GetMaxCharCount to determine a size that will hold the decoded bytes.
-'
+' @param Bytes The byte array containing the sequence of bytes to decode.
+' @param ByteIndex The index of the first byte to decode.
+' @param ByteCount The number of bytes to decode.
+' @param Chars The character array to contain the resulting set of characters.
+' @param CharIndex The index at which to start writing the resulting set of characters.
+' @return The actual number of characters written into <i>Chars</i>.
+' @see #GetChars
+' @see #GetCharCount
+' @see #GetMaxCharCount
+' @see #GetDecoder
+' @see #GetString
+' @include "..\DocIncludes\Encoding.GetCharsEx.html"
 Public Function GetCharsEx(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, ByRef Chars() As Integer, ByVal CharIndex As Long) As Long: End Function
 
 ''
@@ -292,13 +299,17 @@ Public Function GetMaxCharCount(ByVal ByteCount As Long) As Long: End Function
 Public Function GetPreamble() As Byte(): End Function
 
 ''
-' Decodes a set of bytes into a String.
+' When implemented in a derived class, decodes all the bytes in the specified byte array into a string.
 '
-' @param Bytes The set of bytes to be decoded into a string.
-' @param Index The index of the first byte to be decoded.
-' @param Count The number of bytes to be used in the decoding.
-' @return A string containing the decoded set of bytes.
-'
+' @param Bytes The byte array containing the sequence of bytes to decode.
+' @param Index The index of the first byte to decode.
+' @param Count The number of bytes to decode.
+' @return A String containing the results of decoding the specified sequence of bytes.
+' @see #GetChars
+' @see #GetDecoder
+' @see #GetCharCount
+' @see #GetMaxCharCount
+' @include "..\DocIncludes\Encoding.GetString.html"
 Public Function GetString(ByRef Bytes() As Byte, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As String: End Function
 
 ''
