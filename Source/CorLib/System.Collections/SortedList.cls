@@ -256,10 +256,21 @@ Public Sub CopyTo(ByRef Arr As Variant, ByVal ArrayIndex As Long)
     If ArrayIndex + mCount - 1 > UBound(Arr) Then _
         Error.Argument Arg_ArrayPlusOffTooSmall
     
+    On Error GoTo Catch
+    
     Dim i As Long
     For i = 0 To mCount - 1
         Set Arr(ArrayIndex + i) = Cor.NewDictionaryEntry(mKeys(i), mValues(i))
     Next i
+    
+    Exit Sub
+    
+Catch:
+    If Err.Number = vbTypeMismatch Then
+        Throw Cor.NewInvalidCastException(Environment.GetResourceString(InvalidCast_StoreArrayElement))
+    Else
+        Throw Err
+    End If
 End Sub
 
 ''

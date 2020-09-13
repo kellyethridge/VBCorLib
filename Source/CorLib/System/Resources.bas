@@ -282,6 +282,7 @@ Public Enum ResourceStringKey
     InvalidCast_FromTo = 1400
     InvalidCast_DownCastArrayElement = 1401
     InvalidCast_IComparer = 1402
+    InvalidCast_StoreArrayElement = 1403
     
     InvalidOperation_EmptyStack = 1100
     InvalidOperation_EnumNotStarted = 1101

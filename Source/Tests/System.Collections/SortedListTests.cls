@@ -401,6 +401,19 @@ Public Sub CopyTo_WithIndexAndListCountGreaterThanUBound_ThrowsArgumentException
     AssertArgumentException Err
 End Sub
 
+Public Sub CopyTo_WithIncompatibleDestinationArray_ThrowsInvalidCastException()
+    Dim Dst() As Long
+    Dim List As New SortedList
+    
+    ReDim Dst(0)
+    List.Add 1, "a"
+    
+    On Error Resume Next
+    List.CopyTo Dst, 0
+    
+    AssertInvalidCastException Err
+End Sub
+
 Public Sub IndexOfKey_WithValue_ReturnsExpected(ByRef Key As Variant, ByVal Expected As Long)
     Dim List As New SortedList
     List.Add 1, "a"
