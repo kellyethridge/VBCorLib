@@ -4,6 +4,8 @@ version 3.x
 	* Fixed CorArray.Clear not releasing reference types correctly for Variant().
 	* Fixed BigInteger default output formatting was falling back to exponent when is should never.
 	* Fixed BigInteger default output formatting was not padding with leading zeros.
+	* Fixed #19 - SortedList.CopyTo to throw InvalidCastException when cannot copy to destination array.
+	* Fixed SortedList.Capacity to not ReDim internal arrays when new capacity is same as current capacity.
 
 version 3.0 (BREAKING CHANGES)
 	* Renamed cArray to CorArray.
