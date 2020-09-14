@@ -127,7 +127,7 @@ End Property
 ' @return The header tag compatible encoding name.
 '
 Public Property Get HeaderName() As String
-    HeaderName = Table.EncodingName(HeaderName)
+    HeaderName = Table.HeaderName(CodePage)
 End Property
 
 ''
