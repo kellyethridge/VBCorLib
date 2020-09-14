@@ -482,16 +482,16 @@ End Function
 Public Function LastIndexOfAny(ByRef s As String, ByRef OfAny As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As Long
     Dim Range As ListRange
     
-    Range = MakeStringRange(s, StartIndex, Count)
-    
-    If Range.Index < 0 Then _
-        Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_NeedNonNegNum
-    If Range.Count < 0 Then _
-        Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_NeedNonNegNum
-    If Range.Index - Range.Count + 1 < 0 Then _
-        Error.ArgumentOutOfRange "", ArgumentOutOfRange_Count
-    
     If Len(s) > 0 Then
+        Range = MakeStringRange(s, StartIndex, Count)
+        
+        If Range.Index < 0 Then _
+            Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_NeedNonNegNum
+        If Range.Count < 0 Then _
+            Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_NeedNonNegNum
+        If Range.Index - Range.Count + 1 < 0 Then _
+            Error.ArgumentOutOfRange "", ArgumentOutOfRange_Count
+        
         LastIndexOfAny = IndexOfAnyCore(s, OfAny, Range.Index, Range.Index - Range.Count + 1, -1)
     Else
         LastIndexOfAny = -1

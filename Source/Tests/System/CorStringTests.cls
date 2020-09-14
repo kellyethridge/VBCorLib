@@ -876,6 +876,14 @@ Public Sub IndexOfAny_WithStartIndexPlusCountGreaterThanLengthOfString_ThrowsArg
     AssertArgumentOutOfRangeException Err
 End Sub
 
+Public Sub IndexOfAny_WithEmptyString_ReturnsMinusOne()
+    Dim Actual As Long
+    
+    Actual = CorString.IndexOfAny("", "a")
+    
+    Assert.That Actual, Iz.EqualTo(-1)
+End Sub
+
 Public Sub IndexOfAny_WithEmptyStringAndNegativeStartIndex_ThrowsArgumentOutOfRangeException()
     On Error Resume Next
     
@@ -898,6 +906,14 @@ Public Sub LastIndexOfAny_WithValue_ReturnsExpected(ByRef OfAny As Variant, ByVa
     Actual = CorString.LastIndexOfAny("1234512345", OfAny)
     
     Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub LastIndexOfAny_WithEmptyString_ReturnsMinusOne()
+    Dim Actual As Long
+    
+    Actual = CorString.LastIndexOfAny("", "a")
+    
+    Assert.That Actual, Iz.EqualTo(-1)
 End Sub
 
 Public Sub LastIndexOfAny_WithStartIndexAndCount_ReturnsExpected(ByVal Value As Variant, ByVal Expected As Long)

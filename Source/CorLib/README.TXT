@@ -6,6 +6,8 @@ version 3.x
 	* Fixed BigInteger default output formatting was not padding with leading zeros.
 	* Fixed #19 - SortedList.CopyTo to throw InvalidCastException when cannot copy to destination array.
 	* Fixed SortedList.Capacity to not ReDim internal arrays when new capacity is same as current capacity.
+	* Fixed #24 - Object.ToString to handle unspecified types by returning the TypeName result. Also fixes #25.
+	* Fixed #26 - CorString.LastIndexOfAny with an empty string should return -1.
 
 version 3.0 (BREAKING CHANGES)
 	* Renamed cArray to CorArray.
