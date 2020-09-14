@@ -243,6 +243,8 @@ Public Property Let Capacity(ByVal Value As Long)
             Erase mString
             SAPtr(mString) = SafeArrayCreateVector(vbString, 0, 0)
         End If
+        
+        mCapacity = Value
     End If
 End Property
 

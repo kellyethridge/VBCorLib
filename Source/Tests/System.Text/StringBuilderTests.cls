@@ -1028,3 +1028,11 @@ Public Sub ToString_WithSubString_ReturnsSubPortion()
     Assert.That Actual, Iz.EqualTo("cd")
 End Sub
 
+Public Sub Capacity_WhenSet_StoresCapacity()
+    Dim sb As New StringBuilder
+    
+    sb.Capacity = 1024
+    
+    Assert.That sb.Capacity, Iz.EqualTo(1024)
+End Sub
+

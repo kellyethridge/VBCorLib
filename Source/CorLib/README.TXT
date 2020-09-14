@@ -8,6 +8,7 @@ version 3.x
 	* Fixed SortedList.Capacity to not ReDim internal arrays when new capacity is same as current capacity.
 	* Fixed #24 - Object.ToString to handle unspecified types by returning the TypeName result. Also fixes #25.
 	* Fixed #26 - CorString.LastIndexOfAny with an empty string should return -1.
+	* Fixed #66 - StringBuilder not storing capacity when being set causing severe performance issues.
 
 version 3.0 (BREAKING CHANGES)
 	* Renamed cArray to CorArray.
