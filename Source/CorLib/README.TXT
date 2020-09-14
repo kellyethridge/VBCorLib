@@ -14,7 +14,8 @@ version 3.x
 	* Fixed #54 - UnicodeEncoding.HeaderName property was incorrectly accessing underlying encoding table causing 13-Type Mismatch error.
 	* Fixed #39 - StreamWriter and StringWriter were not setting NewLine property to vbCrLf when being set to vbNullString.
 	* Fixed #38 - MemoryStream.ReadByte should throw ObjectDisposedException when closed.
-	
+	* Fixed #37 - MemoryStream.Length should throw ObjectDisposedException when closed.
+
 version 3.0 (BREAKING CHANGES)
 	* Renamed cArray to CorArray.
 	* Renamed cString to CorString.

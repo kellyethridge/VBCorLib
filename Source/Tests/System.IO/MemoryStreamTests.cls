@@ -636,6 +636,17 @@ Public Sub Position_WhenReadWithClosedStream_ThrowsObjectDisposedException()
     AssertObjectDisposedException Err
 End Sub
 
+Public Sub Length_WhenCalledWithClosedStream_ThrowsObjectDisposedException()
+    Dim ms As New MemoryStream
+    Dim p As Long
+    
+    ms.CloseStream
+    
+    On Error Resume Next
+    p = ms.Length
+    
+    AssertObjectDisposedException Err
+End Sub
 
 Private Function MakeMemoryStream() As MemoryStream
     Dim Source() As Byte
