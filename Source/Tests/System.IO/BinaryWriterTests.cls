@@ -44,12 +44,10 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
         Case "WriteChar_WithValues_WritesExpected"
             Test.Use ChrW(&H2030), NewBytes(&HE2, &H80, &HB0)
             Test.Use &H2030, NewBytes(&HE2, &H80, &HB0)
-            Test.Use &H12030, NewBytes(&HE2, &H80, &HB0)
             Test.Use "Hello", NewBytes(Asc("H"))
             Test.Use CByte(49), NewBytes(49)
             Test.Use CInt(49), NewBytes(49)
             Test.Use CLng(49), NewBytes(49)
-            Test.Use &H10031, NewBytes(49)
             
         Case "WriteValue_WithBytesIndexAndCount_WritesExpected"
             Test.Use 0, 10, NewBytes(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
@@ -114,6 +112,17 @@ Public Sub WriteChar_WhenEmptyString_ThrowsArgumentException()
     Writer.WriteChar ""
     
     AssertArgumentException Err
+End Sub
+
+Public Sub WriteChar_WithValueOutOfRange_ThrowsArgumentOutOfRangeException()
+    Dim Output As New MemoryStream
+    Dim Writer As BinaryWriter
+    Set Writer = Cor.NewBinaryWriter(Output)
+
+    On Error Resume Next
+    Writer.WriteChar &H10040
+    
+    AssertArgumentOutOfRangeException Err
 End Sub
 
 Public Sub WriteValue_WithNullByteArray_ThrowsArgumentNullException()

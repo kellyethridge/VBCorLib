@@ -167,7 +167,7 @@ Public Sub WriteChar(ByRef Value As Variant)
             
             mSingleChar(0) = AscW(CStr(Value))
         Case vbLong, vbInteger, vbByte
-            mSingleChar(0) = AsWord(CLng(Value))
+            mSingleChar(0) = Char.ConvertFromInt32(Value)
         Case Else
             Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidValueType, "String or Integer"), "Value")
     End Select

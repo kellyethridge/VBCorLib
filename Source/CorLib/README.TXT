@@ -16,7 +16,8 @@ version 3.x
 	* Fixed #38 - MemoryStream.ReadByte should throw ObjectDisposedException when closed.
 	* Fixed #37 - MemoryStream.Length should throw ObjectDisposedException when closed.
 	* Fixed #31 - Added validation to Constructors.NewChars method.
-	
+	* Fixed #33 - Added validation to BinaryWriter.WriteChar method. Was allowing out-of-range values to be converted.
+
 version 3.0 (BREAKING CHANGES)
 	* Renamed cArray to CorArray.
 	* Renamed cString to CorString.
