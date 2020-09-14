@@ -9,7 +9,8 @@ version 3.x
 	* Fixed #24 - Object.ToString to handle unspecified types by returning the TypeName result. Also fixes #25.
 	* Fixed #26 - CorString.LastIndexOfAny with an empty string should return -1.
 	* Fixed #66 - StringBuilder not storing capacity when being set causing severe performance issues.
-	* Fixed #63 - set DSAParameters.ToXmlString return type explicitly to String.
+	* Fixed #63 - Declare DSAParameters.ToXmlString return type explicitly to String.
+	* Fixed #62 - Declare DBCSCodePageEncoding.ConvertBytesToChars method parameter CharIndex as Long.
 
 version 3.0 (BREAKING CHANGES)
 	* Renamed cArray to CorArray.

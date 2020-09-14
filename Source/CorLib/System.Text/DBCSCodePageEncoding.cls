@@ -181,7 +181,7 @@ Friend Function GetCharsCore(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByV
     GetCharsCore = CharCount
 End Function
 
-Private Function ConvertBytesToChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, ByRef Chars() As Integer, ByVal CharIndex, ByVal Flags As Long) As Long
+Private Function ConvertBytesToChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, ByRef Chars() As Integer, ByVal CharIndex As Long, ByVal Flags As Long) As Long
     ConvertBytesToChars = MultiByteToWideChar(mCodePage, MB_PRECOMPOSED Or Flags, Bytes(ByteIndex), ByteCount, Chars(CharIndex), UBound(Chars) - CharIndex + 1)
 
     Select Case Err.LastDllError
