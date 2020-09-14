@@ -12,6 +12,7 @@ version 3.x
 	* Fixed #63 - Declare DSAParameters.ToXmlString return type explicitly to String.
 	* Fixed #62 - Declare DBCSCodePageEncoding.ConvertBytesToChars method parameter CharIndex as Long.
 	* Fixed #54 - UnicodeEncoding.HeaderName property was incorrectly accessing underlying encoding table causing 13-Type Mismatch error.
+	* Fixed #39 - StreamWriter and StringWriter were not setting NewLine property to vbCrLf when being set to vbNullString.
 
 version 3.0 (BREAKING CHANGES)
 	* Renamed cArray to CorArray.

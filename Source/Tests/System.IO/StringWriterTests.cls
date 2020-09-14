@@ -36,6 +36,10 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use #2/2/2004 3:00:00 PM#, "2/2/2004 3:00:00 PM" & vbCrLf
             Test.Use NewInt32(55), "55" & vbCrLf
             
+        Case "NewLine_WhenSet_StoresExpected"
+            Test.Use "a", "a"
+            Test.Use "", ""
+            
     End Select
 End Sub
 
@@ -203,6 +207,24 @@ Public Sub WriteChars_WithChars_WritesChars()
     Assert.That Writer.ToString, Iz.EqualTo("ab")
 End Sub
 
+Public Sub NewLine_WhenSet_StoresExpected(ByVal Value As String, ByVal Expected As String)
+    Dim Writer As StringWriter
+    Set Writer = CreateWriter
+    
+    Writer.NewLine = Value
+    
+    Assert.That Writer.NewLine, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub NewLine_WhenSetToNullString_StoresCrLf()
+    Dim Writer As StringWriter
+    Set Writer = CreateWriter
+    
+    Writer.NewLine = "a"
+    Writer.NewLine = vbNullString
+    
+    Assert.That Writer.NewLine, Iz.EqualTo(vbCrLf)
+End Sub
 
 Private Function CreateWriter(Optional ByVal Provider As IFormatProvider) As StringWriter
     If Provider Is Nothing Then

@@ -92,7 +92,11 @@ End Property
 ' @remarks The default is CarriageReturn-LineFeed.
 '
 Public Property Let NewLine(ByRef Value As String)
-    mNewLine = Value
+    If StrPtr(Value) = vbNullPtr Then
+        mNewLine = vbCrLf
+    Else
+        mNewLine = Value
+    End If
 End Property
 
 ''
