@@ -587,6 +587,8 @@ End Function
 '    </tr>
 ' </table>
 Public Function ReadByte() As Long
+    EnsureOpen
+    
     If mPosition >= mLength Then
         ReadByte = -1
         Exit Function
