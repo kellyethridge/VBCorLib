@@ -165,13 +165,8 @@ End Function
 ' @include "..\DocIncludes\ObjectStatic.ToString.html"
 Public Function ToString(ByRef Value As Variant, Optional ByRef Format As String, Optional ByVal Provider As IFormatProvider) As String
     Select Case VarType(Value)
-        Case vbVariant
-            ' when the datatype is a variant, it contains a reference to the
-            ' actual value, so we must dereference again to that value to
-            ' get the actual datatype.
-            Dim InnerVariant As Variant
-            VariantCopyInd InnerVariant, Value
-            ToString = ToString(InnerVariant, Format, Provider)
+        Case vbString, vbCurrency, vbBoolean
+            ToString = Value
         Case vbLong, vbInteger, vbByte, vbDouble, vbSingle, vbDecimal
             ToString = NumberFormatter.Format(Value, Format, Provider)
         Case vbDate
@@ -199,13 +194,20 @@ Public Function ToString(ByRef Value As Variant, Optional ByRef Format As String
             Else
                 ToString = TypeName(Value)
             End If
+        Case vbVariant
+            ' when the datatype is a variant, it contains a reference to the
+            ' actual value, so we must dereference again to that value to
+            ' get the actual datatype.
+            Dim InnerVariant As Variant
+            VariantCopyInd InnerVariant, Value
+            ToString = ToString(InnerVariant, Format, Provider)
         Case vbEmpty
             ToString = "Empty"
         Case vbNull
             ToString = "Null"
         Case vbMissing
         Case Else
-            ToString = Value
+            ToString = TypeName(Value)
     End Select
 End Function
 

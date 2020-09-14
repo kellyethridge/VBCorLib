@@ -831,6 +831,15 @@ Public Sub AppendFormat_PlaceHolderWithMissingIndex_ThrowsFormatException()
     AssertFormatException Err
 End Sub
 
+Public Sub AppendFormat_WithArray_AppendsArrayTypeName()
+    Dim sb As New StringBuilder
+    Dim Arr(0) As Long
+    
+    sb.AppendFormat "{0}", Arr
+    
+    Assert.That sb.ToString, Iz.EqualTo("Long()")
+End Sub
+
 Public Sub AppendFormatEx_WithCustomFormatter_RequestsCorrectProvider()
     Dim sb As New StringBuilder
     Dim f As New FakeCustomFormatter

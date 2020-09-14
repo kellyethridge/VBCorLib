@@ -747,7 +747,7 @@ Public Function AppendFormatArrayEx(ByVal Provider As IFormatProvider, ByRef For
     
 Catch:
     GoSub Finally
-    Throw
+    ThrowOrErr Err
 Finally:
     FreeChars FormatChars
     Return
