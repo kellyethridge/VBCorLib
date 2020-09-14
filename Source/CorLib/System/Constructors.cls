@@ -1345,9 +1345,12 @@ Public Function NewChars(ParamArray Values() As Variant) As Integer()
     
     For i = 0 To UBound(Values)
         If VarType(Values(i)) = vbString Then
+            If Len(Values(i)) <> 1 Then _
+                Error.Format Format_NeedSingleChar
+                
             Result(i) = AscW(Values(i))
         Else
-            Result(i) = AsWord(CLng(Values(i)))
+            Result(i) = Char.ConvertFromInt32(Values(i))
         End If
     Next
     

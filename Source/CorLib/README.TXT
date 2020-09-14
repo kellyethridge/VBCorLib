@@ -15,7 +15,8 @@ version 3.x
 	* Fixed #39 - StreamWriter and StringWriter were not setting NewLine property to vbCrLf when being set to vbNullString.
 	* Fixed #38 - MemoryStream.ReadByte should throw ObjectDisposedException when closed.
 	* Fixed #37 - MemoryStream.Length should throw ObjectDisposedException when closed.
-
+	* Fixed #31 - Added validation to Constructors.NewChars method.
+	
 version 3.0 (BREAKING CHANGES)
 	* Renamed cArray to CorArray.
 	* Renamed cString to CorString.
