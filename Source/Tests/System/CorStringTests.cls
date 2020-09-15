@@ -317,6 +317,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "a b c", NullStrings, NewStrings("a", "b", "c")
             Test.Use "a,b,c", ",", NewStrings("a", "b", "c")
             Test.Use "a b c", "", NewStrings("a", "b", "c")
+            Test.Use "abcde", NewStrings("d", "b"), NewStrings("a", "c", "e")
             
         Case "Split_WithRemoveEmptyEntries_ReturnsFilledStringsOnly"
             Test.Use "abbc", NewStrings("b"), NewStrings("a", "c")
@@ -355,6 +356,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "abcd", NullChars, NewStrings("abcd")
             Test.Use "", NewChars("b"), NewStrings("")
             Test.Use vbNullString, NewChars("b"), NewStrings("")
+            Test.Use "abcde", NewChars("d", "b"), NewStrings("a", "c", "e")
             
         Case "Compare_WithValues_ReturnsExpected"
             Test.Use "abc", "abc", StringComparison.Ordinal, 0

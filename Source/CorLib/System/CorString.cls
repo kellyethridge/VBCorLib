@@ -673,7 +673,12 @@ Public Function Split(ByRef s As String, ByRef Separator As Variant, Optional By
         Dim SeparatorIndexes()  As Long
         Dim SeparatorLengths()  As Long
         Dim MatchCount          As Long
-                
+        Dim MaxIndexes          As Long
+        
+        MaxIndexes = Len(s) \ 2 + 1
+        ReDim SeparatorIndexes(0 To MaxIndexes)
+        ReDim SeparatorLengths(0 To MaxIndexes)
+        
         If VarType(Separator) = vbString Then
             If Len(Separator) = 0 Then
                 MatchCount = FindWhitespaceSeparatorIndexes(s, SeparatorIndexes, SeparatorLengths)
@@ -708,16 +713,19 @@ Private Function FindSeparatorIndexes(ByRef s As String, ByRef Separator As Vari
     On Error GoTo Catch
     
     Select Case VarType(Separator)
+        Case vbString
+            FindSeparatorIndexes = FindStringSeparatorIndexes(s, Separator, SeparatorIndexes, SeparatorLengths)
         Case vbStringArray
             SAPtr(StringSeparator) = SAPtrV(Separator)
-            FindSeparatorIndexes = FindStringSeparatorIndexes(s, StringSeparator, SeparatorIndexes, SeparatorLengths)
+            
+            If Len1D(Separator) = 1 Then
+                FindSeparatorIndexes = FindStringSeparatorIndexes(s, StringSeparator(LBound(StringSeparator)), SeparatorIndexes, SeparatorLengths)
+            Else
+                FindSeparatorIndexes = FindStringSeparatorsIndexes(s, StringSeparator, SeparatorIndexes, SeparatorLengths)
+            End If
         Case vbIntegerArray
             SAPtr(CharSeparator) = SAPtrV(Separator)
-            FindSeparatorIndexes = FindCharSeparatorIndexes(s, CharSeparator, SeparatorIndexes, SeparatorLengths)
-        Case vbString
-            ReDim StringSeparator(0)
-            StringSeparator(0) = Separator
-            FindSeparatorIndexes = FindStringSeparatorIndexes(s, StringSeparator, SeparatorIndexes, SeparatorLengths)
+            FindSeparatorIndexes = FindCharSeparatorsIndexes(s, CharSeparator, SeparatorIndexes, SeparatorLengths)
         Case Else
             Error.Argument Argument_CharArrayRequired, "Separator"
     End Select
@@ -734,20 +742,41 @@ Finally:
     Return
 End Function
 
-Private Function FindStringSeparatorIndexes(ByRef s As String, ByRef Separator() As String, ByRef SeparatorIndexes() As Long, ByRef SeparatorLengths() As Long) As Long
-    Dim CharIndex       As Long
-    Dim SLength         As Long
-    Dim SeparatorUB     As Long
-    Dim SeparatorLB     As Long
-    Dim MatchCount      As Long
-    Dim Sep             As String
-    Dim SepLength       As Long
+Private Function FindStringSeparatorIndexes(ByRef s As String, ByRef Separator As Variant, ByRef SeparatorIndexes() As Long, ByRef SeparatorLengths() As Long) As Long
+    Dim MatchCount As Long
+    Dim SepLength  As Long
+    Dim MatchIndex As Long
     
+    SepLength = Len(Separator)
+        
+    Do
+        MatchIndex = InStr(MatchIndex + 1, s, Separator) - 1
+        
+        If MatchIndex >= 0 Then
+            SeparatorIndexes(MatchCount) = MatchIndex
+            SeparatorLengths(MatchCount) = SepLength
+            MatchCount = MatchCount + 1
+            MatchIndex = MatchIndex + SepLength
+        Else
+            Exit Do
+        End If
+    Loop
+    
+    FindStringSeparatorIndexes = MatchCount
+End Function
+
+Private Function FindStringSeparatorsIndexes(ByRef s As String, ByRef Separator() As String, ByRef SeparatorIndexes() As Long, ByRef SeparatorLengths() As Long) As Long
+    Dim CharIndex   As Long
+    Dim SLength     As Long
+    Dim SeparatorUB As Long
+    Dim SeparatorLB As Long
+    Dim MatchCount  As Long
+    Dim Sep         As String
+    Dim SepLength   As Long
+        
     SeparatorUB = UBound(Separator)
     SeparatorLB = LBound(Separator)
     SLength = Len(s)
-    ReDim SeparatorIndexes(0 To SLength \ 2 + 1)
-    ReDim SeparatorLengths(0 To SLength \ 2 + 1)
     
     Do While CharIndex < SLength
         Dim i As Long
@@ -768,14 +797,14 @@ Private Function FindStringSeparatorIndexes(ByRef s As String, ByRef Separator()
                 Exit For
             End If
         Next
-        
+
         CharIndex = CharIndex + 1
     Loop
     
-    FindStringSeparatorIndexes = MatchCount
+    FindStringSeparatorsIndexes = MatchCount
 End Function
 
-Private Function FindCharSeparatorIndexes(ByRef s As String, ByRef Separator() As Integer, ByRef SeparatorIndexes() As Long, ByRef SeparatorLengths() As Long) As Long
+Private Function FindCharSeparatorsIndexes(ByRef s As String, ByRef Separator() As Integer, ByRef SeparatorIndexes() As Long, ByRef SeparatorLengths() As Long) As Long
     Dim Chars()     As Integer
     Dim CharIndex   As Long
     Dim SLength     As Long
@@ -786,8 +815,6 @@ Private Function FindCharSeparatorIndexes(ByRef s As String, ByRef Separator() A
     SeparatorUB = UBound(Separator)
     SeparatorLB = LBound(Separator)
     SLength = Len(s)
-    ReDim SeparatorIndexes(0 To SLength \ 2 + 1)
-    ReDim SeparatorLengths(0 To SLength \ 2 + 1)
     Chars = AllocChars(s)
     
     On Error GoTo Catch
@@ -808,7 +835,7 @@ Private Function FindCharSeparatorIndexes(ByRef s As String, ByRef Separator() A
     Loop
     
     GoSub Finally
-    FindCharSeparatorIndexes = MatchCount
+    FindCharSeparatorsIndexes = MatchCount
     Exit Function
     
 Catch:
@@ -826,8 +853,6 @@ Private Function FindWhitespaceSeparatorIndexes(ByRef s As String, ByRef Separat
     Dim MatchCount  As Long
     
     SLength = Len(s)
-    ReDim SeparatorIndexes(0 To SLength \ 2 + 1)
-    ReDim SeparatorLengths(0 To SLength \ 2 + 1)
     Chars = AllocChars(s)
     
     On Error GoTo Catch
