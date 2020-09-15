@@ -126,24 +126,28 @@ End Property
 ' @return A byte array filled with pseudo-random key bytes.
 ' @include "..\DocIncludes\Rfc2898DeriveBytes.GetBytes.html"
 Public Function GetBytes(ByVal cb As Long) As Byte()
-    Dim Blocks As Long
+    Dim Blocks          As Long
+    Dim Bytes()         As Byte
+    Dim BlockBytes()    As Byte
+    Dim i               As Long
+        
+    If cb < 0 Then _
+        Error.ArgumentOutOfRange "cb", ArgumentOutOfRange_NeedNonNegNum
+        
     Blocks = CorMath.Ceiling(cb / BlockSize)
-    
-    Dim Bytes() As Byte
     ReDim Bytes(0 To (Blocks * BlockSize) + mBytesBuffered - 1)
     
     If mBytesBuffered > 0 Then
         CopyMemory Bytes(0), mBuffer(0), mBytesBuffered
     End If
     
-    Dim i As Long
     For i = 1 To Blocks
-        Dim BlockBytes() As Byte
         BlockBytes = NextBlockBytes
         CopyMemory Bytes((i - 1) * BlockSize + mBytesBuffered), BlockBytes(0), BlockSize
     Next i
     
     mBytesBuffered = (Blocks * BlockSize) - cb
+    
     If mBytesBuffered > 0 Then
         CopyMemory mBuffer(0), Bytes(cb), mBytesBuffered
     End If
