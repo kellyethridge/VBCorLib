@@ -329,6 +329,9 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "abcd", NewStrings("de"), NewStrings("abcd")
             Test.Use "", NewStrings("b"), NewStrings()
             Test.Use "", NewStrings(""), NewStrings()
+            Test.Use "  word  word", NewStrings(" "), NewStrings("word", "word")
+            Test.Use "  word  word  ", " ", NewStrings("word", "word")
+            Test.Use "word  word  ", " ", NewStrings("word", "word")
             
         Case "Split_WithCount_ReturnsLimitedNumberOfSubstrings"
             Test.Use "abc", NewStrings("b"), 2, NewStrings("a", "c")
@@ -1120,7 +1123,7 @@ Public Sub Split_WithCount_ReturnsLimitedNumberOfSubstrings(ByVal StringToSplit 
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub Split_WithRemoveEmptyEntries_ReturnsFilledStringsOnly(ByVal StringToSplit As String, ByRef Separators() As String, ByRef Expected() As String)
+Public Sub Split_WithRemoveEmptyEntries_ReturnsFilledStringsOnly(ByVal StringToSplit As String, ByRef Separators As Variant, ByRef Expected() As String)
     Dim Actual() As String
     
     Actual = CorString.Split(StringToSplit, Separators, , StringSplitOptions.RemoveEmptyEntries)

@@ -17,6 +17,7 @@ version 3.x
 	* Fixed #37 - MemoryStream.Length should throw ObjectDisposedException when closed.
 	* Fixed #31 - Added validation to Constructors.NewChars method.
 	* Fixed #33 - Added validation to BinaryWriter.WriteChar method. Was allowing out-of-range values to be converted.
+	* Fixed #53 - CorString.Split with RemoveEmptyEntries fails with multiple contiguous separators.
 
 version 3.0 (BREAKING CHANGES)
 	* Renamed cArray to CorArray.

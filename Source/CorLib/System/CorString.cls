@@ -880,7 +880,7 @@ Private Function SplitWithoutEmpties(ByRef s As String, ByVal MatchCount As Long
     
     MaxSubstrings = CountSubstrings(s, MatchCount, SeparatorIndexes, SeparatorLengths)
     MaxSubstrings = IIf(MaxSubstrings < Count, MaxSubstrings, Count)
-    SplitWithoutEmpties = CreateSubstrings(s, MaxSubstrings, SeparatorIndexes, SeparatorLengths)
+    SplitWithoutEmpties = CreateSubstrings(s, MatchCount, MaxSubstrings, SeparatorIndexes, SeparatorLengths)
 End Function
 
 Private Function CountSubstrings(ByRef s As String, ByVal MatchCount As Long, ByRef SeparatorIndexes() As Long, ByRef SeparatorLengths() As Long) As Long
@@ -900,7 +900,7 @@ Private Function CountSubstrings(ByRef s As String, ByVal MatchCount As Long, By
     End If
 End Function
 
-Private Function CreateSubstrings(ByRef s As String, ByVal MaxSubstrings As Long, ByRef SeparatorIndexes() As Long, ByRef SeparatorLengths() As Long) As String()
+Private Function CreateSubstrings(ByRef s As String, ByVal MatchCount As Long, ByVal MaxSubstrings As Long, ByRef SeparatorIndexes() As Long, ByRef SeparatorLengths() As Long) As String()
     Dim Result()            As String
     Dim SubstringStartIndex As Long
     Dim ResultIndex         As Long
@@ -908,7 +908,7 @@ Private Function CreateSubstrings(ByRef s As String, ByVal MaxSubstrings As Long
     ReDim Result(0 To MaxSubstrings - 1)
     
     Dim i As Long
-    For i = 0 To MaxSubstrings - 1
+    For i = 0 To MatchCount - 1
         If SeparatorIndexes(i) - SubstringStartIndex > 0 Then
             Result(ResultIndex) = Mid$(s, SubstringStartIndex + 1, SeparatorIndexes(i) - SubstringStartIndex)
             ResultIndex = ResultIndex + 1
