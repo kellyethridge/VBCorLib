@@ -47,6 +47,11 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use NewBytes(0, &H41), NewBytes(), 1
             Test.Use NewBytes(0, &H41), NewBytes(0, &H41), 2
             
+        Case "GetCharCount_WithHangingByteSequenceAndFlushing_ThrowsDecoderFallbackException"
+            Test.Use NewBytes(0, &H40, 0), 2, NewBytes(0)
+            Test.Use NewBytes(0, &H40, 0, &HD8), 2, NewBytes(0, &HD8)
+            Test.Use NewBytes(0, &H40, &H41), 2, NewBytes(&H41)
+            
         Case "GetChars_WithValues_ReturnsExpected"
             Test.Use NewBytes(), NewIntegers()
             Test.Use NewBytes(0), NewIntegers()
@@ -76,6 +81,10 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use NewBytes(0, &HD8), NewBytes(0, &HDC), NewIntegers(), NewIntegers(&HD800, &HDC00), 2
             Test.Use NewBytes(&H41, 0, 0, &HD8), NewBytes(0, &HDC), NewIntegers(&H41), NewIntegers(&HD800, &HDC00), 3
             Test.Use NewBytes(), NewBytes(0, &HD8), NewIntegers(), NewIntegers(&HFFFD), 1
+            
+        Case "GetChars_WithInvalidSequence_ThrowsDecoderFallbackException"
+            Test.Use NewBytes(0, &H40, &H41), 2, NewBytes(&H41)
+            Test.Use NewBytes(0, &H40, &H0, &HD8), 2, NewBytes(&H0, &HD8)
             
     End Select
 End Sub
@@ -109,6 +118,19 @@ Public Sub GetCharCount_WhenFlushingWithHangingHighSurrogate_UsesFallback()
     Actual = Decoder.GetCharCount(NewBytes(&H0, &H41, &H0, &HD8), 0, 4, True)
     
     Assert.That Actual, Iz.EqualTo(2)
+End Sub
+
+Public Sub GetCharCount_WithHangingByteSequenceAndFlushing_ThrowsDecoderFallbackException(ByRef Sequence() As Byte, ByVal ExpectedIndex As Long, ByRef ExpectedBytesUnknown() As Byte)
+    Dim Decoder As Decoder
+    Set Decoder = NewUnicodeEncoding(False, False, True).GetDecoder
+    
+    On Error Resume Next
+    Decoder.GetCharCount Sequence, 0, CorArray.Length(Sequence), True
+    
+    Dim Ex As DecoderFallbackException
+    Set Ex = AssertDecoderFallbackException(Err)
+    Assert.That Ex.Index, Iz.EqualTo(ExpectedIndex)
+    Assert.That Ex.BytesUnknown, Iz.EqualTo(ExpectedBytesUnknown)
 End Sub
 
 Public Sub GetCharCount_WithOddBytes_DoesNotUseFallback()
@@ -200,6 +222,43 @@ Public Sub GetChars_WithMultipleCallsWithFlush_ReturnsExpected(ByRef b1() As Byt
     Assert.That Actual, Iz.EqualTo(ExpectedLength)
     Assert.That Chars1, Iz.EqualTo(ExpectedChars1)
     Assert.That Chars2, Iz.EqualTo(ExpectedChars2)
+End Sub
+
+Public Sub GetChars_WithInvalidSequence_ThrowsDecoderFallbackException(ByRef Sequence() As Byte, ByVal ExpectedIndex As Long, ByRef ExpectedBytesUnknown() As Byte)
+    Dim Decoder As Decoder
+    Dim Chars(100) As Integer
+    
+    Set Decoder = NewUnicodeEncoding(False, False, True).GetDecoder
+    
+    On Error Resume Next
+    Decoder.GetChars Sequence, 0, CorArray.Length(Sequence), Chars, 0, True
+    
+    Dim Ex As DecoderFallbackException
+    Set Ex = AssertDecoderFallbackException(Err)
+    Assert.That Ex.Index, Iz.EqualTo(ExpectedIndex), "Index"
+    Assert.That Ex.BytesUnknown, Iz.EqualTo(ExpectedBytesUnknown), "BytesUnknown"
+End Sub
+
+Public Sub GetChars_WithLastByteSaved_ClearsLastByte()
+    Dim Decoder As Decoder
+    Dim Chars(100) As Integer
+    
+    Set Decoder = NewUnicodeEncoding(False, False, True).GetDecoder
+    
+    Assert.That Decoder.GetChars(NewBytes(0), 0, 1, Chars, 0, False), Iz.EqualTo(0)
+    Assert.That Decoder.GetChars(NewBytes(&H40), 0, 1, Chars, 0, True), Iz.EqualTo(1)
+    Assert.That Decoder.GetChars(NewBytes(&H0, &H41), 0, 2, Chars, 0, True), Iz.EqualTo(1)
+End Sub
+
+Public Sub GetChars_WithLastCharSaved_ClearsLastChar()
+    Dim Decoder As Decoder
+    Dim Chars(100) As Integer
+    
+    Set Decoder = NewUnicodeEncoding(False, False, True).GetDecoder
+
+    Assert.That Decoder.GetChars(NewBytes(0, &HD8), 0, 2, Chars, 0, False), Iz.EqualTo(0)
+    Assert.That Decoder.GetChars(NewBytes(0, &HDC), 0, 2, Chars, 0, True), Iz.EqualTo(2)
+    Assert.That Decoder.GetChars(NewBytes(0, &H40), 0, 2, Chars, 0, True), Iz.EqualTo(1)
 End Sub
 
 Public Sub Fallback_WhenCalled_ReturnsSameInstanceAsEncoding()

@@ -663,19 +663,19 @@ Private Function GetByteCountCore(ByRef Chars() As Integer, ByVal Index As Long,
             Case ASCIIStart To ASCIIEnd
                 ByteCount = ByteCount + 1
             Case Else
-                ByteCount = ByteCount + GetEncoderFallbackCount(Ch, Fallback)
+                ByteCount = ByteCount + GetEncoderFallbackCount(Ch, i, Fallback)
         End Select
     Next
     
     GetByteCountCore = ByteCount
 End Function
 
-Private Function GetEncoderFallbackCount(ByVal Ch As Integer, ByRef Fallback As EncoderFallbackBuffer) As Long
+Private Function GetEncoderFallbackCount(ByVal Ch As Integer, ByVal CharIndex As Long, ByRef Fallback As EncoderFallbackBuffer) As Long
     If Fallback Is Nothing Then
         Set Fallback = mEncoderFallback.CreateFallbackBuffer
     End If
     
-    If Fallback.Fallback(Ch) Then
+    If Fallback.Fallback(Ch, Index:=CharIndex) Then
         GetEncoderFallbackCount = Fallback.Remaining
         Fallback.Reset
     End If
@@ -706,7 +706,7 @@ Private Function GetBytesCore(ByRef Chars() As Integer, ByVal CharIndex As Long,
                     Bytes(ByteIndex) = Ch
                     ByteIndex = ByteIndex + 1
                 Case Else
-                    ByteIndex = InsertEncoderFallback(Ch, Bytes, ByteIndex, Fallback)
+                    ByteIndex = InsertEncoderFallback(Ch, CharIndex, Bytes, ByteIndex, Fallback)
             End Select
             
             CharIndex = CharIndex + 1
@@ -716,12 +716,12 @@ Private Function GetBytesCore(ByRef Chars() As Integer, ByVal CharIndex As Long,
     End If
 End Function
 
-Private Function InsertEncoderFallback(ByVal Ch As Integer, ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByRef Fallback As EncoderFallbackBuffer) As Long
+Private Function InsertEncoderFallback(ByVal Ch As Integer, ByVal CharIndex As Long, ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByRef Fallback As EncoderFallbackBuffer) As Long
     If Fallback Is Nothing Then
         Set Fallback = mEncoderFallback.CreateFallbackBuffer
     End If
     
-    If Fallback.Fallback(Ch) Then
+    If Fallback.Fallback(Ch, Index:=CharIndex) Then
         If ByteIndex + Fallback.Remaining - 1 > UBound(Bytes) Then _
             Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_EncodingConversionOverflowBytes, EncodingName, TypeName(mEncoderFallback)), "Bytes")
         

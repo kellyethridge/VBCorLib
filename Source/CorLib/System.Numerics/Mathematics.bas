@@ -308,10 +308,10 @@ Public Function Modulus(ByVal x As Currency, ByVal y As Currency) As Currency
 End Function
 
 Public Function SwapEndian(ByVal Value As Long) As Long
-    SwapEndian = (((Value And &HFF000000) \ &H1000000) And &HFF&) Or _
-                 ((Value And &HFF0000) \ &H100&) Or _
-                 ((Value And &HFF00&) * &H100&) Or _
-                 ((Value And &H7F&) * &H1000000)
+    SwapEndian = (((Value And &HFF000000) \ vbShift24Bits) And &HFF&) Or _
+                 ((Value And &HFF0000) \ vbShift8Bits) Or _
+                 ((Value And &HFF00&) * vbShift8Bits) Or _
+                 ((Value And &H7F&) * vbShift24Bits)
     If (Value And &H80&) Then SwapEndian = SwapEndian Or &H80000000
 End Function
 

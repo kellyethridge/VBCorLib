@@ -42,20 +42,25 @@ Private mEncoding       As UnicodeEncoding
 Private mFallback       As EncoderFallback
 Private mFallbackBuffer As EncoderFallbackBuffer
 Private mFlushing       As Boolean
-Private mLastChar       As Long
+Private mLastChar       As Integer
 
 
 Friend Property Get Flushing() As Boolean
     Flushing = mFlushing
 End Property
 
-Friend Property Get LastChar() As Long
+Friend Property Get LastChar() As Integer
     LastChar = mLastChar
 End Property
 
-Friend Property Let LastChar(ByVal Value As Long)
+Friend Property Let LastChar(ByVal Value As Integer)
     mLastChar = Value
 End Property
+
+Friend Function GetAndClearLastChar() As Integer
+    GetAndClearLastChar = mLastChar
+    mLastChar = 0
+End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

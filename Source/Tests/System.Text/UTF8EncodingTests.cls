@@ -154,6 +154,14 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use t("a\xdc00a"), 2
             Test.Use t("\xd800\xd800\xdc00"), 4
             
+        Case "GetByteCount_WhenUsingExceptionFallbackWithValues_ThrowsEncoderFallbackException"
+            Test.Use "\u00C4 \uD802\u0033 \u00AE", 2, &HD802
+            Test.Use "\u00C4 \uDC02\u0033 \u00AE", 2, &HDC02
+            Test.Use " \uD802", 1, &HD802
+            Test.Use " \uDC02", 1, &HDC02
+            Test.Use "a\uDC02a", 1, &HDC02
+            Test.Use "a\uD802a", 1, &HD802
+            
         Case "GetCharCount_WithValues_ReturnsExpected"
             Test.Use NewBytes(), 0
             Test.Use NewBytes(&H41), 1 ' A
@@ -190,6 +198,11 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use NewBytes(&H80), NewChars(&HFFFD)
             Test.Use NewBytes(&HF6, &HB0, &H80, &H80), NewChars(&HFFFD, &HFFFD, &HFFFD, &HFFFD) ' U+D800 U+0000
             
+        Case "GetBytesEx_WithInvalidSurrogate_ThrowsEncoderFallbackException"
+            Test.Use "\u00C4 \uD802\u0033 \u00AE", 2, &HD802
+            Test.Use "\u00C4 \uDC02\u0033 \u00AE", 2, &HDC02
+            Test.Use " \uD802", 1, &HD802
+            Test.Use " \uDC02", 1, &HDC02
     End Select
 End Sub
 
@@ -224,6 +237,19 @@ Public Sub GetByteCount_WithFailingFallback_ReturnsExpected(ByRef s As String, B
     Actual = Enc.GetByteCount(s)
     
     Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub GetByteCount_WhenUsingExceptionFallbackWithValues_ThrowsEncoderFallbackException(ByRef Chars As String, ByVal ExpectedIndex As Long, ByVal ExpectedChar As Integer)
+    Dim Enc As Encoding
+    Set Enc = NewUTF8Encoding(False, True)
+    
+    On Error Resume Next
+    Enc.GetByteCount t(Chars)
+    
+    Dim Ex As EncoderFallbackException
+    Set Ex = AssertEncoderFallbackException(Err)
+    Assert.That Ex.Index, Iz.EqualTo(ExpectedIndex), "Index"
+    Assert.That Ex.CharUnknown, Iz.EqualTo(ExpectedChar), "CharUnknown"
 End Sub
 
 Public Sub GetByteCount_WithValues_ReturnsExpected(ByRef s As String, ByVal Expected As Long)
@@ -262,7 +288,7 @@ Public Sub GetBytes_WithString_ReturnsEncoded()
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub GetBytes_WithTwoHighSurrogates_ThrowsArgumentOutOfRangeException()
+Public Sub GetBytes_WithTwoHighSurrogates_ThrowsEncoderFallbackException()
     Dim Encoding As UTF8Encoding
     Set Encoding = NewUTF8Encoding(False, True)
     
@@ -270,6 +296,24 @@ Public Sub GetBytes_WithTwoHighSurrogates_ThrowsArgumentOutOfRangeException()
     Encoding.GetBytes t("\uD800\uD800")
     
     AssertEncoderFallbackException Err
+End Sub
+
+Public Sub GetBytesEx_WithInvalidSurrogate_ThrowsEncoderFallbackException(ByRef InvalidSurrogate As String, ByVal ExpectedIndex As Long, ByVal ExpectedChar As Integer)
+    Dim Enc As Encoding
+    Dim Invalid As String
+    Dim Bytes() As Byte
+    
+    Set Enc = NewUTF8Encoding(False, True)
+    Invalid = t(InvalidSurrogate)
+    ReDim Bytes(0 To Enc.GetMaxByteCount(Len(Invalid)))
+    
+    On Error Resume Next
+    Enc.GetBytesEx Invalid, 0, Len(Invalid), Bytes, 0
+    
+    Dim Ex As EncoderFallbackException
+    Set Ex = AssertEncoderFallbackException(Err)
+    Assert.That Ex.Index, Iz.EqualTo(ExpectedIndex), "Index"
+    Assert.That Ex.CharUnknown, Iz.EqualTo(ExpectedChar), "CharUnknown"
 End Sub
 
 Public Sub GetBytes_WithChars_ReturnsEncoded()

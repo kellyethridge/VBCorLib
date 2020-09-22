@@ -55,6 +55,14 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use NewIntegers(97, 98, 99, 100, 128), 4
             Test.Use t("\xd800\xdc00"), 0
             
+        Case "GetByteCount_WhenUsingExceptionFallbackWithValues_ThrowsEncoderFallbackException"
+            Test.Use "  \uD802\u0033 \u00AE", 2, &HD802
+            Test.Use "  \uDC02\u0033 \u00AE", 2, &HDC02
+            Test.Use " \uD802", 1, &HD802
+            Test.Use " \uDC02", 1, &HDC02
+            Test.Use "a\uDC02a", 1, &HDC02
+            Test.Use "a\uD802a", 1, &HD802
+            
         Case "GetCharCount_WithBytes_ReturnsExpected"
             Test.Use NewBytes(1), 1
             Test.Use NewBytes(1, 2, 3, 4, 5), 5
@@ -86,7 +94,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "?", 100
             Test.Use "??", 200
             Test.Use "", 100
-            
+        
     End Select
 End Sub
 
@@ -124,6 +132,22 @@ Public Sub GetBytes_WithIndexAndCount_ReturnsExpectedSubset(ByRef Chars As Varia
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
+Public Sub GetBytes_WithInvalidCharacter_ThrowsEncoderFallbackException()
+    Dim Enc As Encoding
+    Dim Invalid As String
+    
+    Set Enc = Encoding.GetEncoding(Encoding.ASCII.CodePage, EncoderFallback.ExceptionFallback, DecoderFallback.ExceptionFallback)
+    Invalid = "a" & ChrW$(&HCA)
+    
+    On Error Resume Next
+    Enc.GetBytes Invalid
+    
+    Dim Ex As EncoderFallbackException
+    Set Ex = AssertEncoderFallbackException(Err)
+    Assert.That Ex.Index, Iz.EqualTo(1), "Index"
+    Assert.That Ex.CharUnknown, Iz.EqualTo(&HCA), "CharUnknown"
+End Sub
+
 Public Sub GetByteCount_WithCharacters_ReturnsExpected(ByRef Chars As Variant, ByVal Expected As Long)
     Dim Encoding As New ASCIIEncoding
     
@@ -151,6 +175,20 @@ Public Sub GetByteCount_WithIndexAndCount_ReturnsExpected()
     Actual = Encoding.GetByteCount(NewChars("a", "b", "c"), 1, 2)
     
     Assert.That Actual, Iz.EqualTo(2)
+End Sub
+
+Public Sub GetByteCount_WhenUsingExceptionFallbackWithValues_ThrowsEncoderFallbackException(ByRef Chars As String, ByVal ExpectedIndex As Long, ByVal ExpectedChar As Integer)
+    Dim Enc As ASCIIEncoding
+    Set Enc = Encoding.ASCII.Clone
+    Set Enc.EncoderFallback = EncoderFallback.ExceptionFallback
+    
+    On Error Resume Next
+    Enc.GetByteCount t(Chars)
+    
+    Dim Ex As EncoderFallbackException
+    Set Ex = AssertEncoderFallbackException(Err)
+    Assert.That Ex.Index, Iz.EqualTo(ExpectedIndex), "Index"
+    Assert.That Ex.CharUnknown, Iz.EqualTo(ExpectedChar), "CharUnknown"
 End Sub
 
 Public Sub GetBytesEx_WithCharsThatFitIntoOutput_EncodesAllChars()
@@ -187,6 +225,24 @@ Public Sub GetBytesEx_WithEmptyCharacters_DoesNotFill()
     
     Assert.That ActualCount, Iz.EqualTo(0)
     Assert.That Bytes, Iz.All.EqualTo(0)
+End Sub
+
+Public Sub GetBytesEx_WithInvalidCharacter_ThrowsEncoderFallbackException()
+    Dim Enc As Encoding
+    Dim Invalid As String
+    Dim Bytes() As Byte
+    
+    Set Enc = Encoding.GetEncoding(Encoding.ASCII.CodePage, EncoderFallback.ExceptionFallback, DecoderFallback.ExceptionFallback)
+    ReDim Bytes(10)
+    Invalid = "a" & ChrW$(&HCA)
+    
+    On Error Resume Next
+    Enc.GetBytesEx Invalid, 0, 2, Bytes, 0
+    
+    Dim Ex As EncoderFallbackException
+    Set Ex = AssertEncoderFallbackException(Err)
+    Assert.That Ex.Index, Iz.EqualTo(1), "Index"
+    Assert.That Ex.CharUnknown, Iz.EqualTo(&HCA), "CharUnknown"
 End Sub
 
 Public Sub GetCharCount_WithBytes_ReturnsExpected(ByRef Bytes() As Byte, ByVal Expected As Long)

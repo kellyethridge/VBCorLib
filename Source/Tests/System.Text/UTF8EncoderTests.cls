@@ -47,20 +47,45 @@ End Sub
 
 Public Sub GetByteCount_WithSingleCall_ReturnsExpected(ByRef Chars() As Integer, ByVal Expected As Long)
     Dim Encoder As Encoder
+    Dim Actual As Long
+    
     Set Encoder = Encoding.UTF8.GetEncoder
     
-    Dim Actual As Long
     Actual = Encoder.GetByteCount(Chars, 0, CorArray.Length(Chars), True)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
+Public Sub GetByteCount_WithTrailingHighSurrogate_DoesNotStoreHighSurrogate()
+    Dim Encoder As Encoder
+    Dim Actual As Long
+    
+    Set Encoder = MakeEncoder
+    
+    Actual = Encoder.GetByteCount(NewChars("a", &HD800), 0, 2, False)
+    Assert.That Actual, Iz.EqualTo(1)
+    Actual = Encoder.GetByteCount(NewChars(), 0, 0, True)
+    Assert.That Actual, Iz.EqualTo(0)
+End Sub
+
+Public Sub GetByteCount_WithTrailingHighSurrogateAndFlushing_CountsFallbackCharacters()
+    Dim Encoder As Encoder
+    Dim Actual As Long
+    
+    Set Encoder = MakeEncoder
+    
+    Actual = Encoder.GetByteCount(NewChars("a", &HD800), 0, 2, True)
+    
+    Assert.That Actual, Iz.EqualTo(4)
+End Sub
+
 Public Sub GetBytes_WithSingleCall_ReturnsExpected(ByRef Chars() As Integer, ByRef Expected() As Byte)
     Dim Encoder As Encoder
-    Set Encoder = Encoding.UTF8.GetEncoder
-    
     Dim Actual() As Byte
+    
+    Set Encoder = MakeEncoder
     Actual = CorArray.CreateInstance(vbByte, CorArray.Length(Expected))
+    
     Encoder.GetBytes Chars, 0, CorArray.Length(Chars), Actual, 0, True
     
     Assert.That Actual, Iz.EqualTo(Expected)
@@ -68,11 +93,12 @@ End Sub
 
 Public Sub GetBytes_WithMultipleCalls_ReturnsExpected(ByRef Chars1() As Integer, ByRef Chars2() As Integer, ByRef Expected1() As Byte, ByRef Expected2() As Byte, ByVal ExpectedSize As Long)
     Dim Encoder As Encoder
-    Set Encoder = Encoding.UTF8.GetEncoder
-    
     Dim Actual1() As Byte
     Dim Actual2() As Byte
     Dim ActualSize As Long
+    
+    Set Encoder = MakeEncoder
+    
     Actual1 = CorArray.CreateInstance(vbByte, Encoder.GetByteCount(Chars1, 0, CorArray.Length(Chars1), False))
     ActualSize = Encoder.GetBytes(Chars1, 0, CorArray.Length(Chars1), Actual1, 0, False)
     Actual2 = CorArray.CreateInstance(vbByte, Encoder.GetByteCount(Chars2, 0, CorArray.Length(Chars2), True))
@@ -83,10 +109,41 @@ Public Sub GetBytes_WithMultipleCalls_ReturnsExpected(ByRef Chars1() As Integer,
     Assert.That ActualSize, Iz.EqualTo(ExpectedSize)
 End Sub
 
+Public Sub GetBytes_WithTrailingHighSurrogateAndFlushing_ThrowsEncoderFallbackException()
+    Dim Encoder As Encoder
+    Dim ActualBytes(0 To 15) As Byte
+    
+    Set Encoder = MakeEncoder(True)
+    
+    On Error Resume Next
+    Encoder.GetBytes NewChars("a", "b", &HD800), 0, 3, ActualBytes, 0, True
+    
+    Dim Ex As EncoderFallbackException
+    Set Ex = AssertEncoderFallbackException(Err)
+    Assert.That Ex.Index, Iz.EqualTo(2), "Index"
+    Assert.That Ex.CharUnknown, Iz.EqualTo(&HD800), "CharUnknown"
+End Sub
+
+Public Sub GetBytes_WithInitialHangingHighSurrogate_ThrowsEncoderFallbackException()
+    Dim Encoder As Encoder
+    Dim ActualBytes(0 To 15) As Byte
+    
+    Set Encoder = MakeEncoder(True)
+    Encoder.GetBytes NewChars("a", &HD800), 0, 2, ActualBytes, 0, False
+    
+    On Error Resume Next
+    Encoder.GetBytes NewChars("a"), 0, 1, ActualBytes, 0, False
+    
+    Dim Ex As EncoderFallbackException
+    Set Ex = AssertEncoderFallbackException(Err)
+    Assert.That Ex.Index, Iz.EqualTo(-1), "Index"
+    Assert.That Ex.CharUnknown, Iz.EqualTo(&HD800), "CharUnknown"
+End Sub
 
 
-
-
+Private Function MakeEncoder(Optional ByVal ThrowOnInvalidBytes As Boolean) As Encoder
+    Set MakeEncoder = NewUTF8Encoding(False, ThrowOnInvalidBytes).GetEncoder
+End Function
 
 
 

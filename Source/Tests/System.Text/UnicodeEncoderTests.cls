@@ -84,6 +84,22 @@ Public Sub GetByteCount_WithHighSurrogateAndFlushing_ReturnsTwo()
     Assert.That Actual, Iz.EqualTo(2)
 End Sub
 
+Public Sub GetByteCount_WithHangingHighSurrogateAndFlushing_ThrowsEncoderFallbackException()
+    Dim Chars() As Integer
+    Dim Encoder As Encoder
+    
+    Chars = NewChars("a", "b", &HD800)
+    Set Encoder = NewUnicodeEncoding(False, False, True).GetEncoder
+    
+    On Error Resume Next
+    Encoder.GetByteCount Chars, 0, 3, True
+    
+    Dim Ex As EncoderFallbackException
+    Set Ex = AssertEncoderFallbackException(Err)
+    Assert.That Ex.Index, Iz.EqualTo(2), "Index"
+    Assert.That Ex.CharUnknown, Iz.EqualTo(&HD800), "CharUnknown"
+End Sub
+
 Public Sub GetByteCount_WithHighSurrogateAndNotFlushing_ReturnsZero()
     Dim Encoder As Encoder
     Set Encoder = Encoding.Unicode.GetEncoder
@@ -122,6 +138,17 @@ Public Sub GetBytes_WithMultipleCalls_ReturnsExpected(ByRef c1() As Integer, ByR
     Assert.That ActualLength, Iz.EqualTo(ExpectedLength)
     Assert.That ActualBytes1, Iz.EqualTo(ExpectedBytes1)
     Assert.That ActualBytes2, Iz.EqualTo(ExpectedBytes2)
+End Sub
+
+Public Sub GetBytes_WithLastCharUsed_ClearsLastChar()
+    Dim Encoder As Encoder
+    Dim Bytes(10) As Byte
+    
+    Set Encoder = NewUnicodeEncoding(False, False, True).GetEncoder
+    
+    Assert.That Encoder.GetBytes(NewChars(&HD800), 0, 1, Bytes, 0, False), Iz.EqualTo(0)
+    Assert.That Encoder.GetBytes(NewChars(&HDC00), 0, 1, Bytes, 0, True), Iz.EqualTo(4)
+    Assert.That Encoder.GetBytes(NewChars("a"), 0, 1, Bytes, 0, True), Iz.EqualTo(2)
 End Sub
 
 Public Sub Fallback_WhenCalled_ReturnsSameInstanceAsEncoding()
@@ -188,3 +215,5 @@ Public Sub Convert_WithLimitedOutputBuffer_ConvertsWithinLimits()
     Assert.That BytesUsed, Iz.EqualTo(1250)
     Assert.That Completed, Iz.False
 End Sub
+
+

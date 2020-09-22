@@ -880,7 +880,7 @@ Friend Function GetBytesCore(ByRef Chars() As Integer, ByVal CharIndex As Long, 
     
 ProcessPrevChar:
     If PrevChar <> 0 Then
-        If FallbackUnknownChar(PrevChar, Fallback, Encoder) Then
+        If FallbackUnknownChar(PrevChar, CharIndex - 1, Fallback, Encoder) Then
             Do While Fallback.Remaining > 0
                 Ch = Fallback.GetNextChar And &HFFFF&
                 GoSub ProcessChar
@@ -919,7 +919,7 @@ ProcessChar:
             Case LowSurrogateStart To LowSurrogateEnd
                 ' a low surrogate without a preceeding high surrogate
                 ' just fallback the low surrogate.
-                InFallback = FallbackUnknownChar(Ch, Fallback, Encoder)
+                InFallback = FallbackUnknownChar(Ch, CharIndex - 1, Fallback, Encoder)
             Case Else   ' 0800-FFFF excluding surrogates; 3-byte UTF8 encoded
                 If PutBytes Then
                     If ByteIndex + 2 > MaxByteIndex Then _
@@ -955,7 +955,7 @@ ProcessChar:
                 ' we will attempt to re-process the current character once
                 ' the fallback has completed.
                 CharIndex = CharIndex - 1
-                InFallback = FallbackUnknownChar(PrevChar, Fallback, Encoder)
+                InFallback = FallbackUnknownChar(PrevChar, CharIndex - 1, Fallback, Encoder)
         End Select
         
         PrevChar = 0
@@ -964,7 +964,7 @@ ProcessChar:
     Return
 End Function
 
-Private Function FallbackUnknownChar(ByVal UnknownChar As Long, ByRef Fallback As EncoderFallbackBuffer, ByVal Encoder As Encoder) As Boolean
+Private Function FallbackUnknownChar(ByVal UnknownChar As Long, ByVal CharIndex As Long, ByRef Fallback As EncoderFallbackBuffer, ByVal Encoder As Encoder) As Boolean
     If Fallback Is Nothing Then
         If Encoder Is Nothing Then
             Set Fallback = mEncoderFallback.CreateFallbackBuffer
@@ -973,7 +973,7 @@ Private Function FallbackUnknownChar(ByVal UnknownChar As Long, ByRef Fallback A
         End If
     End If
     
-    FallbackUnknownChar = Fallback.Fallback(UnknownChar)
+    FallbackUnknownChar = Fallback.Fallback(UnknownChar, Index:=CharIndex)
 End Function
 
 

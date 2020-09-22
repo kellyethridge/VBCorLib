@@ -29,6 +29,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use t("Hi Mom -\x263A-!"), 19
             Test.Use t("\x65E5\x672C\x8A9E"), 10
             Test.Use t("Hi Mom \x263A!"), 15
+            Test.Use t("\uD800"), 5
             
         Case "GetCharCount_WithValues_ReturnsExpected"
             Test.Use NewBytes(65, 43, 73, 109, 73, 68, 107, 81, 45, 46), 4  ' "A\x2262\x0391."
@@ -240,6 +241,19 @@ Public Sub GetBytes_WithShiftedCharacters_ReturnsEncoded()
     
     Dim Expected() As Byte
     Expected = NewBytes(&H41, &H2B, &H49, &H6D, &H49, &H44, &H6B, &H51, &H2D, &H2E)
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub GetBytes_WithHighSurrogate_ReturnsEncoded()
+    Dim Chars       As String
+    Dim Actual()    As Byte
+    
+    Chars = t("\uD802")
+    
+    Actual = Encoding.UTF7.GetBytes(Chars)
+    
+    Dim Expected() As Byte
+    Expected = NewBytes(&H2B, &H32, &H41, &H49, &H2D)
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 

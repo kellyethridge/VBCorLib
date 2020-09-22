@@ -43,12 +43,12 @@ End Sub
 Public Sub Constructor_WithCharUnknownHighLowAndIndex_StoresParameters()
     Dim Ex As EncoderFallbackException
     
-    Set Ex = Cor.NewEncoderFallbackException3("Hello", 1, 2, 3)
+    Set Ex = Cor.NewEncoderFallbackException3("Hello", &HD800, &HDC00, 3)
     
     Assert.That Ex.Message, Iz.EqualTo("Hello")
     Assert.That Ex.CharUnknown, Iz.EqualTo(0)
-    Assert.That Ex.CharUnknownHigh, Iz.EqualTo(1)
-    Assert.That Ex.CharUnknownLow, Iz.EqualTo(2)
+    Assert.That Ex.CharUnknownHigh, Iz.EqualTo(&HD800)
+    Assert.That Ex.CharUnknownLow, Iz.EqualTo(&HDC00)
     Assert.That Ex.Index, Iz.EqualTo(3)
 End Sub
 

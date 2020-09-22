@@ -57,13 +57,14 @@ Private Const CodePageProp              As String = "CodePage"
 Private Const DecoderFallbackProp       As String = "DecoderFallback"
 Private Const EncoderFallbackProp       As String = "EncoderFallback"
 
-Private mIsReadOnly             As Boolean
-Private mIsBigEndian            As Boolean
-Private mEmitBOM                As Boolean
-Private mCodePage               As Long
-Private mDecoderFallback        As DecoderFallback
-Private mEncoderFallback        As EncoderFallback
-Private mBytesUnknown(0 To 1)   As Byte
+Private mIsReadOnly         As Boolean
+Private mIsBigEndian        As Boolean
+Private mEmitBOM            As Boolean
+Private mCodePage           As Long
+Private mDecoderFallback    As DecoderFallback
+Private mEncoderFallback    As EncoderFallback
+Private mSingleByte(0)      As Byte
+Private mDoubleByte(0 To 1) As Byte
 
 
 ''
@@ -640,42 +641,50 @@ Friend Property Get Table() As EncodingTable
 End Property
 
 Friend Function GetBytesCore(ByRef Chars() As Integer, ByVal CharIndex As Long, ByVal CharCount As Long, ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByVal Encoder As UnicodeEncoder) As Long
-    Dim Ch          As Long
-    Dim ByteStart   As Long
-    Dim PrevChar    As Long
-    Dim Fallback    As EncoderFallbackBuffer
+    Dim Ch              As Integer
+    Dim ByteStart       As Long
+    Dim MaxByteIndex    As Long
+    Dim PrevChar        As Integer
+    Dim Fallback        As EncoderFallbackBuffer
     
     If CharCount = 0 Then
         Exit Function
     End If
     
     If Not Encoder Is Nothing Then
-        PrevChar = Encoder.LastChar
+        PrevChar = Encoder.GetAndClearLastChar
     End If
     
     ByteStart = ByteIndex
+    MaxByteIndex = UBound(Bytes)
     
     Do While CharCount > 0
-        Ch = Chars(CharIndex) And &HFFFF&
+        Ch = Chars(CharIndex)
         
+        ' If PrevChar has value then it is a high surrogate.
         If IsSurrogate(Ch) Then
             If IsHighSurrogate(Ch) Then
                 If PrevChar <> 0 Then
-                    ' we have two high surrogates in a row
-                    ByteIndex = InsertEncoderFallback(PrevChar, Chars, CharIndex, Bytes, ByteIndex, Fallback, Encoder)
+                    ' we have two high surrogates in a row.
+                    ByteIndex = InsertEncoderFallback(PrevChar, CharIndex - 1, Bytes, ByteIndex, Fallback, Encoder)
                 End If
                 
                 PrevChar = Ch
             ElseIf PrevChar <> 0 Then
-                ' we have valid surrogate pair
+                ' we have valid surrogate pair.
                 ByteIndex = InsertChar(PrevChar, Bytes, ByteIndex)
                 ByteIndex = InsertChar(Ch, Bytes, ByteIndex)
                 PrevChar = 0
             Else
-                ' low surrogate without previous high surrogate
-                ByteIndex = InsertEncoderFallback(Ch, Chars, CharIndex, Bytes, ByteIndex, Fallback, Encoder)
+                ' low surrogate without previous high surrogate.
+                ByteIndex = InsertEncoderFallback(Ch, CharIndex, Bytes, ByteIndex, Fallback, Encoder)
             End If
         Else
+            If PrevChar <> 0 Then
+                ByteIndex = InsertEncoderFallback(PrevChar, CharIndex - 1, Bytes, ByteIndex, Fallback, Encoder)
+                PrevChar = 0
+            End If
+            
             ByteIndex = InsertChar(Ch, Bytes, ByteIndex)
         End If
         
@@ -686,12 +695,12 @@ Friend Function GetBytesCore(ByRef Chars() As Integer, ByVal CharIndex As Long, 
     If Encoder Is Nothing Then
         If PrevChar <> 0 Then
             ' we have a hanging high surrogate
-            ByteIndex = InsertEncoderFallback(PrevChar, Chars, CharIndex, Bytes, ByteIndex, Fallback, Encoder)
+            ByteIndex = InsertEncoderFallback(PrevChar, CharIndex - 1, Bytes, ByteIndex, Fallback, Encoder)
         End If
     ElseIf Encoder.Flushing Then
         If PrevChar <> 0 Then
             ' we have a hanging high surrogate
-            ByteIndex = InsertEncoderFallback(PrevChar, Chars, CharIndex, Bytes, ByteIndex, Fallback, Encoder)
+            ByteIndex = InsertEncoderFallback(PrevChar, CharIndex - 1, Bytes, ByteIndex, Fallback, Encoder)
         End If
     Else
         Encoder.LastChar = PrevChar
@@ -700,7 +709,7 @@ Friend Function GetBytesCore(ByRef Chars() As Integer, ByVal CharIndex As Long, 
     GetBytesCore = ByteIndex - ByteStart
 End Function
 
-Private Function InsertEncoderFallback(ByVal Ch As Long, ByRef Chars() As Integer, ByVal CharIndex As Long, ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByRef Fallback As EncoderFallbackBuffer, ByVal Encoder As Encoder) As Long
+Private Function InsertEncoderFallback(ByVal Ch As Integer, ByVal CharIndex As Long, ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByRef Fallback As EncoderFallbackBuffer, ByVal Encoder As Encoder) As Long
     If Fallback Is Nothing Then
         If Encoder Is Nothing Then
             Set Fallback = mEncoderFallback.CreateFallbackBuffer
@@ -711,25 +720,7 @@ Private Function InsertEncoderFallback(ByVal Ch As Long, ByRef Chars() As Intege
     
     Fallback.Reset
     
-    If IsHighSurrogate(Ch) Then
-        If CharIndex < UBound(Chars) Then
-            Dim NextCh As Integer
-            NextCh = Chars(CharIndex + 1)
-            
-            If IsLowSurrogate(NextCh) Then
-                If Fallback.Fallback(Ch, NextCh) Then
-                    Do While Fallback.Remaining > 0
-                        ByteIndex = InsertChar(Fallback.GetNextChar, Bytes, ByteIndex)
-                    Loop
-                    
-                    InsertEncoderFallback = ByteIndex
-                    Exit Function
-                End If
-            End If
-        End If
-    End If
-    
-    If Fallback.Fallback(Ch) Then
+    If Fallback.Fallback(Ch, Index:=CharIndex) Then
         Do While Fallback.Remaining > 0
             ByteIndex = InsertChar(Fallback.GetNextChar, Bytes, ByteIndex)
         Loop
@@ -738,7 +729,7 @@ Private Function InsertEncoderFallback(ByVal Ch As Long, ByRef Chars() As Intege
     End If
 End Function
 
-Private Function InsertChar(ByVal Ch As Long, ByRef Bytes() As Byte, ByVal ByteIndex As Long) As Long
+Private Function InsertChar(ByVal Ch As Integer, ByRef Bytes() As Byte, ByVal ByteIndex As Long) As Long
     If ByteIndex + 1 > UBound(Bytes) Then _
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_EncodingConversionOverflowBytes, EncodingName, TypeName(EncoderFallback)), "Bytes")
     
@@ -794,23 +785,21 @@ Friend Function GetCharCountCore(ByRef Bytes() As Byte, ByVal Index As Long, ByV
                 If LastChar > 0 Then
                     ' we have two high surrogates in a row, so add fallback count for
                     ' first surrogate only. We may still have a low surrogate to follow.
-                    CharCount = CharCount + GetDecoderFallbackCount(LastChar, FallbackBuffer, Decoder)
+                    CharCount = CharCount + GetDecoderCharFallbackCount(LastChar, Index - vbSizeOfChar, Decoder, FallbackBuffer)
                 End If
                 
                 LastChar = Ch
             ElseIf LastChar = 0 Then
-                ' we have a low surrogate with a missing previous high surrogate
-                ' so add fallback count.
-                CharCount = CharCount + GetDecoderFallbackCount(Ch, FallbackBuffer, Decoder)
+                ' we have a low surrogate with a missing previous high surrogate so add fallback count.
+                CharCount = CharCount + GetDecoderCharFallbackCount(Ch, Index - vbSizeOfChar, Decoder, FallbackBuffer)
             Else
                 ' we have a valid surrogate pair so count two characters.
                 CharCount = CharCount + 2
                 LastChar = 0
             End If
         ElseIf LastChar > 0 Then
-            ' we have a regular character leaving a hanging high surrogate, so add fallback count
-            ' and count the regular character.
-            CharCount = CharCount + 1 + GetDecoderFallbackCount(LastChar, FallbackBuffer, Decoder)
+            ' we have a regular character leaving a hanging high surrogate, so add fallback count and count the regular character.
+            CharCount = CharCount + GetDecoderCharFallbackCount(LastChar, Index - vbSizeOfChar, Decoder, FallbackBuffer) + 1
             LastChar = 0
         Else
             ' just a regular character
@@ -820,34 +809,41 @@ Friend Function GetCharCountCore(ByRef Bytes() As Byte, ByVal Index As Long, ByV
     
     If Decoder Is Nothing Then
         If LastChar > 0 Then
-            CharCount = CharCount + GetDecoderFallbackCount(LastChar, FallbackBuffer, Decoder)
+            CharCount = CharCount + GetDecoderCharFallbackCount(LastChar, Index - vbSizeOfChar, Decoder, FallbackBuffer)
         End If
         If LastByte >= 0 Then
-            CharCount = CharCount + GetDecoderFallbackCount(LastChar, FallbackBuffer, Decoder)
+            CharCount = CharCount + GetDecoderByteFallbackCount(LastByte, Index - 1, Decoder, FallbackBuffer)
         End If
     ElseIf Decoder.Flushing Then
         If LastChar > 0 Then
-            CharCount = CharCount + GetDecoderFallbackCount(LastChar, FallbackBuffer, Decoder)
+            CharCount = CharCount + GetDecoderCharFallbackCount(LastChar, Index - vbSizeOfChar, Decoder, FallbackBuffer)
         End If
         If LastByte >= 0 Then
-            CharCount = CharCount + GetDecoderFallbackCount(LastChar, FallbackBuffer, Decoder)
+            CharCount = CharCount + GetDecoderByteFallbackCount(LastByte, Index - 1, Decoder, FallbackBuffer)
         End If
     End If
     
     GetCharCountCore = CharCount
 End Function
 
-Private Function GetDecoderFallbackCount(ByVal Ch As Long, ByRef FallbackBuffer As DecoderFallbackBuffer, ByVal Decoder As Decoder) As Long
-    Dim ByteBuffer(0 To 1) As Byte
-    
+Private Function GetDecoderByteFallbackCount(ByVal Char As Long, ByVal ByteIndex As Long, ByVal Decoder As Decoder, ByRef FallbackBuffer As DecoderFallbackBuffer) As Long
+    mSingleByte(0) = Char And &HFF&
+    GetDecoderByteFallbackCount = GetDecoderFallbackCount(mSingleByte, ByteIndex, Decoder, FallbackBuffer)
+End Function
+
+Private Function GetDecoderCharFallbackCount(ByVal Char As Long, ByVal ByteIndex As Long, ByVal Decoder As Decoder, ByRef FallbackBuffer As DecoderFallbackBuffer) As Long
     If mIsBigEndian Then
-        ByteBuffer(0) = (Ch \ vbShift8Bits) And &HFF
-        ByteBuffer(1) = Ch And &HFF
+        mDoubleByte(0) = (Char And &HFF00&) \ vbShift8Bits
+        mDoubleByte(1) = Char And &HFF&
     Else
-        ByteBuffer(0) = Ch And &HFF
-        ByteBuffer(1) = (Ch \ vbShift8Bits) And &HFF
+        mDoubleByte(0) = Char And &HFF&
+        mDoubleByte(1) = (Char And &HFF00&) \ vbShift8Bits
     End If
     
+    GetDecoderCharFallbackCount = GetDecoderFallbackCount(mDoubleByte, ByteIndex, Decoder, FallbackBuffer)
+End Function
+
+Private Function GetDecoderFallbackCount(ByRef BytesUnknown() As Byte, ByVal ByteIndex As Long, ByVal Decoder As Decoder, ByRef FallbackBuffer As DecoderFallbackBuffer) As Long
     If FallbackBuffer Is Nothing Then
         If Decoder Is Nothing Then
             Set FallbackBuffer = mDecoderFallback.CreateFallbackBuffer
@@ -855,8 +851,8 @@ Private Function GetDecoderFallbackCount(ByVal Ch As Long, ByRef FallbackBuffer 
             Set FallbackBuffer = Decoder.FallbackBuffer
         End If
     End If
-    
-    If FallbackBuffer.Fallback(ByteBuffer, 0) Then
+                
+    If FallbackBuffer.Fallback(BytesUnknown, ByteIndex) Then
         GetDecoderFallbackCount = FallbackBuffer.Remaining
         FallbackBuffer.Reset
     End If
@@ -864,7 +860,7 @@ End Function
 
 Friend Function GetByteCountCore(ByRef Chars() As Integer, ByVal Index As Long, ByVal Count As Long, ByVal Encoder As UnicodeEncoder) As Long
     Dim ByteCount   As Long
-    Dim PrevChar    As Long
+    Dim PrevChar    As Integer
     Dim Fallback    As EncoderFallbackBuffer
     Dim MaxIndex    As Long
     
@@ -875,16 +871,16 @@ Friend Function GetByteCountCore(ByRef Chars() As Integer, ByVal Index As Long, 
     MaxIndex = Index + Count
     
     Do While Index < MaxIndex
-        Dim Ch As Long
-        Ch = Chars(Index) And &HFFFF&
+        Dim Ch As Integer
+        Ch = Chars(Index)
         
         If IsSurrogate(Ch) Then
             If IsHighSurrogate(Ch) Then
                 If PrevChar <> 0 Then
                     ' got two high surrogates in a row
-                    ByteCount = ByteCount + GetEncoderFallbackCount(PrevChar, Chars, Index, Fallback, Encoder)
+                    ByteCount = ByteCount + GetEncoderFallbackCount(PrevChar, Index - 1, Fallback, Encoder)
                 End If
-                
+
                 PrevChar = Ch
             ElseIf PrevChar <> 0 Then
                 ' got a valid surrogate pair
@@ -892,13 +888,15 @@ Friend Function GetByteCountCore(ByRef Chars() As Integer, ByVal Index As Long, 
                 PrevChar = 0
             Else
                 ' low surrogate without previous high surrogate
-                ByteCount = ByteCount + GetEncoderFallbackCount(PrevChar, Chars, Index, Fallback, Encoder)
+                ByteCount = ByteCount + GetEncoderFallbackCount(Ch, Index, Fallback, Encoder)
             End If
-        ElseIf PrevChar <> 0 Then
-            ' got a previous high surrogate with no low surrogate
-            ByteCount = ByteCount + vbSizeOfChar + GetEncoderFallbackCount(PrevChar, Chars, Index, Fallback, Encoder)
-            PrevChar = 0
         Else
+            If PrevChar <> 0 Then
+                ' got a previous high surrogate with no low surrogate
+                ByteCount = ByteCount + GetEncoderFallbackCount(PrevChar, Index - 1, Fallback, Encoder)
+                PrevChar = 0
+            End If
+        
             ByteCount = ByteCount + vbSizeOfChar
         End If
         
@@ -908,19 +906,19 @@ Friend Function GetByteCountCore(ByRef Chars() As Integer, ByVal Index As Long, 
     If Encoder Is Nothing Then
         If PrevChar <> 0 Then
             ' we have a hanging high surrogate
-            ByteCount = ByteCount + GetEncoderFallbackCount(PrevChar, Chars, Index, Fallback, Encoder)
+            ByteCount = ByteCount + GetEncoderFallbackCount(PrevChar, Index - 1, Fallback, Encoder)
         End If
     ElseIf Encoder.Flushing Then
         If PrevChar <> 0 Then
             ' we have a hanging high surrogate
-            ByteCount = ByteCount + GetEncoderFallbackCount(PrevChar, Chars, Index, Fallback, Encoder)
+            ByteCount = ByteCount + GetEncoderFallbackCount(PrevChar, Index - 1, Fallback, Encoder)
         End If
     End If
     
     GetByteCountCore = ByteCount
 End Function
 
-Private Function GetEncoderFallbackCount(ByVal Ch As Long, ByRef Chars() As Integer, ByVal CharIndex As Long, ByRef Fallback As EncoderFallbackBuffer, ByVal Encoder As Encoder) As Long
+Private Function GetEncoderFallbackCount(ByVal Ch As Integer, ByVal CharIndex As Long, ByRef Fallback As EncoderFallbackBuffer, ByVal Encoder As Encoder) As Long
     If Fallback Is Nothing Then
         If Encoder Is Nothing Then
             Set Fallback = mEncoderFallback.CreateFallbackBuffer
@@ -931,21 +929,7 @@ Private Function GetEncoderFallbackCount(ByVal Ch As Long, ByRef Chars() As Inte
     
     Fallback.Reset
     
-    If IsHighSurrogate(Ch) Then
-        If CharIndex < UBound(Chars) Then
-            Dim NextCh As Long
-            NextCh = Chars(CharIndex + 1)
-            
-            If IsLowSurrogate(NextCh) Then
-                If Fallback.Fallback(Ch, NextCh) Then
-                    GetEncoderFallbackCount = Fallback.Remaining * vbSizeOfChar
-                    Exit Function
-                End If
-            End If
-        End If
-    End If
-    
-    If Fallback.Fallback(Ch) Then
+    If Fallback.Fallback(Ch, Index:=CharIndex) Then
         GetEncoderFallbackCount = Fallback.Remaining * vbSizeOfChar
     End If
 End Function
@@ -965,8 +949,8 @@ Friend Function GetCharsCore(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByV
     If Decoder Is Nothing Then
         LastByte = -1
     Else
-        LastByte = Decoder.LastByte
-        LastChar = Decoder.LastChar
+        LastByte = Decoder.GetAndClearLastByte
+        LastChar = Decoder.GetAndClearLastChar
     End If
     
     Do While ByteIndex < ByteEnd
@@ -991,18 +975,16 @@ Friend Function GetCharsCore(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByV
         
         If IsSurrogate(Ch) Then
             If IsHighSurrogate(Ch) Then
-                ' we have preceeding high surrogate followed
-                ' by this high surrogate.
                 If LastChar > 0 Then
-                    InsertDecoderFallback LastChar, Chars, CharIndex, FallbackBuffer, Decoder
+                    ' we have preceeding high surrogate followed by this high surrogate.
+                    CharIndex = InsertDecoderCharFallback(LastChar, ByteIndex - vbSizeOfChar, Chars, CharIndex, Decoder, FallbackBuffer)
                 End If
                 
                 LastChar = Ch
                 GoTo Continue
             ElseIf LastChar = 0 Then
-                ' we have a low surrogate and expected the preceeding
-                ' character to be a high surrogate.
-                InsertDecoderFallback Ch, Chars, CharIndex, FallbackBuffer, Decoder
+                ' we have a low surrogate and expected the preceeding character to be a high surrogate.
+                CharIndex = InsertDecoderCharFallback(Ch, ByteIndex - vbSizeOfChar, Chars, CharIndex, Decoder, FallbackBuffer)
                 GoTo Continue
             Else
                 ' we have a valid surrogate pair.
@@ -1014,9 +996,8 @@ Friend Function GetCharsCore(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByV
                 LastChar = 0
             End If
         ElseIf LastChar > 0 Then
-            ' we have a preceeding high surrogate, but was not
-            ' followed by a low surrogate.
-            InsertDecoderFallback LastChar, Chars, CharIndex, FallbackBuffer, Decoder
+            ' we have a preceeding high surrogate that was not followed by a low surrogate.
+            CharIndex = InsertDecoderCharFallback(LastChar, ByteIndex - vbSizeOfChar, Chars, CharIndex, Decoder, FallbackBuffer)
             LastChar = 0
         End If
         
@@ -1032,20 +1013,20 @@ Continue:
     If Decoder Is Nothing Then
         If LastChar > 0 Then
             ' have an unmatched high surrogate, handle fallback
-            InsertDecoderFallback LastChar, Chars, CharIndex, FallbackBuffer, Decoder
+            CharIndex = InsertDecoderCharFallback(LastChar, ByteIndex - vbSizeOfChar, Chars, CharIndex, Decoder, FallbackBuffer)
         End If
         If LastByte >= 0 Then
             ' have a partial char, handle fallback
-            InsertDecoderFallback LastByte, Chars, CharIndex, FallbackBuffer, Decoder
+            CharIndex = InsertDecoderByteFallback(LastByte, ByteIndex - 1, Chars, CharIndex, Decoder, FallbackBuffer)
         End If
     ElseIf Decoder.Flushing Then
         If LastChar > 0 Then
             ' have an unmatched high surrogate, handle fallback
-            InsertDecoderFallback LastChar, Chars, CharIndex, FallbackBuffer, Decoder
+            CharIndex = InsertDecoderCharFallback(LastChar, ByteIndex - vbSizeOfChar, Chars, CharIndex, Decoder, FallbackBuffer)
         End If
         If LastByte >= 0 Then
             ' have a partial char, handle fallback
-            InsertDecoderFallback LastByte, Chars, CharIndex, FallbackBuffer, Decoder
+            CharIndex = InsertDecoderByteFallback(LastByte, ByteIndex - 1, Chars, CharIndex, Decoder, FallbackBuffer)
         End If
     Else
         ' save for next round
@@ -1056,15 +1037,24 @@ Continue:
     GetCharsCore = CharIndex - CharStart
 End Function
 
-Private Sub InsertDecoderFallback(ByVal UnknownChar As Long, ByRef Chars() As Integer, ByRef CharIndex As Long, ByRef FallbackBuffer As DecoderFallbackBuffer, ByVal Decoder As Decoder)
+Private Function InsertDecoderByteFallback(ByVal UnknownChar As Long, ByVal ByteIndex As Long, ByRef Chars() As Integer, ByVal CharIndex As Long, ByVal Decoder As UnicodeDecoder, ByRef FallbackBuffer As DecoderFallbackBuffer) As Long
+    mSingleByte(0) = UnknownChar And &HFF&
+    InsertDecoderByteFallback = InsertDecoderFallback(mSingleByte, ByteIndex, Chars, CharIndex, Decoder, FallbackBuffer)
+End Function
+
+Private Function InsertDecoderCharFallback(ByVal UnknownChar As Long, ByVal ByteIndex As Long, ByRef Chars() As Integer, ByVal CharIndex As Long, ByVal Decoder As UnicodeDecoder, ByRef FallbackBuffer As DecoderFallbackBuffer) As Long
     If mIsBigEndian Then
-        mBytesUnknown(0) = (UnknownChar \ vbShift8Bits) And &HFF
-        mBytesUnknown(1) = UnknownChar And &HFF
+        mDoubleByte(0) = (UnknownChar And &HFF00&) \ vbShift8Bits
+        mDoubleByte(1) = UnknownChar And &HFF&
     Else
-        mBytesUnknown(0) = UnknownChar And &HFF
-        mBytesUnknown(1) = (UnknownChar \ vbShift8Bits) And &HFF
+        mDoubleByte(0) = UnknownChar And &HFF
+        mDoubleByte(1) = (UnknownChar \ vbShift8Bits) And &HFF
     End If
     
+    InsertDecoderCharFallback = InsertDecoderFallback(mDoubleByte, ByteIndex, Chars, CharIndex, Decoder, FallbackBuffer)
+End Function
+
+Private Function InsertDecoderFallback(ByRef BytesUnknown() As Byte, ByVal ByteIndex As Long, ByRef Chars() As Integer, ByVal CharIndex As Long, ByVal Decoder As Decoder, ByRef FallbackBuffer As DecoderFallbackBuffer) As Long
     If FallbackBuffer Is Nothing Then
         If Decoder Is Nothing Then
             Set FallbackBuffer = mDecoderFallback.CreateFallbackBuffer
@@ -1073,19 +1063,21 @@ Private Sub InsertDecoderFallback(ByVal UnknownChar As Long, ByRef Chars() As In
         End If
     End If
     
-    If FallbackBuffer.Fallback(mBytesUnknown, 0) Then
+    If FallbackBuffer.Fallback(BytesUnknown, ByteIndex) Then
         Dim Ch As Integer
-        
+
         If CharIndex + FallbackBuffer.Remaining - 1 > UBound(Chars) Then _
             ThrowDecoderSmallConversionBuffer
-        
+
         Do While FallbackBuffer.Remaining > 0
             Ch = FallbackBuffer.GetNextChar
             Chars(CharIndex) = Ch
             CharIndex = CharIndex + 1
         Loop
     End If
-End Sub
+    
+    InsertDecoderFallback = CharIndex
+End Function
 
 Private Sub ThrowDecoderSmallConversionBuffer()
     Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_EncodingConversionOverflowChars, EncodingName, TypeName(DecoderFallback)), "Chars")

@@ -19,7 +19,8 @@ version 3.x
 	* Fixed #33 - Added validation to BinaryWriter.WriteChar method. Was allowing out-of-range values to be converted.
 	* Fixed #53 - CorString.Split with RemoveEmptyEntries fails with multiple contiguous separators.
 	* Closed #47 - Optimized CorString.Split when using string separator or one-dimension array.
-	
+	* Fixed #58 - UTF32Encoding should include character and index When throwing EncoderFallbackException.
+
 version 3.0 (BREAKING CHANGES)
 	* Renamed cArray to CorArray.
 	* Renamed cString to CorString.

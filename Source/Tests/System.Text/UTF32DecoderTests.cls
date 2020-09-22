@@ -79,6 +79,21 @@ Public Sub GetCharCount_WithPartialCharsAndNotFlushing_IgnoresPartialChars()
     Assert.That Actual, Iz.EqualTo(2)
 End Sub
 
+Public Sub GetCharCount_WithMultipleCalls_ReturnsExpected()
+    Dim Dec As Decoder
+    Dim Bytes1() As Byte
+    Dim Bytes2() As Byte
+    Dim Chars(0 To 100) As Integer
+    
+    Set Dec = MakeDecoder
+    Bytes1 = NewBytes(97, 0, 0, 0, 98)
+    Bytes2 = NewBytes(0, 0, 0)
+    
+    Assert.That Dec.GetCharCount(Bytes1, 0, 5, False), Iz.EqualTo(1), "#1"
+    Dec.GetChars Bytes1, 0, 5, Chars, 0, False
+    Assert.That Dec.GetCharCount(Bytes2, 0, 3, True), Iz.EqualTo(1), "#2"
+End Sub
+
 Public Sub GetChars_WithSingleCallAndFlushing_ReturnsExpected(ByRef Bytes() As Byte, ByRef Expected() As Integer)
     Dim Dec As Decoder
     Dim ActualLength As Long

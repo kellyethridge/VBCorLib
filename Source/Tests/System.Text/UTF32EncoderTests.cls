@@ -88,8 +88,8 @@ Public Sub GetByteCount_WithTrailingHighSurrogate_DoesNotStoreHighSurrogate()
     
     Actual = Encoder.GetByteCount(NewChars("a", &HD800), 0, 2, False)
     Assert.That Actual, Iz.EqualTo(4)
-    Actual = Encoder.GetByteCount(NewChars(&HDC00), 0, 1, False)
-    Assert.That Actual, Iz.EqualTo(8)
+    Actual = Encoder.GetByteCount(NewChars(), 0, 0, True)
+    Assert.That Actual, Iz.EqualTo(0)
 End Sub
 
 Public Sub GetBytes_WithSingleCall_ReturnsExpected(ByRef Chars() As Integer, ByRef ExpectedBytes() As Byte)
@@ -137,6 +137,37 @@ Public Sub GetBytes_WithTrailingHighSurrogateAndFlushing_EncodesFallback()
     Assert.That ActualBytes, Iz.EqualTo(NewBytes(97, 0, 0, 0, 98, 0, 0, 0, 63, 0, 0, 0, 63, 0, 0, 0))
 End Sub
 
+Public Sub GetBytes_WithTrailingHighSurrogateAndFlushing_ThrowsEncoderFallbackException()
+    Dim Encoder As Encoder
+    Dim ActualBytes(0 To 15) As Byte
+    
+    Set Encoder = MakeEncoder(True)
+    
+    On Error Resume Next
+    Encoder.GetBytes NewChars("a", "b", &HD800), 0, 3, ActualBytes, 0, True
+    
+    Dim Ex As EncoderFallbackException
+    Set Ex = AssertEncoderFallbackException(Err)
+    Assert.That Ex.Index, Iz.EqualTo(2), "Index"
+    Assert.That Ex.CharUnknown, Iz.EqualTo(&HD800), "CharUnknown"
+End Sub
+
+Public Sub GetBytes_WithInitialHangingHighSurrogate_ThrowsEncoderFallbackException()
+    Dim Encoder As Encoder
+    Dim ActualBytes(0 To 15) As Byte
+    
+    Set Encoder = MakeEncoder(True)
+    Encoder.GetBytes NewChars("a", &HD800), 0, 2, ActualBytes, 0, False
+    
+    On Error Resume Next
+    Encoder.GetBytes NewChars("a"), 0, 1, ActualBytes, 0, False
+    
+    Dim Ex As EncoderFallbackException
+    Set Ex = AssertEncoderFallbackException(Err)
+    Assert.That Ex.Index, Iz.EqualTo(-1), "Index"
+    Assert.That Ex.CharUnknown, Iz.EqualTo(&HD800), "CharUnknown"
+End Sub
+
 Public Sub GetBytes_WithByteBufferTooSmall_ThrowsArgumentException()
     Dim Encoder As Encoder
     Dim TooSmall(0 To 9) As Byte
@@ -145,6 +176,17 @@ Public Sub GetBytes_WithByteBufferTooSmall_ThrowsArgumentException()
     MakeEncoder.GetBytes NewChars("a", "b", &HD800), 0, 3, TooSmall, 0, True
     
     AssertArgumentException Err, "Bytes"
+End Sub
+
+Public Sub GetBytes_WithLastCharUsed_ClearsLastChar()
+    Dim Encoder As Encoder
+    Dim Bytes(10) As Byte
+    
+    Set Encoder = NewUTF32Encoding(False, False, True).GetEncoder
+    
+    Assert.That Encoder.GetBytes(NewChars(&HD800), 0, 1, Bytes, 0, False), Iz.EqualTo(0)
+    Assert.That Encoder.GetBytes(NewChars(&HDC00), 0, 1, Bytes, 0, True), Iz.EqualTo(4)
+    Assert.That Encoder.GetBytes(NewChars("a"), 0, 1, Bytes, 0, True), Iz.EqualTo(4)
 End Sub
 
 Public Sub Fallback_WhenCalled_ReturnsSameInstanceAsEncoding()
@@ -215,6 +257,10 @@ Public Sub Convert_WithLimitedOutputBuffer_ConvertsWithinLimits()
     Assert.That Completed, Iz.False
 End Sub
 
-Private Function MakeEncoder() As Encoder
-    Set MakeEncoder = Encoding.GetEncoding("utf-32", Cor.NewEncoderReplacementFallback("??")).GetEncoder
+Private Function MakeEncoder(Optional ByVal ThrowOnInvalidBytes As Boolean) As Encoder
+    If ThrowOnInvalidBytes Then
+        Set MakeEncoder = NewUTF32Encoding(False, False, True).GetEncoder
+    Else
+        Set MakeEncoder = Encoding.GetEncoding("utf-32", Cor.NewEncoderReplacementFallback("??")).GetEncoder
+    End If
 End Function

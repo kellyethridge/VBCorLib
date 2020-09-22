@@ -278,14 +278,14 @@ End Sub
 
 Friend Sub Init2(ByRef Message As String, ByVal CharUnknown As Long, ByVal Index As Long)
     mBase.Message = Message
-    mCharUnknown = AsWord(CharUnknown)
+    mCharUnknown = Char.ConvertFromInt32(CharUnknown)
     mIndex = Index
 End Sub
 
 Friend Sub Init3(ByRef Message As String, ByVal CharUnknownHigh As Long, ByVal CharUnknownLow As Long, ByVal Index As Long)
     mBase.Message = Message
-    mCharUnknownHigh = AsWord(CharUnknownHigh)
-    mCharUnknownLow = AsWord(CharUnknownLow)
+    mCharUnknownHigh = Char.ConvertFromInt32(CharUnknownHigh)
+    mCharUnknownLow = Char.ConvertFromInt32(CharUnknownLow)
     mIndex = Index
 End Sub
 
