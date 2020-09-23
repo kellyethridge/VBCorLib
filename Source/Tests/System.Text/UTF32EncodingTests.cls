@@ -146,6 +146,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use NewBytes(&H1, &H0, &H0, &H0, &HFF, &HFF, &H11, &H0), 4, NewBytes(&HFF, &HFF, &H11, &H0)
             Test.Use NewBytes(&HFF, &HFF, &H1), 0, NewBytes(&HFF, &HFF, &H1)
             Test.Use NewBytes(&H1, &H0, &H0, &H0, &HFF, &HFF, &H1), 4, NewBytes(&HFF, &HFF, &H1)
+            Test.Use NewBytes(&HFF, &HFF, &HFF, &HFF), 0, NewBytes(&HFF, &HFF, &HFF, &HFF)
             
         Case "GetCharCount_WithInvalidByteSequenceAndBigEndian_ThrowsDecoderFallbackException"
             Test.Use NewBytes(&H0, &H0, &H0, &H1, &H0, &H11, &HFF, &HFF), 4, NewBytes(&H0, &H11, &HFF, &HFF)
@@ -156,6 +157,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use NewBytes(&H1, &H0, &H0, &H0, &HFF, &HFF, &H11, &H0), 4, NewBytes(&HFF, &HFF, &H11, &H0)
             Test.Use NewBytes(&HFF, &HFF, &H1), 0, NewBytes(&HFF, &HFF, &H1)
             Test.Use NewBytes(&H1, &H0, &H0, &H0, &HFF, &HFF, &H1), 4, NewBytes(&HFF, &HFF, &H1)
+            Test.Use NewBytes(&HFF, &HFF, &HFF, &HFF), 0, NewBytes(&HFF, &HFF, &HFF, &HFF)
             
         Case "GetCharsEx_WithInvalidByteSequenceAndBigEndian_ThrowsDecoderFallbackException"
             Test.Use NewBytes(&H0, &H0, &H0, &H1, &H0, &H11, &HFF, &HFF), 4, NewBytes(&H0, &H11, &HFF, &HFF)
