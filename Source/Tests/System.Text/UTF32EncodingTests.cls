@@ -175,6 +175,8 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use NewBytes(97, 0, 0, 0, 97), NewChars("a", &HFFFD)
             Test.Use NewBytes(97, 0, 0, 0, 97, 0), NewChars("a", &HFFFD)
             Test.Use NewBytes(97, 0, 0, 0, 97, 0, 0), NewChars("a", &HFFFD)
+            Test.Use NewBytes(0, 0, 0, 0), NewChars(0)
+            Test.Use NewBytes(&HFF, &HFF, 0, 0), NewChars(&HFFFF)
             
         Case "GetBytesEx_WithInvalidSurrogate_ThrowsEncoderFallbackException"
             Test.Use "\u00C4 \uD802\u0033 \u00AE", 2, &HD802

@@ -57,7 +57,6 @@ Private mEmitBOM            As Boolean
 Private mCodePage           As Long
 Private mEncoderFallback    As EncoderFallback
 Private mDecoderFallback    As DecoderFallback
-Private mBytesUnknown(0)    As Byte
 
 
 ''
@@ -682,69 +681,126 @@ Private Property Get Table() As EncodingTable
 End Property
 
 Friend Function GetByteCountCore(ByRef Chars() As Integer, ByVal Index As Long, ByVal Count As Long, ByVal Encoder As UTF32Encoder) As Long
-    Dim ByteCount   As Long
-    Dim PrevChar    As Integer
-    Dim Fallback    As EncoderFallbackBuffer
-    Dim MaxIndex    As Long
-    
-    If Not Encoder Is Nothing Then
-        PrevChar = Encoder.LastChar
-    End If
-    
-    MaxIndex = Index + Count
-    
-    Do While Index < MaxIndex
-        Dim Ch As Integer
-        Ch = Chars(Index)
-        
-        If IsSurrogate(Ch) Then
-            If IsHighSurrogate(Ch) Then
-                If PrevChar <> 0 Then
-                    ' got two high surrogates in a row
-                    ByteCount = ByteCount + GetEncoderFallbackCount(PrevChar, Index - 1, Fallback, Encoder)
-                End If
-
-                PrevChar = Ch
-            ElseIf PrevChar <> 0 Then
-                ' got a valid surrogate pair
-                ByteCount = ByteCount + vbSizeOfUTF32Char
-                PrevChar = 0
-            Else
-                ' low surrogate without previous high surrogate
-                ByteCount = ByteCount + GetEncoderFallbackCount(Ch, Index, Fallback, Encoder)
-            End If
-        Else
-            If PrevChar <> 0 Then
-                ' got a previous high surrogate with no low surrogate
-                ByteCount = ByteCount + GetEncoderFallbackCount(PrevChar, Index - 1, Fallback, Encoder)
-                PrevChar = 0
-            End If
-        
-            ByteCount = ByteCount + vbSizeOfUTF32Char
-        End If
-        
-        Index = Index + 1
-    Loop
-    
-    If Encoder Is Nothing Then
-        If PrevChar <> 0 Then
-            ' we have a hanging high surrogate
-            ByteCount = ByteCount + GetEncoderFallbackCount(PrevChar, Index - 1, Fallback, Encoder)
-        End If
-    ElseIf Encoder.Flushing Then
-        If PrevChar <> 0 Then
-            ' we have a hanging high surrogate
-            ByteCount = ByteCount + GetEncoderFallbackCount(PrevChar, Index, Fallback, Encoder)
-        End If
-    End If
-    
-    GetByteCountCore = ByteCount
+    GetByteCountCore = GetBytesCore(Chars, Index, Count, NullBytes, 0, Encoder)
 End Function
 
-Private Function GetEncoderFallbackCount(ByVal Char As Integer, ByVal CharIndex As Long, ByRef Fallback As EncoderFallbackBuffer, ByVal Encoder As Encoder) As Long
+Friend Function GetBytesCore(ByRef Chars() As Integer, ByVal CharIndex As Long, ByVal CharCount As Long, ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByVal Encoder As UTF32Encoder) As Long
+    Const BeforeSurrogateStart  As Long = SurrogateStart - 1
+    Const AfterSurrogateEnd     As Long = SurrogateEnd + 1
+    
+    Dim FallbackBuffer  As EncoderFallbackBuffer
+    Dim StartIndex      As Long
+    Dim LastChar        As Long
+    Dim Ch              As Long
+    Dim BytesUBound     As Long
+    Dim PutBytes        As Boolean
+    
+    If SAPtr(Bytes) <> vbNullPtr Then
+        BytesUBound = UBound(Bytes)
+        PutBytes = True
+    End If
+    
+    If Not Encoder Is Nothing Then
+        LastChar = Encoder.LastChar
+        
+        If PutBytes Then
+            Encoder.LastChar = 0
+        End If
+    End If
+    
+    StartIndex = ByteIndex
+    
+    Do While CharCount > 0
+        Ch = Chars(CharIndex) And &HFFFF&
+        
+        If LastChar = 0 Then
+            Select Case Ch
+                Case 0 To BeforeSurrogateStart, AfterSurrogateEnd To &HFFFF&
+                    If PutBytes Then
+                        If ByteIndex + vbSizeOfUTF32Char - 1 > BytesUBound Then _
+                            ThrowEncoderSmallConversionBuffer
+                        
+                        ' This isn't quite a duplicate of the character assignment
+                        ' later in this method. This version only assigns two bytes
+                        ' from the character. The other assigns three bytes.
+                        If mIsBigEndian Then
+                            Bytes(ByteIndex) = 0
+                            Bytes(ByteIndex + 1) = 0
+                            Bytes(ByteIndex + 2) = (Ch \ vbShift8Bits) And &HFF
+                            Bytes(ByteIndex + 3) = Ch And &HFF
+                        Else
+                            Bytes(ByteIndex) = Ch And &HFF
+                            Bytes(ByteIndex + 1) = (Ch \ vbShift8Bits) And &HFF
+                            Bytes(ByteIndex + 2) = 0
+                            Bytes(ByteIndex + 3) = 0
+                        End If
+                    End If
+                    
+                    ByteIndex = ByteIndex + vbSizeOfUTF32Char
+                Case HighSurrogateStart To HighSurrogateEnd
+                    LastChar = Ch
+                Case Else
+                    ByteIndex = InsertFallbackCharacters(Ch, CharIndex, Bytes, ByteIndex, Encoder, FallbackBuffer)
+            End Select
+        Else
+            Select Case Ch
+                Case LowSurrogateStart To LowSurrogateEnd
+                    If PutBytes Then
+                        Dim Pair As Long
+                        
+                        If ByteIndex + vbSizeOfUTF32Char - 1 > BytesUBound Then _
+                            ThrowEncoderSmallConversionBuffer
+                        
+                        Pair = (LastChar And &H3FF) * vbShift10Bits + (Ch And &H3FF) + UnicodePlane1Start
+                        
+                        ' This isn't quite a duplicate of the character assignment
+                        ' earlier in this method. This version assigns three bytes
+                        ' from the character. The other assigns two bytes.
+                        If mIsBigEndian Then
+                            Bytes(ByteIndex) = 0
+                            Bytes(ByteIndex + 1) = (Pair \ vbShift16Bits) And &HFF
+                            Bytes(ByteIndex + 2) = (Pair \ vbShift8Bits) And &HFF
+                            Bytes(ByteIndex + 3) = Pair And &HFF
+                        Else
+                            Bytes(ByteIndex) = Pair And &HFF
+                            Bytes(ByteIndex + 1) = (Pair \ vbShift8Bits) And &HFF
+                            Bytes(ByteIndex + 2) = (Pair \ vbShift16Bits) And &HFF
+                            Bytes(ByteIndex + 3) = 0
+                        End If
+                    End If
+                    
+                    ByteIndex = ByteIndex + 4
+                Case Else
+                    ' A high surrogate must be followed by a low surrogate or we need
+                    ' to fallback the invalid sequence of characters.
+                    ByteIndex = InsertFallbackCharacters(LastChar, CharIndex - 1, Bytes, ByteIndex, Encoder, FallbackBuffer)
+                    CharIndex = CharIndex - 1
+                    CharCount = CharCount + 1
+            End Select
+            
+            LastChar = 0
+        End If
+                
+        CharIndex = CharIndex + 1
+        CharCount = CharCount - 1
+    Loop
+    
+    If LastChar <> 0 Then
+        If Encoder Is Nothing Then
+            ByteIndex = InsertFallbackCharacters(LastChar, CharIndex - 1, Bytes, ByteIndex, Encoder, FallbackBuffer)
+        ElseIf Encoder.Flushing Then
+            ByteIndex = InsertFallbackCharacters(LastChar, CharIndex - 1, Bytes, ByteIndex, Encoder, FallbackBuffer)
+        ElseIf PutBytes Then
+            Encoder.LastChar = LastChar
+        End If
+    End If
+    
+    GetBytesCore = ByteIndex - StartIndex
+End Function
+
+Private Function InsertFallbackCharacters(ByVal Ch As Long, ByVal CharIndex As Long, ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByVal Encoder As UTF32Encoder, ByRef Fallback As EncoderFallbackBuffer) As Long
     Dim FallbackChar    As Integer
     Dim LastChar        As Integer
-    Dim Count           As Long
     
     If Fallback Is Nothing Then
         If Encoder Is Nothing Then
@@ -756,97 +812,7 @@ Private Function GetEncoderFallbackCount(ByVal Char As Integer, ByVal CharIndex 
     
     Fallback.Reset
     
-    If Fallback.Fallback(Char, Index:=CharIndex) Then
-        Do While Fallback.Remaining > 0
-            FallbackChar = Fallback.GetNextChar
-            
-            If IsHighSurrogate(FallbackChar) Then
-                If LastChar <> 0 Then _
-                    Error.Argument Argument_InvalidCharSequenceNoIndex
-                    
-                LastChar = FallbackChar
-            ElseIf IsLowSurrogate(FallbackChar) Then
-                If LastChar = 0 Then _
-                    Error.Argument Argument_InvalidCharSequenceNoIndex
-                    
-                Count = Count + vbSizeOfUTF32Char
-                LastChar = 0
-            ElseIf LastChar <> 0 Then
-                Error.Argument Argument_InvalidCharSequenceNoIndex
-            Else
-                Count = Count + vbSizeOfUTF32Char
-            End If
-        Loop
-    End If
-    
-    GetEncoderFallbackCount = Count
-End Function
-
-Friend Function GetBytesCore(ByRef Chars() As Integer, ByVal CharIndex As Long, ByVal CharCount As Long, ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByVal Encoder As UTF32Encoder) As Long
-    Dim FallbackBuffer  As EncoderFallbackBuffer
-    Dim StartIndex      As Long
-    Dim LastChar        As Integer
-    Dim Ch              As Integer
-    
-    If Not Encoder Is Nothing Then
-        LastChar = Encoder.GetAndClearLastChar
-    End If
-    
-    StartIndex = ByteIndex
-    
-    Do While CharCount > 0
-        Ch = Chars(CharIndex)
-        
-        ' If LastChar has a value, then there was a high surrogate from the last loop.
-        If LastChar <> 0 Then
-            ' A high surrogate must be followed by a low surrogate or we need
-            ' to fallback the invalid sequence of characters.
-            If IsLowSurrogate(Ch) Then
-                ByteIndex = InsertUTF32Char(ConvertToUtf32(LastChar, Ch), Bytes, ByteIndex)
-            Else
-                ByteIndex = InsertFallbackCharacters(LastChar, CharIndex - 1, Bytes, ByteIndex, Encoder, FallbackBuffer)
-                CharIndex = CharIndex - 1
-                CharCount = CharCount + 1
-            End If
-            
-            LastChar = 0
-        ElseIf IsHighSurrogate(Ch) Then
-            LastChar = Ch
-        ElseIf IsLowSurrogate(Ch) Then
-            ByteIndex = InsertFallbackCharacters(Ch, CharIndex, Bytes, ByteIndex, Encoder, FallbackBuffer)
-        Else
-            ByteIndex = InsertUTF32Char(Ch And &HFFFF&, Bytes, ByteIndex)
-        End If
-        
-        CharIndex = CharIndex + 1
-        CharCount = CharCount - 1
-    Loop
-    
-    If LastChar <> 0 Then
-        If Encoder Is Nothing Then
-            ByteIndex = InsertFallbackCharacters(LastChar, CharIndex - 1, Bytes, ByteIndex, Encoder, FallbackBuffer)
-        ElseIf Encoder.Flushing Then
-            ByteIndex = InsertFallbackCharacters(LastChar, CharIndex - 1, Bytes, ByteIndex, Encoder, FallbackBuffer)
-        Else
-            Encoder.LastChar = LastChar
-        End If
-    End If
-    
-    GetBytesCore = ByteIndex - StartIndex
-End Function
-
-Private Function InsertFallbackCharacters(ByVal Ch As Integer, ByVal CharIndex As Long, ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByVal Encoder As UTF32Encoder, ByRef Fallback As EncoderFallbackBuffer) As Long
-    Dim FallbackChar    As Integer
-    Dim LastChar        As Integer
-    
-    If Fallback Is Nothing Then
-        If Encoder Is Nothing Then
-            Set Fallback = mEncoderFallback.CreateFallbackBuffer
-        Else
-            Set Fallback = Encoder.FallbackBuffer
-        End If
-    End If
-    
+    ' Didn't optimize the fallback because it's not really the happy path.
     If Fallback.Fallback(Ch, Index:=CharIndex) Then
         Do While Fallback.Remaining > 0
             FallbackChar = Fallback.GetNextChar
@@ -872,19 +838,22 @@ Private Function InsertFallbackCharacters(ByVal Ch As Integer, ByVal CharIndex A
     
     If LastChar <> 0 Then _
         Error.Argument Argument_InvalidCharSequenceNoIndex
-    
+        
     InsertFallbackCharacters = ByteIndex
 End Function
 
 Private Function InsertUTF32Char(ByVal UTF32Char As Long, ByRef Bytes() As Byte, ByVal ByteIndex As Long) As Long
-    If ByteIndex + vbSizeOfUTF32Char - 1 > UBound(Bytes) Then _
-        ThrowEncoderSmallConversionBuffer
+    If SAPtr(Bytes) Then
+        If ByteIndex + vbSizeOfUTF32Char - 1 > UBound(Bytes) Then _
+            ThrowEncoderSmallConversionBuffer
     
-    If mIsBigEndian Then
-        UTF32Char = SwapEndian(UTF32Char)
-    End If
+        If mIsBigEndian Then
+            UTF32Char = SwapEndian(UTF32Char)
+        End If
 
-    AsLong(Bytes(ByteIndex)) = UTF32Char
+        AsLong(Bytes(ByteIndex)) = UTF32Char
+    End If
+    
     InsertUTF32Char = ByteIndex + vbSizeOfUTF32Char
 End Function
 
@@ -893,7 +862,8 @@ Friend Function GetCharCountCore(ByRef Bytes() As Byte, ByVal Index As Long, ByV
 End Function
 
 Friend Function GetCharsCore(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, ByRef Chars() As Integer, ByVal CharIndex As Long, ByVal Decoder As UTF32Decoder) As Long
-    Const MaxSurrogatePair As Long = &H10FFFF
+    Const BeforeSurrogateStart  As Long = SurrogateStart - 1
+    Const AfterSurrogateEnd     As Long = SurrogateEnd + 1
     
     Dim PutChars        As Boolean
     Dim CharsUBound     As Long
@@ -920,14 +890,30 @@ Friend Function GetCharsCore(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByV
     End If
     
     Do While ByteCount > 0
+        If ByteCount > 3 And BytesRead = 0 Then
 #If Release Then
-        UTF32Char = ((UTF32Char \ vbShift8Bits) And &HFFFFFF) Or (Bytes(ByteIndex) * vbShift24Bits)
+            UTF32Char = Bytes(ByteIndex) Or _
+                        Bytes(ByteIndex + 1) * vbShift8Bits Or _
+                        Bytes(ByteIndex + 2) * vbShift16Bits Or _
+                        Bytes(ByteIndex + 3) * vbShift24Bits
 #Else
-        UTF32Char = ShiftRightInt32(UTF32Char, 8) Or ShiftLeftInt32(Bytes(ByteIndex), 24)
+            UTF32Char = AsLong(Bytes(ByteIndex))
+#End If
+
+            BytesRead = 4
+            ByteIndex = ByteIndex + 4
+            ByteCount = ByteCount - 4
+        Else
+#If Release Then
+            UTF32Char = ((UTF32Char \ vbShift8Bits) And &HFFFFFF) Or (Bytes(ByteIndex) * vbShift24Bits)
+#Else
+            UTF32Char = ShiftRightInt32(UTF32Char, 8) Or ShiftLeftInt32(Bytes(ByteIndex), 24)
 #End If
         
-        BytesRead = BytesRead + 1
-        ByteIndex = ByteIndex + 1
+            BytesRead = BytesRead + 1
+            ByteIndex = ByteIndex + 1
+            ByteCount = ByteCount - 1
+        End If
         
         If BytesRead = 4 Then
             If mIsBigEndian Then
@@ -935,20 +921,25 @@ Friend Function GetCharsCore(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByV
             End If
                         
             Select Case UTF32Char
-                ' Cannot be greater than the largest possible UTF-32 value, nor can it
-                ' be a 16-bit version of a high or low surrogate character.
-                Case Is < 0, Is > MaxSurrogatePair, SurrogateStart To SurrogateEnd
-                    ' Swap the endian back because we are pulling the BytesUnknown array
-                    ' from the character which had the endian swapped to make it little endian.
-                    If mIsBigEndian Then
-                        UTF32Char = SwapEndian(UTF32Char)
+                ' Check if we have an normal character. These will be the most common characters to process.
+                ' Characters are from U+0000 to U+D7FF and U+E000 to U+FFFF.
+                Case 0 To BeforeSurrogateStart, AfterSurrogateEnd To &HFFFF&
+                    If PutChars Then
+                        If CharIndex > CharsUBound Then _
+                            ThrowDecoderSmallConversionBuffer
+
+    #If Release Then
+                        Chars(CharIndex) = UTF32Char And &HFFFF&
+    #Else
+                        Chars(CharIndex) = AsWord(UTF32Char)
+    #End If
                     End If
-    
-                    CharIndex = InsertDecoderFallback(AsQByteArr(UTF32Char).Bytes, ByteIndex - vbSizeOfUTF32Char, Chars, CharIndex, Decoder, FallbackBuffer)
-                    
-                ' Check if is a surrogate pair. It will always have this bit set because
-                ' it is added when combining high/low surrogates.
-                Case Is >= UnicodePlane1Start
+
+                    CharIndex = CharIndex + 1
+                
+                ' Check if we have an encoded high/low surrogate pair.
+                ' Encoded surrogate pairs are from U+10000 to U+10FFFF.
+                Case UnicodePlane1Start To UnicodePlane16End
                     If PutChars Then
                         If CharIndex + 1 > CharsUBound Then _
                             ThrowDecoderSmallConversionBuffer
@@ -959,26 +950,21 @@ Friend Function GetCharsCore(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByV
                     End If
     
                     CharIndex = CharIndex + 2
+                    
+                ' We have an invalid character, so fallback.
                 Case Else
-                    If PutChars Then
-                        If CharIndex > CharsUBound Then _
-                            ThrowDecoderSmallConversionBuffer
-    
-    #If Release Then
-                        Chars(CharIndex) = UTF32Char And &HFFFF&
-    #Else
-                        Chars(CharIndex) = AsWord(UTF32Char)
-    #End If
+                    ' Swap the endian back because we are pulling the BytesUnknown array
+                    ' from the character which had the endian swapped to make it little endian.
+                    If mIsBigEndian Then
+                        UTF32Char = SwapEndian(UTF32Char)
                     End If
     
-                    CharIndex = CharIndex + 1
+                    CharIndex = InsertDecoderFallback(AsQByteArr(UTF32Char).Bytes, ByteIndex - vbSizeOfUTF32Char, Chars, CharIndex, Decoder, FallbackBuffer)
             End Select
             
             BytesRead = 0
             UTF32Char = 0
         End If
-        
-        ByteCount = ByteCount - 1
     Loop
     
     If BytesRead > 0 Then
