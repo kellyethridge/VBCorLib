@@ -87,6 +87,9 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use NewBytes(&HA0, &H3, &HA3, &H3), NewIntegers(&H3A0, &H3A3)
             Test.Use NewBytes(&H0, &HDC, &H0, &H0), NewIntegers(&HFFFD, &H0)
             
+        Case "GetCharsEx_WithValues_Decodes"
+             Test.Use NewBytes(&H0, &HD8, &H41, &H0), 2, NewChars(&HFFFD, &H41)
+
         Case "GetCharsEx_WithInvalidSequence_ThrowsDecoderFallbackException"
             Test.Use NewBytes(&H40), 0, NewBytes(&H40)
             Test.Use NewBytes(0, &H40, &H41), 2, NewBytes(&H41)
@@ -123,6 +126,13 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use " \uDC02", 1, &HDC02
             Test.Use "a\uDC02a", 1, &HDC02
             Test.Use "a\uD802a", 1, &HD802
+            
+        Case "GetBytesEx_WithLittleEndianEncoding_ReturnsExpected"
+            Test.Use t("za"), NewBytes(122, 0, 97, 0)
+            Test.Use t("\xd800\xdc00"), NewBytes(&H0, &HD8, &H0, &HDC)
+            Test.Use t("\xd800a"), NewBytes(&HFD, &HFF, 97, 0)
+            Test.Use t("\xd800\xd800"), NewBytes(&HFD, &HFF, &HFD, &HFF)
+            Test.Use t("\xd800\xd800a"), NewBytes(&HFD, &HFF, &HFD, &HFF, 97, 0)
         
         Case "GetBytes_WithLittleEndianEncoding_ReturnsExpected"
             Test.Use t("\xD800\xD800"), NewBytes(&HFD, &HFF, &HFD, &HFF)
@@ -187,6 +197,19 @@ Public Sub GetBytexEx_WhenLittleEndian_Encodes()
     Assert.That ActualBytes, Iz.EqualTo(NewBytes(&HA0, &H3, &HA3, &H3))
 End Sub
 
+Public Sub GetBytesEx_WithSubCharArray_EncodesSubArray()
+    Dim Enc As New UnicodeEncoding
+    Dim Unicode As String
+    Dim Bytes() As Byte
+    
+    Unicode = "abcdefghijk"
+    ReDim Bytes(0 To 8)
+    
+    Assert.That Enc.GetBytesEx(Unicode, 3, 3, Bytes, 1), Iz.EqualTo(6)
+    
+    Assert.That Bytes, Iz.EqualTo(NewBytes(0, 100, 0, 101, 0, 102, 0, 0, 0))
+End Sub
+
 Public Sub GetBytes_WithLittleEndianEncoding_ReturnsExpected(ByRef Chars As Variant, ByRef Expected() As Byte)
     Dim Enc As New UnicodeEncoding
     
@@ -196,12 +219,51 @@ Public Sub GetBytes_WithLittleEndianEncoding_ReturnsExpected(ByRef Chars As Vari
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
+Public Sub GetBytesEx_WithLittleEndianEncoding_ReturnsExpected(ByRef Chars As String, ByRef Expected() As Byte)
+    Dim Enc As New UnicodeEncoding
+    Dim Actual() As Byte
+    Dim Count As Long
+    
+    ReDim Actual(UBound(Expected))
+    
+    Count = Enc.GetBytesEx(Chars, 0, Len(Chars), Actual, 0)
+    
+    Assert.That Count, Iz.EqualTo(CorArray.Length(Expected)), "#Count"
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
 Public Sub GetBytes_WithBigEndianEncoding_ReturnsEncoded(ByRef Chars As Variant, ByRef Expected() As Byte)
     Dim Enc As UnicodeEncoding
     Set Enc = NewUnicodeEncoding(True, True)
     
     Dim Actual() As Byte
     Actual = Enc.GetBytes(Chars)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub GetBytes_WithLargeCharacterSet_ReturnsEncoded()
+    Dim Chars() As Integer
+    Dim Actual() As Byte
+    Dim Expected() As Byte
+    Dim i As Long
+    Dim s As String
+    
+    ReDim Chars(0 To 55)
+    
+    For i = 0 To 25
+        Chars(i) = 65 + i
+        Chars(30 + i) = 97 + i
+    Next
+    
+    Chars(26) = &HD800
+    Chars(27) = &HDC00
+    Chars(28) = &HDBFF
+    Chars(29) = &HDFFF
+    s = NewString(Chars)
+    Expected = s
+    
+    Actual = Encoding.Unicode.GetBytes(Chars)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
@@ -235,6 +297,19 @@ Public Sub GetBytesEx_WithInvalidSurrogate_ThrowsEncoderFallbackException(ByVal 
     Assert.That Ex.CharUnknown, Iz.EqualTo(ExpectedChar), "CharUnknown"
 End Sub
 
+Public Sub GetBytesEx_TestOptimizationUseOfSmallerBytesBuffer_ThrowsArgumentException()
+    Dim Chars() As Integer
+    Dim Bytes() As Byte
+    
+    Chars = NewChars(66, 67, 68, 69, 70)
+    ReDim Bytes(0 To 8)
+    
+    On Error Resume Next
+    Encoding.Unicode.GetBytesEx Chars, 0, 5, Bytes, 0
+    
+    AssertArgumentException Err
+End Sub
+
 Public Sub GetChars_WithValues_ReturnsExpected(ByRef Bytes() As Byte, ByRef Expected() As Integer)
     Dim Enc As New UnicodeEncoding
     Dim Actual() As Integer
@@ -242,6 +317,19 @@ Public Sub GetChars_WithValues_ReturnsExpected(ByRef Bytes() As Byte, ByRef Expe
     Actual = Enc.GetChars(Bytes)
     
     Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub GetCharsEx_WithValues_Decodes(ByRef Bytes() As Byte, ByVal ExpectedCount As Long, ByRef ExpectedChars() As Integer)
+    Dim Enc As New UnicodeEncoding
+    Dim ActualCount As Long
+    Dim ActualChars() As Integer
+    
+    ReDim ActualChars(UBound(ExpectedChars))
+    
+    ActualCount = Enc.GetCharsEx(Bytes, 0, CorArray.Length(Bytes), ActualChars, 0)
+    
+    Assert.That ActualCount, Iz.EqualTo(ExpectedCount), "Count"
+    Assert.That ActualChars, Iz.EqualTo(ExpectedChars), "Chars"
 End Sub
 
 Public Sub GetCharsEx_WithSmallOutputBuffer_ThrowsArgumentException()
