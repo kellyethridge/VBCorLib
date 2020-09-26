@@ -776,41 +776,17 @@ Private Sub QuickSortStringComparer(ByRef Context As StringSortContext, ByVal Le
     Loop
 End Sub
 
-Private Sub InsertionSortStringComparer(ByRef Context As StringSortContext, ByVal Left As Long, ByVal Right As Long)
-    Dim i As Long
-    Dim j As Long
-    Dim x As String
-    Dim PtrX As Long
-    
-    i = Left
-    
-    Do While i <= Right
-        PtrX = Context.KeyPtrs(i)
-        StringPtr(x) = PtrX
-        j = i - 1
-        
-        Do While j >= Left
-            If Context.Comparer.Compare(Context.Keys(j), x) <= 0 Then
-                Exit Do
-            End If
-            
-            Context.KeyPtrs(j + 1) = Context.KeyPtrs(j)
-            j = j - 1
-        Loop
-        
-        Context.KeyPtrs(j + 1) = PtrX
-        StringPtr(x) = vbNullPtr
-        i = i + 1
-    Loop
-End Sub
-
 Private Sub QuickSortObject(ByRef Keys() As Object, ByVal Left As Long, ByVal Right As Long)
-    Dim i As Long, j As Long, x As Variant, Key As IComparable
+    Dim i As Long, j As Long, x As Variant
+    Dim Comp As IComparer
+    
+    Set Comp = Comparer.Default
+    
     Do While Left < Right
         i = Left: j = Right: Set x = Keys((i + j) \ 2)
         Do
-            Do While Comparer.Default.Compare(Keys(i), x) < 0: i = i + 1: Loop
-            Do While Comparer.Default.Compare(Keys(j), x) > 0: j = j - 1: Loop
+            Do While Comp.Compare(Keys(i), x) < 0: i = i + 1: Loop
+            Do While Comp.Compare(Keys(j), x) > 0: j = j - 1: Loop
             
             If i > j Then Exit Do
             If i < j Then Helper.Swap4 Keys(i), Keys(j): If mHasSortItems Then SwapSortItems mSortItems, i, j

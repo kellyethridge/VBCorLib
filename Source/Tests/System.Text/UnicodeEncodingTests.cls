@@ -89,6 +89,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             
         Case "GetCharsEx_WithValues_Decodes"
              Test.Use NewBytes(&H0, &HD8, &H41, &H0), 2, NewChars(&HFFFD, &H41)
+             Test.Use NewBytes(&H41, &H0, &H0, &HD8, &H0, &HDC, &H41, &H0, &H42, &H0, &H43, &H0), 6, NewChars(&H41, &HD800, &HDC00, &H41, &H42, &H43)
 
         Case "GetCharsEx_WithInvalidSequence_ThrowsDecoderFallbackException"
             Test.Use NewBytes(&H40), 0, NewBytes(&H40)
@@ -308,6 +309,32 @@ Public Sub GetBytesEx_TestOptimizationUseOfSmallerBytesBuffer_ThrowsArgumentExce
     Encoding.Unicode.GetBytesEx Chars, 0, 5, Bytes, 0
     
     AssertArgumentException Err
+End Sub
+
+' This test is useful only when stepping the the UnicodeEncoding.GetBytesCore method.
+Public Sub GetBytesEx_WithMisalignedBytesArray_DoesNotUseOptimizedRoutine()
+    Dim Chars() As Integer
+    Dim Bytes() As Byte
+    
+    Chars = NewChars(66, 67, 68, 69, 70)
+    ReDim Bytes(0 To 10)
+    
+    Assert.That Encoding.Unicode.GetBytesEx(Chars, 0, 5, Bytes, 1), Iz.EqualTo(10)
+    
+    Assert.That Bytes, Iz.EqualTo(NewBytes(0, 66, 0, 67, 0, 68, 0, 69, 0, 70, 0))
+End Sub
+
+' This test is useful only when stepping the the UnicodeEncoding.GetCharsCore method.
+Public Sub GetCharsEx_WithMisalignedBytesArray_DoesNotUseOptimizedRoutine()
+    Dim Chars() As Integer
+    Dim Bytes() As Byte
+
+    Bytes = NewBytes(0, 66, 0, 67, 0, 68, 0, 69, 0, 70, 0)
+    ReDim Chars(0 To 4)
+    
+    Assert.That Encoding.Unicode.GetCharsEx(Bytes, 1, 10, Chars, 0), Iz.EqualTo(5)
+    
+    Assert.That Chars, Iz.EqualTo(NewChars(66, 67, 68, 69, 70))
 End Sub
 
 Public Sub GetChars_WithValues_ReturnsExpected(ByRef Bytes() As Byte, ByRef Expected() As Integer)
