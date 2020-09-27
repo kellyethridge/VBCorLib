@@ -311,6 +311,19 @@ Public Sub GetBytesEx_TestOptimizationUseOfSmallerBytesBuffer_ThrowsArgumentExce
     AssertArgumentException Err
 End Sub
 
+Public Sub GetBytesEx_WithSmallConversionBuffer_ThrowsArgumentException()
+    Dim Chars() As Integer
+    Dim Bytes() As Byte
+    
+    Chars = NewChars(66, 67, 68, 69, 70)
+    Bytes = NewBytes()
+    
+    On Error Resume Next
+    Encoding.Unicode.GetBytesEx Chars, 0, 5, Bytes, 0
+    
+    AssertArgumentException Err
+End Sub
+
 ' This test is useful only when stepping the the UnicodeEncoding.GetBytesCore method.
 Public Sub GetBytesEx_WithMisalignedBytesArray_DoesNotUseOptimizedRoutine()
     Dim Chars() As Integer

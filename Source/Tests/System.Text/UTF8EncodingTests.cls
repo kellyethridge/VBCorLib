@@ -203,6 +203,16 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "\u00C4 \uDC02\u0033 \u00AE", 2, &HDC02
             Test.Use " \uD802", 1, &HD802
             Test.Use " \uDC02", 1, &HDC02
+            
+        Case "GetBytesEx_WithValues_ReturnsEncoded"
+            Test.Use NewChars(0, 127, 1, 126, 2, 125), NewBytes(0, 127, 1, 126, 2, 125)
+            Test.Use NewChars(&H80, &H7FF, &H81, &H7FE), NewBytes(&HC2, &H80, &HDF, &HBF, &HC2, &H81, &HDF, &HBE)
+            Test.Use NewChars(&H800, &HFFFF, &H801, &HFFFE), NewBytes(&HE0, &HA0, &H80, &HEF, &HBF, &HBF, &HE0, &HA0, &H81, &HEF, &HBF, &HBE)
+            Test.Use NewChars(&HD800, &HDC00, &HDBFF, &HDFFF), NewBytes(&HF0, &H90, &H80, &H80, &HF4, &H8F, &HBF, &HBF)
+            Test.Use NewChars(&HDC00, 97), NewBytes(&HEF, &HBF, &HBD, 97)
+            Test.Use NewChars(&HD800, 97), NewBytes(&HEF, &HBF, &HBD, 97)
+            Test.Use NewChars(97, &HD800), NewBytes(97, &HEF, &HBF, &HBD)
+            Test.Use NewChars(), NewBytes()
     End Select
 End Sub
 
@@ -314,6 +324,35 @@ Public Sub GetBytesEx_WithInvalidSurrogate_ThrowsEncoderFallbackException(ByRef 
     Set Ex = AssertEncoderFallbackException(Err)
     Assert.That Ex.Index, Iz.EqualTo(ExpectedIndex), "Index"
     Assert.That Ex.CharUnknown, Iz.EqualTo(ExpectedChar), "CharUnknown"
+End Sub
+
+Public Sub GetBytesEx_WithValues_ReturnsEncoded(ByRef Chars As Variant, ByRef ExpectedBytes() As Byte)
+    Dim Enc As New UTF8Encoding
+    Dim ExpectedCount As Long
+    Dim ActualCount As Long
+    Dim ActualBytes() As Byte
+    
+    ExpectedCount = CorArray.Length(ExpectedBytes)
+    ActualBytes = CorArray.CreateInstance(vbByte, ExpectedCount)
+    
+    ActualCount = Enc.GetBytesEx(Chars, 0, CorArray.Length(Chars), ActualBytes, 0)
+    
+    Assert.That ActualCount, Iz.EqualTo(ExpectedCount), "Count"
+    Assert.That ActualBytes, Iz.EqualTo(ExpectedBytes), "Bytes"
+End Sub
+
+Public Sub GetBytesEx_WithSmallConversionBuffer_ThrowsArgumentException()
+    Dim Enc As New UTF8Encoding
+    Dim Bytes() As Byte
+    Dim Chars() As Integer
+    
+    Chars = NewChars("a")
+    Bytes = NewBytes()
+    
+    On Error Resume Next
+    Enc.GetBytesEx Chars, 0, 1, Bytes, 0
+    
+    AssertArgumentException Err, "Bytes"
 End Sub
 
 Public Sub GetBytes_WithChars_ReturnsEncoded()
