@@ -180,23 +180,38 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use NewBytes(&H80), 1
             Test.Use NewBytes(&HF6, &HB0, &H80, &H80), 4 ' U+D800 U+0000
             
-        Case "GetChars_WithValues_ReturnsExpected"
+        Case "GetCharsEx_WithByteSequence_DecodesCharacters"
+            ' Single byte sequence
             Test.Use NewBytes(), NewIntegers()
             Test.Use NewBytes(&H41), NewChars("A") ' A
             Test.Use NewBytes(&H41, &H42, &H43), NewChars("A", "B", "C") ' ABC
-            Test.Use NewBytes(&HC0), NewChars(&HFFFD)
+            
+            ' Two-byte sequence
             Test.Use NewBytes(&HC2, &H80), NewChars(&H80)  ' U+0080
-            Test.Use NewBytes(&HC0, &H80), NewChars(&HFFFD, &HFFFD) ' 2-byte encoding of U+0000 is invalid
             Test.Use NewBytes(223, 191), NewChars(&H7FF) ' U+07FF
+            
+            ' Three-byte sequence
             Test.Use NewBytes(224, 160, 128), NewChars(&H800) ' U+0800
+            Test.Use NewBytes(&HED, &H9F, &HBF), NewChars(&HD7FF)
+            Test.Use NewBytes(&HEE, &H80, &H80), NewChars(&HE000)
             Test.Use NewBytes(239, 191, 191), NewChars(&HFFFF) ' U+FFFF
+            
+            ' Four-byte sequence (surrogate pairs)
+            Test.Use NewBytes(240, 144, 128, 128), NewChars(&HD800, &HDC00) ' U+D800 U+DC00
+            
+            ' Test multi-character byte sequences
+            Test.Use NewBytes(&H41, &HC2, &H81, 224, 160, 128, &HEE, &H80, &H80), NewChars("A", &H81, &H800, &HE000) ' A U+0081 U+0800 U+E000
+            
+            ' Invalid sequences
+            Test.Use NewBytes(&HC0), NewChars(&HFFFD)
+            Test.Use NewBytes(&HC0, &H80), NewChars(&HFFFD, &HFFFD) ' 2-byte encoding of U+0000 is invalid
             Test.Use NewBytes(224, 159, 191), NewChars(&HFFFD, &HFFFD) ' U+07FF -> U+FFFD U+FFFD
             Test.Use NewBytes(239, 191, 189), NewChars(&HFFFD) ' U+FFFD
             Test.Use NewBytes(&HED, &HA0, &H80), NewChars(&HFFFD, &HFFFD) ' U+D800
-            Test.Use NewBytes(240, 144, 128, 128), NewChars(&HD800, &HDC00) ' U+D800 U+DC00
             Test.Use NewBytes(240, 65), NewChars(&HFFFD, &H41)
             Test.Use NewBytes(&H80), NewChars(&HFFFD)
             Test.Use NewBytes(&HF6, &HB0, &H80, &H80), NewChars(&HFFFD, &HFFFD, &HFFFD, &HFFFD) ' U+D800 U+0000
+            Test.Use NewBytes(&HF0, &H10, &HFC, &H0), NewChars(&HFFFD, &H10, &HFFFD, &H0)
             
         Case "GetBytesEx_WithInvalidSurrogate_ThrowsEncoderFallbackException"
             Test.Use "\u00C4 \uD802\u0033 \u00AE", 2, &HD802
@@ -204,7 +219,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use " \uD802", 1, &HD802
             Test.Use " \uDC02", 1, &HDC02
             
-        Case "GetBytesEx_WithValues_ReturnsEncoded"
+        Case "GetBytesEx_WithCharacters_EncodesCharacters"
             Test.Use NewChars(0, 127, 1, 126, 2, 125), NewBytes(0, 127, 1, 126, 2, 125)
             Test.Use NewChars(&H80, &H7FF, &H81, &H7FE), NewBytes(&HC2, &H80, &HDF, &HBF, &HC2, &H81, &HDF, &HBE)
             Test.Use NewChars(&H800, &HFFFF, &H801, &HFFFE), NewBytes(&HE0, &HA0, &H80, &HEF, &HBF, &HBF, &HE0, &HA0, &H81, &HEF, &HBF, &HBE)
@@ -213,6 +228,33 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use NewChars(&HD800, 97), NewBytes(&HEF, &HBF, &HBD, 97)
             Test.Use NewChars(97, &HD800), NewBytes(97, &HEF, &HBF, &HBD)
             Test.Use NewChars(), NewBytes()
+            
+        Case "GetCharsEx_WithInvalidByteSequence_ThrowsDecoderFallbackException"
+            Test.Use NewBytes(&HC0), 0, NewBytes(&HC0)
+            Test.Use NewBytes(1, 2, &H80), 2, NewBytes(&H80) ' invalid start of any sequence
+            Test.Use NewBytes(1, 2, &HC1), 2, NewBytes(&HC1) ' invalid start of 2-byte sequence
+            Test.Use NewBytes(1, 2, &HC2, 0), 2, NewBytes(&HC2) ' invalid 2nd byte of 2-byte character
+            Test.Use NewBytes(&HF0, &H10, &HFC, &H0), 0, NewBytes(&HF0)
+            Test.Use NewBytes(&HF0, &H10, &HF8, &H0), 0, NewBytes(&HF0)
+            Test.Use NewBytes(1, 2, &HE1), 2, NewBytes(&HE1) ' hanging 1 byte of 3-byte character
+            Test.Use NewBytes(1, 2, &HE0, &HA2), 2, NewBytes(&HE0, &HA2) ' hanging 2 bytes of 3-byte character
+            Test.Use NewBytes(&HF0, &H8F, &HBF, &HBF), 0, NewBytes(&HF0, &H8F)
+            Test.Use NewBytes(1, 2, &HF0, &H90, &H80), 2, NewBytes(&HF0, &H90, &H80) ' hanging first 3 bytes of surrogate pair
+            Test.Use NewBytes(1, 2, &HF0, &H90), 2, NewBytes(&HF0, &H90) ' hanging 2 bytes of surrogate pair
+
+        Case "GetCharCount_WithInvalidByteSequence_ThrowsDecoderFallbackException"
+            Test.Use NewBytes(&HC0), 0, NewBytes(&HC0)
+            Test.Use NewBytes(1, 2, &H80), 2, NewBytes(&H80) ' invalid start of any sequence
+            Test.Use NewBytes(1, 2, &HC1), 2, NewBytes(&HC1) ' invalid start of 2-byte sequence
+            Test.Use NewBytes(1, 2, &HC2, 0), 2, NewBytes(&HC2) ' invalid 2nd byte of 2-byte character
+            Test.Use NewBytes(&HF0, &H10, &HFC, &H0), 0, NewBytes(&HF0)
+            Test.Use NewBytes(&HF0, &H10, &HF8, &H0), 0, NewBytes(&HF0)
+            Test.Use NewBytes(1, 2, &HE1), 2, NewBytes(&HE1) ' hanging start of 3-byte character
+            Test.Use NewBytes(1, 2, &HE0, &HA2), 2, NewBytes(&HE0, &HA2) ' hanging 2 bytes of 3-byte character
+            Test.Use NewBytes(1, 2, &HF0, &H90, &H80), 2, NewBytes(&HF0, &H90, &H80) ' hanging first 3 bytes of surrogate pair
+            Test.Use NewBytes(&HF0, &H8F, &HBF, &HBF), 0, NewBytes(&HF0, &H8F)
+            Test.Use NewBytes(1, 2, &HF0, &H90), 2, NewBytes(&HF0, &H90) ' hanging 2 bytes of surrogate pair
+        
     End Select
 End Sub
 
@@ -229,13 +271,95 @@ Public Sub GetCharCount_WithValues_ReturnsExpected(ByRef Bytes() As Byte, ByVal 
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub GetChars_WithValues_ReturnsExpected(ByRef Bytes() As Byte, ByRef Expected() As Integer)
+Public Sub GetCharsEx_WithByteSequence_DecodesCharacters(ByRef Bytes() As Byte, ByRef ExpectedChars() As Integer)
+    Dim Enc             As New UTF8Encoding
+    Dim ExpectedCount   As Long
+    Dim ActualCount     As Long
+    Dim ActualChars()   As Integer
+    
+    ExpectedCount = CorArray.Length(ExpectedChars)
+    ActualChars = CorArray.CreateInstance(vbInteger, ExpectedCount)
+    
+    ActualCount = Enc.GetCharsEx(Bytes, 0, CorArray.Length(Bytes), ActualChars, 0)
+    
+    Assert.That ActualCount, Iz.EqualTo(ExpectedCount), "Count"
+    Assert.That ActualChars, Iz.EqualTo(ExpectedChars), "Chars"
+End Sub
+
+' This test is to help test the fast loop with only ASCII characters. It's only
+' useful in debug mode so the code can be walked through to ensure expected
+' code paths are being executed.
+Public Sub GetCharsEx_WithLongSequence_DecodesChars()
+    Const Count As Long = 21
     Dim Enc As New UTF8Encoding
+    Dim Bytes() As Byte
+    Dim Chars() As Integer
+    Dim i As Long
     
-    Dim Actual() As Integer
-    Actual = Enc.GetChars(Bytes)
+    ReDim Bytes(0 To Count - 1)
+    ReDim Chars(0 To Count - 1)
     
-    Assert.That Actual, Iz.EqualTo(Expected)
+    For i = 0 To Count - 1
+        Bytes(i) = i
+    Next
+    
+    Assert.That Enc.GetCharsEx(Bytes, 0, Count, Chars, 0), Iz.EqualTo(Count)
+    
+    Assert.That Chars, Iz.EqualTo(Bytes)
+End Sub
+
+Public Sub GetCharsEx_WithInvalidByteSequence_ThrowsDecoderFallbackException(ByRef InvalidSequence() As Byte, ByVal ExpectedIndex As Long, ByRef ExpectedBytesUnknown() As Byte)
+    Dim Enc As UTF8Encoding
+    Dim Chars(100) As Integer
+    
+    Set Enc = NewUTF8Encoding(False, True)
+    
+    On Error GoTo Catch
+    Enc.GetCharsEx InvalidSequence, LBound(InvalidSequence), CorArray.Length(InvalidSequence), Chars, 0
+    
+Catch:
+    Dim Ex As DecoderFallbackException
+    Set Ex = AssertDecoderFallbackException(Err)
+    
+    ' The .NET version of the fallback will have a DecoderFallbackException.Index of one less than
+    ' what the documentation says. The documentation says the index is of the byte that caused
+    ' the invalid sequence to happen. I'm going with the documentation because that index value
+    ' makes the most sense, so all VBCorLib indexes will be one more than what .NET indicates.
+    Assert.That Ex.Index, Iz.EqualTo(ExpectedIndex), "Index"
+    Assert.That Ex.BytesUnknown, Iz.EqualTo(ExpectedBytesUnknown), "BytesUnknown"
+End Sub
+
+Public Sub GetCharsEx_WithInvalidByteSequenceAndNonZeroLBound_ThrowsDecoderFallbackException()
+    Dim Enc As UTF8Encoding
+    Dim Chars(100) As Integer
+    Dim Bytes(5 To 10) As Byte
+    
+    Set Enc = NewUTF8Encoding(False, True)
+    Bytes(7) = &H80
+    
+    On Error GoTo Catch
+    Enc.GetCharsEx Bytes, 5, 6, Chars, 0
+    
+Catch:
+    Dim Ex As DecoderFallbackException
+    Set Ex = AssertDecoderFallbackException(Err)
+    Assert.That Ex.Index, Iz.EqualTo(7)
+    Assert.That Ex.BytesUnknown, Iz.EqualTo(NewBytes(&H80))
+End Sub
+
+Public Sub GetCharCount_WithInvalidByteSequence_ThrowsDecoderFallbackException(ByRef InvalidSequence() As Byte, ByVal ExpectedIndex As Long, ByRef ExpectedBytesUnknown() As Byte)
+    Dim Enc As UTF8Encoding
+    
+    Set Enc = NewUTF8Encoding(False, True)
+    
+    On Error GoTo Catch
+    Enc.GetCharCount InvalidSequence
+    
+Catch:
+    Dim Ex As DecoderFallbackException
+    Set Ex = AssertDecoderFallbackException(Err)
+    Assert.That Ex.Index, Iz.EqualTo(ExpectedIndex), "Index"
+    Assert.That Ex.BytesUnknown, Iz.EqualTo(ExpectedBytesUnknown), "BytesUnknown"
 End Sub
 
 Public Sub GetByteCount_WithFailingFallback_ReturnsExpected(ByRef s As String, ByVal Expected As Long)
@@ -326,7 +450,7 @@ Public Sub GetBytesEx_WithInvalidSurrogate_ThrowsEncoderFallbackException(ByRef 
     Assert.That Ex.CharUnknown, Iz.EqualTo(ExpectedChar), "CharUnknown"
 End Sub
 
-Public Sub GetBytesEx_WithValues_ReturnsEncoded(ByRef Chars As Variant, ByRef ExpectedBytes() As Byte)
+Public Sub GetBytesEx_WithCharacters_EncodesCharacters(ByRef Chars As Variant, ByRef ExpectedBytes() As Byte)
     Dim Enc As New UTF8Encoding
     Dim ExpectedCount As Long
     Dim ActualCount As Long
@@ -432,43 +556,86 @@ Public Sub RegressionTest_Bug_59648()
     Assert.That Chars, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub T1_Correct_GreekWord_kosme()
-    Dim Data() As Byte
-    Dim s As String
+Public Sub GetCharsEx_Correct_GreekWord_kosme()
+    Dim Enc             As New UTF8Encoding
+    Dim Data()          As Byte
+    Dim ActualChars(4)  As Integer
+    Dim ActualCount     As Long
     
     Data = NewBytes(&HCE, &HBA, &HE1, &HBD, &HB9, &HCF, &H83, &HCE, &HBC, &HCE, &HB5)
-    s = mUTF8.GetString(Data)
     
-    Assert.That BitConverter.ToString(mUTF8.GetBytes(s)), Iz.EqualTo(BitConverter.ToString(Data))
+    ActualCount = Enc.GetCharsEx(Data, 0, UBound(Data) + 1, ActualChars, 0)
+    
+    Dim Expected() As Integer
+    Expected = NewChars(&H3BA, &H1F79, &H3C3, &H3BC, &H3B5)
+    Assert.That ActualCount, Iz.EqualTo(5)
+    Assert.That ActualChars, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub GetCharCount_Correct_GreekWord_kosme()
+    Dim Enc     As New UTF8Encoding
+    Dim Data()  As Byte
+    Dim Actual  As Long
+    
+    Data = NewBytes(&HCE, &HBA, &HE1, &HBD, &HB9, &HCF, &H83, &HCE, &HBC, &HCE, &HB5)
+    
+    Actual = Enc.GetCharCount(Data)
+    
+    Assert.That Actual, Iz.EqualTo(5)
 End Sub
 
 Public Sub T2_Boundary_1_FirstPossibleSequence_Pass(ByRef Data() As Byte, ByVal Expected As Long)
     Dim s As String
-    
+        
     s = mUTF8.GetString(Data)
-    
+        
     Assert.That MemLong(StrPtr(s)), Iz.EqualTo(Expected)
-    Assert.That mUTF8.GetBytes(s), Iz.EqualTo(Data)
+    Assert.That mUTF8.GetBytes(s), Iz.EqualTo(Data), "GetBytes"
 End Sub
 
-Public Sub T2_Boundary_1_FirstPossibleSequence_Fail_5()
-    Dim data215() As Byte
-    data215 = NewBytes(&HF8, &H88, &H80, &H80, &H80)
+Public Sub GetCharsEx_Boundary_1_FirstPossibleSequence_Fail_5()
+    Dim Data215() As Byte
+    Dim Chars(0 To 100) As Integer
+    Data215 = NewBytes(&HF8, &H88, &H80, &H80, &H80)
     
-    On Error Resume Next
-    Dim Actual As String
-    Actual = mUTF8.GetString(data215)
+    On Error GoTo Catch
+    mUTF8.GetCharsEx Data215, 0, CorArray.Length(Data215), Chars, 0
     
+Catch:
     AssertDecoderFallbackException Err
 End Sub
 
-Public Sub T2_Boundary_2_FirstPossibleSequence__Fail_6()
+Public Sub GetCharCount_Boundary_1_FirstPossibleSequence_Fail_5()
+    Dim Data215() As Byte
+    Data215 = NewBytes(&HF8, &H88, &H80, &H80, &H80)
+    
+    On Error GoTo Catch
+    mUTF8.GetCharCount Data215
+    
+Catch:
+    AssertDecoderFallbackException Err
+End Sub
+
+Public Sub GetCharsEx_Boundary_2_FirstPossibleSequence__Fail_6()
+    Dim Data() As Byte
+    Dim Chars(10) As Integer
+    Data = NewBytes(&HFC, &H84, &H80, &H80, &H80, &H80)
+    
+    On Error GoTo Catch
+    mUTF8.GetCharsEx Data, 0, UBound(Data) + 1, Chars, 0
+    
+Catch:
+    AssertDecoderFallbackException Err
+End Sub
+
+Public Sub GetCharCount_Boundary_2_FirstPossibleSequence__Fail_6()
     Dim Data() As Byte
     Data = NewBytes(&HFC, &H84, &H80, &H80, &H80, &H80)
     
-    On Error Resume Next
-    mUTF8.GetString Data
+    On Error GoTo Catch
+    mUTF8.GetCharCount Data
     
+Catch:
     AssertDecoderFallbackException Err
 End Sub
 
@@ -481,34 +648,97 @@ Public Sub T2_Boundary_2_LastPossibleSequence_Pass(ByRef Data() As Byte, ByVal E
     Assert.That mUTF8.GetBytes(s), Iz.EqualTo(Data)
 End Sub
 
-Public Sub T2_Boundary_2_LastPossibleSequence_Fail_4()
+Public Sub GetCharsEx_T2_Boundary_2_LastPossibleSequence_Fail_4()
     Dim Data() As Byte
+    Dim Chars(100) As Integer
+    
     Data = NewBytes(&H7F, &HBF, &HBF, &HBF)
     
-    On Error Resume Next
-    mUTF8.GetString Data
+    On Error GoTo Catch
+    mUTF8.GetCharsEx Data, 0, Len1D(Data), Chars, 0
     
-    AssertDecoderFallbackException Err
+Catch:
+    Dim Ex As DecoderFallbackException
+    Set Ex = AssertDecoderFallbackException(Err)
+    Assert.That Ex.Index, Iz.EqualTo(1), "Count"
+    Assert.That Ex.BytesUnknown, Iz.EqualTo(NewBytes(&HBF)), "BytesUnknown"
 End Sub
 
-Public Sub T2_Boundary_2_LastPossibleSequence_Fail_5()
+Public Sub GetCharCount_T2_Boundary_2_LastPossibleSequence_Fail_4()
     Dim Data() As Byte
+    
+    Data = NewBytes(&H7F, &HBF, &HBF, &HBF)
+    
+    On Error GoTo Catch
+    mUTF8.GetCharCount Data
+    
+Catch:
+    Dim Ex As DecoderFallbackException
+    Set Ex = AssertDecoderFallbackException(Err)
+    Assert.That Ex.Index, Iz.EqualTo(1), "Index"
+    Assert.That Ex.BytesUnknown, Iz.EqualTo(NewBytes(&HBF)), "BytesUnknown"
+End Sub
+
+Public Sub GetCharsEx_T2_Boundary_2_LastPossibleSequence_Fail_5()
+    Dim Data() As Byte
+    Dim Chars(100) As Integer
+    
     Data = NewBytes(&HFB, &HBF, &HBF, &HBF, &HBF)
     
-    On Error Resume Next
-    mUTF8.GetString Data
+    On Error GoTo Catch
+    mUTF8.GetCharsEx Data, 0, Len1D(Data), Chars, 0
     
-    AssertDecoderFallbackException Err
+Catch:
+    Dim Ex As DecoderFallbackException
+    Set Ex = AssertDecoderFallbackException(Err)
+    Assert.That Ex.Index, Iz.EqualTo(0), "Index"
+    Assert.That Ex.BytesUnknown, Iz.EqualTo(NewBytes(&HFB))
 End Sub
 
-Public Sub T2_Boundary_2_LastPossibleSequence_Fail_6()
+Public Sub GetCharCount_T2_Boundary_2_LastPossibleSequence_Fail_5()
     Dim Data() As Byte
+    
+    Data = NewBytes(&HFB, &HBF, &HBF, &HBF, &HBF)
+    
+    On Error GoTo Catch
+    mUTF8.GetCharCount Data
+    
+Catch:
+    Dim Ex As DecoderFallbackException
+    Set Ex = AssertDecoderFallbackException(Err)
+    Assert.That Ex.Index, Iz.EqualTo(0), "Index"
+    Assert.That Ex.BytesUnknown, Iz.EqualTo(NewBytes(&HFB))
+End Sub
+
+Public Sub GetCharsEx_T2_Boundary_2_LastPossibleSequence_Fail_6()
+    Dim Data() As Byte
+    Dim Chars(100) As Integer
+    
     Data = NewBytes(&HFB, &HBF, &HBF, &HBF, &HBF, &HBF)
     
-    On Error Resume Next
-    mUTF8.GetString Data
+    On Error GoTo Catch
+    mUTF8.GetCharsEx Data, 0, Len1D(Data), Chars, 0
     
-    AssertDecoderFallbackException Err
+Catch:
+    Dim Ex As DecoderFallbackException
+    Set Ex = AssertDecoderFallbackException(Err)
+    Assert.That Ex.Index, Iz.EqualTo(0), "Index"
+    Assert.That Ex.BytesUnknown, Iz.EqualTo(NewBytes(&HFB))
+End Sub
+
+Public Sub GetCharCount_T2_Boundary_2_LastPossibleSequence_Fail_6()
+    Dim Data() As Byte
+    
+    Data = NewBytes(&HFB, &HBF, &HBF, &HBF, &HBF, &HBF)
+    
+    On Error GoTo Catch
+    mUTF8.GetCharCount Data
+    
+Catch:
+    Dim Ex As DecoderFallbackException
+    Set Ex = AssertDecoderFallbackException(Err)
+    Assert.That Ex.Index, Iz.EqualTo(0), "Index"
+    Assert.That Ex.BytesUnknown, Iz.EqualTo(NewBytes(&HFB))
 End Sub
 
 Public Sub T2_Boundary_3_Other_Pass(ByRef Data() As Byte, ByVal Expected As Long)
@@ -516,18 +746,39 @@ Public Sub T2_Boundary_3_Other_Pass(ByRef Data() As Byte, ByVal Expected As Long
     
     s = mUTF8.GetString(Data)
     
-    Assert.That MemLong(StrPtr(s)), Iz.EqualTo(Expected)
-    Assert.That mUTF8.GetBytes(s), Iz.EqualTo(Data)
+    Assert.That MemLong(StrPtr(s)), Iz.EqualTo(Expected), "Chars"
+    Assert.That mUTF8.GetBytes(s), Iz.EqualTo(Data), "GetBytes"
 End Sub
 
-Public Sub T2_Boundary_3_Other_Fail_5()
+Public Sub GetCharsEx_T2_Boundary_3_Other_Fail_5()
     Dim Data() As Byte
+    Dim Chars(100) As Integer
+    
     Data = NewBytes(&HF4, &H90, &H80, &H80)
     
-    On Error Resume Next
-    mUTF8.GetString Data
+    On Error GoTo Catch
+    mUTF8.GetCharsEx Data, 0, Len1D(Data), Chars, 0
     
-    AssertDecoderFallbackException Err
+Catch:
+    Dim Ex As DecoderFallbackException
+    Set Ex = AssertDecoderFallbackException(Err)
+    Assert.That Ex.Index, Iz.EqualTo(0), "Index"
+    Assert.That Ex.BytesUnknown, Iz.EqualTo(NewBytes(&HF4, &H90))
+End Sub
+
+Public Sub GetCharCount_T2_Boundary_3_Other_Fail_5()
+    Dim Data() As Byte
+    
+    Data = NewBytes(&HF4, &H90, &H80, &H80)
+    
+    On Error GoTo Catch
+    mUTF8.GetCharCount Data
+    
+Catch:
+    Dim Ex As DecoderFallbackException
+    Set Ex = AssertDecoderFallbackException(Err)
+    Assert.That Ex.Index, Iz.EqualTo(0), "Index"
+    Assert.That Ex.BytesUnknown, Iz.EqualTo(NewBytes(&HF4, &H90))
 End Sub
 
 Public Sub T3_Malformed_1_UnexpectedContinuation_3(ByRef Data() As Byte)
@@ -551,15 +802,37 @@ Public Sub T3_Malformed_3_LastContinuationMissing(ByRef Data() As Byte)
     AssertDecoderFallbackException Err
 End Sub
 
-Public Sub T3_Malformed_4_ConcatenationImcomplete()
+Public Sub GetCharsEx_T3_Malformed_4_ConcatenationImcomplete()
     Dim Data() As Byte
+    Dim Chars(100) As Integer
+    
     Data = NewBytes(&HC0, &HE0, &H80, &HF0, &H80, &H80, &HF8, &H80, &H80, &H80, &HFC, &H80, &H80, &H80, &H80, &HDF, _
                     &HEF, &HBF, &HF7, &HBF, &HBF, &HFB, &HBF, &HBF, &HBF, &HFD, &HBF, &HBF, &HBF, &HBF)
         
-    On Error Resume Next
-    mUTF8.GetString Data
+    On Error GoTo Catch
+    mUTF8.GetCharsEx Data, 0, Len1D(Data), Chars, 0
     
-    AssertDecoderFallbackException Err
+Catch:
+    Dim Ex As DecoderFallbackException
+    Set Ex = AssertDecoderFallbackException(Err)
+    Assert.That Ex.Index, Iz.EqualTo(0), "Index"
+    Assert.That Ex.BytesUnknown, Iz.EqualTo(NewBytes(&HC0))
+End Sub
+
+Public Sub GetCharCount_T3_Malformed_4_ConcatenationImcomplete()
+    Dim Data() As Byte
+    
+    Data = NewBytes(&HC0, &HE0, &H80, &HF0, &H80, &H80, &HF8, &H80, &H80, &H80, &HFC, &H80, &H80, &H80, &H80, &HDF, _
+                    &HEF, &HBF, &HF7, &HBF, &HBF, &HFB, &HBF, &HBF, &HBF, &HFD, &HBF, &HBF, &HBF, &HBF)
+        
+    On Error GoTo Catch
+    mUTF8.GetCharCount Data
+    
+Catch:
+    Dim Ex As DecoderFallbackException
+    Set Ex = AssertDecoderFallbackException(Err)
+    Assert.That Ex.Index, Iz.EqualTo(0), "Index"
+    Assert.That Ex.BytesUnknown, Iz.EqualTo(NewBytes(&HC0))
 End Sub
 
 Public Sub T3_Malformed_5_ImpossibleBytes(ByRef Data() As Byte)

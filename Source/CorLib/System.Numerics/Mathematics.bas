@@ -24,6 +24,9 @@ Attribute VB_Name = "Mathematics"
 '
 Option Explicit
 
+Public Const vbShift12Bits As Long = &H1000&
+Public Const vbShift18Bits As Long = &H40000
+
 Public Powers(31)   As Long
 Public PowersOf2()  As Integer
 
