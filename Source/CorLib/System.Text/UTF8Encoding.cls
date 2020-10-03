@@ -80,10 +80,10 @@ Private mIsReadOnly                 As Boolean
 Private mShouldEmitUTF8Identifier   As Boolean
 Private mEncoderFallback            As EncoderFallback
 Private mDecoderFallback            As DecoderFallback
-Private mLongCharsSA                As SafeArray1d
-Private mIntegerBytesSA             As SafeArray1d
-Private mLongCharsSAPtr             As Long
-Private mIntegerBytesSAPtr          As Long
+Private mFastLongsSA                As SafeArray1d
+Private mFastLongsSAPtr             As Long
+Private mFastLongs2SA               As SafeArray1d
+Private mFastLongs2SAPtr            As Long
 Private m1ByteUnknown(0)            As Byte
 Private m2BytesUnknown(1)           As Byte
 Private m3BytesUnknown(2)           As Byte
@@ -289,15 +289,12 @@ Public Function GetByteCount(ByRef Chars As Variant, Optional ByRef Index As Var
         GetByteCount = GetByteCountCore(LocalChars, Range.Index, Range.Count, Nothing)
     End If
     
-    GoSub Finally
+    FreeChars LocalChars
     Exit Function
     
 Catch:
-    GoSub Finally
-    ThrowOrErr Err
-Finally:
     FreeChars LocalChars
-    Return
+    ThrowOrErr Err
 End Function
 
 ''
@@ -325,15 +322,12 @@ Public Function GetBytes(ByRef Chars As Variant, Optional ByRef Index As Variant
     SAPtr(GetBytes) = SafeArrayCreateVectorEx(vbByte, 0, ByteCount)
     GetBytesCore LocalChars, Range.Index, Range.Count, GetBytes, 0, Nothing
     
-    GoSub Finally
+    FreeChars LocalChars
     Exit Function
     
 Catch:
-    GoSub Finally
-    ThrowOrErr Err
-Finally:
     FreeChars LocalChars
-    Return
+    ThrowOrErr Err
 End Function
 
 ''
@@ -444,15 +438,12 @@ Public Function GetString(ByRef Bytes() As Byte, Optional ByRef Index As Variant
     On Error GoTo Catch
     GetCharsCore Bytes, Range.Index, Range.Count, Chars, 0, Nothing
     
-    GoSub Finally
+    FreeChars Chars
     Exit Function
     
 Catch:
-    GoSub Finally
-    ThrowOrErr Err
-Finally:
     FreeChars Chars
-    Return
+    ThrowOrErr Err
 End Function
 
 ''
@@ -593,15 +584,15 @@ Friend Sub InitClone(ByVal Other As UTF8Encoding)
 End Sub
 
 Private Sub Class_InitProperties()
-    mLongCharsSA.cbElements = 4
-    mLongCharsSA.cDims = 1
-    mLongCharsSA.cElements = &H7FFFFFFF
-    mLongCharsSAPtr = VarPtr(mLongCharsSA)
+    mFastLongsSA.cbElements = 4
+    mFastLongsSA.cDims = 1
+    mFastLongsSA.cElements = &H7FFFFFFF
+    mFastLongsSAPtr = VarPtr(mFastLongsSA)
     
-    mIntegerBytesSA.cbElements = 2
-    mIntegerBytesSA.cDims = 1
-    mIntegerBytesSA.cElements = &H7FFFFFFF
-    mIntegerBytesSAPtr = VarPtr(mIntegerBytesSA)
+    mFastLongs2SA.cbElements = 4
+    mFastLongs2SA.cDims = 1
+    mFastLongs2SA.cElements = &H7FFFFFFF
+    mFastLongs2SAPtr = VarPtr(mFastLongs2SA)
     
     Set mEncoderFallback = Cor.NewEncoderReplacementFallback(ChrW$(&HFFFD))
     Set mDecoderFallback = Cor.NewDecoderReplacementFallback(ChrW$(&HFFFD))
@@ -623,11 +614,21 @@ Friend Function GetCharCountCore(ByRef Bytes() As Byte, ByVal Index As Long, ByV
     Dim Fallback        As DecoderFallbackBuffer
     Dim CharNoFlags     As Long
     Dim CharCount       As Long
+    Dim CanFastLoop     As Boolean
+    Dim BytesAddress    As Long
+    Dim BytesLB         As Long
+    Dim FastBytes()     As Long
     
     MaxIndex = Index + Count - 1
     
     If Not Decoder Is Nothing Then
         Char = Decoder.Char
+    End If
+    
+    If Len1D(Bytes) > 0 Then
+        BytesLB = LBound(Bytes)
+        BytesAddress = VarPtr(Bytes(BytesLB))
+        CanFastLoop = True
     End If
     
     Do While Index <= MaxIndex
@@ -639,9 +640,213 @@ Friend Function GetCharCountCore(ByRef Bytes() As Byte, ByVal Index As Long, ByV
             If b < &H80 Then
                 CharCount = CharCount + 1
                 
+                ' Fast loop: adapted from .NET reference source.
+                Dim AvailableBytes  As Long
+                Dim MaxFastIndex    As Long
+                Dim FastIndex       As Long
+                
+                If Not CanFastLoop Then
+                    GoTo Continue
+                End If
+                
+                AvailableBytes = MaxIndex - Index + 1
+                
+                ' Don't fall into the fast decoding loop if we don't have enough characters.
+                ' Note that if we don't have enough bytes, MaxFastIndex will prevent us from entering the fast loop.
+                If AvailableBytes <= 13 Then
+                    ' Run through as many ASCII characters as quickly as we can here.
+                    Do While Index <= MaxIndex
+                        b = Bytes(Index)
+                        Index = Index + 1
+                        
+                        ' Check if not an ASCII character.
+                        If b > &H7F Then
+                            GoTo ProcessChar
+                        End If
+                        
+                        CharCount = CharCount + 1
+                    Loop
+                    
+                    ' We got here without hitting a non-ascii character so
+                    ' we are out of characters. Time to exit the loop.
+                    Exit Do
+                End If
+                
+                ' To compute the upper bound, assume that all characters are ASCII characters at this point,
+                ' the boundary will be decreased for every non-ASCII character we encounter
+                ' Also, we need 7 chars reserve for the unrolled ASCII decoding loop and for decoding of multibyte sequences
+                MaxFastIndex = Index + AvailableBytes - 7
+                
+                Do While Index < MaxFastIndex
+                    b = Bytes(Index)
+                    Index = Index + 1
+                    
+                    ' Is it a non-ASCII character?
+                    If b > &H7F Then
+                        GoTo LongCode
+                    End If
+                    
+                    CharCount = CharCount + 1
+                    
+                    ' Check to see if the address is currently at
+                    ' an odd byte. If so, we'll read that single
+                    ' byte and process it hopefully just moving
+                    ' one byte forward to make the address 2-byte aligned.
+                    ' However, if the byte contains a non-ASCII character,
+                    ' then we have to fall out.
+                    If (BytesAddress + Index) And &H1 Then
+                        b = Bytes(Index)
+                        Index = Index + 1
+                        
+                        ' Is it a non-ASCII character?
+                        If b > &H7F Then
+                            GoTo LongCode
+                        End If
+                        
+                        CharCount = CharCount + 1
+                    End If
+                    
+                    ' If we get here, then we know the previous alignment code
+                    ' got the address 2-byte aligned. Now we want to check and
+                    ' see if that 2-byte alignment happens to also be a 4-byte
+                    ' alignment. If not we will try to read two more bytes to
+                    ' get the 4-byte alignment for the fast inner loop.
+                    If (BytesAddress + Index) And &H2 Then
+                        b = Bytes(Index) Or (Bytes(Index + 1) * vbShift8Bits)
+                        
+                        ' Are either byte non-ASCII?
+                        If b And &H8080& Then
+                            GoTo LongCodeWithMask
+                        End If
+                        
+                        Index = Index + 2
+                        CharCount = CharCount + 2
+                    End If
+                    
+                    ' Set up our faster access to the Bytes and Chars arrays.
+                    mFastLongsSA.PVData = BytesAddress + (Index - BytesLB)
+                    SAPtr(FastBytes) = mFastLongsSAPtr
+                    FastIndex = 0
+                    
+                    ' We should be 4-byte aligned here so let'er rip!
+                    ' We are working with 8 bytes at a time. Normally this
+                    ' would require 8 byte reads and 8 char writes, but we
+                    ' are accessing both arrays as Longs, so we get the
+                    ' array access count down to 2 reads and 4 writes.
+                    Do While Index < MaxFastIndex
+                        Dim b2 As Long
+                        b = FastBytes(FastIndex)
+                        b2 = FastBytes(FastIndex + 1)
+                        FastIndex = FastIndex + 2
+                        
+                        ' Check if any of the 8 bytes is a non-ASCII and bail if any are.
+                        If (b Or b2) And &H80808080 Then
+                            SAPtr(FastBytes) = vbNullPtr
+                            GoTo LongCodeWithMask
+                        End If
+                        
+                        CharCount = CharCount + 8
+                        Index = Index + 8
+                    Loop
+                    
+                    SAPtr(FastBytes) = vbNullPtr
+                    Exit Do
+
+LongCodeWithMask:
+                    ' The multi-byte checks in previous code revealed that at least
+                    ' one of the bytes is not ASCII, so here we are. Will do a quick
+                    ' check to see if the first byte is at least ASCII and if so we
+                    ' can store it and continue with the loop. This way there is a
+                    ' chance that the multi-byte access didn't go to complete waste.
+                    b = b And &HFF&
+                    Index = Index + 1
+                                        
+                    If b <= &H7F Then
+                        CharCount = CharCount + 1
+                        GoTo ContinueFastLoop
+                    End If
+                
+LongCode:
+                    Dim CharC As Long
+                    CharC = Bytes(Index)
+                    Index = Index + 1
+                    
+                    If (b And &H40) = 0 Then
+                        GoTo BadLongCode
+                    ElseIf (CharC And &HC0) <> &H80 Then
+                        GoTo BadLongCode
+                    End If
+                    
+                    CharC = CharC And &H3F
+                    
+                    If b And &H20 Then
+                        CharC = CharC Or ((b And &HF) * vbShift6Bits)
+                        
+                        If b And &H10 Then
+                            ' 4-byte encoding (surrogate)
+                            b = Bytes(Index)
+                            
+                            Dim SurrogateCheck As Long
+                            SurrogateCheck = CharC \ vbShift4Bits
+                            
+                            If (SurrogateCheck < 1) Or (SurrogateCheck > 16) Then
+                                GoTo BadLongCode
+                            ElseIf ((b And &HC0) <> &H80) Then
+                                GoTo BadLongCode
+                            End If
+                            
+                            CharC = (CharC * vbShift6Bits) Or (b And &H3F)
+                            b = Bytes(Index + 1)
+                            
+                            If (b And &HC0) <> &H80 Then
+                                GoTo BadLongCode
+                            End If
+                            
+                            Index = Index + 2
+                            CharCount = CharCount + 1
+                            MaxFastIndex = MaxFastIndex - 1
+                        Else
+                            ' 3-byte encoding
+                            b = Bytes(Index)
+                            
+                            If (CharC And (&H1F * vbShift5Bits)) = 0 Then
+                                GoTo BadLongCode
+                            ElseIf (CharC And (&HF800 \ vbShift6Bits)) = (&HD800& \ vbShift6Bits) Then
+                                GoTo BadLongCode
+                            ElseIf (b And &HC0) <> &H80 Then
+                                GoTo BadLongCode
+                            End If
+                            
+                            Index = Index + 1
+                            b = (CharC * vbShift6Bits) Or (b And &H3F)
+                            MaxFastIndex = MaxFastIndex - 1
+                        End If
+                    Else
+                        ' 2-byte encoding
+                        b = b And &H1F
+                        
+                        If b <= 1 Then
+                            GoTo BadLongCode
+                        End If
+                    End If
+                    
+                    CharCount = CharCount + 1
+                    MaxFastIndex = MaxFastIndex - 1
+                    
+ContinueFastLoop:
+                Loop
+                
+                GoTo Continue
+                
+BadLongCode:
+                Index = Index - 2
+                GoTo Continue
+            End If
+            
+ProcessChar:
             ' The start of all multi-byte sequence has the 6-bit set. So check
             ' that here for a valid multi-byte sequence.
-            ElseIf (b And &HE0) = &HC0 Then
+            If (b And &HE0) = &HC0 Then
                 ' 2-byte sequence
                 Char = b And &H1F
                 
@@ -668,7 +873,11 @@ Friend Function GetCharCountCore(ByRef Bytes() As Byte, ByVal Index As Long, ByV
                 ' We have an invalid start for a multi-byte sequence so fallback this byte.
                 CharCount = CharCount + CountFallbackCharacter(b, Index, Decoder, Fallback)
             End If
-        ElseIf (b And &HC0) = &H80 Then
+            
+            GoTo Continue
+        End If
+        
+        If (b And &HC0) = &H80 Then
             ' Next byte in multi-byte character.
             Char = (Char And &H1FFFFFF) * vbShift6Bits Or (b And &H3F)
             
@@ -768,20 +977,26 @@ Friend Function GetCharsCore(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByV
     Dim Fallback        As DecoderFallbackBuffer
     Dim CharNoFlags     As Long
     Dim FastBytes()     As Long
-    Dim FastIndex       As Long
-    Dim MaxFastIndex    As Long
+    Dim FastChars()     As Long
+    Dim FastByteIndex   As Long
+    Dim FastCharIndex   As Long
     Dim CanFastLoop     As Boolean
     Dim BytesAddress    As Long
-        
+    Dim BytesLB         As Long
+    Dim CharsAddress    As Long
+    Dim CharsLB         As Long
+    
     StartCharIndex = CharIndex
     MaxByteIndex = ByteIndex + ByteCount - 1
     MaxCharIndex = UBound(Chars)
     CanFastLoop = Len1D(Chars) > 1 And Len1D(Bytes) > 3
     
     If CanFastLoop Then
-        BytesAddress = VarPtr(Bytes(ByteIndex)) - LBound(Bytes)
+        BytesLB = LBound(Bytes)
+        BytesAddress = VarPtr(Bytes(BytesLB))
+        CharsLB = LBound(Chars)
+        CharsAddress = VarPtr(Chars(CharsLB))
     End If
-
     
     If Not Decoder Is Nothing Then
         Char = Decoder.Char
@@ -800,9 +1015,293 @@ Friend Function GetCharsCore(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByV
                 Chars(CharIndex) = b
                 CharIndex = CharIndex + 1
                 
+                ' Fast loop: shamelessly adapted from .NET reference source.
+                Dim AvailableChars As Long
+                Dim AvailableBytes As Long
+                Dim MaxFastCharIndex As Long
+                
+                If Not CanFastLoop Then
+                    GoTo Continue
+                End If
+                
+                AvailableChars = MaxCharIndex - CharIndex + 1
+                AvailableBytes = MaxByteIndex - ByteIndex + 1
+                
+                ' Don't fall into the fast decoding loop if we don't have enough characters.
+                ' Note that if we don't have enough bytes, MaxFastByteIndex will prevent us from entering the fast loop.
+                If AvailableChars <= 13 Then
+                    If AvailableChars < AvailableBytes Then
+                        GoTo Continue
+                    End If
+                    
+                    ' Run through as many ASCII characters as quickly as we can here.
+                    Do While ByteIndex <= MaxByteIndex
+                        b = Bytes(ByteIndex)
+                        ByteIndex = ByteIndex + 1
+                        
+                        ' Check if not an ASCII character.
+                        If b > &H7F Then
+                            GoTo ProcessChar
+                        End If
+                        
+                        Chars(CharIndex) = b
+                        CharIndex = CharIndex + 1
+                    Loop
+                    
+                    ' We got here without hitting a non-ascii character so
+                    ' we are out of characters. Time to exit the loop.
+                    Exit Do
+                End If
+                
+                ' We may need as many as 1 character per byte, so reduce the byte count if necessary.
+                ' If AvailableChars is too small, MaxFastByteIndex will be before MaxCharIndex and we won't do fast loop.
+                If AvailableChars < AvailableBytes Then
+                    AvailableBytes = AvailableChars
+                End If
+                
+                ' To compute the upper bound, assume that all characters are ASCII characters at this point,
+                ' the boundary will be decreased for every non-ASCII character we encounter
+                ' Also, we need 7 chars reserve for the unrolled ASCII decoding loop and for decoding of multibyte sequences
+                MaxFastCharIndex = CharIndex + AvailableBytes - 7
+                
+                Do While CharIndex < MaxFastCharIndex
+                    b = Bytes(ByteIndex)
+                    ByteIndex = ByteIndex + 1
+                    
+                    ' Is it a non-ASCII character?
+                    If b > &H7F Then
+                        GoTo LongCode
+                    End If
+                    
+                    Chars(CharIndex) = b
+                    CharIndex = CharIndex + 1
+                    
+                    ' Even though x86 can handle 32-bit unaligned access,
+                    ' we want to optimize the 8-byte access as much as
+                    ' possible by aligning to 32-bit alignments. However,
+                    ' we don't try for alignment with the character 16-bit array,
+                    ' so we'll take the hit if it's not aligned. There's a good
+                    ' chance it will be aligned though.
+                    
+                    ' Check to see if the address is currently at
+                    ' an odd byte. If so, we'll read that single
+                    ' byte and process it hopefully just moving
+                    ' one byte forward to make the address 2-byte aligned.
+                    ' However, if the byte contains a non-ASCII character,
+                    ' then we have to fall out.
+                    If (BytesAddress + ByteIndex) And &H1 Then
+                        b = Bytes(ByteIndex)
+                        ByteIndex = ByteIndex + 1
+                        
+                        ' Is it a non-ASCII character?
+                        If b > &H7F Then
+                            GoTo LongCode
+                        End If
+                                                
+                        Chars(CharIndex) = b
+                        CharIndex = CharIndex + 1
+                    End If
+                    
+                    ' If we get here, then we know the previous alignment code
+                    ' got the address 2-byte aligned. Now we want to check and
+                    ' see if that 2-byte alignment happens to also be a 4-byte
+                    ' alignment. If not we will try to read two more bytes to
+                    ' get the 4-byte alignment for the fast inner loop.
+                    If (BytesAddress + ByteIndex) And &H2 Then
+                        b = Bytes(ByteIndex) Or (Bytes(ByteIndex + 1) * vbShift8Bits)
+                        
+                        ' Are either byte non-ASCII?
+                        If b And &H8080& Then
+                            GoTo LongCodeWithMask
+                        End If
+                        
+                        Chars(CharIndex) = b And &H7F
+                        Chars(CharIndex + 1) = (b And &H7F00&) \ vbShift8Bits
+                        ByteIndex = ByteIndex + 2
+                        CharIndex = CharIndex + 2
+                    End If
+                    
+                    ' Set up our faster access to the Bytes and Chars arrays.
+                    mFastLongsSA.PVData = BytesAddress + ByteIndex - BytesLB
+                    SAPtr(FastBytes) = mFastLongsSAPtr
+                    
+                    ' The character array may not be 4-byte aligned, but we will
+                    ' lean on x86 to deal with 32-bit access crossing alignment boundry.
+                    mFastLongs2SA.PVData = CharsAddress + (CharIndex - CharsLB) * 2
+                    SAPtr(FastChars) = mFastLongs2SAPtr
+                    
+                    FastByteIndex = 0
+                    FastCharIndex = 0
+                    
+                    ' We should be 4-byte aligned here so let'er rip!
+                    ' We are working with 8 bytes at a time. Normally this
+                    ' would require 8 byte reads and 8 char writes, but we
+                    ' are accessing both arrays as Longs, so we get the
+                    ' array access count down to 2 reads and 4 writes.
+                    Do While CharIndex < MaxFastCharIndex
+                        Dim b2 As Long
+                        b = FastBytes(FastByteIndex)
+                        b2 = FastBytes(FastByteIndex + 1)
+                        FastByteIndex = FastByteIndex + 2
+                        
+                        ' Check if any of the 8 bytes is a non-ASCII and bail if any are.
+                        If (b Or b2) And &H80808080 Then
+                            SAPtr(FastBytes) = vbNullPtr
+                            SAPtr(FastChars) = vbNullPtr
+                            GoTo LongCodeWithMask
+                        End If
+                        
+                        FastChars(FastCharIndex) = (b And &H7F) Or ((b And &H7F00&) * vbShift8Bits)
+                        FastChars(FastCharIndex + 1) = ((b And &H7F0000) \ vbShift16Bits) Or ((b And &H7F000000) \ vbShift8Bits)
+                        FastChars(FastCharIndex + 2) = (b2 And &H7F) Or ((b2 And &H7F00&) * vbShift8Bits)
+                        FastChars(FastCharIndex + 3) = ((b2 And &H7F0000) \ vbShift16Bits) Or ((b2 And &H7F000000) \ vbShift8Bits)
+                        FastCharIndex = FastCharIndex + 4
+                        
+                        CharIndex = CharIndex + 8
+                        ByteIndex = ByteIndex + 8
+                    Loop
+                    
+                    SAPtr(FastBytes) = vbNullPtr
+                    SAPtr(FastChars) = vbNullPtr
+                    Exit Do
+
+LongCodeWithMask:
+                    ' The multi-byte checks in previous code revealed that at least
+                    ' one of the bytes is not ASCII, so here we are. Will do a quick
+                    ' check to see if the first byte is at least ASCII and if so we
+                    ' can store it and continue with the loop. This way there is a
+                    ' chance that the multi-byte access didn't go to complete waste.
+                    b = b And &HFF&
+                    ByteIndex = ByteIndex + 1
+                                        
+                    If b <= &H7F Then
+                        Chars(CharIndex) = b
+                        CharIndex = CharIndex + 1
+                        GoTo ContinueFastLoop
+                    End If
+                
+LongCode:
+                    ' We grab the 2nd byte for the multi-byte sequence.
+                    Dim CharC As Long
+                    CharC = Bytes(ByteIndex)
+                    ByteIndex = ByteIndex + 1
+                    
+                    ' We do a check to ensure the 0x11XXvvvv 0x10vvvvvv multi-byte format.
+                    
+                    ' The first byte has already had bit 7 checked earlier, so just check
+                    ' bit 6 for the 0x11XXvvvv format. We will know we have at least a 2 byte sequence.
+                    '                  ^
+                    If (b And &H40) = 0 Then
+                        GoTo BadLongCode
+                    ' The first byte passed so check the second byte for 0x10vvvvvv format.
+                    ElseIf (CharC And &HC0) <> &H80 Then
+                        GoTo BadLongCode
+                    End If
+                    
+                    ' Take the encoded lower 6 bits of the second byte in the sequence.
+                    CharC = CharC And &H3F
+                    
+                    ' We check bit 5 to see if this is the start of a 3 or 4 byte sequence.
+                    ' 3 byte start with 0x1110vvvv
+                    ' 4 byte start with 0x11110vvv
+                    '                       ^
+                    If b And &H20 Then
+                        ' Push the lower 4 bits of the first byte into the
+                        ' decoded character sequence, so now we have 9 or 10 bits decoded.
+                        CharC = CharC Or ((b And &HF) * vbShift6Bits)
+                        
+                        ' Check for 4 byte sequence 0x11110vvv.
+                        '                                ^
+                        If b And &H10 Then
+                            ' it's a 4-byte encoding (surrogate pair)
+                            b = Bytes(ByteIndex) ' Get byte 3 of the 4-byte sequence.
+                            
+                            Dim SurrogateCheck As Long
+                            ' check that bit 4 is zero, the non-shortest form of surrogate
+                            ' and the valid surrogate range 0x000000 - 0x10FFFF at the same time
+                            SurrogateCheck = CharC \ vbShift4Bits
+
+                            If (SurrogateCheck < 1) Or (SurrogateCheck > 16) Then
+                                GoTo BadLongCode
+                            ElseIf (b And &HC0) <> &H80 Then ' byte 3 should have the 0x10vvvvvv format.
+                                GoTo BadLongCode
+                            End If
+                            
+                            CharC = (CharC * vbShift6Bits) Or (b And &H3F) ' fold byte 3 bits into our decoded character.
+                            b = Bytes(ByteIndex + 1) ' get byte 4 of the sequence.
+                            
+                            If (b And &HC0) <> &H80 Then ' check that it has the 0x10vvvvvv format.
+                                GoTo BadLongCode
+                            End If
+                            
+                            ByteIndex = ByteIndex + 2
+                            b = (CharC * vbShift6Bits) Or (b And &H3F) ' fold byte 4 bits into the decoded character.
+                            
+                            ' we should have a value from 0x000000 to 0x10FFFF.
+                            ' Push the high surrogate part into a character and let the low surrogate character get
+                            ' stored at the end of the multi-byte sequence.
+#If Release Then
+                            Chars(CharIndex) = (((b \ vbShift10Bits) And &H7FF&) + (HighSurrogateStart - 64)) And &HFFFF&
+#Else
+                            Chars(CharIndex) = AsWord(((b \ vbShift10Bits) And &H7FF&) + (HighSurrogateStart - 64))
+#End If
+                            CharIndex = CharIndex + 1
+                            
+                            b = (b And &H3FF) + LowSurrogateStart
+                            MaxFastCharIndex = MaxFastCharIndex - 1
+                        Else
+                            ' must be a 3-byte encoding
+                            b = Bytes(ByteIndex)
+                            
+                            '
+                            If (CharC And &H3E0) = 0 Then
+                                GoTo BadLongCode
+                            ElseIf (CharC And &H3E0) = &H360 Then
+                                GoTo BadLongCode
+                            ElseIf (b And &HC0) <> &H80 Then
+                                GoTo BadLongCode
+                            End If
+                            
+                            ByteIndex = ByteIndex + 1
+                            b = (CharC * vbShift6Bits) Or (b And &H3F)
+                            MaxFastCharIndex = MaxFastCharIndex - 1
+                        End If
+                    Else
+                        ' 2-byte encoding
+                        b = b And &H1F
+                        
+                        If b <= 1 Then
+                            GoTo BadLongCode
+                        End If
+                        
+                        b = (b * vbShift6Bits) Or CharC
+                    End If
+                    
+#If Release Then
+                    Chars(CharIndex) = (b And &HFFFF&)
+#Else
+                    Chars(CharIndex) = AsWord(b)
+#End If
+                    CharIndex = CharIndex + 1
+                    MaxFastCharIndex = MaxFastCharIndex - 1
+                    
+ContinueFastLoop:
+                Loop
+                
+                GoTo Continue
+                
+BadLongCode:
+                ' Move back 2 positions because we only officially move
+                ' the index forward after validation has occurred. So only
+                ' the first 2 bytes of a multi-byte sequence has actually been counted for.
+                ByteIndex = ByteIndex - 2
+                GoTo Continue
+            End If
+            
+ProcessChar:
             ' The start of all multi-byte sequence has the 6-bit set. So check
             ' that here for a valid multi-byte sequence.
-            ElseIf (b And &HE0) = &HC0 Then
+            If (b And &HE0) = &HC0 Then
                 ' 2-byte sequence
                 Char = b And &H1F
                 
@@ -829,7 +1328,12 @@ Friend Function GetCharsCore(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByV
                 ' We have an invalid start for a multi-byte sequence so fallback this byte.
                 CharIndex = FallbackCharacter(b, ByteIndex, Chars, CharIndex, Decoder, Fallback)
             End If
-        ElseIf (b And &HC0) = &H80 Then
+            
+            GoTo Continue
+        End If
+        
+        
+        If (b And &HC0) = &H80 Then
             ' Next byte in multi-byte character.
             Char = (Char And &H1FFFFFF) * vbShift6Bits Or (b And &H3F)
             
@@ -842,8 +1346,8 @@ Friend Function GetCharsCore(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByV
                         ' 2nd byte of 4 bytes
                         ' Check for non-shortest form of surrogate and the valid surrogate
                         ' range &h000000 - &h10FFFF at the same time
-                        Select Case (Char And &H1F0) - &H10
-                            Case Is < 0, Is > 240
+                        Select Case Char And &H1F0
+                            Case Is < &H10, Is > &H100
                                 CharIndex = FallbackCharacter(Char, ByteIndex, Chars, CharIndex, Decoder, Fallback)
                                 Char = 0
                         End Select
@@ -1011,16 +1515,18 @@ Friend Function GetByteCountCore(ByRef Chars() As Integer, ByVal Index As Long, 
     Dim InFallback      As Boolean
     Dim MaxCharIndex    As Long
     Dim StartByteIndex  As Long
-    Dim LongChars()     As Long
+    Dim FastChars()     As Long
     Dim CanFastLoop     As Boolean
     Dim CharsAddress    As Long
     Dim ByteCount       As Long
+    Dim CharsLB         As Long
     
     MaxCharIndex = Index + Count - 1
     CanFastLoop = Len1D(Chars) > 0
     
     If CanFastLoop Then
-        CharsAddress = VarPtr(Chars(Index)) - LBound(Chars) * 2
+        CharsLB = LBound(Chars)
+        CharsAddress = VarPtr(Chars(CharsLB))
     End If
     
     If Not Encoder Is Nothing Then
@@ -1038,46 +1544,42 @@ ProcessNext:
             End If
         Else
             Ch = Chars(Index) And &HFFFF&
+            Index = Index + 1
             
             ' Quick check to see if we should even attempt a fast loop because
             ' we won't know for sure until everything has been set up then
             ' it needs to be torn down. This causes huge slow-downs for non-ascii characters.
             If Ch < &H80 Then
                 If Not InFallback And PrevChar = 0 And CanFastLoop Then
-                    ' do fast loop
-                    If ((CharsAddress + Index) And &H3) = 0 Then ' 32-bit aligned
-                        Dim MaxFastIndex As Long
-                        Dim FastIndex As Long
-                        
-                        MaxFastIndex = (Count - Index) \ 2 - 1
-                        mLongCharsSA.PVData = CharsAddress + Index
+                    ' Getting here means we will at least count the initial char.
+                    ByteCount = ByteCount + 1
                     
-                        SAPtr(LongChars) = mLongCharsSAPtr
-                        
-                        For FastIndex = 0 To MaxFastIndex
-                            Dim Temp As Long
-                            
-                            Temp = LongChars(FastIndex)
-                            
-                            If (Temp And &HFF80FF80) <> 0 Then
-                                Exit For
-                            End If
-                        Next
-                        
-                        SAPtr(LongChars) = vbNullPtr
-                        
-                        If FastIndex > 0 Then
-                            Index = Index + FastIndex * 2
-                            ByteCount = ByteCount + FastIndex * 2
-                            GoTo ProcessNext
+                    Dim MaxFastIndex    As Long
+                    Dim FastIndex       As Long
+                    
+                    MaxFastIndex = (Count - Index) \ 2 - 1
+                    mFastLongsSA.PVData = CharsAddress + (Index - CharsLB) * 2
+                    SAPtr(FastChars) = mFastLongsSAPtr
+                    
+                    For FastIndex = 0 To MaxFastIndex
+                        If FastChars(FastIndex) And &HFF80FF80 Then
+                            Exit For
                         End If
+                    Next
+                    
+                    SAPtr(FastChars) = vbNullPtr
+                    
+                    If FastIndex > 0 Then
+                        Index = Index + FastIndex * 2
+                        ByteCount = ByteCount + FastIndex * 2
                     End If
+                    
+                    GoTo Continue
                 End If
             End If
-            
-            Index = Index + 1
         End If
         
+ProcessChar:
         If PrevChar = 0 Then
             Select Case Ch
                 Case Is < &H80
@@ -1140,20 +1642,24 @@ Friend Function GetBytesCore(ByRef Chars() As Integer, ByVal CharIndex As Long, 
     Dim MaxCharIndex    As Long
     Dim StartByteIndex  As Long
     Dim MaxByteIndex    As Long
-    Dim LongChars()     As Long
-    Dim IntegerBytes()  As Integer
+    Dim FastChars()     As Long
+    Dim FastBytes()     As Long
     Dim CanFastLoop     As Boolean
     Dim CharsAddress    As Long
     Dim BytesAddress    As Long
-
-    MaxByteIndex = UBound(Bytes)
+    Dim CharsLB         As Long
+    Dim BytesLB         As Long
+    
     StartByteIndex = ByteIndex
+    MaxByteIndex = UBound(Bytes)
     MaxCharIndex = CharIndex + CharCount - 1
     CanFastLoop = Len1D(Chars) > 0 And Len1D(Bytes) > 1
     
     If CanFastLoop Then
-        CharsAddress = VarPtr(Chars(CharIndex)) - LBound(Chars) * 2
-        BytesAddress = VarPtr(Bytes(ByteIndex)) - LBound(Bytes)
+        CharsLB = LBound(Chars)
+        BytesLB = LBound(Bytes)
+        CharsAddress = VarPtr(Chars(CharsLB))
+        BytesAddress = VarPtr(Bytes(BytesLB))
     End If
     
     If Not Encoder Is Nothing Then
@@ -1172,79 +1678,207 @@ ProcessNext:
             End If
         Else
             Ch = Chars(CharIndex) And &HFFFF&
-            
-            ' Quick check to see if we should even attempt a fast loop because
-            ' we won't know for sure until everything has been set up then
-            ' it needs to be torn down. This causes huge slow-downs for non-ascii characters.
-            If Ch < &H80 Then
-                If Not InFallback And PrevChar = 0 And CanFastLoop Then
-                    ' do fast loop
-                    If ((BytesAddress + ByteIndex) And &H1) = 0 Then ' 16-bit aligned
-                        If ((CharsAddress + CharIndex) And &H3) = 0 Then ' 32-bit aligned
-                            Dim MaxFastIndex As Long
-                            Dim FastIndex As Long
-                            
-                            If (MaxByteIndex - ByteIndex) < (MaxCharIndex - CharIndex) Then
-                                MaxFastIndex = (MaxByteIndex - ByteIndex) \ 2 - 1
-                            Else
-                                MaxFastIndex = (CharCount - CharIndex) \ 2 - 1
-                            End If
-                            
-                            mLongCharsSA.PVData = CharsAddress + CharIndex
-                            mIntegerBytesSA.PVData = BytesAddress + ByteIndex
-                        
-                            SAPtr(LongChars) = mLongCharsSAPtr
-                            SAPtr(IntegerBytes) = mIntegerBytesSAPtr
-                            
-                            For FastIndex = 0 To MaxFastIndex
-                                Dim Temp As Long
-                                
-                                Temp = LongChars(FastIndex)
-                                
-                                ' Check for adjacent ascii characters. If we don't
-                                ' have that then we can't store anything, so just
-                                ' bail and let the slow loop take care of things.
-                                If (Temp And &HFF80FF80) <> 0 Then
-                                    Exit For
-                                End If
-
-                                #If Release Then
-                                IntegerBytes(FastIndex) = ((Temp And &H7F0000) \ vbShift8Bits) Or (Temp And &H7F)
-                                #Else
-                                Dim Temp2 As Long
-                                Temp2 = ((Temp And &H7F0000) \ vbShift8Bits) Or (Temp And &H7F)
-
-                                IntegerBytes(FastIndex) = AsWord(Temp2)
-                                #End If
-                            Next
-                            
-                            SAPtr(LongChars) = vbNullPtr
-                            SAPtr(IntegerBytes) = vbNullPtr
-                            
-                            ' If the fast loop successfully processed as least one
-                            ' set of adjacent ascii characters, then let the slow
-                            ' loop start again with the non-ascii character found.
-                            If FastIndex > 0 Then
-                                CharIndex = CharIndex + FastIndex * 2
-                                ByteIndex = ByteIndex + FastIndex * 2
-                                GoTo Continue
-                            End If
-                        End If
-                    End If
-                End If
-            End If
-            
             CharIndex = CharIndex + 1
         End If
         
         If PrevChar = 0 Then
-            Select Case Ch
-                Case Is < &H80
-                    If ByteIndex > MaxByteIndex Then _
-                        ThrowEncoderSmallConversionBuffer
+            If Ch < &H80 Then
+                If ByteIndex > MaxByteIndex Then _
+                    ThrowEncoderSmallConversionBuffer
+                
+                Bytes(ByteIndex) = Ch
+                ByteIndex = ByteIndex + 1
+                
+                If Not CanFastLoop Then
+                    GoTo Continue
+                End If
+                
+                ' Fast loop: shamelessly adapted from the .NET reference source.
+                Dim AvailableChars  As Long
+                Dim AvailableBytes  As Long
+                Dim MaxFastCharIndex As Long
+                Dim FastCharIndex   As Long
+                Dim FastByteIndex   As Long
+                Dim ChB             As Long
+                
+                AvailableChars = MaxCharIndex - CharIndex + 1
+                AvailableBytes = MaxByteIndex - ByteIndex + 1
+                
+                ' Don't fall into the fast decoding loop if we don't have enough characters
+                ' Note that if we don't have enough bytes, MaxFastCharIndex will prevent us from entering the fast loop.
+                If AvailableChars <= 13 Then
+                    ' we are hoping for 1 byte per char.
+                    If AvailableBytes < AvailableChars Then
+                        ' Not enough output room.
+                        GoTo Continue
+                    End If
+                    
+                    ' Run through the characters as fast as we can in
+                    ' a tight loop as long as they are ascii.
+                    Do While CharIndex <= MaxCharIndex
+                        Ch = Chars(CharIndex) And &HFFFF&
+                        CharIndex = CharIndex + 1
+                        
+                        If Ch > &H7F Then
+                            ' we hit a non-ascii character so process
+                            ' it through the slow loop.
+                            GoTo ProcessNextChar
+                        End If
+                        
+                        Bytes(ByteIndex) = Ch
+                        ByteIndex = ByteIndex + 1
+                    Loop
+                                        
+                    ' Since we got here we must have looped through all
+                    ' characters and stored them in the output bytes.
+                    ' So exit the slow loop; we are done.
+                    Exit Do
+                End If
+                
+                ' we need at least 1 byte per character, but Convert might allow us to convert
+                ' only part of the input, so try as much as we can. Reduce CharCount if necessary
+                If AvailableBytes < AvailableChars Then
+                    AvailableChars = AvailableBytes
+                End If
+                
+                ' FASTLOOP:
+                ' - optimistic range checks
+                ' - fallbacks to the slow loop for all special cases, exception throwing, etc.
+                '
+                ' To compute the upper bound, assume that all characters are ASCII characters at this point,
+                '  the boundary will be decreased for every non-ASCII character we encounter
+                ' Also, we need 5 chars reserve for the unrolled ansi decoding loop and for decoding of surrogates
+                ' If there aren't enough bytes for the output, then pStop will be <= pSrc and will bypass the loop.
+                MaxFastCharIndex = CharIndex + AvailableChars - 5
+                
+                Do While CharIndex < MaxFastCharIndex
+                    Ch = Chars(CharIndex) And &HFFFF&
+                    CharIndex = CharIndex + 1
+                    
+                    If Ch > &H7F Then
+                         GoTo LongCode
+                    End If
                     
                     Bytes(ByteIndex) = Ch
                     ByteIndex = ByteIndex + 1
+                    
+                    ' Attempt to align character array to 32-bit boundry.
+                    If (CharsAddress + CharIndex * 2) And &H2 Then
+                        ' Not 32-bit aligned, so attempt to process
+                        ' 1 character hoping it is ascii.
+                        Ch = Chars(CharIndex) And &HFFFF&
+                        CharIndex = CharIndex + 1
+                        
+                        If Ch > &H7F Then
+                            GoTo LongCode
+                        End If
+                        
+                        Bytes(ByteIndex) = Ch
+                        ByteIndex = ByteIndex + 1
+                    End If
+                    
+                    ' Prepare for fast access to both the character and byte arrays.
+                    mFastLongsSA.PVData = CharsAddress + (CharIndex - CharsLB) * 2
+                    mFastLongs2SA.PVData = BytesAddress + ByteIndex - BytesLB
+                    SAPtr(FastChars) = mFastLongsSAPtr
+                    SAPtr(FastBytes) = mFastLongs2SAPtr
+                    FastCharIndex = 0
+                    FastByteIndex = 0
+                    
+                    ' Run 4 characters at a time!
+                    Do While CharIndex < MaxFastCharIndex
+                        Ch = FastChars(FastCharIndex)
+                        ChB = FastChars(FastCharIndex + 1)
+                        
+                        ' Check for any non-ascii characters.
+                        If (Ch Or ChB) And &HFF80FF80 Then
+                            SAPtr(FastChars) = vbNullPtr
+                            SAPtr(FastBytes) = vbNullPtr
+                            GoTo LongCodeWithMask
+                        End If
+                        
+                        FastBytes(FastByteIndex) = (Ch And &H7F&) Or ((Ch And &H7F0000) \ vbShift8Bits) Or ((ChB And &H7F&) * vbShift16Bits) Or ((ChB And &H7F0000) * vbShift8Bits)
+                        FastByteIndex = FastByteIndex + 1
+                        FastCharIndex = FastCharIndex + 2
+                        CharIndex = CharIndex + 4
+                        ByteIndex = ByteIndex + 4
+                    Loop
+                    
+                    SAPtr(FastChars) = vbNullPtr
+                    SAPtr(FastBytes) = vbNullPtr
+                    GoTo Continue
+                    
+LongCodeWithMask:
+                    ' We came from the inner fast loop with the
+                    ' Ch holding 2 characters, so we need to
+                    ' chop off the high 16-bits and process
+                    ' the lower 16-bits as a regulare character.
+                    Ch = Ch And &HFFFF&
+                    CharIndex = CharIndex + 1
+                    
+                    If Ch > &H7F Then
+                        GoTo LongCode
+                    End If
+                    
+                    Bytes(ByteIndex) = Ch
+                    ByteIndex = ByteIndex + 1
+                    GoTo FastLoopContinue
+                    
+LongCode:
+                    Dim ChD As Long
+                    
+                    If Ch <= &H7FF& Then
+                        ' 2 byte encoding
+                        ChD = (Ch \ vbShift6Bits) Or &HC0
+                    Else
+                        If Ch < HighSurrogateStart Or Ch > LowSurrogateEnd Then
+                            ' 3 byte encoding
+                            ChD = (Ch \ vbShift12Bits) Or &HE0
+                        Else
+                            ' 4 byte encoding (surrogate pair)
+                            If Ch > HighSurrogateEnd Then
+                                ' we have a low surrogate without previous high surrogate.
+                                CharIndex = CharIndex - 1
+                                Exit Do
+                            End If
+                            
+                            ChD = Chars(CharIndex)
+                            CharIndex = CharIndex + 1
+                            
+                            If ChD < LowSurrogateStart Or ChD > LowSurrogateEnd Then
+                                ' we have high surrogate not followed by low surrogate.
+                                CharIndex = CharIndex - 2
+                                Exit Do
+                            End If
+                            
+                            Ch = ChD + (Ch * vbShift10Bits) + &H10000 - LowSurrogateStart - (HighSurrogateStart * vbShift10Bits)
+                            Bytes(ByteIndex) = (Ch \ vbShift18Bits) Or &HF0&
+                            ByteIndex = ByteIndex + 1
+                            ChD = ((Ch \ vbShift12Bits) And &H3F&) Or &H80
+                        End If
+                        
+                        Bytes(ByteIndex) = ChD
+                        ByteIndex = ByteIndex + 1
+                        MaxFastCharIndex = MaxFastCharIndex - 1
+                        ChD = ((Ch \ vbShift6Bits) And &H3F&) Or &H80&
+                    End If
+                    
+                    Bytes(ByteIndex) = ChD
+                    MaxFastCharIndex = MaxFastCharIndex - 1
+                    ByteIndex = ByteIndex + 1
+                    
+                    Bytes(ByteIndex) = (Ch And &H3F&) Or &H80&
+                    ByteIndex = ByteIndex + 1
+                    
+FastLoopContinue:
+                Loop
+                
+                Ch = 0
+                GoTo Continue
+            End If
+            
+ProcessNextChar:
+            Select Case Ch
                 Case Is < &H800
                     If ByteIndex > MaxByteIndex Then _
                         ThrowEncoderSmallConversionBuffer

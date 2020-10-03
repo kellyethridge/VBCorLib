@@ -671,6 +671,8 @@ Friend Function GetBytesCore(ByRef Chars() As Integer, ByVal CharIndex As Long, 
     Dim CanFastLoop     As Boolean
     Dim CharsAddress    As Long
     Dim BytesAddress    As Long
+    Dim CharsLB         As Long
+    Dim BytesLB         As Long
     
     If CharCount = 0 Then
         Exit Function
@@ -684,8 +686,10 @@ Friend Function GetBytesCore(ByRef Chars() As Integer, ByVal CharIndex As Long, 
     CanFastLoop = Not mIsBigEndian And Len1D(Bytes) > 0 And Len1D(Chars) > 0
     
     If CanFastLoop Then
-        CharsAddress = VarPtr(Chars(CharIndex)) - LBound(Chars) * 2
-        BytesAddress = VarPtr(Bytes(ByteIndex)) - LBound(Bytes)
+        CharsLB = LBound(Chars)
+        BytesLB = LBound(Bytes)
+        CharsAddress = VarPtr(Chars(CharsLB))
+        BytesAddress = VarPtr(Bytes(BytesLB))
     End If
     
     ByteStart = ByteIndex
@@ -706,8 +710,8 @@ Friend Function GetBytesCore(ByRef Chars() As Integer, ByVal CharIndex As Long, 
                         MaxLongIndex = (MaxCharIndex - CharIndex + 1) \ 2 - 1
                     End If
 
-                    mLongCharsSA.PVData = CharsAddress + CharIndex * 2
-                    mLongBytesSA.PVData = BytesAddress + ByteIndex
+                    mLongCharsSA.PVData = CharsAddress + (CharIndex - CharsLB) * 2
+                    mLongBytesSA.PVData = BytesAddress + ByteIndex - BytesLB
                     
                     SAPtr(LongChars) = mLongCharsSAPtr
                     SAPtr(LongBytes) = mLongBytesSAPtr
@@ -1034,7 +1038,8 @@ Friend Function GetByteCountCore(ByRef Chars() As Integer, ByVal Index As Long, 
     Dim LongChar        As Long
     Dim CanFastLoop     As Boolean
     Dim CharsAddress    As Long
-
+    Dim CharsLB         As Long
+    
     If Not Encoder Is Nothing Then
         PrevChar = Encoder.LastChar
     End If
@@ -1042,7 +1047,8 @@ Friend Function GetByteCountCore(ByRef Chars() As Integer, ByVal Index As Long, 
     CanFastLoop = Not mIsBigEndian And Len1D(Chars) > 0
     
     If CanFastLoop Then
-        CharsAddress = VarPtr(Chars(Index)) - LBound(Chars) * 2
+        CharsLB = LBound(Chars)
+        CharsAddress = VarPtr(Chars(CharsLB))
     End If
     
     MaxCharIndex = Index + Count - 1
@@ -1055,7 +1061,7 @@ Friend Function GetByteCountCore(ByRef Chars() As Integer, ByVal Index As Long, 
                 ' do fast looping
                 MaxLongIndex = (MaxCharIndex - Index + 1) \ 2 - 1
                 
-                mLongCharsSA.PVData = CharsAddress + Index * 2
+                mLongCharsSA.PVData = CharsAddress + (Index - CharsLB) * 2
                 SAPtr(LongChars) = mLongCharsSAPtr
                 
                 For LongIndex = 0 To MaxLongIndex
@@ -1166,6 +1172,8 @@ Friend Function GetCharsCore(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByV
     Dim MaxByteIndex    As Long
     Dim CharsAddress    As Long
     Dim BytesAddress    As Long
+    Dim CharsLB         As Long
+    Dim BytesLB         As Long
     
     CharIndexStart = CharIndex
     MaxCharIndex = UBound(Chars)
@@ -1181,8 +1189,10 @@ Friend Function GetCharsCore(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByV
     CanFastLoop = Not mIsBigEndian And Len1D(Bytes) > 0 And Len1D(Chars) > 0
     
     If CanFastLoop Then
-        CharsAddress = VarPtr(Chars(CharIndex)) - LBound(Chars) * 2
-        BytesAddress = VarPtr(Bytes(ByteIndex)) - LBound(Bytes)
+        CharsLB = LBound(Chars)
+        BytesLB = LBound(Bytes)
+        CharsAddress = VarPtr(Chars(CharsLB))
+        BytesAddress = VarPtr(Bytes(BytesLB))
     End If
     
     Do While ByteCount > 0
@@ -1199,8 +1209,8 @@ Friend Function GetCharsCore(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByV
                         MaxLongIndex = (MaxCharIndex - CharIndex + 1) \ 2 - 1
                     End If
 
-                    mLongCharsSA.PVData = CharsAddress + CharIndex * 2
-                    mLongBytesSA.PVData = BytesAddress + ByteIndex
+                    mLongCharsSA.PVData = CharsAddress + (CharIndex - CharsLB) * 2
+                    mLongBytesSA.PVData = BytesAddress + ByteIndex - BytesLB
 
                     SAPtr(LongChars) = mLongCharsSAPtr
                     SAPtr(LongBytes) = mLongBytesSAPtr

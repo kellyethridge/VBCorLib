@@ -57,6 +57,10 @@ Friend Property Let PrevChar(ByVal Value As Long)
     mPrevChar = Value
 End Property
 
+Friend Property Get FallbackBuffer() As EncoderFallbackBuffer
+    Set FallbackBuffer = Encoder_FallbackBuffer
+End Property
+
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Constructors

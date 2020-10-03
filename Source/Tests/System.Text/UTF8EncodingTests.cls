@@ -308,6 +308,221 @@ Public Sub GetCharsEx_WithLongSequence_DecodesChars()
     Assert.That Chars, Iz.EqualTo(Bytes)
 End Sub
 
+' Fast loop test
+Public Sub GetCharsEx_WithLongSequenceAndBytesIndexOffset_DecodesChars()
+    Const Count As Long = 21
+    Dim Enc As New UTF8Encoding
+    Dim Bytes() As Byte
+    Dim Chars() As Integer
+    Dim i As Long
+    
+    ReDim Bytes(0 To Count - 1)
+    ReDim Chars(0 To Count - 1)
+    
+    For i = 0 To Count - 1
+        Bytes(i) = i
+    Next
+    
+    Assert.That Enc.GetCharsEx(Bytes, 1, Count - 1, Chars, 0), Iz.EqualTo(Count - 1)
+    
+    For i = 0 To 19
+        Assert.That Chars(i), Iz.EqualTo(i + 1), "Index: " & i
+    Next
+End Sub
+
+Public Sub GetCharsEx_WithLongSequenceAndCharsIndexOffset_DecodesChars()
+    Dim Enc As New UTF8Encoding
+    Dim Bytes() As Byte
+    Dim Chars() As Integer
+    
+    ReDim Chars(0 To 20)
+    Bytes = NewBytes(&H0, &H1, &H2, &H3, &H4, &H5, &H6, &H7, &H8, &H9, &HA, &HB, &HC, &HD, &HE, &HF, &H10, &H11, &H12, &H13, &H14)
+    
+    Assert.That Enc.GetCharsEx(Bytes, 0, Len1D(Bytes) - 1, Chars, 1), Iz.EqualTo(20)
+    
+    Dim Expected() As Integer
+    Expected = NewChars(&H0, &H0, &H1, &H2, &H3, &H4, &H5, &H6, &H7, &H8, &H9, &HA, &HB, &HC, &HD, &HE, &HF, &H10, &H11, &H12, &H13)
+    Assert.That Chars, Iz.EqualTo(Expected)
+End Sub
+
+' This test is to help test the fast loop with only ASCII characters. It's only
+' useful in debug mode so the code can be walked through to ensure expected
+' code paths are being executed.
+Public Sub GetCharCount_WithLongSequence_ReturnsCount()
+    Const Count As Long = 21
+    Dim Enc     As New UTF8Encoding
+    Dim Bytes() As Byte
+    Dim Actual  As Long
+    Dim i As Long
+    
+    ReDim Bytes(0 To Count - 1)
+    
+    For i = 0 To Count - 1
+        Bytes(i) = i
+    Next
+        
+    Actual = Enc.GetCharCount(Bytes)
+    
+    Assert.That Actual, Iz.EqualTo(Count)
+End Sub
+
+' Fast-loop test.
+Public Sub GetCharsEx_WithLongSurrogatePairSequence_DecodesChars()
+    Dim Enc As New UTF8Encoding
+    Dim Bytes() As Byte
+    Dim Chars() As Integer
+    Dim i As Long
+    
+    ReDim Bytes(0 To 41)
+    ReDim Chars(0 To 21)
+    
+    Bytes(0) = 2
+    Bytes(1) = 3
+    For i = 2 To UBound(Bytes) Step 4
+        ' &hF0,&h90,&h8F,&hBF
+        Bytes(i) = &HF0
+        Bytes(i + 1) = &H90
+        Bytes(i + 2) = &H8F
+        Bytes(i + 3) = &HBF
+    Next
+    
+    Assert.That Enc.GetCharsEx(Bytes, 0, Len1D(Bytes), Chars, 0), Iz.EqualTo(Len1D(Chars))
+    
+    Assert.That Chars(0), Iz.EqualTo(2)
+    Assert.That Chars(1), Iz.EqualTo(3)
+    
+    For i = 2 To UBound(Chars) Step 2
+        Assert.That Chars(i), Iz.EqualTo(&HD800)
+        Assert.That Chars(i + 1), Iz.EqualTo(&HDFFF)
+    Next
+End Sub
+
+' Fast-loop test.
+Public Sub GetCharCount_WithLongSurrogatePairSequence_ReturnsCount()
+    Dim Enc     As New UTF8Encoding
+    Dim Bytes() As Byte
+    Dim Actual  As Long
+    Dim i As Long
+    
+    ReDim Bytes(0 To 41)
+    
+    Bytes(0) = 2
+    Bytes(1) = 3
+    For i = 2 To UBound(Bytes) Step 4
+        ' &hF0,&h90,&h8F,&hBF
+        Bytes(i) = &HF0
+        Bytes(i + 1) = &H90
+        Bytes(i + 2) = &H8F
+        Bytes(i + 3) = &HBF
+    Next
+    
+    Actual = Enc.GetCharCount(Bytes)
+    
+    Assert.That Actual, Iz.EqualTo(22)
+End Sub
+
+
+' Fast-loop test.
+Public Sub GetCharsEx_WithLong3ByteSequence_DecodesChars()
+    Dim Enc As New UTF8Encoding
+    Dim Bytes() As Byte
+    Dim Chars() As Integer
+    
+    Bytes = NewBytes(&H32, &H33, &HE0, &HA0, &H80, &HE0, &HA0, &H80, &HE0, &HA0, &H80, &HE0, &HA0, &H80, &HE0, &HA0, &H80, &HE0, &HA0, &H80, &HE0, &HA0, &H80, &HE0, &HA0, &H80, &HE0, &HA0, &H80, &HE0, &HA0, &H80, _
+                     &H32, &H33, &HE0, &HA0, &H80, &HE0, &HA0, &H80, &HE0, &HA0, &H80, &HE0, &HA0, &H80, &HE0, &HA0, &H80, &HE0, &HA0, &H80, &HE0, &HA0, &H80, &HE0, &HA0, &H80, &HE0, &HA0, &H80, &HE0, &HA0, &H80)
+    ReDim Chars(0 To 23)
+    
+    Assert.That Enc.GetCharsEx(Bytes, 0, Len1D(Bytes), Chars, 0), Iz.EqualTo(Len1D(Chars))
+    
+    Dim Expected() As Integer
+    Expected = NewChars(&H32, &H33, &H800, &H800, &H800, &H800, &H800, &H800, &H800, &H800, &H800, &H800, &H32, &H33, &H800, &H800, &H800, &H800, &H800, &H800, &H800, &H800, &H800, &H800)
+    Assert.That Chars, Iz.EqualTo(Expected)
+End Sub
+
+' Fast-loop test.
+Public Sub GetCharCount_WithLong3ByteSequence_ReturnsCount()
+    Dim Enc     As New UTF8Encoding
+    Dim Bytes() As Byte
+    Dim Actual  As Long
+    
+    Bytes = NewBytes(&H32, &H33, &HE0, &HA0, &H80, &HE0, &HA0, &H80, &HE0, &HA0, &H80, &HE0, &HA0, &H80, &HE0, &HA0, &H80, &HE0, &HA0, &H80, &HE0, &HA0, &H80, &HE0, &HA0, &H80, &HE0, &HA0, &H80, &HE0, &HA0, &H80, _
+                     &H32, &H33, &HE0, &HA0, &H80, &HE0, &HA0, &H80, &HE0, &HA0, &H80, &HE0, &HA0, &H80, &HE0, &HA0, &H80, &HE0, &HA0, &H80, &HE0, &HA0, &H80, &HE0, &HA0, &H80, &HE0, &HA0, &H80, &HE0, &HA0, &H80)
+    
+    Actual = Enc.GetCharCount(Bytes)
+    
+    Assert.That Actual, Iz.EqualTo(24)
+End Sub
+
+' Fast-loop test.
+Public Sub GetCharsEx_WithLong2ByteSequence_DecodesChars()
+    Dim Enc As New UTF8Encoding
+    Dim Bytes() As Byte
+    Dim Chars() As Integer
+    
+    Bytes = NewBytes(&H32, &H33, &HC2, &H81, &HC2, &H81, &HC2, &H81, &HC2, &H81, &HC2, &H81, &HC2, &H81, &HC2, &H81, &HC2, &H81, &HC2, &H81, &HC2, &H81, &HC2, &H81, &HC2, &H81, &HC2, &H81, &HC2, &H81, &HC2, &H81, &HC2, &H81, &HC2, &H81, &HC2, &H81, &HC2, &H81, &HC2, &H81)
+    ReDim Chars(0 To 21)
+    
+    Assert.That Enc.GetCharsEx(Bytes, 0, Len1D(Bytes), Chars, 0), Iz.EqualTo(22)
+    
+    Dim Expected() As Integer
+    Expected = NewChars(&H32, &H33, &H81, &H81, &H81, &H81, &H81, &H81, &H81, &H81, &H81, &H81, &H81, &H81, &H81, &H81, &H81, &H81, &H81, &H81, &H81, &H81)
+    Assert.That Chars, Iz.EqualTo(Expected)
+End Sub
+
+' Fast-loop test.
+Public Sub GetCharCount_WithLong2ByteSequence_ReturnsCount()
+    Dim Enc     As New UTF8Encoding
+    Dim Bytes() As Byte
+    Dim Actual  As Long
+    
+    Bytes = NewBytes(&H32, &H33, &HC2, &H81, &HC2, &H81, &HC2, &H81, &HC2, &H81, &HC2, &H81, &HC2, &H81, &HC2, &H81, &HC2, &H81, &HC2, &H81, &HC2, &H81, &HC2, &H81, &HC2, &H81, &HC2, &H81, &HC2, &H81, &HC2, &H81, &HC2, &H81, &HC2, &H81, &HC2, &H81, &HC2, &H81, &HC2, &H81)
+    
+    Actual = Enc.GetCharCount(Bytes)
+    
+    Assert.That Actual, Iz.EqualTo(22)
+End Sub
+
+' Fast-loop test.
+Public Sub GetCharsEx_CheckIf2ByteAlignmentBailsOnNonASCII()
+    Dim Enc As New UTF8Encoding
+    Dim Bytes() As Byte
+    Dim Chars() As Integer
+    
+    ReDim Bytes(0 To 29) ' Make array big enough to trigger fast-loop.
+    Bytes(2) = &H31
+    Bytes(4) = &HC2 ' Start of 2-byte character
+    Bytes(5) = &H81
+    Bytes(7) = &HC2 ' Start of 2-byte character that should cause 2-byte alignment bail-out.
+    Bytes(8) = &H81
+    
+    ReDim Chars(0 To 28)
+    
+    Assert.That Enc.GetCharsEx(Bytes, 0, 30, Chars, 0), Iz.EqualTo(28)
+    
+    Assert.That Chars(2), Iz.EqualTo(&H31)
+    Assert.That Chars(4), Iz.EqualTo(&H81)
+    Assert.That Chars(5), Iz.EqualTo(0)
+    Assert.That Chars(6), Iz.EqualTo(&H81)
+End Sub
+
+' Fast-loop test.
+Public Sub GetCharCount_CheckIf2ByteAlignmentBailsOnNonASCII()
+    Dim Enc     As New UTF8Encoding
+    Dim Bytes() As Byte
+    Dim Actual  As Long
+    
+    ReDim Bytes(0 To 29) ' Make array big enough to trigger fast-loop.
+    Bytes(2) = &H31
+    Bytes(4) = &HC2 ' Start of 2-byte character
+    Bytes(5) = &H81
+    Bytes(7) = &HC2 ' Start of 2-byte character that should cause 2-byte alignment bail-out.
+    Bytes(8) = &H81
+    
+    Actual = Enc.GetCharCount(Bytes)
+    
+    Assert.That Actual, Iz.EqualTo(28)
+End Sub
+
 Public Sub GetCharsEx_WithInvalidByteSequence_ThrowsDecoderFallbackException(ByRef InvalidSequence() As Byte, ByVal ExpectedIndex As Long, ByRef ExpectedBytesUnknown() As Byte)
     Dim Enc As UTF8Encoding
     Dim Chars(100) As Integer
@@ -463,6 +678,120 @@ Public Sub GetBytesEx_WithCharacters_EncodesCharacters(ByRef Chars As Variant, B
     
     Assert.That ActualCount, Iz.EqualTo(ExpectedCount), "Count"
     Assert.That ActualBytes, Iz.EqualTo(ExpectedBytes), "Bytes"
+End Sub
+
+' Fast loop test.
+Public Sub GetBytesEx_WithLongAsciiSequence_ReturnsBytes()
+    Dim Enc As New UTF8Encoding
+    Dim Chars() As Integer
+    Dim Bytes() As Byte
+    Dim Expected() As Byte
+    
+    Chars = NewChars(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24)
+    ReDim Bytes(0 To 24)
+    
+    Assert.That Enc.GetBytesEx(Chars, 0, 25, Bytes, 0), Iz.EqualTo(25), "Count"
+    
+    Expected = NewBytes(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24)
+    Assert.That Bytes, Iz.EqualTo(Expected)
+End Sub
+
+' Fast loop test
+Public Sub GetBytesEx_WithLongAsciiSequenceIncludingEmbedded2ByteCharacter_ReturnsBytes()
+    Dim Enc As New UTF8Encoding
+    Dim Chars() As Integer
+    Dim Bytes() As Byte
+    Dim Expected() As Byte
+    
+    Chars = NewChars(&H0, &H1, &H2, &H3, &H4, &H5, &H6, &H7, &H8, &H9, &H81, &HB, &HC, &HD, &HE, &HF, &H10, &H11, &H12, &H13, &H14, &H15, &H16, &H17, &H18)
+    ReDim Bytes(0 To 25)
+    
+    Assert.That Enc.GetBytesEx(Chars, 0, 25, Bytes, 0), Iz.EqualTo(26), "Count"
+    
+    Expected = NewBytes(&H0, &H1, &H2, &H3, &H4, &H5, &H6, &H7, &H8, &H9, &HC2, &H81, &HB, &HC, &HD, &HE, &HF, &H10, &H11, &H12, &H13, &H14, &H15, &H16, &H17, &H18)
+    Assert.That Bytes, Iz.EqualTo(Expected)
+End Sub
+
+' Fast loop test.
+Public Sub GetBytesEx_WithLongAsciiSequenceIncludingEmbeded3ByteCharacter_ReturnsBytes()
+    Dim Enc As New UTF8Encoding
+    Dim Chars() As Integer
+    Dim Bytes() As Byte
+    Dim Expected() As Byte
+    
+    Chars = NewChars(&H0, &H1, &H2, &H3, &H4, &H5, &H6, &H7, &H8, &H9, &H800, &HB, &HC, &HD, &HE, &HF, &H10, &H11, &H12, &H13, &H14, &H15, &H16, &H17, &H18)
+    ReDim Bytes(0 To 26)
+    
+    Assert.That Enc.GetBytesEx(Chars, 0, 25, Bytes, 0), Iz.EqualTo(27), "Count"
+    
+    Expected = NewBytes(&H0, &H1, &H2, &H3, &H4, &H5, &H6, &H7, &H8, &H9, &HE0, &HA0, &H80, &HB, &HC, &HD, &HE, &HF, &H10, &H11, &H12, &H13, &H14, &H15, &H16, &H17, &H18)
+    Assert.That Bytes, Iz.EqualTo(Expected)
+End Sub
+
+' Fast loop test.
+Public Sub GetBytesEx_WithLongAsciiSequenceIncludingEmbededSurrogatePair_ReturnsBytes()
+    Dim Enc As New UTF8Encoding
+    Dim Chars() As Integer
+    Dim Bytes() As Byte
+    Dim Expected() As Byte
+    
+    Chars = NewChars(&H0, &H1, &H2, &H3, &H4, &H5, &H6, &H7, &H8, &H9, &HD8FF, &HDCFF, &HC, &HD, &HE, &HF, &H10, &H11, &H12, &H13, &H14, &H15, &H16, &H17, &H18)
+    ReDim Bytes(0 To 26)
+    
+    Assert.That Enc.GetBytesEx(Chars, 0, 25, Bytes, 0), Iz.EqualTo(27), "Count"
+    
+    Expected = NewBytes(&H0, &H1, &H2, &H3, &H4, &H5, &H6, &H7, &H8, &H9, &HF1, &H8F, &HB3, &HBF, &HC, &HD, &HE, &HF, &H10, &H11, &H12, &H13, &H14, &H15, &H16, &H17, &H18)
+    Assert.That Bytes, Iz.EqualTo(Expected)
+End Sub
+
+' Fast loop test.
+Public Sub GetByteCount_WithLongAsciiSequence_ReturnsCount()
+    Dim Enc As New UTF8Encoding
+    Dim Chars() As Integer
+    
+    Chars = NewChars(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24)
+    ReDim Bytes(0 To 24)
+    
+    Assert.That Enc.GetByteCount(Chars), Iz.EqualTo(25), "Count"
+End Sub
+
+' Fast loop test
+Public Sub GetByteCount_WithLongAsciiSequenceIncludingEmbedded2ByteCharacter_ReturnsCount()
+    Dim Enc As New UTF8Encoding
+    Dim Chars() As Integer
+    
+    Chars = NewChars(&H0, &H1, &H2, &H3, &H4, &H5, &H6, &H7, &H8, &H9, &H81, &HB, &HC, &HD, &HE, &HF, &H10, &H11, &H12, &H13, &H14, &H15, &H16, &H17, &H18)
+    
+    Assert.That Enc.GetByteCount(Chars), Iz.EqualTo(26), "Count"
+End Sub
+
+Public Sub GetByteCount_WithLongAsciiSequenceEndingWith2ByteCharacter_ReturnsCount()
+    Dim Enc As New UTF8Encoding
+    Dim Chars() As Integer
+    
+    Chars = NewChars(&H0, &H1, &H2, &H3, &H4, &H5, &H6, &H7, &H8, &H9, &HA, &HB, &HC, &HD, &HE, &HF, &H10, &H11, &H12, &H13, &H14, &H15, &H16, &H17, &H81)
+    
+    Assert.That Enc.GetByteCount(Chars), Iz.EqualTo(26), "Count"
+End Sub
+
+' Fast loop test.
+Public Sub GetByteCount_WithLongAsciiSequenceIncludingEmbeded3ByteCharacter_ReturnsCount()
+    Dim Enc As New UTF8Encoding
+    Dim Chars() As Integer
+    
+    Chars = NewChars(&H0, &H1, &H2, &H3, &H4, &H5, &H6, &H7, &H8, &H9, &H800, &HB, &HC, &HD, &HE, &HF, &H10, &H11, &H12, &H13, &H14, &H15, &H16, &H17, &H18)
+    
+    Assert.That Enc.GetByteCount(Chars), Iz.EqualTo(27), "Count"
+End Sub
+
+' Fast loop test.
+Public Sub GetByteCount_WithLongAsciiSequenceIncludingEmbededSurrogatePair_ReturnsCount()
+    Dim Enc As New UTF8Encoding
+    Dim Chars() As Integer
+    
+    Chars = NewChars(&H0, &H1, &H2, &H3, &H4, &H5, &H6, &H7, &H8, &H9, &HD8FF, &HDCFF, &HC, &HD, &HE, &HF, &H10, &H11, &H12, &H13, &H14, &H15, &H16, &H17, &H18)
+    
+    Assert.That Enc.GetByteCount(Chars), Iz.EqualTo(27), "Count"
 End Sub
 
 Public Sub GetBytesEx_WithSmallConversionBuffer_ThrowsArgumentException()
