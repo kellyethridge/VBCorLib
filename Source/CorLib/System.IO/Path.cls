@@ -666,7 +666,7 @@ Private Function HasIllegalCharacters(ByRef Path As String) As Boolean
     PathChars = AllocChars(Path)
     
     For i = 0 To Len(Path) - 1
-        Select Case PathChars(i)
+        Select Case PathChars(i) And &HFFFF&
             Case vbQuoteChar, vbLessThanChar, vbGreaterThanChar, vbPipeChar, Is < vbSpaceChar
                 HasIllegalCharacters = True
                 Exit For
