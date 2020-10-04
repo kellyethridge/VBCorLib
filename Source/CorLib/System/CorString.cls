@@ -730,16 +730,12 @@ Private Function FindSeparatorIndexes(ByRef s As String, ByRef Separator As Vari
             Error.Argument Argument_CharArrayRequired, "Separator"
     End Select
 
-    GoSub Finally
     Exit Function
     
 Catch:
-    GoSub Finally
-    ThrowOrErr Err
-Finally:
     SAPtr(StringSeparator) = vbNullPtr
     SAPtr(CharSeparator) = vbNullPtr
-    Return
+    ThrowOrErr Err
 End Function
 
 Private Function FindStringSeparatorIndexes(ByRef s As String, ByRef Separator As Variant, ByRef SeparatorIndexes() As Long, ByRef SeparatorLengths() As Long) As Long
@@ -834,16 +830,13 @@ Private Function FindCharSeparatorsIndexes(ByRef s As String, ByRef Separator() 
         CharIndex = CharIndex + 1
     Loop
     
-    GoSub Finally
+    FreeChars Chars
     FindCharSeparatorsIndexes = MatchCount
     Exit Function
     
 Catch:
-    GoSub Finally
-    ThrowOrErr Err
-Finally:
     FreeChars Chars
-    Return
+    ThrowOrErr Err
 End Function
 
 Private Function FindWhitespaceSeparatorIndexes(ByRef s As String, ByRef SeparatorIndexes() As Long, ByRef SeparatorLengths() As Long) As Long
@@ -867,16 +860,13 @@ Private Function FindWhitespaceSeparatorIndexes(ByRef s As String, ByRef Separat
         CharIndex = CharIndex + 1
     Loop
     
-    GoSub Finally
+    FreeChars Chars
     FindWhitespaceSeparatorIndexes = MatchCount
     Exit Function
     
 Catch:
-    GoSub Finally
-    ThrowOrErr Err
-Finally:
     FreeChars Chars
-    Return
+    ThrowOrErr Err
 End Function
 
 Private Function SplitWithEmpties(ByRef s As String, ByVal MatchCount As Long, ByRef SeparatorIndexes() As Long, ByRef SeparatorLengths() As Long, ByVal Count As Long) As String()
@@ -1357,23 +1347,22 @@ Private Function IndexOfAnyCore(ByRef s As String, ByRef OfAny As Variant, ByVal
         For j = OfAnyLB To OfAnyUB
             If Ch = OfAnyChars(j) Then
                 IndexOfAnyCore = i
-                GoSub Finally
-                Exit Function
+                GoTo CleanExit
             End If
         Next
     Next
     
     IndexOfAnyCore = -1
-    GoSub Finally
-    Exit Function
+    GoTo CleanExit
     
 Catch:
-    GoSub Finally
-    ThrowOrErr Err
-Finally:
     FreeChars OfAnyChars
     FreeChars Chars
-    Return
+    ThrowOrErr Err
+    
+CleanExit:
+    FreeChars OfAnyChars
+    FreeChars Chars
 End Function
 
 Private Function TrimCore(ByRef s As String, ByRef TrimChars As Variant, ByVal TrimHead As Boolean, ByVal TrimTail As Boolean) As String

@@ -586,15 +586,12 @@ Public Function ReadString() As String
         mDecoder.GetChars EncodedBytes, 0, NumberOfBytesRead, Chars, 0, True
     End If
     
-    GoSub Finally
+    FreeChars Chars
     Exit Function
     
 Catch:
-    GoSub Finally
-    ThrowOrErr Err
-Finally:
     FreeChars Chars
-    Return
+    ThrowOrErr Err
 End Function
 
 ''
@@ -716,15 +713,12 @@ Private Function ReadToByteBuffer(ByVal BufferPtr As Long, ByRef BufferRange As 
     SAPtr(Buffer) = BufferPtr
     ReadToByteBuffer = mStream.ReadBlock(Buffer, BufferRange.Index, BufferRange.Count)
     
-    GoSub Finally
+    SAPtr(Buffer) = vbNullPtr
     Exit Function
     
 Catch:
-    GoSub Finally
-    ThrowOrErr Err
-Finally:
     SAPtr(Buffer) = vbNullPtr
-    Return
+    ThrowOrErr Err
 End Function
 
 Private Function ReadToCharBuffer(ByVal BufferPtr As Long, ByRef BufferRange As ListRange) As Long
@@ -734,15 +728,12 @@ Private Function ReadToCharBuffer(ByVal BufferPtr As Long, ByRef BufferRange As 
     SAPtr(Buffer) = BufferPtr
     ReadToCharBuffer = ReadCharBytes(Buffer, BufferRange.Index, BufferRange.Count)
     
-    GoSub Finally
+    SAPtr(Buffer) = vbNullPtr
     Exit Function
     
 Catch:
-    GoSub Finally
-    ThrowOrErr Err
-Finally:
     SAPtr(Buffer) = vbNullPtr
-    Return
+    ThrowOrErr Err
 End Function
 
 Private Function ReadCharBytes(ByRef Chars() As Integer, ByVal Index As Long, ByVal Count As Long) As Long

@@ -744,15 +744,12 @@ Public Function AppendFormatArrayEx(ByVal Provider As IFormatProvider, ByRef For
     End If
     
     Set AppendFormatArrayEx = Me
-    GoSub Finally
+    FreeChars FormatChars
     Exit Function
     
 Catch:
-    GoSub Finally
-    ThrowOrErr Err
-Finally:
     FreeChars FormatChars
-    Return
+    ThrowOrErr Err
 End Function
 
 
@@ -837,15 +834,12 @@ Private Sub AppendCharsValue(ByRef Value As Variant, ByRef StartIndex As Variant
 
     AppendCharsCore Chars, Range.Index, Range.Count
     
-    GoSub Finally
+    FreeChars Chars
     Exit Sub
 
 Catch:
-    GoSub Finally
-    Throw
-Finally:
     FreeChars Chars
-    Return
+    ThrowOrErr Err
 End Sub
 
 Private Sub AppendStringValue(ByRef Value As Variant, ByRef StartIndex As Variant, ByRef Count As Variant)

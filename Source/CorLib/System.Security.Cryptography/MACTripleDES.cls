@@ -385,15 +385,12 @@ Private Sub ComputeHashOnBytes(ByRef Source As Variant, ByRef Index As Variant, 
     Range = MakeArrayRange(Source, Index, Count)
     mStream.WriteBlock Bytes, Range.Index, Range.Count
 
-    GoSub Finally
+    SAPtr(Bytes) = vbNullPtr
     Exit Sub
     
 Catch:
-    GoSub Finally
-    ThrowOrErr Err
-Finally:
     SAPtr(Bytes) = vbNullPtr
-    Return
+    ThrowOrErr Err
 End Sub
 
 Private Sub VerifyNotDisposed()

@@ -317,16 +317,13 @@ Public Function SignHash(ByRef RgbHash() As Byte, ByRef Str As String) As Byte()
     CorArray.Reverse Signature, 0, SizeOfRComponent
     CorArray.Reverse Signature, SizeOfRComponent, SizeOfSComponent
     
-    GoSub Finally
+    CryptDestroyHash Hash
     SignHash = Signature
     Exit Function
 
 Catch:
-    GoSub Finally
-    Throw
-Finally:
     CryptDestroyHash Hash
-    Return
+    ThrowOrErr Err
 End Function
 
 ''

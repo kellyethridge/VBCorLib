@@ -255,15 +255,12 @@ Public Function GetByteCount(ByRef Chars As Variant, Optional ByRef Index As Var
     Range = ValidateGetBytes(LocalChars, Index, Count)
     GetByteCount = GetByteCountCore(LocalChars, Range.Index, Range.Count)
     
-    GoSub Finally
+    FreeChars LocalChars
     Exit Function
     
 Catch:
-    GoSub Finally
-    Throw
-Finally:
     FreeChars LocalChars
-    Return
+    ThrowOrErr Err
 End Function
 
 ''
@@ -293,15 +290,12 @@ Public Function GetBytes(ByRef Chars As Variant, Optional ByRef Index As Variant
     SAPtr(GetBytes) = SafeArrayCreateVectorEx(vbByte, 0, ByteCount)
     GetBytesCore LocalChars, Range.Index, Range.Count, GetBytes, 0
     
-    GoSub Finally
+    FreeChars LocalChars
     Exit Function
     
 Catch:
-    GoSub Finally
-    ThrowOrErr Err
-Finally:
     FreeChars LocalChars
-    Return
+    ThrowOrErr Err
 End Function
 
 ''
@@ -332,15 +326,12 @@ Public Function GetBytesEx(ByRef Chars As Variant, ByVal CharIndex As Long, ByVa
         GetBytesEx = GetBytesCore(LocalChars, CharIndex, CharCount, Bytes, ByteIndex)
     End If
     
-    GoSub Finally
+    FreeChars LocalChars
     Exit Function
     
 Catch:
-    GoSub Finally
-    ThrowOrErr Err
-Finally:
     FreeChars LocalChars
-    Return
+    ThrowOrErr Err
 End Function
 
 ''
@@ -552,15 +543,12 @@ Public Function GetString(ByRef Bytes() As Byte, Optional ByRef Index As Variant
     On Error GoTo Catch
     GetCharsCore Bytes, Range.Index, Range.Count, Chars, 0
     
-    GoSub Finally
+    FreeChars Chars
     Exit Function
     
 Catch:
-    GoSub Finally
-    ThrowOrErr Err
-Finally:
     FreeChars Chars
-    Return
+    ThrowOrErr Err
 End Function
 
 ''
@@ -804,14 +792,16 @@ Private Function GetCharsCore(ByRef Bytes() As Byte, ByVal ByteIndex As Long, By
     Dim b           As Byte
     Dim ByteEnd     As Long
     Dim Fallback    As DecoderFallbackBuffer
+    Dim CharsUB     As Long
     
+    CharsUB = UBound(Chars)
     ByteEnd = ByteIndex + ByteCount
 
     Do While ByteIndex < ByteEnd
         b = Bytes(ByteIndex)
         
         If b <= ASCIIEnd Then
-            If CharIndex > UBound(Chars) Then _
+            If CharIndex > CharsUB Then _
                 Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_EncodingConversionOverflowChars, EncodingName, TypeName(mDecoderFallback)), "Chars")
         
             Chars(CharIndex) = b

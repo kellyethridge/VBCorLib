@@ -266,15 +266,12 @@ Public Function GetByteCount(ByRef Chars As Variant, Optional ByRef Index As Var
     Range = ValidateGetBytes(LocalChars, Index, Count)
     GetByteCount = GetByteCountCore(LocalChars, Range.Index, Range.Count, Nothing)
     
-    GoSub Finally
+    FreeChars LocalChars
     Exit Function
     
 Catch:
-    GoSub Finally
-    ThrowOrErr Err
-Finally:
     FreeChars LocalChars
-    Return
+    ThrowOrErr Err
 End Function
 
 ''
@@ -305,16 +302,13 @@ Public Function GetBytes(ByRef Chars As Variant, Optional ByRef Index As Variant
         Output = Cor.NewBytes()
     End If
     
-    GoSub Finally
+    FreeChars LocalChars
     GetBytes = Output
     Exit Function
     
 Catch:
-    GoSub Finally
-    ThrowOrErr Err
-Finally:
     FreeChars LocalChars
-    Return
+    ThrowOrErr Err
 End Function
 
 ''
@@ -345,15 +339,12 @@ Public Function GetBytesEx(ByRef Chars As Variant, ByVal CharIndex As Long, ByVa
         GetBytesEx = GetBytesCore(LocalChars, CharIndex, CharCount, Bytes, ByteIndex, Nothing)
     End If
     
-    GoSub Finally
+    FreeChars LocalChars
     Exit Function
     
 Catch:
-    GoSub Finally
-    ThrowOrErr Err
-Finally:
     FreeChars LocalChars
-    Return
+    ThrowOrErr Err
 End Function
 
 ''
@@ -502,15 +493,12 @@ Public Function GetString(ByRef Bytes() As Byte, Optional ByRef Index As Variant
     On Error GoTo Catch
     GetCharsCore Bytes, Range.Index, Range.Count, Chars, 0, Nothing
     
-    GoSub Finally
+    FreeChars Chars
     Exit Function
     
 Catch:
-    GoSub Finally
-    ThrowOrErr Err
-Finally:
     FreeChars Chars
-    Return
+    ThrowOrErr Err
 End Function
 
 ''

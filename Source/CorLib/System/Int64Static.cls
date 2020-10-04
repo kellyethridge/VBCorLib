@@ -762,15 +762,12 @@ Friend Sub DoubleToInt64(ByVal Value As Double, ByRef Result As Int64)
         Result = Negate(Result)
     End If
     
-    GoSub Finally
+    SAPtr(Digits) = vbNullPtr
     Exit Sub
     
 Catch:
-    GoSub Finally
-    ThrowOrErr Err
-Finally:
     SAPtr(Digits) = vbNullPtr
-    Return
+    ThrowOrErr Err
 End Sub
 
 Friend Property Get Int64Guid() As VBGUID

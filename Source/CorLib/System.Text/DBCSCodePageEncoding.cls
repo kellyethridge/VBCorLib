@@ -342,15 +342,12 @@ Private Function Encoding_GetByteCount(Chars As Variant, Optional Index As Varia
     
     Encoding_GetByteCount = GetByteCountCore(LocalChars, Range.Index, Range.Count)
     
-    GoSub Finally
+    FreeChars LocalChars
     Exit Function
     
 Catch:
-    GoSub Finally
-    ThrowOrErr Err
-Finally:
     FreeChars LocalChars
-    Return
+    ThrowOrErr Err
 End Function
 
 Private Function Encoding_GetBytes(Chars As Variant, Optional Index As Variant, Optional Count As Variant) As Byte()
@@ -365,15 +362,12 @@ Private Function Encoding_GetBytes(Chars As Variant, Optional Index As Variant, 
     SAPtr(Encoding_GetBytes) = SafeArrayCreateVectorEx(vbByte, 0, GetByteCountCore(LocalChars, Range.Index, Range.Count))
     GetBytesCore LocalChars, Range.Index, Range.Count, Encoding_GetBytes, 0
     
-    GoSub Finally
+    FreeChars LocalChars
     Exit Function
     
 Catch:
-    GoSub Finally
-    ThrowOrErr Err
-Finally:
     FreeChars LocalChars
-    Return
+    ThrowOrErr Err
 End Function
 
 Private Function Encoding_GetBytesEx(Chars As Variant, ByVal CharIndex As Long, ByVal CharCount As Long, Bytes() As Byte, ByVal ByteIndex As Long) As Long
@@ -385,15 +379,12 @@ Private Function Encoding_GetBytesEx(Chars As Variant, ByVal CharIndex As Long, 
     ValidateGetBytesEx LocalChars, CharIndex, CharCount, Bytes, ByteIndex
     Encoding_GetBytesEx = GetBytesCore(LocalChars, CharIndex, CharCount, Bytes, ByteIndex)
     
-    GoSub Finally
+    FreeChars LocalChars
     Exit Function
     
 Catch:
-    GoSub Finally
-    ThrowOrErr Err
-Finally:
     FreeChars LocalChars
-    Return
+    ThrowOrErr Err
 End Function
 
 Private Function Encoding_GetCharCount(Bytes() As Byte, Optional Index As Variant, Optional Count As Variant) As Long
@@ -460,15 +451,12 @@ Private Function Encoding_GetString(Bytes() As Byte, Optional Index As Variant, 
     On Error GoTo Catch
     GetCharsCore Bytes, Range.Index, Range.Count, Chars, 0, Nothing
     
-    GoSub Finally
+    FreeChars Chars
     Exit Function
     
 Catch:
-    GoSub Finally
-    ThrowOrErr Err
-Finally:
     FreeChars Chars
-    Return
+    ThrowOrErr Err
 End Function
 
 Private Property Get Encoding_HeaderName() As String

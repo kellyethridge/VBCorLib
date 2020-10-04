@@ -351,15 +351,12 @@ Private Sub WriteBytes(ByRef Buffer As Variant, Optional ByRef Index As Variant,
     On Error GoTo Catch
     mOutStream.WriteBlock Bytes, Range.Index, Range.Count
     
-    GoSub Finally
+    SAPtr(Bytes) = vbNullPtr
     Exit Sub
     
 Catch:
-    GoSub Finally
-    Throw Err
-Finally:
     SAPtr(Bytes) = vbNullPtr
-    Return
+    ThrowOrErr Err
 End Sub
 
 

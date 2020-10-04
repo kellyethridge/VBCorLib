@@ -203,15 +203,12 @@ Public Function FromBase64String(ByRef s As String) As Byte()
     On Error GoTo Catch
     FromBase64String = FromBase64CharArray(Chars, 0, Len(s))
     
-    GoSub Finally
+    FreeChars Chars
     Exit Function
     
 Catch:
-    GoSub Finally
-    ThrowOrErr Err
-Finally:
     FreeChars Chars
-    Return
+    ThrowOrErr Err
 End Function
 
 ''

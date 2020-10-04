@@ -1289,15 +1289,12 @@ Private Sub WriteLineCore(ByRef Args() As Variant)
     End If
 
     Out.WriteValue Environment.NewLine
-    GoSub Finally
+    FreeArguments Shifted
     Exit Sub
     
 Catch:
-    GoSub Finally
-    ThrowOrErr Err
-Finally:
     FreeArguments Shifted
-    Return
+    ThrowOrErr Err
 End Sub
 
 Private Sub WriteCore(ByRef Value As Variant, ByRef Args() As Variant)

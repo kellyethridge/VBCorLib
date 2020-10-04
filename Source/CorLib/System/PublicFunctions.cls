@@ -147,15 +147,12 @@ Continue:
         Error.Format Format_UnrecognizedEscapeSequence
     
     t = mTextOut.ToString
-    GoSub Finally
+    FreeChars Chars
     Exit Function
     
 Catch:
-    GoSub Finally
-    Throw
-Finally:
     FreeChars Chars
-    Return
+    ThrowOrErr Err
 End Function
 
 Private Function ReadHexChar(ByRef Chars() As Integer, ByVal Index As Long) As Long

@@ -427,16 +427,14 @@ Private Sub SortStrings(ByRef Keys As Variant, ByVal Left As Long, ByVal Right A
     
     On Error GoTo Catch
     Sorter.Invoke Context, ByVal Left, ByVal Right
-    GoSub Finally
+    SAPtr(Context.KeyPtrs) = vbNullPtr
+    SAPtr(Context.Keys) = vbNullPtr
     Exit Sub
     
 Catch:
-    GoSub Finally
-    ThrowOrErr Err
-Finally:
     SAPtr(Context.KeyPtrs) = vbNullPtr
     SAPtr(Context.Keys) = vbNullPtr
-    Return
+    ThrowOrErr Err
 End Sub
 
 Public Sub SetSortKeys(ByVal pSA As Long)

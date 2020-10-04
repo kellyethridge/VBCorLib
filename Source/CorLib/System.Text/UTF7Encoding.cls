@@ -256,15 +256,12 @@ Public Function GetByteCount(ByRef Chars As Variant, Optional ByRef Index As Var
     
     GetByteCount = GetByteCountCore(LocalChars, Range.Index, Range.Count, Nothing)
     
-    GoSub Finally
+    FreeChars LocalChars
     Exit Function
     
 Catch:
-    GoSub Finally
-    Throw
-Finally:
     FreeChars LocalChars
-    Return
+    ThrowOrErr Err
 End Function
 
 ''
@@ -292,15 +289,12 @@ Public Function GetBytes(ByRef Chars As Variant, Optional ByRef Index As Variant
     SAPtr(GetBytes) = SafeArrayCreateVectorEx(vbByte, 0, ByteCount)
     GetBytesCore LocalChars, Range.Index, Range.Count, GetBytes, 0, Nothing
     
-    GoSub Finally
+    FreeChars LocalChars
     Exit Function
     
 Catch:
-    GoSub Finally
-    ThrowOrErr Err
-Finally:
     FreeChars LocalChars
-    Return
+    ThrowOrErr Err
 End Function
 
 ''
@@ -327,15 +321,12 @@ Public Function GetBytesEx(ByRef Chars As Variant, ByVal CharIndex As Long, ByVa
     ValidateGetBytesEx LocalChars, CharIndex, CharCount, Bytes, ByteIndex
     GetBytesEx = GetBytesCore(LocalChars, CharIndex, CharCount, Bytes, ByteIndex, Nothing)
     
-    GoSub Finally
+    FreeChars LocalChars
     Exit Function
     
 Catch:
-    GoSub Finally
-    Throw
-Finally:
     FreeChars LocalChars
-    Return
+    ThrowOrErr Err
 End Function
 
 ''
@@ -357,15 +348,12 @@ Public Function GetString(ByRef Bytes() As Byte, Optional ByRef Index As Variant
     On Error GoTo Catch
     GetCharsCore Bytes, Range.Index, Range.Count, Output, 0, Nothing
     
-    GoSub Finally
+    FreeChars Output
     Exit Function
 
 Catch:
-    GoSub Finally
-    ThrowOrErr Err
-Finally:
     FreeChars Output
-    Return
+    ThrowOrErr Err
 End Function
 
 ''
