@@ -687,52 +687,46 @@ Friend Function GetBytesCore(ByRef Chars() As Integer, ByVal CharIndex As Long, 
     Do While CharCount > 0
         ' The fast loop was shamefully adapted from the .NET reference source in UnicodeEncoding class.
         If PrevChar = 0 And CanFastLoop Then
-            ' check if element is 32-bit aligned
-            If ((BytesAddress + ByteIndex) And &H3) = 0 Then
-                ' check if element is 32-bit aligned
-                If ((CharsAddress + CharIndex * 2) And &H3) = 0 Then
-                    ' do fast looping
-                    If (MaxByteIndex - ByteIndex + 1) \ 2 < (MaxCharIndex - CharIndex + 1) Then
-                        MaxLongIndex = (MaxByteIndex - ByteIndex + 1) \ 4 - 1
-                    Else
-                        MaxLongIndex = (MaxCharIndex - CharIndex + 1) \ 2 - 1
-                    End If
+            ' do fast looping
+            If (MaxByteIndex - ByteIndex + 1) \ 2 < (MaxCharIndex - CharIndex + 1) Then
+                MaxLongIndex = (MaxByteIndex - ByteIndex + 1) \ 4 - 1
+            Else
+                MaxLongIndex = (MaxCharIndex - CharIndex + 1) \ 2 - 1
+            End If
 
-                    mLongCharsSA.PVData = CharsAddress + (CharIndex - CharsLB) * 2
-                    mLongBytesSA.PVData = BytesAddress + ByteIndex - BytesLB
+            mLongCharsSA.PVData = CharsAddress + (CharIndex - CharsLB) * 2
+            mLongBytesSA.PVData = BytesAddress + ByteIndex - BytesLB
+            
+            SAPtr(LongChars) = mLongCharsSAPtr
+            SAPtr(LongBytes) = mLongBytesSAPtr
+            
+            For LongIndex = 0 To MaxLongIndex
+                LongChar = LongChars(LongIndex)
+                
+                If LongChar And &H80808080 Then
+                    Dim Temp As Long
                     
-                    SAPtr(LongChars) = mLongCharsSAPtr
-                    SAPtr(LongBytes) = mLongBytesSAPtr
+                    Temp = (LongChar And &HF800F800) Xor &HD800D800
                     
-                    For LongIndex = 0 To MaxLongIndex
-                        LongChar = LongChars(LongIndex)
-                        
-                        If LongChar And &H80808080 Then
-                            Dim Temp As Long
-                            
-                            Temp = (LongChar And &HF800F800) Xor &HD800D800
-                            
-                            If (Temp And &HFFFF0000) = 0 Or (Temp And &HFFFF&) = 0 Then
-                                If ((LongChar And &HFC00FC00) Xor &HDC00D800) <> 0 Then
-                                    Exit For
-                                End If
-                            End If
+                    If (Temp And &HFFFF0000) = 0 Or (Temp And &HFFFF&) = 0 Then
+                        If ((LongChar And &HFC00FC00) Xor &HDC00D800) <> 0 Then
+                            Exit For
                         End If
-                        
-                        LongBytes(LongIndex) = LongChar
-                    Next
-                    
-                    SAPtr(LongChars) = vbNullPtr
-                    SAPtr(LongBytes) = vbNullPtr
-                    
-                    CharIndex = CharIndex + LongIndex * 2
-                    ByteIndex = ByteIndex + LongIndex * 4
-                    CharCount = CharCount - LongIndex * 2
-                    
-                    If CharCount < 1 Then
-                        Exit Do
                     End If
                 End If
+                
+                LongBytes(LongIndex) = LongChar
+            Next
+            
+            SAPtr(LongChars) = vbNullPtr
+            SAPtr(LongBytes) = vbNullPtr
+            
+            CharIndex = CharIndex + LongIndex * 2
+            ByteIndex = ByteIndex + LongIndex * 4
+            CharCount = CharCount - LongIndex * 2
+            
+            If CharCount < 1 Then
+                Exit Do
             End If
         End If
         
@@ -882,39 +876,36 @@ Friend Function GetCharCountCore(ByRef Bytes() As Byte, ByVal Index As Long, ByV
     Do While Count > 0
         ' The fast loop was shamefully adapted from the .NET reference source in UnicodeEncoding class.
         If LastChar = 0 And LastByte = -1 And CanFastLoop Then
-            ' check if element is 32-bit aligned
-            If ((BytesAddress + Index) And &H3) = 0 Then
-                ' do fast looping
-                MaxLongIndex = (MaxByteIndex - Index + 1) \ 4 - 1
+            ' do fast looping
+            MaxLongIndex = (MaxByteIndex - Index + 1) \ 4 - 1
 
-                mLongBytesSA.PVData = BytesAddress + Index
-                SAPtr(LongBytes) = mLongBytesSAPtr
+            mLongBytesSA.PVData = BytesAddress + Index
+            SAPtr(LongBytes) = mLongBytesSAPtr
 
-                For LongIndex = 0 To MaxLongIndex
-                    LongByte = LongBytes(LongIndex)
+            For LongIndex = 0 To MaxLongIndex
+                LongByte = LongBytes(LongIndex)
 
-                    If LongByte And &H80808080 Then
-                        Dim Temp As Long
+                If LongByte And &H80808080 Then
+                    Dim Temp As Long
 
-                        Temp = (LongByte And &HF800F800) Xor &HD800D800
+                    Temp = (LongByte And &HF800F800) Xor &HD800D800
 
-                        If (Temp And &HFFFF0000) = 0 Or (Temp And &HFFFF&) = 0 Then
-                            If ((LongByte And &HFC00FC00) Xor &HDC00D800) <> 0 Then
-                                Exit For
-                            End If
+                    If (Temp And &HFFFF0000) = 0 Or (Temp And &HFFFF&) = 0 Then
+                        If ((LongByte And &HFC00FC00) Xor &HDC00D800) <> 0 Then
+                            Exit For
                         End If
                     End If
-                Next
-
-                SAPtr(LongBytes) = vbNullPtr
-
-                CharCount = CharCount + LongIndex * 2
-                Index = Index + LongIndex * 4
-                Count = Count - LongIndex * 4
-
-                If Count < 1 Then
-                    Exit Do
                 End If
+            Next
+
+            SAPtr(LongBytes) = vbNullPtr
+
+            CharCount = CharCount + LongIndex * 2
+            Index = Index + LongIndex * 4
+            Count = Count - LongIndex * 4
+
+            If Count < 1 Then
+                Exit Do
             End If
         End If
     
@@ -1042,41 +1033,37 @@ Friend Function GetByteCountCore(ByRef Chars() As Integer, ByVal Index As Long, 
     MaxCharIndex = Index + Count - 1
     
     Do While Count > 0
-        ' The fast loop was shamefully adapted from the .NET reference source in UnicodeEncoding class.
         If PrevChar = 0 And CanFastLoop Then
-            ' check if element is 32-bit aligned
-            If ((CharsAddress + Index * 2) And &H3) = 0 Then
-                ' do fast looping
-                MaxLongIndex = (MaxCharIndex - Index + 1) \ 2 - 1
+            ' do fast looping
+            MaxLongIndex = (MaxCharIndex - Index + 1) \ 2 - 1
+            
+            mLongCharsSA.PVData = CharsAddress + (Index - CharsLB) * 2
+            SAPtr(LongChars) = mLongCharsSAPtr
+            
+            For LongIndex = 0 To MaxLongIndex
+                LongChar = LongChars(LongIndex)
                 
-                mLongCharsSA.PVData = CharsAddress + (Index - CharsLB) * 2
-                SAPtr(LongChars) = mLongCharsSAPtr
-                
-                For LongIndex = 0 To MaxLongIndex
-                    LongChar = LongChars(LongIndex)
+                If LongChar And &H80808080 Then
+                    Dim Temp As Long
                     
-                    If LongChar And &H80808080 Then
-                        Dim Temp As Long
-                        
-                        Temp = (LongChar And &HF800F800) Xor &HD800D800
-                        
-                        If (Temp And &HFFFF0000) = 0 Or (Temp And &HFFFF&) = 0 Then
-                            If ((LongChar And &HFC00FC00) Xor &HDC00D800) <> 0 Then
-                                Exit For
-                            End If
+                    Temp = (LongChar And &HF800F800) Xor &HD800D800
+                    
+                    If (Temp And &HFFFF0000) = 0 Or (Temp And &HFFFF&) = 0 Then
+                        If ((LongChar And &HFC00FC00) Xor &HDC00D800) <> 0 Then
+                            Exit For
                         End If
                     End If
-                Next
-                
-                SAPtr(LongChars) = vbNullPtr
-                
-                Index = Index + LongIndex * 2
-                Count = Count - LongIndex * 2
-                ByteCount = ByteCount + LongIndex * 4
-                
-                If Count < 1 Then
-                    Exit Do
                 End If
+            Next
+            
+            SAPtr(LongChars) = vbNullPtr
+            
+            Index = Index + LongIndex * 2
+            Count = Count - LongIndex * 2
+            ByteCount = ByteCount + LongIndex * 4
+            
+            If Count < 1 Then
+                Exit Do
             End If
         End If
         
@@ -1186,53 +1173,47 @@ Friend Function GetCharsCore(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByV
     Do While ByteCount > 0
         ' The fast loop was shamefully adapted from the .NET reference source in UnicodeEncoding class.
         If LastChar = 0 And LastByte = -1 And CanFastLoop Then
-            ' check if element is 32-bit aligned
-            If ((BytesAddress + ByteIndex) And &H3) = 0 Then
-                ' check if element is 32-bit aligned
-                If ((CharsAddress + CharIndex * 2) And &H3) = 0 Then
-                    ' do fast looping
-                    If (MaxByteIndex - ByteIndex + 1) \ 2 < (MaxCharIndex - CharIndex + 1) Then
-                        MaxLongIndex = (MaxByteIndex - ByteIndex + 1) \ 4 - 1
-                    Else
-                        MaxLongIndex = (MaxCharIndex - CharIndex + 1) \ 2 - 1
-                    End If
+            ' do fast looping
+            If (MaxByteIndex - ByteIndex + 1) \ 2 < (MaxCharIndex - CharIndex + 1) Then
+                MaxLongIndex = (MaxByteIndex - ByteIndex + 1) \ 4 - 1
+            Else
+                MaxLongIndex = (MaxCharIndex - CharIndex + 1) \ 2 - 1
+            End If
 
-                    mLongCharsSA.PVData = CharsAddress + (CharIndex - CharsLB) * 2
-                    mLongBytesSA.PVData = BytesAddress + ByteIndex - BytesLB
+            mLongCharsSA.PVData = CharsAddress + (CharIndex - CharsLB) * 2
+            mLongBytesSA.PVData = BytesAddress + ByteIndex - BytesLB
 
-                    SAPtr(LongChars) = mLongCharsSAPtr
-                    SAPtr(LongBytes) = mLongBytesSAPtr
+            SAPtr(LongChars) = mLongCharsSAPtr
+            SAPtr(LongBytes) = mLongBytesSAPtr
 
-                    For LongIndex = 0 To MaxLongIndex
-                        LongByte = LongBytes(LongIndex)
+            For LongIndex = 0 To MaxLongIndex
+                LongByte = LongBytes(LongIndex)
 
-                        ' Does bit logic to determine if valid or invalid surrogate pair exists.
-                        If LongByte And &H80808080 Then
-                            Dim Temp As Long
+                ' Does bit logic to determine if valid or invalid surrogate pair exists.
+                If LongByte And &H80808080 Then
+                    Dim Temp As Long
 
-                            Temp = (LongByte And &HF800F800) Xor &HD800D800
+                    Temp = (LongByte And &HF800F800) Xor &HD800D800
 
-                            If (Temp And &HFFFF0000) = 0 Or (Temp And &HFFFF&) = 0 Then
-                                If ((LongByte And &HFC00FC00) Xor &HDC00D800) <> 0 Then
-                                    Exit For
-                                End If
-                            End If
+                    If (Temp And &HFFFF0000) = 0 Or (Temp And &HFFFF&) = 0 Then
+                        If ((LongByte And &HFC00FC00) Xor &HDC00D800) <> 0 Then
+                            Exit For
                         End If
-
-                        LongChars(LongIndex) = LongByte
-                    Next
-
-                    SAPtr(LongChars) = vbNullPtr
-                    SAPtr(LongBytes) = vbNullPtr
-
-                    CharIndex = CharIndex + LongIndex * 2
-                    ByteIndex = ByteIndex + LongIndex * 4
-                    ByteCount = ByteCount - LongIndex * 4
-
-                    If ByteCount < 1 Then
-                        Exit Do
                     End If
                 End If
+
+                LongChars(LongIndex) = LongByte
+            Next
+
+            SAPtr(LongChars) = vbNullPtr
+            SAPtr(LongBytes) = vbNullPtr
+
+            CharIndex = CharIndex + LongIndex * 2
+            ByteIndex = ByteIndex + LongIndex * 4
+            ByteCount = ByteCount - LongIndex * 4
+
+            If ByteCount < 1 Then
+                Exit Do
             End If
         End If
         
