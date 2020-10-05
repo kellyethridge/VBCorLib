@@ -56,6 +56,7 @@ Private mBigEndianUnicode   As UnicodeEncoding
 Private mEncodings          As New Hashtable
 Private mEncodingTable      As New EncodingTable
 Private mDefault            As Encoding
+Private mEncodingInfos()    As EncodingInfo
 
 
 ''
@@ -274,7 +275,11 @@ End Function
 ' @return An array of classes containing a minimal of information.
 '
 Public Function GetEncodings() As EncodingInfo()
-    GetEncodings = mEncodingTable.GetEncodings
+    If CorArray.IsNullOrEmpty(mEncodingInfos) Then
+        mEncodingInfos = EncodingTable.GetEncodings
+    End If
+    
+    GetEncodings = mEncodingInfos
 End Function
 
 ''

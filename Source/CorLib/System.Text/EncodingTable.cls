@@ -114,7 +114,7 @@ Friend Function GetEncodings() As EncodingInfo()
         Set Encodings(i) = New EncodingInfo
         
         With mEncodingData(i)
-            Encodings(i).Init .CodePage, .WebName, .EncodingName
+            Encodings(i).Init .CodePage, .EncodingName, .WebName
         End With
     Next i
     
