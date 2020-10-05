@@ -685,7 +685,7 @@ Private Function ReadOneChar() As Long
     If ReadCharBytes(mSingleChar, 0, 1) = 0 Then
         ReadOneChar = NoChars
     Else
-        AsWord(ReadOneChar) = mSingleChar(0)
+        ReadOneChar = mSingleChar(0) And &HFFFF&
     End If
 End Function
 
@@ -741,6 +741,13 @@ Private Function ReadCharBytes(ByRef Chars() As Integer, ByVal Index As Long, By
     Dim BufferPos           As Long
     Dim TotalCharsRead      As Long
     Dim NumberOfCharsRead   As Long
+    Dim SavedPosition       As Long
+    
+    If mStream.CanSeek Then
+        SavedPosition = mStream.Position
+    End If
+    
+    On Error GoTo Catch
     
     Do While TotalCharsRead < Count
         SingleByte = mStream.ReadByte
@@ -763,6 +770,14 @@ Private Function ReadCharBytes(ByRef Chars() As Integer, ByVal Index As Long, By
     Loop
     
     ReadCharBytes = TotalCharsRead
+    Exit Function
+    
+Catch:
+    If mStream.CanSeek Then
+        mStream.SeekPosition SavedPosition - mStream.Position, FromCurrent
+    End If
+    
+    ThrowOrErr Err
 End Function
 
 Private Function ReadStringLength() As Long
