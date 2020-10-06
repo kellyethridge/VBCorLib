@@ -20,6 +20,12 @@ version 3.x
 	* Fixed #53 - CorString.Split with RemoveEmptyEntries fails with multiple contiguous separators.
 	* Closed #47 - Optimized CorString.Split when using string separator or one-dimension array.
 	* Fixed #58 - UTF32Encoding should include character and index When throwing EncoderFallbackException.
+	* Fixed #66 - StringBuilder was not storing the updated capacity causing the backing field to be conintually re-allocated.
+	* Fixed #68 - Path class was not taking into consideration that characters can be negative when checking for illegal characters.
+	* Fixed #70 - Encoding fallbacks now correctly set Index and BytesUnknown when thrown.
+	* Fixed #71 - Addressed UTF8Encoding performance. Enhanced additional Encodings' performances as well.
+	* Fixed #72 - Remove all GoSub usage from project as it would cause severe performance issues when compiled.
+	* Fixed #69 - Added additional encodings by name, improving the retrieval of an Encoding.
 
 version 3.0 (BREAKING CHANGES)
 	* Renamed cArray to CorArray.

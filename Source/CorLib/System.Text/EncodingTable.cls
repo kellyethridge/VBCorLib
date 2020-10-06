@@ -53,9 +53,15 @@ Private Type DataItem
     WindowsCodePage     As Long
 End Type
 
+Private Type CodePageItem
+    WebName     As String
+    CodePage    As Long
+End Type
+
 Private mEncodingData()     As DataItem
 Private mIndexByCodePage    As Hashtable
 Private mCodePageByName     As Hashtable
+Private mCodePageItems()        As CodePageItem
 
 
 Friend Property Get BodyName(ByVal cp As Long) As String
@@ -94,15 +100,28 @@ Friend Property Get WindowsCodePage(ByVal cp As Long) As Long
     WindowsCodePage = mEncodingData(GetIndex(cp)).WindowsCodePage
 End Property
 
-Friend Function GetCodePage(ByRef Name As String) As Long
-    Dim CodePage As Variant
+Friend Function GetCodePage(ByRef Name As Variant) As Long
+    Dim Index As Long
+    Dim Hi As Long
+    Dim Lo As Long
+        
+    Hi = UBound(mCodePageItems)
     
-    CodePage = mCodePageByName(Name)
+    Do While Lo <= Hi
+        Index = (Lo + Hi) \ 2
+        
+        Select Case StrComp(Name, mCodePageItems(Index).WebName, vbTextCompare)
+            Case Is < 0
+                Hi = Index - 1
+            Case Is > 0
+                Lo = Index + 1
+            Case Else
+                GetCodePage = mCodePageItems(Index).CodePage
+                Exit Function
+        End Select
+    Loop
     
-    If IsEmpty(CodePage) Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_EncodingNotSupported, Name), "Name")
-    
-    GetCodePage = CodePage
+    Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_EncodingNotSupported, Name), "Name")
 End Function
 
 Friend Function GetEncodings() As EncodingInfo()
@@ -141,11 +160,53 @@ Private Function GetIndex(ByVal cp As Long) As Long
     End If
 End Function
 
+Private Sub LoadData()
+    LoadCodePageLookup
+    LoadEncodingInfos
+End Sub
+
+' The binary data is formatted that the first two bytes is the count in lo/hi byte format.
+' The encoding data is the name in ascii characters terminated by a null followed by two bytes
+' for the code page in lo/hi byte format.
+Private Sub LoadCodePageLookup()
+    Dim Data()      As Byte
+    Dim Ch          As Byte
+    Dim Name        As String
+    Dim CodePage    As Long
+    Dim Index       As Long
+    Dim DataUB      As Long
+    Dim CPIndex     As Long
+    Dim Count       As Long
+    
+    Data = LoadResData(101, "CODEPAGELOOKUP")
+    DataUB = UBound(Data)
+    Count = Data(0) Or (Data(1) * vbShift8Bits)
+    Index = 2
+    ReDim mCodePageItems(Count - 1)
+    
+    Do While Index < DataUB
+        Ch = Data(Index)
+        Index = Index + 1
+        
+        If Ch = 0 Then
+            CodePage = Data(Index) Or (Data(Index + 1) * vbShift8Bits)
+            Index = Index + 2
+            mCodePageItems(CPIndex).WebName = Name
+            mCodePageItems(CPIndex).CodePage = CodePage
+            
+            CPIndex = CPIndex + 1
+            Name = vbNullString
+        Else
+            Name = Name & Chr$(Ch)
+        End If
+    Loop
+End Sub
+
 ' The byte stream is formatted using a BinaryWriter.
 ' The first item written is the number of encodings in
 ' the stream, as a vbLong. The order to read in each item
 ' of an encoding is the same as defined in DataItem at the top.
-Private Sub LoadData()
+Private Sub LoadEncodingInfos()
     Dim Data()          As Byte
     Dim ms              As MemoryStream
     Dim Reader          As BinaryReader
@@ -157,17 +218,12 @@ Private Sub LoadData()
     NumEncodings = Reader.ReadInt32
     
     ReDim mEncodingData(0 To NumEncodings - 1)
-    
     Set mIndexByCodePage = New Hashtable
-    Set mCodePageByName = Cor.NewHashtable(EqualityComparer:=StringComparer.OrdinalIgnoreCase)
     
     Dim i As Long
     For i = 0 To NumEncodings - 1
         FillData Reader, mEncodingData(i)
         mIndexByCodePage.Add mEncodingData(i).CodePage, i
-        mCodePageByName(mEncodingData(i).WebName) = mEncodingData(i).CodePage
-        mCodePageByName(mEncodingData(i).BodyName) = mEncodingData(i).CodePage
-        mCodePageByName(mEncodingData(i).EncodingName) = mEncodingData(i).CodePage
     Next i
     
     Reader.CloseReader

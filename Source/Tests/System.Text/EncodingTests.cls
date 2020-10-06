@@ -39,8 +39,18 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "us-ascii", Encoding.ASCII
             Test.Use "utf-7", Encoding.UTF7
             Test.Use "utf-32", Encoding.UTF32
+            Test.Use "ascii", Encoding.ASCII
             
     End Select
+End Sub
+
+Public Sub GetEncoding_WithLatin5_ReturnsEncoding28599()
+    Dim Actual As Encoding
+    
+    Set Actual = Encoding.GetEncoding("latin5")
+    
+    Assert.That Actual.CodePage, Iz.EqualTo(28599)
+    Assert.That Actual.WebName, Iz.EqualTo("iso-8859-9")
 End Sub
 
 Public Sub Unicode_WhenCalled_ReturnsLittleEndianUnicodeEncoding()

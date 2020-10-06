@@ -227,7 +227,7 @@ Public Function GetEncoding(ByRef CodePageOrName As Variant, Optional ByVal Enco
     
     Select Case VarType(CodePageOrName)
         Case vbString
-            CodePage = mEncodingTable.GetCodePage(CStr(CodePageOrName))
+            CodePage = mEncodingTable.GetCodePage(CodePageOrName)
         Case vbLong, vbInteger, vbByte
             CodePage = CodePageOrName
         Case Else
@@ -254,18 +254,22 @@ Public Function GetEncoding(ByRef CodePageOrName As Variant, Optional ByVal Enco
         Case 12001
             Set GetEncoding = Cor.NewUTF32Encoding(True, True)
         Case Else
-            If mEncodings.Contains(CodePage) Then
-                Set GetEncoding = mEncodings(CodePage)
-            Else
-                Set GetEncoding = NewCodePageEncoding(CodePage)
-                mEncodings.Add CodePage, GetEncoding
-            End If
+            Set GetEncoding = GetOrCreateEncoding(mEncodings(CodePage), CodePage)
     End Select
     
     If Not EncoderFallback Is Nothing Or Not DecoderFallback Is Nothing Then
         Set GetEncoding = GetEncoding.Clone
         Set GetEncoding.EncoderFallback = IfObject(EncoderFallback, GetEncoding.EncoderFallback)
         Set GetEncoding.DecoderFallback = IfObject(DecoderFallback, GetEncoding.DecoderFallback)
+    End If
+End Function
+
+Private Function GetOrCreateEncoding(ByRef SearchResult As Variant, ByVal CodePage As Long) As Encoding
+    If IsEmpty(SearchResult) Then
+        Set GetOrCreateEncoding = NewCodePageEncoding(CodePage)
+        mEncodings.Add CodePage, GetOrCreateEncoding
+    Else
+        Set GetOrCreateEncoding = SearchResult
     End If
 End Function
 
