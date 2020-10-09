@@ -831,6 +831,15 @@ Public Sub AppendFormat_PlaceHolderWithMissingIndex_ThrowsFormatException()
     AssertFormatException Err
 End Sub
 
+Public Sub AppendFormat_WithArray_AppendsArrayTypeName()
+    Dim sb As New StringBuilder
+    Dim Arr(0) As Long
+    
+    sb.AppendFormat "{0}", Arr
+    
+    Assert.That sb.ToString, Iz.EqualTo("Long()")
+End Sub
+
 Public Sub AppendFormatEx_WithCustomFormatter_RequestsCorrectProvider()
     Dim sb As New StringBuilder
     Dim f As New FakeCustomFormatter
@@ -1017,5 +1026,13 @@ Public Sub ToString_WithSubString_ReturnsSubPortion()
     Actual = sb.ToString(2, 2)
     
     Assert.That Actual, Iz.EqualTo("cd")
+End Sub
+
+Public Sub Capacity_WhenSet_StoresCapacity()
+    Dim sb As New StringBuilder
+    
+    sb.Capacity = 1024
+    
+    Assert.That sb.Capacity, Iz.EqualTo(1024)
 End Sub
 

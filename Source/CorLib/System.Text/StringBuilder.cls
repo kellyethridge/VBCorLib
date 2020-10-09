@@ -243,6 +243,8 @@ Public Property Let Capacity(ByVal Value As Long)
             Erase mString
             SAPtr(mString) = SafeArrayCreateVector(vbString, 0, 0)
         End If
+        
+        mCapacity = Value
     End If
 End Property
 
@@ -268,6 +270,7 @@ End Property
 ' @remarks <p><i>Index</i> is zero-based.</p>
 ' <p>Setting a character can only replace an existing character. A character cannot be appended using this method.
 ' To append a character use <a href="StringBuilder.AppendChar.html">StringBuilder.AppendChar</a>.</p>
+' @see #AppendChar
 Public Property Let Chars(ByVal Index As Long, ByVal Char As Integer)
     If Index < 0 Or Index >= mLength Then _
         Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_Index
@@ -741,15 +744,12 @@ Public Function AppendFormatArrayEx(ByVal Provider As IFormatProvider, ByRef For
     End If
     
     Set AppendFormatArrayEx = Me
-    GoSub Finally
+    FreeChars FormatChars
     Exit Function
     
 Catch:
-    GoSub Finally
-    Throw
-Finally:
     FreeChars FormatChars
-    Return
+    ThrowOrErr Err
 End Function
 
 
@@ -834,15 +834,12 @@ Private Sub AppendCharsValue(ByRef Value As Variant, ByRef StartIndex As Variant
 
     AppendCharsCore Chars, Range.Index, Range.Count
     
-    GoSub Finally
+    FreeChars Chars
     Exit Sub
 
 Catch:
-    GoSub Finally
-    Throw
-Finally:
     FreeChars Chars
-    Return
+    ThrowOrErr Err
 End Sub
 
 Private Sub AppendStringValue(ByRef Value As Variant, ByRef StartIndex As Variant, ByRef Count As Variant)

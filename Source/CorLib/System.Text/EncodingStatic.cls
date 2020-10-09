@@ -38,14 +38,13 @@ Attribute VB_Exposed = True
 ''
 ' Provides static methods used to retrieve existing encodings and convert between encodings.
 '
-' @remarks This class cannot be directly instantiated. To access the methods, use the variable name directly.
-' <pre>
-' Dim en As Encoding
-' Set en = Encoding.UTF8
-' </pre>
-'
 ' @see Encoding
-'
+' @see ASCIIEncoding
+' @see UTF7Encoding
+' @see UTF8Encoding
+' @see UTF32Encoding
+' @see UnicodeEncoding
+' @include "..\DocIncludes\Encoding.html"
 Option Explicit
 
 Private mUTF32              As UTF32Encoding
@@ -57,13 +56,27 @@ Private mBigEndianUnicode   As UnicodeEncoding
 Private mEncodings          As New Hashtable
 Private mEncodingTable      As New EncodingTable
 Private mDefault            As Encoding
+Private mEncodingInfos()    As EncodingInfo
 
 
 ''
-' Returns the default ANSI Encoding for the system.
+' Gets an encoding for the operating system's current ANSI code page.
 '
-' @return Default system encoding.
-'
+' @return An encoding for the operating system's current ANSI code page.
+' @remarks <table style="width: auto">
+'   <tr><th>Caution</th></tr>
+'   <tr>
+'       <td>Different computers can use different encodings as the default, and the default encoding can even change on a single computer.
+'           Therefore, data streamed from one computer to another or even retrieved at different times on the same computer might be translated incorrectly.
+'           In addition, the encoding returned by the <b>Default</b> property uses best-fit fallback to map unsupported characters to characters supported by the code page.
+'           For these two reasons, using the default encoding is generally not recommended. To ensure that encoded bytes are decoded properly, your application
+'           should use a Unicode encoding, such as <a href="UTF8Encoding.html">UTF8Encoding</a> or <a href="UnicodeEncoding.html">UnicodeEncoding</a>, with a preamble.
+'           Another option is to use a higher-level protocol to ensure that the same format is used for encoding and decoding.</td>
+'   </tr>
+' </table>
+' <p>The system ANSI code page defined by <b>Default</b> covers the ASCII set of characters, but the encoding is different from the encoding for ASCII.
+' Because all <b>Default</b> encodings lose data, your application might use <a href="EncodingStatic.Get.UTF8.html">UTF8</a> instead. UTF-8 is often
+' identical in the U+00 to U+7F range, but can encode other characters without loss.</p>
 Public Property Get Default() As Encoding
     If mDefault Is Nothing Then
         Set mDefault = GetEncoding(0)
@@ -76,8 +89,7 @@ End Property
 ' Gets an encoding for the UTF-16 format that uses the big endian byte order.
 '
 ' @return An encoding object for the UTF-16 format that uses the big endian byte order.
-' @remarks This encoding is constructed using <a href="Constructors.NewUnicodeEncoding.html">Cor.NewUnicodeEncoding(True, True)</a>
-' and may not be appropriate for your application.
+' @include "..\DocIncludes\Encoding.Get.BigEndianUnicode.html"
 Public Property Get BigEndianUnicode() As UnicodeEncoding
     If mBigEndianUnicode Is Nothing Then
         Set mBigEndianUnicode = Cor.NewUnicodeEncoding(True, True)
@@ -90,8 +102,7 @@ End Property
 ' Gets an encoding for the UTF-16 format using the little endian byte order.
 '
 ' @return An encoding for the UTF-16 format using the little endian byte order.
-' @remarks This encoding is constructed using <a href="Constructors.NewUnicodeEncoding.html">Cor.NewUnicodeEncoding(False, True)</a>
-' and may not be appropriate for your application.
+' @include "..\DocIncludes\Encoding.Get.Unicode.html"
 Public Property Get Unicode() As UnicodeEncoding
     If mUnicode Is Nothing Then
         Set mUnicode = Cor.NewUnicodeEncoding(False, True)
@@ -104,7 +115,7 @@ End Property
 ' Gets an encoding for the ASCII (7-bit) character set.
 '
 ' @return An encoding for the ASCII (7-bit) character set.
-' @remarks This encoding is declared as New ASCIIEncoding.
+' @include "..\DocIncludes\Encoding.Get.ASCII.html"
 Public Property Get ASCII() As ASCIIEncoding
     If mASCII Is Nothing Then
         Set mASCII = New ASCIIEncoding
@@ -117,7 +128,7 @@ End Property
 ' Gets an encoding for the UTF-7 format.
 '
 ' @return An encoding for the UTF-7 format.
-' @remarks This encoding is declared as New UTF7Encoding.
+' @include "..\DocIncludes\Encoding.Get.UTF7.html"
 Public Property Get UTF7() As UTF7Encoding
     If mUTF7 Is Nothing Then
         Set mUTF7 = New UTF7Encoding
@@ -130,8 +141,7 @@ End Property
 ' Gets an encoding for the UTF-8 format.
 '
 ' @return An encoding for the UTF-8 format.
-' @remarks This encoding is constructed using <a href="Constructors.NewUTF8Encoding.html">Cor.NewUTF8Encoding(True)</a>
-' and may not be appropriate for your application.
+' @include "..\DocIncludes\Encoding.Get.UTF8.html"
 Public Property Get UTF8() As UTF8Encoding
     If mUTF8 Is Nothing Then
         Set mUTF8 = Cor.NewUTF8Encoding(True)
@@ -144,12 +154,7 @@ End Property
 ' Gets an encoding for the UTF-32 format using the little endian byte order.
 '
 ' @return An encoding object for the UTF-32 format using the little endian byte order.
-' @remarks The <a href="UTF32Encoding.html">UTF32Encoding</a> object that is returned by this property
-' may not have the appropriate behavior for your app. It uses replacement fallback to replace each
-' string that it cannot encode and each byte that it cannot decode with the Unicode REPLACEMENT CHARACTER (U+FFFE).
-' Instead, you can call the <a href="Cor.NewUTF32Encoding.html">NewUTF32Encoding(Boolean, Boolean, Boolean)</a>
-' constructor to instantiate a <a href="UTF32Encoding.html">UTF32Encoding</a> object whose fallback is either an
-' <a href="EncoderFallbackException.html">EncoderFallbackException</a> or a <a href="DecoderFallbackException.html">DecoderFallbackException</a>.
+' @include "..\DocIncludes\Encoding.Get.UTF32.html"
 Public Property Get UTF32() As UTF32Encoding
     If mUTF32 Is Nothing Then
         Set mUTF32 = Cor.NewUTF32Encoding(False, True)
@@ -161,13 +166,43 @@ End Property
 ''
 ' Converts a set of bytes from one encoding to another encoding.
 '
-' @param srcEncoding The encoding to be used to decode the bytes.
-' @param dstEncoding The encoding to be used to re-encode the decoded characters.
-' @param Bytes The bytes to be converted from one encoding to the other.
-' @param Index The starting byte to begin decoding at.
-' @param Count The number of bytes to be included in the decoding process.
-' @return The encoded bytes.
-'
+' @param SrcEncoding The encoding of the source array, <i>Bytes</i>.
+' @param DstEncoding The encoding of the output array.
+' @param Bytes The array of bytes to convert.
+' @param Index The index of the first element of <i>Bytes</i> to convert.
+' @param Count The number of bytes to convert.
+' @return An array of bytes containing the result of converting a range of bytes in bytes from <i>SrcEncoding</i> to <i>DstEncoding</i>.
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th><th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ArgumentNullException.html">ArgumentNullException</a></td>
+'        <td><i>SrcEncoding</i> is <b>Nothing</b>.<br>
+'           -or-<br>
+'           <i>DstEncoding</i> is <b>Nothing</b>.<br>
+'           -or-<br>
+'           <i>Bytes</i> is uninitialized.
+'        </td>
+'   </tr>
+'   <tr>
+'       <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+'       <td><i>Index</i> and <i>Count</i> do not specify a valid range in the byte array.</td>
+'   </tr>
+'   <tr>
+'       <td><a href="DecoderFallbackException.html">DecoderFallbackException</a></td>
+'       <td>A fallback occurred<br>
+'           -and-<br>
+'           <b>SrcEncoding</b>.<a href="Encoding.Get.DecoderFallback.html">DecoderFallback</a> is set to <a href="DecoderExceptionFallback.html">DecoderExceptionFallback</a>.</td>
+'   </tr>
+'   <tr>
+'       <td><a href="EncoderFallbackException.html">EncoderFallbackException</a></td>
+'       <td>A fallback occurred<br>
+'           -and-<br>
+'           <b>DstEncoding</b>.<a href="Encoding.Get.EncoderFallback.html">EncoderFallback</a> is set to <a href="EncoderExceptionFallback.html">EncoderExceptionFallback</a>.</td>
+'   </tr>
+' </table>
 Public Function Convert(ByVal SrcEncoding As Encoding, ByVal DstEncoding As Encoding, ByRef Bytes() As Byte, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Byte()
     If SrcEncoding Is Nothing Then _
         Error.ArgumentNull "SrcEncoding"
@@ -180,18 +215,19 @@ Public Function Convert(ByVal SrcEncoding As Encoding, ByVal DstEncoding As Enco
 End Function
 
 ''
-' Returns an encoding for a specified codepage.
+' Returns the encoding associated with the specified code page identifier or name. Optional parameters specify an error handler for characters that cannot be encoded and byte sequences that cannot be decoded.
 '
-' @param CodePageOrName The codepage number or name to encode with or 0 (zero) to use the default encoding.
+' @param CodePageOrName The code page number or name to encode with or 0 (zero) to use the default encoding.
 ' @param EncoderFallback An object that provides an error-handling procedure when a character cannot be encoded with the current encoding.
 ' @param DecoderFallback An object that provides an error-handling procedure when a byte sequence cannot be decoded with the current encoding.
 ' @return An encoding for a specific codepage or name.
+' @include "..\DocIncludes\Encoding.GetEncoding.html"
 Public Function GetEncoding(ByRef CodePageOrName As Variant, Optional ByVal EncoderFallback As EncoderFallback, Optional ByVal DecoderFallback As DecoderFallback) As Encoding
     Dim CodePage As Long
     
     Select Case VarType(CodePageOrName)
         Case vbString
-            CodePage = mEncodingTable.GetCodePage(CStr(CodePageOrName))
+            CodePage = mEncodingTable.GetCodePage(CodePageOrName)
         Case vbLong, vbInteger, vbByte
             CodePage = CodePageOrName
         Case Else
@@ -218,12 +254,7 @@ Public Function GetEncoding(ByRef CodePageOrName As Variant, Optional ByVal Enco
         Case 12001
             Set GetEncoding = Cor.NewUTF32Encoding(True, True)
         Case Else
-            If mEncodings.Contains(CodePage) Then
-                Set GetEncoding = mEncodings(CodePage)
-            Else
-                Set GetEncoding = NewCodePageEncoding(CodePage)
-                mEncodings.Add CodePage, GetEncoding
-            End If
+            Set GetEncoding = GetOrCreateEncoding(mEncodings(CodePage), CodePage)
     End Select
     
     If Not EncoderFallback Is Nothing Or Not DecoderFallback Is Nothing Then
@@ -233,13 +264,26 @@ Public Function GetEncoding(ByRef CodePageOrName As Variant, Optional ByVal Enco
     End If
 End Function
 
+Private Function GetOrCreateEncoding(ByRef SearchResult As Variant, ByVal CodePage As Long) As Encoding
+    If IsEmpty(SearchResult) Then
+        Set GetOrCreateEncoding = NewCodePageEncoding(CodePage)
+        mEncodings.Add CodePage, GetOrCreateEncoding
+    Else
+        Set GetOrCreateEncoding = SearchResult
+    End If
+End Function
+
 ''
 ' Returns a list of minimal information about each encoding.
 '
 ' @return An array of classes containing a minimal of information.
 '
 Public Function GetEncodings() As EncodingInfo()
-    GetEncodings = mEncodingTable.GetEncodings
+    If CorArray.IsNullOrEmpty(mEncodingInfos) Then
+        mEncodingInfos = EncodingTable.GetEncodings
+    End If
+    
+    GetEncodings = mEncodingInfos
 End Function
 
 ''

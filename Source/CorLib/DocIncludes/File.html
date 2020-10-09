@@ -1,0 +1,59 @@
+@remarks Use the <b>File</b> class for typical operations such as copying, moving, renaming, creating, opening, deleting, and appending to files. You can also use the <b>File</b> class to get and set file attributes or date and time information related to the creation, access, and writing of a file.
+<p>Many of the <b>File</b> methods return other I/O types when you create or open files. You can use these other types to further manipulate a file. For more information, see specific <b>File</b> members such as <a href="File.OpenText.html">OpenText</a>, <a href="File.CreateText.html">CreateText</a>, or <a href="File.Create.html">Create</a>.</p>
+<p>Because all <b>File</b> methods are static, it might be more efficient to use a <b>File</b> method rather than a corresponding <a href="FileInfo.html">FileInfo</a> instance method if you want to perform only one action. All <b>File</b> methods require the path to the file that you are manipulating.</p>
+<p>By default, full read/write access to new files is granted to all users.</p>
+<p>The following table describes the enumerations that are used to customize the behavior of various <b>File</b> methods.</p>
+<table style="width: auto">
+	<tr>
+		<th>Enumeration</th><th>Description</th>
+	</tr>
+	<tr>
+		<td><a href="FileStream.FileAccess.html">FileAccess</a></td>
+		<td>Specifies read and write access to a file.</td>
+	</tr>
+	<tr>
+		<td><a href="FileStream.FileShare.html">FileShare</a></td>
+		<td>Specifies the level of access permitted for a file that is already in use.</td>
+	</tr>
+	<tr>
+		<td><a href="FileStream.FileMode.html">FileMode</a></td>
+		<td>Specifies whether the contents of an existing file are preserved or overwritten, and whether requests to create an existing file cause an exception.</td>
+	</tr>
+</table>
+<table style="width: auto">
+	<tr>
+		<th>Note</th>
+	</tr>
+	<tr>
+		<td>In members that accept a path as an input string, that path must be well-formed or an exception is raised. For example, if a path is fully qualified but begins with a space, the path is not trimmed in methods of the class. Therefore, the path is malformed and an exception is raised. Similarly, a path or a combination of paths cannot be fully qualified twice. For example, "c:\temp c:\windows" also raises an exception in most cases. Ensure that your paths are well-formed when using methods that accept a path string.</td>
+	</tr>
+</table>
+<p>In members that accept a path, the path can refer to a file or just a directory. The specified path can also refer to a relative path or a Universal Naming Convention (UNC) path for a server and share name. For example, all the following are acceptable paths:</p>
+<ul>
+	<li>"c:\MyDir\MyFile.txt"</li>
+	<li>"c:\MyDir"</li>
+	<li>"MyDir\MySubDir"</li>
+	<li>"\\MyServer\MyShare"</li>
+</ul>
+@examples The following example demonstrates how to use the <b>File</b> class to check whether a file exists, and depending on the result, either create a new file and write to it, or open the existing file and read from it.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Const</span> Path <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span> = <span style="color: #a31515">&quot;c:\temp\MyTest.txt&quot;</span>
+
+    <span style="color: #0000ff">If</span> <span style="color: #0000ff">Not</span> File.Exists(Path) <span style="color: #0000ff">Then</span>
+        <span style="color: #008000">&#39; Create a file to write to.</span>
+        <span style="color: #0000ff">Dim</span> sw <span style="color: #0000ff">As</span> StreamWriter
+        <span style="color: #0000ff">Set</span> sw = File.CreateText(Path)
+        sw.WriteLine <span style="color: #a31515">&quot;Hello&quot;</span>
+        sw.WriteLine <span style="color: #a31515">&quot;And&quot;</span>
+        sw.WriteLine <span style="color: #a31515">&quot;Welcome&quot;</span>
+        sw.Flush
+    <span style="color: #0000ff">End</span> <span style="color: #0000ff">If</span>
+
+    <span style="color: #008000">&#39; Open the file to read from.</span>
+    <span style="color: #0000ff">Dim</span> sr <span style="color: #0000ff">As</span> StreamReader
+    <span style="color: #0000ff">Set</span> sr = File.OpenText(Path)
+    <span style="color: #0000ff">Do</span> <span style="color: #0000ff">While</span> sr.Peek &gt;= 0
+        Debug.Print sr.ReadLine
+    <span style="color: #0000ff">Loop</span>
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+</pre></div>

@@ -11,6 +11,11 @@ Public Const CAL_ITWODIGITYEARMAX As Long = &H30
 Public Const LOCALE_RETURN_NUMBER As Long = &H20000000
 Public Const CAL_RETURN_NUMBER As Long = LOCALE_RETURN_NUMBER
 
+
+Public Function Len1D(ByRef Arr As Variant) As Long
+    Len1D = UBound(Arr) - LBound(Arr) + 1
+End Function
+
 Public Function Missing(Optional ByRef Value As Variant) As Variant
     Missing = Value
 End Function

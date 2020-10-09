@@ -42,6 +42,9 @@ Option Explicit
 Implements IObject
 Implements Decoder
 
+Private Const UnsetLastByte As Long = -1
+Private Const UnsetLastChar As Long = 0
+
 Private mEncoding       As UnicodeEncoding
 Private mFallback       As DecoderFallback
 Private mFallbackBuffer As DecoderFallbackBuffer
@@ -58,6 +61,11 @@ Friend Property Get LastByte() As Long
     LastByte = mLastByte
 End Property
 
+Friend Function GetAndClearLastByte() As Long
+    GetAndClearLastByte = mLastByte
+    mLastByte = UnsetLastByte
+End Function
+
 Friend Property Let LastByte(ByVal Value As Long)
     mLastByte = Value
 End Property
@@ -69,6 +77,11 @@ End Property
 Friend Property Let LastChar(ByVal Value As Long)
     mLastChar = Value
 End Property
+
+Friend Function GetAndClearLastChar() As Long
+    GetAndClearLastChar = mLastChar
+    mLastChar = UnsetLastChar
+End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -151,8 +164,8 @@ Private Function Decoder_GetChars(Bytes() As Byte, ByVal ByteIndex As Long, ByVa
 End Function
 
 Private Sub Decoder_Reset()
-    mLastByte = -1
-    mLastChar = 0
+    mLastByte = UnsetLastByte
+    mLastChar = UnsetLastChar
     
     If Not mFallbackBuffer Is Nothing Then
         mFallbackBuffer.Reset

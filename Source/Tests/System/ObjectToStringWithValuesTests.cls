@@ -83,6 +83,12 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             ' UDT
             Test.Use NewInt64(1, 0), "1"
             
+            ' Array
+            Test.Use Array(), "Variant()"
+            
+            ReDim Longs(0) As Long
+            Test.Use Longs, "Long()"
+            
         Case "ToString_WithIntegerUsingFormat_ReturnsExpected"
             Test.Use -1, "x", "ffff"
             Test.Use -1, "X", "FFFF"

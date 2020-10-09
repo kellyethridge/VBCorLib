@@ -65,8 +65,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = MyBase.Equals(Me, Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = MyBase.GetHashCode(Me)
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = MyBase.GetHashCode(Me)
 End Function
 
 Private Function IObject_ToString() As String
@@ -78,7 +78,7 @@ End Function
 '   ICollection Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub ICollection_CopyTo(Arr As Variant, ByVal Index As Long)
-    Call mList.CopyValues(Arr, Index)
+    mList.CopyValues Arr, Index
 End Sub
 
 Private Property Get ICollection_Count() As Long

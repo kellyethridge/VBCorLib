@@ -1008,16 +1008,13 @@ Private Function CustomFormat(ByRef dt As CorDateTime, ByRef Pattern As String) 
         Throw Cor.NewFormatException("A matching quote was not found in the format string.")
     
     CustomFormat = StringBuilderCache.GetStringAndRelease(sb)
-    GoSub Finally
+    FreeChars PatternChars
     Exit Function
     
 Catch:
-    GoSub Finally
+    FreeChars PatternChars
     StringBuilderCache.Release sb
     ThrowOrErr Err
-Finally:
-    FreeChars PatternChars
-    Return
 End Function
 
 Private Function GetSecondsFraction(ByRef Ticks As Variant) As Long

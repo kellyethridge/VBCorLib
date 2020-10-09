@@ -1,0 +1,86 @@
+@remarks The elements are copied to the array in the same order in which the enumerator iterates through the <a href="Hashtable.html">Hashtable</a>.
+<p>To copy only the keys in the <a href="Hashtable.html">Hashtable</a>, use <code>Hashtable.Keys.CopyTo</code>.</p>
+<p>To copy only the values in the <a href="Hashtable.html">Hashtable</a>, use <code>Hashtable.Values.CopyTo</code>.</p>
+<p>This method is an O(<i>n</i>) operation, where <i>n</i> is <a href="Hashtable.Get.Count.html">Count</a>.</p>
+@exceptions
+<table style="width: auto">
+	<tr>
+		<th>Exception</th><th>Condition</th>
+	</tr>
+	<tr>
+		<td><a href="ArgumentNullException.html">ArgumentNullException</a></td>
+		<td><i>Arr</i> is uninitialized.</td>
+	</tr>
+	<tr>
+		<td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+		<td><i>ArrayIndex</i> is less than lowerbound.</td>
+	</tr>
+	<tr>
+		<td><a href="ArgumentException.html">ArgumentException</a></td>
+		<td><i>Arr</i> is multidimensional.<br/>
+			-or-<br/>
+			The number of elements in the source <a href="Hashtable.html">Hashtable</a> is greater than the available space from <i>ArrayIndex</i> to the end of the destination <i>Arr</i>.
+		</td>
+	</tr>
+	<tr>
+		<td><a href="InvalidCastException.html">InvalidCastException</a></td>
+		<td>The type of the source <a href="Hashtable.html">Hashtable</a> cannot be cast automatically to the type of the destination <i>Arr</i>.</td>
+	</tr>
+</table>
+@examples The following example shows how to copy the list of keys or the list of values in a <a href="Hashtable.html">Hashtable</a> into a one-dimensional Array.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #008000">&#39; Creates and initializes the source Hashtable.</span>
+    <span style="color: #0000ff">Dim</span> MySourceHT <span style="color: #0000ff">As</span> <span style="color: #0000ff">New</span> Hashtable
+    MySourceHT.Add <span style="color: #a31515">&quot;A&quot;</span>, <span style="color: #a31515">&quot;valueA&quot;</span>
+    MySourceHT.Add <span style="color: #a31515">&quot;B&quot;</span>, <span style="color: #a31515">&quot;valueB&quot;</span>
+    
+    <span style="color: #008000">&#39; Creates and initializes the one-dimensional target Array.</span>
+    <span style="color: #0000ff">Dim</span> MyTargetArray(14) <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+    MyTargetArray(0) = <span style="color: #a31515">&quot;The&quot;</span>
+    MyTargetArray(1) = <span style="color: #a31515">&quot;quick&quot;</span>
+    MyTargetArray(2) = <span style="color: #a31515">&quot;brown&quot;</span>
+    MyTargetArray(3) = <span style="color: #a31515">&quot;fox&quot;</span>
+    MyTargetArray(4) = <span style="color: #a31515">&quot;jumped&quot;</span>
+    MyTargetArray(5) = <span style="color: #a31515">&quot;over&quot;</span>
+    MyTargetArray(6) = <span style="color: #a31515">&quot;the&quot;</span>
+    MyTargetArray(7) = <span style="color: #a31515">&quot;lazy&quot;</span>
+    MyTargetArray(8) = <span style="color: #a31515">&quot;dog&quot;</span>
+    
+    <span style="color: #008000">&#39; Displays the values of the target Array.</span>
+    Debug.Print <span style="color: #a31515">&quot;The target Array contains the following before:&quot;</span>
+    PrintValues MyTargetArray
+
+    <span style="color: #008000">&#39; Copies the keys in the source Hashtable to the target Hashtable, starting at index 6.</span>
+    Debug.Print <span style="color: #a31515">&quot;After copying the keys, starting at index 6:&quot;</span>
+    MySourceHT.Keys.CopyTo MyTargetArray, 6
+
+    <span style="color: #008000">&#39; Displays the values of the target Array.</span>
+    PrintValues MyTargetArray
+
+    <span style="color: #008000">&#39; Copies the values in the source Hashtable to the target Hashtable, starting at index 6.</span>
+    Debug.Print <span style="color: #a31515">&quot;After copying the values, starting at index 6:&quot;</span>
+    MySourceHT.Values.CopyTo MyTargetArray, 6
+
+    <span style="color: #008000">&#39; Displays the values of the target Array.</span>
+    PrintValues MyTargetArray
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> PrintValues(<span style="color: #0000ff">ByRef</span> MyArr() <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>)
+    <span style="color: #0000ff">Dim</span> i <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
+    
+    <span style="color: #0000ff">For</span> i = LBound(MyArr) <span style="color: #0000ff">To</span> UBound(MyArr)
+        Debug.Print <span style="color: #a31515">&quot; &quot;</span> &amp; MyArr(i)<span style="border: 1px solid #FF0000">;</span>
+    <span style="color: #0000ff">Next</span>
+    
+    Debug.Print
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span> <span style="color: #008000">&#39;PrintValues</span>
+
+<span style="color: #008000">&#39; This example code produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    The target Array contains the following before:</span>
+<span style="color: #008000">&#39;     The quick brown fox jumped over the lazy dog</span>
+<span style="color: #008000">&#39;    After copying the keys, starting at index 6:</span>
+<span style="color: #008000">&#39;     The quick brown fox jumped over A B dog</span>
+<span style="color: #008000">&#39;    After copying the values, starting at index 6:</span>
+<span style="color: #008000">&#39;     The quick brown fox jumped over valueA valueB dog</span>
+</pre></div>

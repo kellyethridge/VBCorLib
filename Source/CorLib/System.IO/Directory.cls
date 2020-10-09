@@ -38,6 +38,9 @@ Attribute VB_Exposed = True
 ''
 ' Provides a set of static methods for manipulating and retrieving directory information.
 '
+' @remarks Use the <b>Directory</b> class for typical operations such as copying, moving, renaming, creating, and deleting directories.
+' You can also use the <b>Directory</b> class to get and set DateTime information related to the creation, access, and writing of a directory.
+' @include "..\DocIncludes\Directory.html"
 Option Explicit
 
 Private Const FILE_FLAG_BACKUP_SEMANTICS        As Long = &H2000000
@@ -48,6 +51,13 @@ Private Enum SystemEntryTypes
     DirectoryEntry = 2
 End Enum
 
+''
+' Specifies whether to search the current directory, or the current directory and all subdirectories.
+'
+' @param AllDirectories Includes the current directory and all the subdirectories in a search operation. This option includes reparse points like mounted drives and symbolic links in the search.
+' @param TopDirectoryOnly Includes only the current directory in a search.
+' @remarks If you choose <b>AllDirectories</b> in your search and the directory structure contains a link that creates a loop, the search operation enters an infinite loop.
+' @include "..\DocIncludes\Directory.SearchOption.html"
 Public Enum SearchOption
     AllDirectories
     TopDirectoryOnly

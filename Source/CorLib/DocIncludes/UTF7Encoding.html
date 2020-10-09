@@ -1,0 +1,50 @@
+@remarks <p>Encoding is the process of transforming a set of Unicode characters into a sequence of bytes. Decoding is the process of transforming a sequence of encoded bytes into a set of Unicode characters.</p>
+<p>The UTF-7 encoding represents Unicode characters as sequences of 7-bit ASCII characters. This encoding supports certain protocols for which it is required, most often e-mail or newsgroup protocols. Since UTF-7 is not particularly secure or robust, and most modern systems allow 8-bit encodings, UTF-8 should normally be preferred to UTF-7.</p>
+<table style="width: auto">
+	<tr>
+		<th>Caution</th>
+	</tr>
+	<tr>
+		<td><b>UTF7Encoding</b> does not provide error detection. For security reasons, you should use <a href="UTF8Encoding.html">UTF8Encoding</a>, <a href="UnicodeEncoding.html">UnicodeEncoding</a>, or <a href="UTF32Encoding.html">UTF32Encoding</a> and enable error detection.</td>
+	</tr>
+</table>
+<p>Information about the UTF-7 encoding scheme can be found at <a href="http://www.faqs.org/rfcs/rfc2152.html">http://www.faqs.org/rfcs/rfc2152.html</a>.</p>
+<p>The <a href="UTF7Encoding.GetByteCount.html">GetByteCount</a> method determines how many bytes result in encoding a set of Unicode characters, and the <a href="UTF7Encoding.GetBytes.html">GetBytes</a> method performs the actual encoding.</p>
+<p>Likewise, the <a href="UTF7Encoding.GetCharCount.html">GetCharCount</a> method determines how many characters result in decoding a sequence of bytes, and the <a href="UTF7Encoding.GetChars.html">GetChars</a> and <a href="UTF7Encoding.GetString.html">GetString</a> methods perform the actual decoding.</p>
+<p><b>UTF7Encoding</b> corresponds to the Windows code page 65000.</p>
+@examples The following code example demonstrates how to use a <b>UTF7Encoding</b> to encode a string of Unicode characters and store them in a byte array. Notice that when the byte array is decoded back to a string, no data is lost.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> UTF7            <span style="color: #0000ff">As</span> <span style="color: #0000ff">New</span> UTF7Encoding
+    <span style="color: #0000ff">Dim</span> UnicodeString   <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+    <span style="color: #0000ff">Dim</span> EncodedBytes()  <span style="color: #0000ff">As</span> <span style="color: #2b91af">Byte</span>
+    <span style="color: #0000ff">Dim</span> DecodedString   <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+    <span style="color: #0000ff">Dim</span> b               <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>
+    
+    <span style="color: #0000ff">Set</span> Console.OutputEncoding = Encoding.UTF8
+    
+    <span style="color: #008000">&#39; A Unicode string with two characters outside a 7-bit code range.</span>
+    UnicodeString = t(<span style="color: #a31515">&quot;This Unicode string contains two characters with codes outside a 7-bit code range, Pi (\u03a0) and Sigma (\u03a3).&quot;</span>)
+    
+    Console.WriteLine <span style="color: #a31515">&quot;Original string:&quot;</span>
+    Console.WriteLine UnicodeString
+    
+    <span style="color: #008000">&#39; Encode the string.</span>
+    EncodedBytes = UTF7.GetBytes(UnicodeString)
+    Console.WriteLine
+    Console.WriteLine <span style="color: #a31515">&quot;Encoded bytes:&quot;</span>
+    
+    <span style="color: #0000ff">For</span> <span style="color: #0000ff">Each</span> b <span style="color: #0000ff">In</span> EncodedBytes
+        Console.WriteValue <span style="color: #a31515">&quot;[{0}]&quot;</span>, b
+    <span style="color: #0000ff">Next</span>
+    
+    Console.WriteLine
+    
+    <span style="color: #008000">&#39; Decode bytes back to string.</span>
+    <span style="color: #008000">&#39; Notice Pi and Sigma characters are still present.</span>
+    DecodedString = UTF7.GetString(EncodedBytes)
+    Console.WriteLine
+    Console.WriteLine <span style="color: #a31515">&quot;Decoded bytes:&quot;</span>
+    Console.WriteLine DecodedString
+    Console.ReadKey
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+</pre></div>

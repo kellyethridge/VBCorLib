@@ -1,0 +1,29 @@
+@remarks <i>Paths</i> should be an array of the parts of the path to combine. If the one of the subsequent paths is an absolute path, then the combine operation resets starting with that absolute path, discarding all previous combined paths.
+<p>Zero-length strings are omitted from the combined path.</p>
+<p>The parameters are not parsed if they have white space.</p>
+<p>Not all invalid characters for directory and file names are interpreted as unacceptable by the <b>Combine</b> method, because you can use these characters for search wildcard characters. For example, while <code>Path.Combine("c:\", "*.txt")</code> might be invalid if you were to create a file from it, it is valid as a search string. It is therefore successfully interpreted by the <b>Combine</b> method.</p>
+@exceptions
+<table style="width: auto">
+	<tr>
+		<th>Exception</th><th>Condition</th>
+	</tr>
+	<tr>
+		<td><a href="ArgumentException.html">ArgumentException</a></td>
+		<td>One of the strings in the array contains one or more of the invalid characters defined in <a href="Path.GetInvalidPathChars.html">GetInvalidPathChars</a>.</td>
+	</tr>
+</table>
+@examples The following example combines an array of strings into a path.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> Paths() <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+    <span style="color: #0000ff">Dim</span> FullPath <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+    
+    Paths = NewStrings(<span style="color: #a31515">&quot;d:\archives&quot;</span>, <span style="color: #a31515">&quot;2001&quot;</span>, <span style="color: #a31515">&quot;media&quot;</span>, <span style="color: #a31515">&quot;images&quot;</span>)
+    FullPath = Path.CombineArray(Paths)
+    
+    Debug.Print FullPath
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; This example code produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    d:\archives\2001\media\images</span>
+</pre></div>

@@ -18,6 +18,8 @@ Option Explicit
 Implements ICategorizable
 Implements ITestCaseSource
 
+Private Const MaxSurrogatePair As Long = &H10FFFF
+
 Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
     Cat.ForFixture "System.Text"
 End Sub
@@ -48,6 +50,14 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use t("\uD8FF\uD8FF"), 8
             Test.Use t("\uD8FF\uDC00\uD8FF"), 8
             Test.Use t("\uDC00\uD8FF\uDC00\uD8FF"), 12
+            
+        Case "GetByteCount_WhenUsingExceptionFallbackWithValues_ThrowsEncoderFallbackException"
+            Test.Use "\u00C4 \uD802\u0033 \u00AE", 2, &HD802
+            Test.Use "\u00C4 \uDC02\u0033 \u00AE", 2, &HDC02
+            Test.Use " \uD802", 1, &HD802
+            Test.Use " \uDC02", 1, &HDC02
+            Test.Use "a\uDC02a", 1, &HDC02
+            Test.Use "a\uD802a", 1, &HD802
                     
         Case "GetBytes_AsLittleEndianWithChars_ReturnsEncodedChars"
             Test.Use "a", NewBytes(97, 0, 0, 0)
@@ -131,6 +141,28 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use NewBytes(97, 0), 3
             Test.Use NewBytes(97, 0, 0), 3
             
+        Case "GetCharCount_WithInvalidByteSequence_ThrowsDecoderFallbackException"
+            Test.Use NewBytes(&HFF, &HFF, &H11, &H0), 0, NewBytes(&HFF, &HFF, &H11, &H0)
+            Test.Use NewBytes(&H1, &H0, &H0, &H0, &HFF, &HFF, &H11, &H0), 4, NewBytes(&HFF, &HFF, &H11, &H0)
+            Test.Use NewBytes(&HFF, &HFF, &H1), 0, NewBytes(&HFF, &HFF, &H1)
+            Test.Use NewBytes(&H1, &H0, &H0, &H0, &HFF, &HFF, &H1), 4, NewBytes(&HFF, &HFF, &H1)
+            Test.Use NewBytes(&HFF, &HFF, &HFF, &HFF), 0, NewBytes(&HFF, &HFF, &HFF, &HFF)
+            
+        Case "GetCharCount_WithInvalidByteSequenceAndBigEndian_ThrowsDecoderFallbackException"
+            Test.Use NewBytes(&H0, &H0, &H0, &H1, &H0, &H11, &HFF, &HFF), 4, NewBytes(&H0, &H11, &HFF, &HFF)
+            Test.Use NewBytes(&H0, &H0, &H0, &H1, &H1, &HFF, &HFF), 4, NewBytes(&H1, &HFF, &HFF)
+            
+        Case "GetCharsEx_WithInvalidByteSequence_ThrowsDecoderFallbackException"
+            Test.Use NewBytes(&HFF, &HFF, &H11, &H0), 0, NewBytes(&HFF, &HFF, &H11, &H0)
+            Test.Use NewBytes(&H1, &H0, &H0, &H0, &HFF, &HFF, &H11, &H0), 4, NewBytes(&HFF, &HFF, &H11, &H0)
+            Test.Use NewBytes(&HFF, &HFF, &H1), 0, NewBytes(&HFF, &HFF, &H1)
+            Test.Use NewBytes(&H1, &H0, &H0, &H0, &HFF, &HFF, &H1), 4, NewBytes(&HFF, &HFF, &H1)
+            Test.Use NewBytes(&HFF, &HFF, &HFF, &HFF), 0, NewBytes(&HFF, &HFF, &HFF, &HFF)
+            
+        Case "GetCharsEx_WithInvalidByteSequenceAndBigEndian_ThrowsDecoderFallbackException"
+            Test.Use NewBytes(&H0, &H0, &H0, &H1, &H0, &H11, &HFF, &HFF), 4, NewBytes(&H0, &H11, &HFF, &HFF)
+            Test.Use NewBytes(&H0, &H0, &H0, &H1, &H1, &HFF, &HFF), 4, NewBytes(&H1, &HFF, &HFF)
+            
         Case "GetCharsEx_WithBytes_ReturnsExpected"
             Test.Use NewBytes, NewChars
             Test.Use NewBytes(97, 0, 0, 0), NewChars("a")
@@ -143,6 +175,14 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use NewBytes(97, 0, 0, 0, 97), NewChars("a", &HFFFD)
             Test.Use NewBytes(97, 0, 0, 0, 97, 0), NewChars("a", &HFFFD)
             Test.Use NewBytes(97, 0, 0, 0, 97, 0, 0), NewChars("a", &HFFFD)
+            Test.Use NewBytes(0, 0, 0, 0), NewChars(0)
+            Test.Use NewBytes(&HFF, &HFF, 0, 0), NewChars(&HFFFF)
+            
+        Case "GetBytesEx_WithInvalidSurrogate_ThrowsEncoderFallbackException"
+            Test.Use "\u00C4 \uD802\u0033 \u00AE", 2, &HD802
+            Test.Use "\u00C4 \uDC02\u0033 \u00AE", 2, &HDC02
+            Test.Use " \uD802", 1, &HD802
+            Test.Use " \uDC02", 1, &HDC02
             
     End Select
 End Sub
@@ -236,6 +276,19 @@ Public Sub GetByteCount_withInvalidSurrogatesAndSurrogatePairFallbackCharacters_
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
+Public Sub GetByteCount_WhenUsingExceptionFallbackWithValues_ThrowsEncoderFallbackException(ByRef Chars As String, ByVal ExpectedIndex As Long, ByVal ExpectedChar As Integer)
+    Dim Enc As Encoding
+    Set Enc = NewUTF32Encoding(False, False, True)
+    
+    On Error Resume Next
+    Enc.GetByteCount t(Chars)
+    
+    Dim Ex As EncoderFallbackException
+    Set Ex = AssertEncoderFallbackException(Err)
+    Assert.That Ex.Index, Iz.EqualTo(ExpectedIndex), "Index"
+    Assert.That Ex.CharUnknown, Iz.EqualTo(ExpectedChar), "CharUnknown"
+End Sub
+
 Public Sub GetByteCount_WithIndexAndCount_ReturnsExpected()
     Dim Enc As New UTF32Encoding
     Dim Actual As Long
@@ -309,6 +362,23 @@ Public Sub GetBytesEx_WhenCalled_ReturnsEncodedBytes()
     
     Assert.That ActualCount, Iz.EqualTo(8)
     Assert.That ActualBytes, Iz.EqualTo(NewBytes(0, 98, 0, 0, 0, 99, 0, 0, 0, 0, 0))
+End Sub
+
+Public Sub GetBytesEx_WithInvalidSurrogate_ThrowsEncoderFallbackException(ByVal Invalid As String, ByVal ExpectedIndex As Long, ByVal ExpectedChar As Integer)
+    Dim Enc As Encoding
+    Dim Bytes() As Byte
+    
+    Set Enc = NewUTF32Encoding(False, False, True)
+    Invalid = t(Invalid)
+    ReDim Bytes(0 To Enc.GetMaxByteCount(Len(Invalid)))
+    
+    On Error Resume Next
+    Enc.GetBytesEx Invalid, 0, Len(Invalid), Bytes, 0
+    
+    Dim Ex As EncoderFallbackException
+    Set Ex = AssertEncoderFallbackException(Err)
+    Assert.That Ex.Index, Iz.EqualTo(ExpectedIndex), "Index"
+    Assert.That Ex.CharUnknown, Iz.EqualTo(ExpectedChar), "CharUnknown"
 End Sub
 
 Public Sub GetMaxByteCount_WhenCalled_ReturnsCount()
@@ -393,6 +463,32 @@ Public Sub GetCharCount_WithBigEndianBytes_ReturnsExpected(ByRef Bytes() As Byte
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
+Public Sub GetCharCount_WithInvalidByteSequence_ThrowsDecoderFallbackException(ByRef Sequence() As Byte, ByVal ExpectedIndex As Long, ByRef ExpectedBytesUnknown() As Byte)
+    Dim Enc As UTF32Encoding
+    Set Enc = NewUTF32Encoding(False, False, True)
+    
+    On Error Resume Next
+    Enc.GetCharCount Sequence
+    
+    Dim Ex As DecoderFallbackException
+    Set Ex = AssertDecoderFallbackException(Err)
+    Assert.That Ex.Index, Iz.EqualTo(ExpectedIndex), "Index"
+    Assert.That Ex.BytesUnknown, Iz.EqualTo(ExpectedBytesUnknown), "BytesUnknown"
+End Sub
+
+Public Sub GetCharCount_WithInvalidByteSequenceAndBigEndian_ThrowsDecoderFallbackException(ByRef Sequence() As Byte, ByVal ExpectedIndex As Long, ByRef ExpectedBytesUnknown() As Byte)
+    Dim Enc As UTF32Encoding
+    Set Enc = NewUTF32Encoding(True, False, True)
+    
+    On Error Resume Next
+    Enc.GetCharCount Sequence
+    
+    Dim Ex As DecoderFallbackException
+    Set Ex = AssertDecoderFallbackException(Err)
+    Assert.That Ex.Index, Iz.EqualTo(ExpectedIndex), "Index"
+    Assert.That Ex.BytesUnknown, Iz.EqualTo(ExpectedBytesUnknown), "BytesUnknown"
+End Sub
+
 Public Sub GetCharsEx_WithBytes_ReturnsExpected(ByRef Bytes() As Byte, ByRef Expected() As Integer)
     Dim ActualLength As Long
     Dim ActualChars() As Integer
@@ -401,8 +497,38 @@ Public Sub GetCharsEx_WithBytes_ReturnsExpected(ByRef Bytes() As Byte, ByRef Exp
     
     ActualLength = Encoding.UTF32.GetCharsEx(Bytes, LBound(Bytes), CorArray.Length(Bytes), ActualChars, LBound(Expected))
     
-    Assert.That ActualLength, Iz.EqualTo(CorArray.Length(Expected))
-    Assert.That ActualChars, Iz.EqualTo(Expected)
+    Assert.That ActualLength, Iz.EqualTo(CorArray.Length(Expected)), "Length"
+    Assert.That ActualChars, Iz.EqualTo(Expected), "Chars"
+End Sub
+
+Public Sub GetCharsEx_WithInvalidByteSequence_ThrowsDecoderFallbackException(ByRef Sequence() As Byte, ByVal ExpectedIndex As Long, ByRef ExpectedBytesUnknown() As Byte)
+    Dim Enc As UTF32Encoding
+    Dim Chars(0 To 100) As Integer
+    
+    Set Enc = NewUTF32Encoding(False, False, True)
+    
+    On Error Resume Next
+    Enc.GetCharsEx Sequence, LBound(Sequence), CorArray.Length(Sequence), Chars, 0
+    
+    Dim Ex As DecoderFallbackException
+    Set Ex = AssertDecoderFallbackException(Err)
+    Assert.That Ex.Index, Iz.EqualTo(ExpectedIndex), "Index"
+    Assert.That Ex.BytesUnknown, Iz.EqualTo(ExpectedBytesUnknown), "BytesUnknown"
+End Sub
+
+Public Sub GetCharsEx_WithInvalidByteSequenceAndBigEndian_ThrowsDecoderFallbackException(ByRef Sequence() As Byte, ByVal ExpectedIndex As Long, ByRef ExpectedBytesUnknown() As Byte)
+    Dim Enc As UTF32Encoding
+    Dim Chars(0 To 100) As Integer
+    
+    Set Enc = NewUTF32Encoding(True, False, True)
+    
+    On Error Resume Next
+    Enc.GetCharsEx Sequence, LBound(Sequence), CorArray.Length(Sequence), Chars, 0
+    
+    Dim Ex As DecoderFallbackException
+    Set Ex = AssertDecoderFallbackException(Err)
+    Assert.That Ex.Index, Iz.EqualTo(ExpectedIndex), "Index"
+    Assert.That Ex.BytesUnknown, Iz.EqualTo(ExpectedBytesUnknown), "BytesUnknown"
 End Sub
 
 Public Sub GetChars_WhenCalled_ReturnsExpected()

@@ -167,7 +167,7 @@ Public Sub WriteChar(ByRef Value As Variant)
             
             mSingleChar(0) = AscW(CStr(Value))
         Case vbLong, vbInteger, vbByte
-            mSingleChar(0) = AsWord(CLng(Value))
+            mSingleChar(0) = Char.ConvertFromInt32(Value)
         Case Else
             Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidValueType, "String or Integer"), "Value")
     End Select
@@ -351,15 +351,12 @@ Private Sub WriteBytes(ByRef Buffer As Variant, Optional ByRef Index As Variant,
     On Error GoTo Catch
     mOutStream.WriteBlock Bytes, Range.Index, Range.Count
     
-    GoSub Finally
+    SAPtr(Bytes) = vbNullPtr
     Exit Sub
     
 Catch:
-    GoSub Finally
-    Throw Err
-Finally:
     SAPtr(Bytes) = vbNullPtr
-    Return
+    ThrowOrErr Err
 End Sub
 
 

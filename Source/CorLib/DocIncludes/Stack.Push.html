@@ -1,0 +1,57 @@
+@remarks If <a href="Stack.Get.Count.html">Count</a> already equals the capacity, the capacity of the <a href="Stack.html">Stack</a> is increased by automatically reallocating the internal array, and the existing elements are copied to the new array before the new element is added.
+<p>If <a href="Stack.Get.Count.html">Count</a> is less than the capacity of the stack, <b>Push</b> is an O(1) operation. If the capacity needs to be increased to accommodate the new element, <b>Push</b> becomes an O(<i>n</i>) operation, where <i>n</i> is <a href="Stack.Get.Count.html">Count</a>.</p>
+@examples The following example shows how to add elements to the <a href="Stack.html">Stack</a>, remove elements from the <a href="Stack.html">Stack</a>, or view the element at the top of the <a href="Stack.html">Stack</a>.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #008000">&#39; Creates an initializes a new Stack.</span>
+    <span style="color: #0000ff">Dim</span> MyStack <span style="color: #0000ff">As</span> <span style="color: #0000ff">New</span> Stack
+    MyStack.Push <span style="color: #a31515">&quot;The&quot;</span>
+    MyStack.Push <span style="color: #a31515">&quot;quick&quot;</span>
+    MyStack.Push <span style="color: #a31515">&quot;brown&quot;</span>
+    MyStack.Push <span style="color: #a31515">&quot;fox&quot;</span>
+    
+    <span style="color: #008000">&#39; Displays the Stack.</span>
+    Debug.Print <span style="color: #a31515">&quot;Stack values:&quot;</span>;
+    PrintValues MyStack
+    
+    <span style="color: #008000">&#39; Removes an element from the Stack.</span>
+    Debug.Print t(<span style="color: #a31515">&quot;(Pop)\t\t&quot;</span>) &amp; MyStack.Pop
+    
+    <span style="color: #008000">&#39; Displays the Stack.</span>
+    Debug.Print <span style="color: #a31515">&quot;Stack values:&quot;</span>;
+    PrintValues MyStack
+    
+    <span style="color: #008000">&#39; Removes another element from the Stack.</span>
+    Debug.Print t(<span style="color: #a31515">&quot;(Pop)\t\t&quot;</span>) &amp; MyStack.Pop
+    
+    <span style="color: #008000">&#39; Displays the Stack.</span>
+    Debug.Print <span style="color: #a31515">&quot;Stack values:&quot;</span>;
+    PrintValues MyStack
+    
+    <span style="color: #008000">&#39; Views the first element in the Stack but does not remove it.</span>
+    Debug.Print t(<span style="color: #a31515">&quot;(Peek)\t\t&quot;</span>) &amp; MyStack.Peek
+    
+    <span style="color: #008000">&#39; Displays the Stack.</span>
+    Debug.Print <span style="color: #a31515">&quot;Stack values:&quot;</span>;
+    PrintValues MyStack
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> PrintValues(<span style="color: #0000ff">ByVal</span> MyCollection <span style="color: #0000ff">As</span> IEnumerable)
+    <span style="color: #0000ff">Dim</span> Item <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>
+    
+    <span style="color: #0000ff">For</span> <span style="color: #0000ff">Each</span> Item <span style="color: #0000ff">In</span> MyCollection
+        Debug.Print vbTab &amp; Item;
+    <span style="color: #0000ff">Next</span>
+    
+    Debug.Print
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; This example code produce the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    Stack values:    fox    brown    quick    The</span>
+<span style="color: #008000">&#39;    (Pop)       fox</span>
+<span style="color: #008000">&#39;    Stack values:    brown    quick    The</span>
+<span style="color: #008000">&#39;    (Pop)       brown</span>
+<span style="color: #008000">&#39;    Stack Values:    quick The</span>
+<span style="color: #008000">&#39;    (Peek)      quick</span>
+<span style="color: #008000">&#39;    Stack Values:    quick The</span>
+</pre></div>

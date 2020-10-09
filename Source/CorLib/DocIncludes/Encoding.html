@@ -1,0 +1,67 @@
+@remarks Encoding is the process of transforming a set of Unicode characters into a sequence of bytes. In contrast, decoding is the process of transforming a sequence of encoded bytes into a set of Unicode characters.
+<p>Note that <b>Encoding</b> is intended to operate on Unicode characters instead of arbitrary binary data, such as byte arrays. If your application must encode arbitrary binary data into text, it should use a protocol such as uuencode, which is implemented by methods such as <a href="Convert.ToBase64CharArray.html">Convert.ToBase64CharArray</a>.</p>
+<p>VBCorLib provides the following implementations of the <b>Encoding</b> class to support current Unicode encodings and other encodings:</p>
+<ul>
+	<li><a href="ASCIIEncoding.html">ASCIIEncoding</a> encodes Unicode characters as single 7-bit ASCII characters. This encoding only supports character values between U+0000 and U+007F. Code page 20127. Also available through the <a href="EncodingStatic.Get.ASCII.html">ASCII</a> property.</li>
+	<li><a href="UTF7Encoding.html">UTF7Encoding</a> encodes Unicode characters using the UTF-7 encoding. This encoding supports all Unicode character values. Code page 65000. Also available through the <a href="EncodingStatic.Get.UTF7.html">UTF7</a> property.</li>
+	<li><a href="UTF8Encoding.html">UTF8Encoding</a> encodes Unicode characters using the UTF-8 encoding. This encoding supports all Unicode character values. Code page 65001. Also available through the <a href="EncodingStatic.Get.UTF8.html">UTF8</a> property.</li>
+	<li><a href="UnicodeEncoding.html">UnicodeEncoding</a> encodes Unicode characters using the UTF-16 encoding. Both little endian and big endian byte orders are supported. Also available through the <a href="EncodingStatic.Get.Unicode.html">Unicode</a> property and the <a href="EncodingStatic.Get.BigEndianUnicode.html">BigEndianUnicode</a> property.</li>
+	<li><a href="UTF32Encoding.html">UTF32Encoding</a> encodes Unicode characters using the UTF-32 encoding. Both little endian (code page 12000) and big endian (code page 12001) byte orders are supported. Also available through the <a href="EncodingStatic.Get.UTF32.html">UTF32</a> property.</li>
+</ul>
+<p>The <b>Encoding</b> class is primarily intended to convert between different encodings and Unicode. Often one of the derived Unicode classes is the correct choice for your application.</p>
+<p>Your applications use the <a href="EncodingStatic.GetEncoding.html">GetEncoding</a> method to obtain other encodings. They should use the <a href="EncodingStatic.GetEncodings.html">GetEncodings</a> method to get a list of all encodings.</p>
+<p>If the data to be converted is available only in sequential blocks (such as data read from a stream) or if the amount of data is so large that it needs to be divided into smaller blocks, your application should use the <a href="Decoder.html">Decoder</a> or the <a href="Encoder.html">Encoder</a> provided by the <a href="Encoding.GetDecoder.html">GetDecoder</a> method or the <a href="Encoding.GetEncoder.html">GetEncoder</a> method, respectively, of a derived class.</p>
+<p>The UTF-16 and the UTF-32 encoders can use the big endian byte order (most significant byte first) or the little endian byte order (least significant byte first). For example, the Latin Capital Letter A (U+0041) is serialized as follows (in hexadecimal):</p>
+<ul>
+	<li>UTF-16 big endian byte order: 00 41</li>
+	<li>UTF-16 little endian byte order: 41 00</li>
+	<li>UTF-32 big endian byte order: 00 00 00 41</li>
+	<li>UTF-32 little endian byte order: 41 00 00 00</li>
+</ul>
+<p>The <a href="Encoding.GetPreamble.html">GetPreamble</a> method retrieves an array of bytes that includes the byte order mark (BOM). If this byte array is prefixed to an encoded stream, it helps the decoder to identify the encoding format used.</p>
+<p>For more information on byte order and the byte order mark, see The Unicode Standard at the <a href="https://home.unicode.org">Unicode home page</a>.</p>
+<p>Note that the encoding classes allow errors to:</p>
+<ul>
+	<li>Silently change to a "?" character.</li>
+	<li>Use a "best fit" character.</li>
+	<li>Change to an application-specific behavior through use of the <a href="EncoderFallback.html">EncoderFallback</a> and <a href="DecoderFallback.html">DecoderFallback</a> classes with the U+FFFD Unicode replacement character.</li>
+</ul>
+<p>Your applications are recommended to throw exceptions on all data stream errors. An application either uses a "throwonerror" flag when applicable or uses the <a href="EncoderExceptionFallback.html">EncoderExceptionFallback</a> and <a href="DecoderExceptionFallback.html">DecoderExceptionFallback</a> classes. Best fit fallback is often not recommended because it can cause data loss or confusion and is slower than simple character replacements. For ANSI encodings, the best fit behavior is the default.</p>
+@examples The following example converts a string from one encoding to another.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> UnicodeString   <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+    <span style="color: #0000ff">Dim</span> AsciiEncoding   <span style="color: #0000ff">As</span> Encoding
+    <span style="color: #0000ff">Dim</span> UnicodeEncoding <span style="color: #0000ff">As</span> Encoding
+    <span style="color: #0000ff">Dim</span> AsciiBytes()    <span style="color: #0000ff">As</span> <span style="color: #2b91af">Byte</span>
+    <span style="color: #0000ff">Dim</span> UnicodeBytes()  <span style="color: #0000ff">As</span> <span style="color: #2b91af">Byte</span>
+    <span style="color: #0000ff">Dim</span> AsciiChars()    <span style="color: #0000ff">As</span> <span style="color: #2b91af">Integer</span>
+    <span style="color: #0000ff">Dim</span> AsciiString     <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+    
+    <span style="color: #0000ff">Set</span> Console.OutputEncoding = Encoding.UTF8
+    UnicodeString = t(<span style="color: #a31515">&quot;This string contains the unicode character Pi (\u03a0)&quot;</span>)
+    
+    <span style="color: #008000">&#39; Create two different encodings.</span>
+    <span style="color: #0000ff">Set</span> AsciiEncoding = Encoding.ASCII
+    <span style="color: #0000ff">Set</span> UnicodeEncoding = Encoding.Unicode
+    
+    <span style="color: #008000">&#39; Convert the string into a byte array.</span>
+    UnicodeBytes = UnicodeEncoding.GetBytes(UnicodeString)
+    
+    <span style="color: #008000">&#39; Perform the convertion from one encoding to the other.</span>
+    AsciiBytes = Encoding.Convert(UnicodeEncoding, AsciiEncoding, UnicodeBytes)
+    
+    <span style="color: #008000">&#39; Convert the new Byte() into a Char() and then into a string.</span>
+    AsciiChars = AsciiEncoding.GetChars(AsciiBytes)
+    AsciiString = NewString(AsciiChars)
+    
+    <span style="color: #008000">&#39; Display the strings created before and after the conversion.</span>
+    Console.WriteLine <span style="color: #a31515">&quot;Original string: &quot;</span> &amp; UnicodeString
+    Console.WriteLine <span style="color: #a31515">&quot;Ascii converted string: &quot;</span> &amp; AsciiString
+    Console.ReadKey
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; This example code produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    Original string: This string contains the unicode character Pi (&Pi;)</span>
+<span style="color: #008000">&#39;    Ascii converted string: This string contains the unicode character Pi (?)</span>
+</pre></div>

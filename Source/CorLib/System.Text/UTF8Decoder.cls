@@ -139,7 +139,7 @@ End Property
 Private Function Decoder_GetCharCount(Bytes() As Byte, ByVal Index As Long, ByVal Count As Long, Optional ByVal Flush As Boolean) As Long
     ValidateDecoderGetCharCount Bytes, Index, Count
     mFlushing = Flush
-    Decoder_GetCharCount = mEncoding.GetCharsCore(Bytes, Index, Count, NullChars, 0, Me)
+    Decoder_GetCharCount = mEncoding.GetCharCountCore(Bytes, Index, Count, Me)
 End Function
 
 Private Function Decoder_GetChars(Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, Chars() As Integer, ByVal CharIndex As Long, Optional ByVal Flush As Boolean) As Long

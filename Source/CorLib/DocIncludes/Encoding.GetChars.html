@@ -1,0 +1,99 @@
+@remarks <p><b>Encoding.GetChars</b> gets characters from an input byte sequence. <b>Encoding.GetChars</b> is different than <a href="Decoder.GetChars.html">Decoder.GetChars</a> because <a href="Encoding.html">Encoding</a> expects discrete conversions, while <a href="Decoder.html">Decoder</a> is designed for multiple passes on a single input stream.</p>
+<p>If the data to be converted is available only in sequential blocks (such as data read from a stream) or if the amount of data is so large that it needs to be divided into smaller blocks, the application should use the <a href="Decoder.html">Decoder</a> or the <a href="Encoder.html">Encoder</a> provided by the <a href="Encoding.GetDecoder.html">GetDecoder</a> method or the <a href="Encoding.GetEncoder.html">GetEncoder</a> method, respectively, of an implemented class.</p>
+<p><b>Note</b> This method is intended to operate on Unicode characters, not on arbitrary binary data, such as byte arrays. If your application needs to encode arbitrary binary data into text, it should use a protocol such as uuencode, which is implemented by methods such as <a href="Convert.ToBase64CharArray.html">Convert.ToBase64CharArray</a>.</p>
+<p>The <a href="Encoding.GetCharCount.html">GetCharCount</a> method determines how many characters result in decoding a sequence of bytes, and the <b>GetChars</b> method performs the actual decoding. The <b>Encoding.GetChars</b> method expects discrete conversions, in contrast to the <a href="Decoder.GetChars.html">Decoder.GetChars</a> method, which handles multiple passes on a single input stream.</p>
+<p>Several versions of <a href="Encoding.GetCharCount.html">GetCharCount</a> and <b>GetChars</b> are supported. The following are some programming considerations for use of these methods:</p>
+<ul>
+	<li>The application might need to decode multiple input bytes from a code page and process the bytes using multiple calls. In this case, your application probably needs to maintain state between calls, because byte sequences can be interrupted when processed in batches. (For example, part of an ISO-2022 shift sequence may end one <b>GetChars</b> call and continue at the beginning of the next <b>GetChars</b> call. <b>Encoding.GetChars</b> will call the fallback for those incomplete sequences, but <a href="Decoder.html">Decoder</a> will remember those sequences for the next call.)</li>
+	<li>If the application handles string outputs, it is recommended to use the <a href="Encoding.GetString.html">GetString</a> method. Since this method must check string length and allocate a buffer, it is slightly slower, but the resulting <b>String</b> type is to be preferred.</li>
+	<li>If your application must convert a large amount of data, it should reuse the output buffer. In this case, the <a href="Encoding.GetCharsEx.html">GetCharsEx</a> version that supports output character buffers is the best choice.</li>
+	<li>Consider using the <a href="Decoder.Convert.html">Decoder.Convert</a> method instead of <a href="Encoding.GetCharCount.html">GetCharCount</a>. The conversion method converts as much data as possible and throws an exception if the output buffer is too small. For continuous decoding of a stream, this method is often the best choice.</li>
+</ul>
+@exceptions
+<table style="width: auto">
+	<tr>
+		<th>Exception</th><th>Condition</th>
+	</tr>
+	<tr>
+		<td><a href="ArgumentNullException.html">ArgumentNullException</a></td>
+		<td><i>Bytes</i> is <b>null</b>.</td>
+	</tr>
+	<tr>
+		<td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+		<td>
+			<i>Index</i> is less than the lower-bound of <i>Bytes</i>.<br>
+			-or-<br>
+			<i>Count</i> is less than zero.<br>
+			-or-<br>
+			<i>Index</i> and <i>Count</i> do not denote a valid range in <i>Bytes</i>.
+		</td>
+	</tr>
+	<tr>
+		<td><a href="DecoderFallbackException.html">DecoderFallbackException</a></td>
+		<td>A fallback occurred<br>
+			-and-<br>
+			<a href="Encoding.Get.DecoderFallback.html">DecoderFallback</a> is set to <a href="DecoderExceptionFallback.html">DecoderExceptionFallback</a>.
+		</td>
+	</tr>
+</table>
+@examples The following example encodes a string into an array of bytes, and then decodes the bytes into an array of characters.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> U32LE <span style="color: #0000ff">As</span> Encoding
+    <span style="color: #0000ff">Dim</span> U32BE <span style="color: #0000ff">As</span> Encoding
+    <span style="color: #0000ff">Dim</span> MyStr <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+    <span style="color: #0000ff">Dim</span> BytesLE() <span style="color: #0000ff">As</span> <span style="color: #2b91af">Byte</span>
+    <span style="color: #0000ff">Dim</span> BytesBE() <span style="color: #0000ff">As</span> <span style="color: #2b91af">Byte</span>
+    
+    <span style="color: #0000ff">Set</span> Console.OutputEncoding = Encoding.UTF8
+    <span style="color: #0000ff">Set</span> U32LE = Encoding.GetEncoding(<span style="color: #a31515">&quot;utf-32&quot;</span>)
+    <span style="color: #0000ff">Set</span> U32BE = Encoding.GetEncoding(<span style="color: #a31515">&quot;utf-32BE&quot;</span>)
+    
+    <span style="color: #008000">&#39; Use a string containing the following characters:</span>
+    <span style="color: #008000">&#39;    Latin Small Letter Z (U+007A)</span>
+    <span style="color: #008000">&#39;    Latin Small Letter A (U+0061)</span>
+    <span style="color: #008000">&#39;    Combining Breve (U+0306)</span>
+    <span style="color: #008000">&#39;    Latin Small Letter AE With Acute (U+01FD)</span>
+    <span style="color: #008000">&#39;    Greek Small Letter Beta (U+03B2)</span>
+    MyStr = <span style="color: #a31515">&quot;za&quot;</span> &amp; ChrW$(&amp;H306) &amp; ChrW$(&amp;H1FD) &amp; ChrW$(&amp;H3B2)
+    
+    <span style="color: #008000">&#39; Encode the string using the big-endian byte order.</span>
+    BytesBE = U32BE.GetBytes(MyStr)
+    
+    <span style="color: #008000">&#39; Encode the string using the little-endian byte order.</span>
+    BytesLE = U32LE.GetBytes(MyStr)
+    
+    <span style="color: #008000">&#39; Get the char counts, and decode the byte arrays.</span>
+    Console.WriteValue <span style="color: #a31515">&quot;BE array with BE encoding : &quot;</span>
+    PrintCountsAndChars BytesBE, U32BE
+    Console.WriteValue <span style="color: #a31515">&quot;LE array with LE encoding : &quot;</span>
+    PrintCountsAndChars BytesLE, U32LE
+    
+    Console.ReadKey
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> PrintCountsAndChars(<span style="color: #0000ff">ByRef</span> Bytes() <span style="color: #0000ff">As</span> <span style="color: #2b91af">Byte</span>, <span style="color: #0000ff">ByVal</span> Enc <span style="color: #0000ff">As</span> Encoding)
+    <span style="color: #0000ff">Dim</span> CharCount <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
+    <span style="color: #0000ff">Dim</span> MaxCount <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
+    <span style="color: #0000ff">Dim</span> Chars() <span style="color: #0000ff">As</span> <span style="color: #2b91af">Integer</span>
+    
+    <span style="color: #008000">&#39; Display the name of the encoding used.</span>
+    Console.WriteValue <span style="color: #a31515">&quot;{0,-25} :&quot;</span>, Enc.ToString
+    
+    <span style="color: #008000">&#39; Display the exact character count.</span>
+    CharCount = Enc.GetCharCount(Bytes)
+    Console.WriteValue <span style="color: #a31515">&quot; {0,-3}&quot;</span>, CharCount
+    
+    <span style="color: #008000">&#39; Display the maximum character count.</span>
+    MaxCount = Enc.GetMaxCharCount(CorArray.Length(Bytes))
+    Console.WriteValue <span style="color: #a31515">&quot; {0,-3} :&quot;</span>, MaxCount
+    
+    <span style="color: #008000">&#39; Decode the bytes and display the characters.</span>
+    Chars = Enc.GetChars(Bytes)
+    Console.WriteLine NewString(Chars)
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; This example code produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;BE array with BE encoding : CorLib.UTF32Encoding      : 5   12  :za&#x306;&#x1FD;&#x3B2;</span>
+<span style="color: #008000">&#39;LE array with LE encoding : CorLib.UTF32Encoding      : 5   12  :za&#x306;&#x1FD;&#x3B2;</span>
+</pre></div>

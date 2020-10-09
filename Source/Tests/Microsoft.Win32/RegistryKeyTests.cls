@@ -31,7 +31,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
         Case "RoundTrip_WithValues_ReturnsExpected"
             Test.Use CLng(1)
             Test.Use "One"
-            Test.Use CCur(1)
+            Test.Use CInt64(1)
             Test.Use NewBytes(1, 2, 3, 4)
             Test.Use NewStrings("one", "two", "three")
             Test.Use "%PATH%"
@@ -42,6 +42,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use CCur(1), RegistryValueKind.QWordKind
             Test.Use NewBytes(1, 2, 3, 4), RegistryValueKind.BinaryKind
             Test.Use NewStrings("one", "two", "three"), RegistryValueKind.MultiStringKind
+            Test.Use CInt64(1), RegistryValueKind.QWordKind
             
     End Select
 End Sub

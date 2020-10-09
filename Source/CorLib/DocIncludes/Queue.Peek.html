@@ -1,0 +1,66 @@
+@remarks This method is similar to the <a href="Queue.Dequeue.html">Dequeue</a> method, but <b>Peek</b> does not modify the <a href="Queue.html">Queue</a>.
+@exceptions
+<table style="width: auto">
+	<tr>
+		<th>Exception</th><th>Condition</th>
+	</tr>
+	<tr>
+		<td><a href="InvalidOperationException.html">InvalidOperationException</a></td>
+		<td>The <a href="Queue.html">Queue</a> is empty.</td>
+	</tr>
+</table>
+@examples The following example shows how to add elements to the <a href="Queue.html">Queue</a>, remove elements from the <a href="Queue.html">Queue</a>, or view the element at the beginning of the <a href="Queue.html">Queue</a>.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> MyQ <span style="color: #0000ff">As</span> <span style="color: #0000ff">New</span> Queue
+    
+    MyQ.Enqueue <span style="color: #a31515">&quot;The&quot;</span>
+    MyQ.Enqueue <span style="color: #a31515">&quot;quick&quot;</span>
+    MyQ.Enqueue <span style="color: #a31515">&quot;brown&quot;</span>
+    MyQ.Enqueue <span style="color: #a31515">&quot;fox&quot;</span>
+    
+    <span style="color: #008000">&#39; Display the Queue</span>
+    Debug.Print <span style="color: #a31515">&quot;Queue values:&quot;</span>;
+    PrintValues MyQ
+    
+    <span style="color: #008000">&#39; Removes an element from the queue.</span>
+    Debug.Print <span style="color: #a31515">&quot;(Dequeue)    &quot;</span> &amp; MyQ.Dequeue
+    
+    <span style="color: #008000">&#39; Displays the queue.</span>
+    Debug.Print <span style="color: #a31515">&quot;Queue values:&quot;</span>;
+    PrintValues MyQ
+    
+    <span style="color: #008000">&#39; Removes another element from the queue.</span>
+    Debug.Print <span style="color: #a31515">&quot;(Dequeue)    &quot;</span> &amp; MyQ.Dequeue
+    
+    <span style="color: #008000">&#39; Displays the queue.</span>
+    Debug.Print <span style="color: #a31515">&quot;Queue values:&quot;</span>;
+    PrintValues MyQ
+    
+    <span style="color: #008000">&#39; Views the first element in the queue but does not remove it.</span>
+    Debug.Print <span style="color: #a31515">&quot;(Peek)       &quot;</span> &amp; MyQ.Peek
+    
+    <span style="color: #008000">&#39; Displays the queue.</span>
+    Debug.Print <span style="color: #a31515">&quot;Queue values:&quot;</span>;
+    PrintValues MyQ
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> PrintValues(<span style="color: #0000ff">ByVal</span> MyCollection <span style="color: #0000ff">As</span> IEnumerable)
+    <span style="color: #0000ff">Dim</span> Item <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>
+    
+    <span style="color: #0000ff">For</span> <span style="color: #0000ff">Each</span> Item <span style="color: #0000ff">In</span> MyCollection
+        Debug.Print <span style="color: #a31515">&quot;    &quot;</span> &amp; Item;
+    <span style="color: #0000ff">Next</span>
+    
+    Debug.Print
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; This example code produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    Queue values:    The    quick    brown    fox</span>
+<span style="color: #008000">&#39;    (Dequeue)    The</span>
+<span style="color: #008000">&#39;    Queue values:    quick    brown    fox</span>
+<span style="color: #008000">&#39;    (Dequeue)    quick</span>
+<span style="color: #008000">&#39;    Queue Values:    brown fox</span>
+<span style="color: #008000">&#39;    (Peek)       brown</span>
+<span style="color: #008000">&#39;    Queue Values:    brown fox</span>
+</pre></div>

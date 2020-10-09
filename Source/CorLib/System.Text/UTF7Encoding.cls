@@ -36,15 +36,15 @@ Attribute VB_Exposed = True
 '
 
 ''
-' A set of functions used to convert unicode characters to and from byte arrays.
-'
-' @remarks Characters less that 128 may be directly encoded as their existing
-' ascii value. Characters above 127 are encoded using a Base-64 encoding scheme.
-' <p>Information about the UTF-7 encoding scheme can be found at "http://www.faqs.org/rfcs/rfc2152.html".</p>
+' Represents a UTF-7 encoding of Unicode characters.
 '
 ' @see Constructors
 ' @see Encoding
-'
+' @see ASCIIEncoding
+' @see UTF8Encoding
+' @see UTF32Encoding
+' @see UnicodeEncoding
+' @include "..\DocIncludes\UTF7Encoding.html"
 Option Explicit
 Implements IObject
 Implements Encoding
@@ -64,7 +64,7 @@ Private mBytesUnknown(0 To 0)           As Byte
 ''
 ' When implemented in a derived class, gets a value indicating whether the current encoding is read-only.
 '
-' @return <b>true</b> if the current <a href="Encoding.html">Encoding</a> is read-only; otherwise, <b>false</b>. The default is <b>true</b>.
+' @return <b>True</b> if the current <a href="Encoding.html">Encoding</a> is read-only; otherwise, <b>False</b>. The default is <b>True</b>.
 '
 Public Property Get IsReadOnly() As Boolean
     IsReadOnly = mIsReadOnly
@@ -256,15 +256,12 @@ Public Function GetByteCount(ByRef Chars As Variant, Optional ByRef Index As Var
     
     GetByteCount = GetByteCountCore(LocalChars, Range.Index, Range.Count, Nothing)
     
-    GoSub Finally
+    FreeChars LocalChars
     Exit Function
     
 Catch:
-    GoSub Finally
-    Throw
-Finally:
     FreeChars LocalChars
-    Return
+    ThrowOrErr Err
 End Function
 
 ''
@@ -292,22 +289,18 @@ Public Function GetBytes(ByRef Chars As Variant, Optional ByRef Index As Variant
     SAPtr(GetBytes) = SafeArrayCreateVectorEx(vbByte, 0, ByteCount)
     GetBytesCore LocalChars, Range.Index, Range.Count, GetBytes, 0, Nothing
     
-    GoSub Finally
+    FreeChars LocalChars
     Exit Function
     
 Catch:
-    GoSub Finally
-    ThrowOrErr Err
-Finally:
     FreeChars LocalChars
-    Return
+    ThrowOrErr Err
 End Function
 
 ''
 ' Encodes a set of characters into an array of bytes, returning the number of bytes produced.
 '
-' @param Chars the set of characters to be encoded into bytes. This can
-' be either an Integer array or a String.
+' @param Chars the set of characters to be encoded into bytes. This can be either an Integer array or a String.
 ' @param CharIndex The index of the first character to begin encoding from.
 ' @param CharCount The number of characters to be encoded.
 ' @param Bytes The destination for the encoded characters.
@@ -328,15 +321,12 @@ Public Function GetBytesEx(ByRef Chars As Variant, ByVal CharIndex As Long, ByVa
     ValidateGetBytesEx LocalChars, CharIndex, CharCount, Bytes, ByteIndex
     GetBytesEx = GetBytesCore(LocalChars, CharIndex, CharCount, Bytes, ByteIndex, Nothing)
     
-    GoSub Finally
+    FreeChars LocalChars
     Exit Function
     
 Catch:
-    GoSub Finally
-    Throw
-Finally:
     FreeChars LocalChars
-    Return
+    ThrowOrErr Err
 End Function
 
 ''
@@ -358,15 +348,12 @@ Public Function GetString(ByRef Bytes() As Byte, Optional ByRef Index As Variant
     On Error GoTo Catch
     GetCharsCore Bytes, Range.Index, Range.Count, Output, 0, Nothing
     
-    GoSub Finally
+    FreeChars Output
     Exit Function
 
 Catch:
-    GoSub Finally
-    ThrowOrErr Err
-Finally:
     FreeChars Output
-    Return
+    ThrowOrErr Err
 End Function
 
 ''
@@ -476,10 +463,10 @@ End Function
 ' Returns a decoder that maintains state.
 '
 ' @return The stateful decoder.
-' @remarks Unlike UTF8Encoding, the decoder maintains state between decoding calls. this allows
+' @remarks Unlike <a href="UTF8Encoding.html">UTF8Encoding</a>, the decoder maintains state between decoding calls. this allows
 ' for a sequence of bytes to not have to be in the same call in order to be decoded to the
 ' representive character. All characters other than directly encodable characters are encoded
-' in a Modified Base64 encoding, which can be require 3 bytes to decode to a single character.
+' in a modified Base64 encoding, which can be require 3 bytes to decode to a single character.
 ' This decoder allows the Base64 encoded byte set to be decoded across multiple calls and still
 ' be decoded as a single set of bytes. A multi-byte encoded characters does not need to be in
 ' the same call in order to be decoded properly.

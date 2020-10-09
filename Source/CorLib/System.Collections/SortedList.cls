@@ -135,12 +135,14 @@ Public Property Let Capacity(ByVal Value As Long)
     If Value < mCount Then _
         Error.ArgumentOutOfRange "Value", ArgumentOutOfRange_SmallCapacity
     
-    If Value > 0 Then
-        ReDim Preserve mKeys(0 To Value - 1)
-        ReDim Preserve mValues(0 To Value - 1)
-    Else
-        mKeys = Array()
-        mValues = Array()
+    If Value <> mCapacity Then
+        If Value > 0 Then
+            ReDim Preserve mKeys(0 To Value - 1)
+            ReDim Preserve mValues(0 To Value - 1)
+        Else
+            mKeys = Array()
+            mValues = Array()
+        End If
     End If
     
     mCapacity = Value
@@ -256,10 +258,21 @@ Public Sub CopyTo(ByRef Arr As Variant, ByVal ArrayIndex As Long)
     If ArrayIndex + mCount - 1 > UBound(Arr) Then _
         Error.Argument Arg_ArrayPlusOffTooSmall
     
+    On Error GoTo Catch
+    
     Dim i As Long
     For i = 0 To mCount - 1
         Set Arr(ArrayIndex + i) = Cor.NewDictionaryEntry(mKeys(i), mValues(i))
     Next i
+    
+    Exit Sub
+    
+Catch:
+    If Err.Number = vbTypeMismatch Then
+        Throw Cor.NewInvalidCastException(Environment.GetResourceString(InvalidCast_StoreArrayElement))
+    Else
+        Throw Err
+    End If
 End Sub
 
 ''
@@ -501,6 +514,7 @@ End Property
 ' </table>
 Public Property Let Item(ByRef Key As Variant, ByRef Value As Variant)
     Dim Index As Long
+    
     Index = CorArray.InternalBinarySearch(mKeys, 0, mCount, Key, mComparer)
     
     If Index >= 0 Then

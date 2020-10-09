@@ -415,16 +415,13 @@ Public Function SignHash(ByRef RgbHash() As Byte, ByRef Str As String) As Byte()
     If CryptSignHash(Hash, mKeyNumber, vbNullString, 0, Signature(0), Size) = BOOL_FALSE Then _
         Error.Cryptographic LastDllError
     
-    GoSub Finally
+    CryptDestroyHash Hash
     SignHash = ReverseByteCopy(Signature)
     Exit Function
     
 Catch:
-    GoSub Finally
-    Throw
-Finally:
     CryptDestroyHash Hash
-    Return
+    ThrowOrErr Err
 End Function
 
 ''

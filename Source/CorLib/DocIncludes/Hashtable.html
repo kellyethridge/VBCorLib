@@ -1,0 +1,131 @@
+@remarks The <b>Hashtable</b> is a collection that uses the hash code and equality of a key value to identify a specific value stored. Keys can be primitives, strings, objects, and variant sub-types such as <b>Empty</b> and <b>Null</b>.
+<p>The default usage of an object as a key is to use the <b>ObjPtr</b> for the hash code and a reference check for equality. This may not be suitable for a specific application. The objects used a key by a <b>Hashtable</b> should implement the <a href="IObject.html">IObject</a> interface and provide more appropriate <a href="IObject.GetHashCode.html">GetHashCode</a> and <a href="IObject.Equals.html">Equals</a> methods for the specific application.</p>
+<p>The load factor of a <b>Hashtable</b> determines the maximum ratio of elements to buckets. Smaller load factors cause faster average lookup times at the cost of increased memory consumption. The default load factor of 1.0 generally provides the best balance between speed and size. A different load factor can also be specified when the <b>Hashtable</b> is created.</p>
+<p>As elements are added to a <b>Hashtable</b>, the actual load factor of the <b>Hashtable</b> increases. When the actual load factor reaches the specified load factor, the number of buckets in the <b>Hashtable</b> is automatically increased to the smallest prime number that is larger than twice the current number of <b>Hashtable</b> buckets.</p>
+<p>The <b>For Each</b> statement enumerates each element in the collection. Since each element of the <b>Hashtable</b> is a key/value pair, the element type is not the type of the key or the type of the value. Instead, the element type is <a href="DictionaryEntry.html">DictionaryEntry</a>. For example:</p>
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">    <span style="color: #0000ff">Dim</span> Entry <span style="color: #0000ff">As</span> DictionaryEntry
+    
+    <span style="color: #0000ff">For</span> <span style="color: #0000ff">Each</span> Entry <span style="color: #0000ff">In</span> MyHashTable
+        <span style="color: #008000">&#39; ...</span>
+    <span style="color: #0000ff">Next</span>
+</pre></div>
+@examples The following example shows how to create, initialize and perform various functions to a <b>Hashtable</b> and how to print out its keys and values.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #008000">&#39; Create a new hash table.</span>
+    <span style="color: #0000ff">Dim</span> OpenWith <span style="color: #0000ff">As</span> <span style="color: #0000ff">New</span> Hashtable
+
+    <span style="color: #008000">&#39; Add some elements to the hash table. There are no</span>
+    <span style="color: #008000">&#39; duplicate keys, but some of the values are duplicates.</span>
+    OpenWith.Add <span style="color: #a31515">&quot;txt&quot;</span>, <span style="color: #a31515">&quot;notepad.exe&quot;</span>
+    OpenWith.Add <span style="color: #a31515">&quot;bmp&quot;</span>, <span style="color: #a31515">&quot;paint.exe&quot;</span>
+    OpenWith.Add <span style="color: #a31515">&quot;dib&quot;</span>, <span style="color: #a31515">&quot;paint.exe&quot;</span>
+    OpenWith.Add <span style="color: #a31515">&quot;rtf&quot;</span>, <span style="color: #a31515">&quot;wordpad.exe&quot;</span>
+
+    <span style="color: #008000">&#39; The Add method throws an exception if the new key is</span>
+    <span style="color: #008000">&#39; already in the hash table.</span>
+    <span style="color: #0000ff">On</span> <span style="color: #0000ff">Error</span> <span style="color: #0000ff">GoTo</span> <span style="color: #0000ff">Catch</span>
+    OpenWith.Add <span style="color: #a31515">&quot;txt&quot;</span>, <span style="color: #a31515">&quot;winword.exe&quot;</span>
+    <span style="color: #0000ff">GoTo</span> EndTry
+<span style="color: #0000ff">Catch</span>:
+    Debug.Print <span style="color: #a31515">&quot;An element with Key = &quot;&quot;txt&quot;&quot; already exists.&quot;</span>
+EndTry:
+
+    <span style="color: #008000">&#39; The Item property is the default property, so you</span>
+    <span style="color: #008000">&#39; can omit its name when accessing elements.</span>
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;For key = &quot;&quot;rtf&quot;&quot;, value = {0}.&quot;</span>, OpenWith(<span style="color: #a31515">&quot;rtf&quot;</span>))
+
+    <span style="color: #008000">&#39; The default Item property can be used to change the value</span>
+    <span style="color: #008000">&#39; associated with a key.</span>
+    OpenWith(<span style="color: #a31515">&quot;rtf&quot;</span>) = <span style="color: #a31515">&quot;winword.exe&quot;</span>
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;For key = &quot;&quot;rtf&quot;&quot;, value = {0}.&quot;</span>, OpenWith(<span style="color: #a31515">&quot;rtf&quot;</span>))
+
+    <span style="color: #008000">&#39; If a key does not exist, setting the default Item property</span>
+    <span style="color: #008000">&#39; for that key adds a new key/value pair.</span>
+    OpenWith(<span style="color: #a31515">&quot;doc&quot;</span>) = <span style="color: #a31515">&quot;winword.exe&quot;</span>
+
+    <span style="color: #008000">&#39; ContainsKey can be used to test keys before inserting</span>
+    <span style="color: #008000">&#39; them.</span>
+    <span style="color: #0000ff">If</span> <span style="color: #0000ff">Not</span> OpenWith.ContainsKey(<span style="color: #a31515">&quot;ht&quot;</span>) <span style="color: #0000ff">Then</span>
+        OpenWith.Add <span style="color: #a31515">&quot;ht&quot;</span>, <span style="color: #a31515">&quot;hypertrm.exe&quot;</span>
+        Debug.Print CorString.Format(<span style="color: #a31515">&quot;Value added for key = &quot;&quot;ht&quot;&quot;: {0}&quot;</span>, OpenWith(<span style="color: #a31515">&quot;ht&quot;</span>))
+    <span style="color: #0000ff">End</span> <span style="color: #0000ff">If</span>
+
+    <span style="color: #008000">&#39; When you use foreach to enumerate hash table elements,</span>
+    <span style="color: #008000">&#39; the elements are retrieved as KeyValuePair objects.</span>
+    <span style="color: #0000ff">Dim</span> DE <span style="color: #0000ff">As</span> DictionaryEntry
+    
+    Debug.Print
+    
+    <span style="color: #0000ff">For</span> <span style="color: #0000ff">Each</span> DE <span style="color: #0000ff">In</span> OpenWith
+        Debug.Print CorString.Format(<span style="color: #a31515">&quot;Key = {0}, Value = {1}&quot;</span>, DE.Key, DE.Value)
+    <span style="color: #0000ff">Next</span> DE
+
+    <span style="color: #008000">&#39; To get the values alone, use the Values property.</span>
+    <span style="color: #0000ff">Dim</span> ValueColl <span style="color: #0000ff">As</span> ICollection
+    <span style="color: #0000ff">Set</span> ValueColl = OpenWith.Values
+
+    <span style="color: #008000">&#39; The elements of the ValueCollection are strongly typed</span>
+    <span style="color: #008000">&#39; with the type that was specified for hash table values.</span>
+    <span style="color: #0000ff">Dim</span> Value <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>
+    
+    Debug.Print
+    
+    <span style="color: #0000ff">For</span> <span style="color: #0000ff">Each</span> Value <span style="color: #0000ff">In</span> ValueColl
+        Debug.Print CorString.Format(<span style="color: #a31515">&quot;Value = {0}&quot;</span>, Value)
+    <span style="color: #0000ff">Next</span>
+
+    <span style="color: #008000">&#39; To get the keys alone, use the Keys property.</span>
+    <span style="color: #0000ff">Dim</span> KeyColl <span style="color: #0000ff">As</span> ICollection
+    <span style="color: #0000ff">Set</span> KeyColl = OpenWith.Keys
+
+    <span style="color: #008000">&#39; The elements of the KeyCollection are strongly typed</span>
+    <span style="color: #008000">&#39; with the type that was specified for hash table keys.</span>
+    <span style="color: #0000ff">Dim</span> Key <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>
+    
+    Debug.Print
+    
+    <span style="color: #0000ff">For</span> <span style="color: #0000ff">Each</span> Key <span style="color: #0000ff">In</span> KeyColl
+        Debug.Print CorString.Format(<span style="color: #a31515">&quot;Key = {0}&quot;</span>, Key)
+    <span style="color: #0000ff">Next</span>
+
+    <span style="color: #008000">&#39; Use the Remove method to remove a key/value pair.</span>
+    Debug.Print vbLf &amp; <span style="color: #a31515">&quot;Remove(&quot;&quot;doc&quot;&quot;)&quot;</span>
+    OpenWith.Remove <span style="color: #a31515">&quot;doc&quot;</span>
+
+    <span style="color: #0000ff">If</span> <span style="color: #0000ff">Not</span> OpenWith.ContainsKey(<span style="color: #a31515">&quot;doc&quot;</span>) <span style="color: #0000ff">Then</span>
+        Debug.Print <span style="color: #a31515">&quot;Key &quot;&quot;doc&quot;&quot; is not found.&quot;</span>
+    <span style="color: #0000ff">End</span> <span style="color: #0000ff">If</span>
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; This example code produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    An element with Key = &quot;txt&quot; already exists.</span>
+<span style="color: #008000">&#39;    For key = &quot;rtf&quot;, value = wordpad.exe.</span>
+<span style="color: #008000">&#39;    For key = &quot;rtf&quot;, value = winword.exe.</span>
+<span style="color: #008000">&#39;    Value added for key = &quot;ht&quot;: hypertrm.exe</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    Key = dib, Value = paint.exe</span>
+<span style="color: #008000">&#39;    Key = ht, Value = hypertrm.exe</span>
+<span style="color: #008000">&#39;    Key = doc, Value = winword.exe</span>
+<span style="color: #008000">&#39;    Key = rtf, Value = winword.exe</span>
+<span style="color: #008000">&#39;    Key = bmp, Value = paint.exe</span>
+<span style="color: #008000">&#39;    Key = txt, Value = notepad.exe</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    Value = Paint.exe</span>
+<span style="color: #008000">&#39;    Value = hypertrm.exe</span>
+<span style="color: #008000">&#39;    Value = winword.exe</span>
+<span style="color: #008000">&#39;    Value = winword.exe</span>
+<span style="color: #008000">&#39;    Value = Paint.exe</span>
+<span style="color: #008000">&#39;    Value = notepad.exe</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    Key = dib</span>
+<span style="color: #008000">&#39;    Key = ht</span>
+<span style="color: #008000">&#39;    Key = doc</span>
+<span style="color: #008000">&#39;    Key = rtf</span>
+<span style="color: #008000">&#39;    Key = bmp</span>
+<span style="color: #008000">&#39;    Key = txt</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    Remove (&quot;doc&quot;)</span>
+<span style="color: #008000">&#39;    Key &quot;doc&quot; is not found.</span>
+</pre></div>
+

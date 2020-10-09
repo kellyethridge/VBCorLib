@@ -466,9 +466,9 @@ Public Function GetValue(ByRef Name As String, Optional ByRef Default As Variant
             Exit Function
             
         Case QWordKind
-            Dim c As Currency
-            ThrowOnFailure RegQueryValueEx(mHKey, Name, 0, ValueType, c, 8)
-            GetValue = c
+            Dim qw As Int64
+            ThrowOnFailure RegQueryValueEx(mHKey, Name, 0, ValueType, qw, 8)
+            GetValue = qw
             
         Case Else
             VariantCopyInd GetValue, Default
@@ -659,6 +659,7 @@ Private Function SetValueBinary(ByRef Name As String, ByRef Value As Variant) As
     
     If Not CorArray.IsNull(Value) Then
         Size = CorArray.Length(Value)
+        
         If Size > 0 Then
             lpData = MemLong(SAPtrV(Value) + PVDATA_OFFSET)
         End If
@@ -667,7 +668,7 @@ Private Function SetValueBinary(ByRef Name As String, ByRef Value As Variant) As
     SetValueBinary = RegSetValueEx(mHKey, Name, 0, REG_BINARY, lpData, Size)
 End Function
 
-Private Function SetValueQWord(ByRef Name As String, ByVal Value As Currency) As Long
+Private Function SetValueQWord(ByRef Name As String, ByRef Value As Int64) As Long
     SetValueQWord = RegSetValueEx(mHKey, Name, 0, REG_QWORD, VarPtr(Value), 8)
 End Function
 
@@ -675,7 +676,7 @@ Private Function SetValueObject(ByRef Name As String, ByVal Value As IObject) As
     SetValueObject = SetValueSZ(Name, Value.ToString)
 End Function
 
-Private Function SetValueDirect(ByRef Name As String, ByRef Value As Variant)
+Private Function SetValueDirect(ByRef Name As String, ByRef Value As Variant) As Long
     Dim Result As Long
     
     Select Case VarType(Value)
@@ -685,8 +686,8 @@ Private Function SetValueDirect(ByRef Name As String, ByRef Value As Variant)
             Result = SetValueMultiSZ(Name, Value)
         Case vbByteArray
             Result = SetValueBinary(Name, Value)
-        Case vbCurrency
-            Result = SetValueQWord(Name, Value)
+        Case vbCurrency, vbUserDefinedType
+            Result = SetValueQWord(Name, CInt64(Value))
         Case vbObject
             Result = SetValueObject(Name, Value)
         Case Else
@@ -709,18 +710,7 @@ Private Function SetValueWithConvert(ByRef Name As String, ByRef Value As Varian
         Case ExpandStringKind
             Result = SetValueExpandSZ(Name, Value)
         Case QWordKind
-            ' We assume if an actual Currency datatype value was passed in
-            ' then that value was the expected 64-bit value. If a different
-            ' datatype (eg. vbLong) was passed in, then we assume that the
-            ' 64-bits need to be lined up. A vbLong of 1 does not equal
-            ' a vbCurrency of 1 in a 64-bit representation, so we need to
-            ' divide the vbLong value by 10000 to have correct bit alignment.
-            If VarType(Value) = vbCurrency Then
-                Result = SetValueQWord(Name, Value)
-            Else
-                Result = SetValueQWord(Name, 0.0001@ * CCur(Value))
-            End If
-            
+            Result = SetValueQWord(Name, CInt64(Value))
         Case Else
             If IsObject(Value) Then
                 Result = SetValueObject(Name, Value)

@@ -42,16 +42,16 @@ Public Type BigNumber
 End Type
 
 
-Public Function Equals(ByRef X As BigNumber, ByRef Y As BigNumber) As Boolean
-    If X.Sign <> Y.Sign Then
+Public Function Equals(ByRef x As BigNumber, ByRef y As BigNumber) As Boolean
+    If x.Sign <> y.Sign Then
         Exit Function
-    ElseIf X.Precision <> Y.Precision Then
+    ElseIf x.Precision <> y.Precision Then
         Exit Function
     End If
     
     Dim i As Long
-    For i = 0 To X.Precision - 1
-        If X.Digits(i) <> Y.Digits(i) Then
+    For i = 0 To x.Precision - 1
+        If x.Digits(i) <> y.Digits(i) Then
             Exit Function
         End If
     Next
@@ -59,24 +59,24 @@ Public Function Equals(ByRef X As BigNumber, ByRef Y As BigNumber) As Boolean
     Equals = True
 End Function
 
-Public Function Compare(ByRef X As BigNumber, ByRef Y As BigNumber) As Long
+Public Function Compare(ByRef x As BigNumber, ByRef y As BigNumber) As Long
     Dim Result As Long
     
-    Result = X.Sign - Y.Sign
+    Result = x.Sign - y.Sign
     
     If Result = 0 Then
-        Result = X.Precision - Y.Precision
+        Result = x.Precision - y.Precision
         
         If Result = 0 Then
             Dim i As Long
-            For i = X.Precision - 1 To 0 Step -1
-                Result = (X.Digits(i) And &HFFFF&) - (Y.Digits(i) And &HFFFF&)
+            For i = x.Precision - 1 To 0 Step -1
+                Result = (x.Digits(i) And &HFFFF&) - (y.Digits(i) And &HFFFF&)
                 If Result <> 0 Then
                     Exit For
                 End If
             Next i
         Else
-            Result = X.Sign * Result
+            Result = x.Sign * Result
         End If
     End If
     
@@ -538,7 +538,7 @@ Private Sub DivideCore(ByRef u As BigNumber, ByRef v As BigNumber, ByRef Quotien
                 Dim qHatDigits As Long
                 Dim rHatDigits As Long
 
-                qHatDigits = (qHat * (v.Digits(n - 2) And &HFFFF&))
+                qHatDigits = (qHat * vDigit2) '(v.Digits(n - 2) And &HFFFF&))
                 rHatDigits = (rHat * &H10000) + (u.Digits(j + n - 2) And &HFFFF&)
                 
                 If (qHatDigits - &H80000000) <= (rHatDigits - &H80000000) Then
@@ -1065,22 +1065,22 @@ Public Sub SingleInPlaceAdd(ByRef n As BigNumber, ByVal Value As Integer)
     Loop
 End Sub
 
-Private Function UInt32x16To32(ByVal X As Long, ByVal Y As Integer) As Long
+Private Function UInt32x16To32(ByVal x As Long, ByVal y As Integer) As Long
     Dim v As Currency
     Dim w As Currency
     
-    v = Y And &HFFFF&
-    w = (v * X) * 0.0001@
+    v = y And &HFFFF&
+    w = (v * x) * 0.0001@
     
     UInt32x16To32 = AsLong(w)
 End Function
 
-Private Function UInt32Compare(ByVal X As Long, ByVal Y As Long) As Long
+Private Function UInt32Compare(ByVal x As Long, ByVal y As Long) As Long
     Dim u As Currency
     Dim v As Currency
     
-    AsLong(u) = X
-    AsLong(v) = Y
+    AsLong(u) = x
+    AsLong(v) = y
      
     UInt32Compare = Sgn(u - v)
 End Function
@@ -1170,43 +1170,43 @@ Public Function SinglePlaceDivide(ByRef u() As Integer, ByVal Length As Long, By
     SinglePlaceDivide = q
 End Function
 
-Private Function UInt16x16To32(ByVal X As Long, ByVal Y As Long) As Long
+Private Function UInt16x16To32(ByVal x As Long, ByVal y As Long) As Long
     Dim u As Currency
     Dim v As Currency
     Dim w As Currency
     
-    u = X And &HFFFF&
-    v = Y And &HFFFF&
+    u = x And &HFFFF&
+    v = y And &HFFFF&
     w = (u * v) * 0.0001@
       
     UInt16x16To32 = AsLong(w)
 End Function
 
-Private Function UInt32d16To32(ByVal X As Long, ByVal Y As Long) As Long
+Private Function UInt32d16To32(ByVal x As Long, ByVal y As Long) As Long
     Dim d As Currency
 
-    AsLong(d) = X
+    AsLong(d) = x
     d = d * 10000@
-    UInt32d16To32 = Int(d / (Y And &HFFFF&))
+    UInt32d16To32 = Int(d / (y And &HFFFF&))
 End Function
 
-Private Function UInt32m16To32(ByVal X As Long, ByVal Y As Long) As Long
+Private Function UInt32m16To32(ByVal x As Long, ByVal y As Long) As Long
     Dim q As Currency
     Dim d As Currency
     Dim v As Currency
     
-    v = Y And &HFFFF&
-    AsLong(d) = X
+    v = y And &HFFFF&
+    AsLong(d) = x
     d = d * 10000@
     q = Int(d / v)
     UInt32m16To32 = d - q * v
 End Function
 
-Private Function Make32(ByVal X As Integer, ByVal Y As Integer) As Long
-    Make32 = Helper.ShiftLeft(X And &HFFFF&, 16) Or (Y And &HFFFF&)
+Private Function Make32(ByVal x As Integer, ByVal y As Integer) As Long
+    Make32 = Helper.ShiftLeft(x And &HFFFF&, 16) Or (y And &HFFFF&)
 End Function
 
-Private Function RightShift16(ByVal X As Long) As Long
-    RightShift16 = ((X And &HFFFF0000) \ &H10000) And &HFFFF&
+Private Function RightShift16(ByVal x As Long) As Long
+    RightShift16 = ((x And &HFFFF0000) \ &H10000) And &HFFFF&
 End Function
 #End If

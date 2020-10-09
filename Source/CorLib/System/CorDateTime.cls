@@ -38,22 +38,14 @@ Attribute VB_Exposed = True
 ''
 ' Represents a point in time.
 '
-' @remarks The CorDateTime class can represent a point in time from
-' 1/1/0001 12:00:00 AM to 12/31/9999 11:59:59 PM. The time is represented
-' in a gregorian calendar set.
-'
-' <pre>
-' Dim dt As CorDateTime
-' Set dt = NewDate(#1/1/2005 8:30:00AM#")
-' </pre>
-'
+' @remarks The <b>CorDateTime</b> class can represent a point in time from 1/1/0001 12:00:00 AM to 12/31/9999 11:59:59 PM. The time is represented in a gregorian calendar set.
 ' @see Constructors
 ' @see CorDateTimeStatic
 ' @see DateTimeFormatInfo
 ' @see TimeSpan
 ' @see IComparable
 ' @see IFormattable
-'
+' @include "..\DocIncludes\CorDateTime.html"
 Option Explicit
 Implements IObject
 Implements IComparable

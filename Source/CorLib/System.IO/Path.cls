@@ -36,15 +36,9 @@ Attribute VB_Exposed = True
 '
 
 ''
-' Provides functions to locate and format path information.
+' Performs operations on String instances that contain file or directory path information.
 '
-' @remarks All members of Path are static. To access them, use the
-' Path.* convention.
-' <pre>
-' Dim p As String
-' p = Path.Combine(App.Path, "file.txt")
-' </pre>
-'
+' @include "..\DocIncludes\Path.html"
 Option Explicit
 
 Private mInvalidPathChars()     As Integer
@@ -57,7 +51,13 @@ Private mTrimEndChars()         As Integer
 '
 ' @return The character code of the alternative directory separator (47).
 ' @remarks The alternate character is usually found on systems such as Unix.
-'
+' @see #AltDirectorySeparator
+' @see #DirectorySeparator
+' @see #DirectorySeparatorChar
+' @see #PathSeparator
+' @see #PathSeparatorChar
+' @see #VolumeSeparator
+' @see #VolumeSeparatorChar
 Public Property Get AltDirectorySeparatorChar() As Integer
     AltDirectorySeparatorChar = vbAltDirectorySeparatorChar
 End Property
@@ -67,7 +67,13 @@ End Property
 '
 ' @return The string of the alternative directory separator "/".
 ' @remarks The alternate string is usually found on systems such as Unix.
-'
+' @see #AltDirectorySeparatorChar
+' @see #DirectorySeparator
+' @see #DirectorySeparatorChar
+' @see #PathSeparator
+' @see #PathSeparatorChar
+' @see #VolumeSeparator
+' @see #VolumeSeparatorChar
 Public Property Get AltDirectorySeparator() As String
     AltDirectorySeparator = vbAltDirectorySeparator
 End Property
@@ -76,7 +82,13 @@ End Property
 ' Returns the directory separator character for Windows.
 '
 ' @return The directory separator character for Windows (92).
-'
+' @see #DirectorySeparator
+' @see #AltDirectorySeparator
+' @see #AltDirectorySeparatorChar
+' @see #PathSeparator
+' @see #PathSeparatorChar
+' @see #VolumeSeparator
+' @see #VolumeSeparatorChar
 Public Property Get DirectorySeparatorChar() As Integer
     DirectorySeparatorChar = vbDirectorySeparatorChar
 End Property
@@ -85,7 +97,13 @@ End Property
 ' Returns the directory separator string for Windows.
 '
 ' @return The directory separator string for windows "\".
-'
+' @see #DirectorySeparatorChar
+' @see #AltDirectorySeparator
+' @see #AltDirectorySeparatorChar
+' @see #PathSeparator
+' @see #PathSeparatorChar
+' @see #VolumeSeparator
+' @see #VolumeSeparatorChar
 Public Property Get DirectorySeparator() As String
     DirectorySeparator = vbDirectorySeparator
 End Property
@@ -94,7 +112,13 @@ End Property
 ' The character code used to separate strings in an environment variable.
 '
 ' @return The environment variable string separator character code (59).
-'
+' @see #DirectorySeparator
+' @see #DirectorySeparatorChar
+' @see #AltDirectorySeparator
+' @see #AltDirectorySeparatorChar
+' @see #PathSeparator
+' @see #VolumeSeparator
+' @see #VolumeSeparatorChar
 Public Property Get PathSeparatorChar() As Integer
     PathSeparatorChar = vbPathSeparatorChar
 End Property
@@ -103,7 +127,13 @@ End Property
 ' The string used to seperate strings in an environment variable.
 '
 ' @return The environment variable string separator ";".
-'
+' @see #DirectorySeparator
+' @see #DirectorySeparatorChar
+' @see #AltDirectorySeparator
+' @see #AltDirectorySeparatorChar
+' @see #PathSeparatorChar
+' @see #VolumeSeparator
+' @see #VolumeSeparatorChar
 Public Property Get PathSeparator() As String
     PathSeparator = vbPathSeparator
 End Property
@@ -112,7 +142,13 @@ End Property
 ' The character code used to separate volume labels from path information.
 '
 ' @return The character code for the volume separator (58).
-'
+' @see #DirectorySeparator
+' @see #DirectorySeparatorChar
+' @see #AltDirectorySeparator
+' @see #AltDirectorySeparatorChar
+' @see #PathSeparator
+' @see #PathSeparatorChar
+' @see #VolumeSeparator
 Public Property Get VolumeSeparatorChar() As Integer
     VolumeSeparatorChar = vbVolumeSeparatorChar
 End Property
@@ -121,20 +157,28 @@ End Property
 ' Returns the string version of the volume separator.
 '
 ' @return The string version of the volume separator ":".
-'
+' @see #DirectorySeparator
+' @see #DirectorySeparatorChar
+' @see #AltDirectorySeparator
+' @see #AltDirectorySeparatorChar
+' @see #PathSeparator
+' @see #PathSeparatorChar
+' @see #VolumeSeparatorChar
 Public Property Get VolumeSeparator() As String
     VolumeSeparator = vbVolumeSeparator
 End Property
 
 ''
-' Replaces the extension of a filename with a new extension.
+' Changes the extension of a path string.
 '
-' @param Path The filename with an optional path.
-' @param Extension The new extension to change the filename's to.
-' @return The filename with the new extension, including a path if supplied.
-' @remarks Passing in an <i>Extension</i> of <i>vbNullString</i> will remove
-' any extension and period from the path.
-'
+' @param Path The path information to modify. The path cannot contain any of the characters defined in <a href="Path.GetInvalidPathChars.html">GetInvalidPathChars</a>.
+' @param Extension The new extension (with or without a leading period). Specify <b>vbNullString</b> to remove an existing extension from <i>Path</i>.
+' @return The modified path information.
+' <p>If <i>Path</i> has length zero, <b>vbNullString</b> is returned. If <i>Extension</i> is <b>vbNullString</b>, the returned string contains the specified
+' path with its extension removed. If <i>Path</i> has no extension, and <i>Extension</i> is not <b>vbNullString</b>, the returned string contains
+' <i>Extension</i> appended to the end of <i>Path</i>.</p>
+' @see #GetInvalidPathChars
+' @include "..\DocIncludes\Path.ChangeExtension.html"
 Public Function ChangeExtension(ByRef Path As String, ByRef Extension As String) As String
     If Len(Path) = 0 Then
         Exit Function
@@ -163,15 +207,12 @@ Public Function ChangeExtension(ByRef Path As String, ByRef Extension As String)
 End Function
 
 ''
-' Returns an indication if the path is rooted or not.
+' Gets a value indicating whether the specified path string contains a root.
 '
-' @param Path The path to check if is rooted.
-' @return The indication of the path being rooted.
-' @remarks <p>A rooted path is one that starts with a volume name,
-' UNC server name, or directory separator. Such paths as C:\MyDir\File,
-' \\Server\Share\File, and \MyFile are rooted.</p>
-' <p>This function does not verify that the path actually exists.</p>
-'
+' @param Path The path to test.
+' @return <b>True</b> if <i>Path</i> contains a root; otherwise <b>False</b>.
+' @see #GetInvalidPathChars
+' @include "..\DocIncludes\Path.IsPathRooted.html"
 Public Function IsPathRooted(ByRef Path As String) As Boolean
     If Len(Path) = 0 Then
         Exit Function
@@ -189,15 +230,17 @@ Public Function IsPathRooted(ByRef Path As String) As Boolean
 End Function
 
 ''
-' Returns if a filename has an extension.
+' Determines whether a path includes a file name extension.
 '
-' @param Path A filename and optional path to check for an extension.
-' @return An indication of the filename having an extension.
-' @remarks <p>The path string is search for a '.' that separates the
-' the extension from the filename itself. If any of the directory separator
-' characters or volume separator is encountered before a '.', then the
-' filename is considered not to have an extension.
-'
+' @param Path The path to search for an extension.
+' @return <b>True</b> if the characters that follow the last directory separator (\ or /) or volume separator (:) in the path include a period (.) followed by one or more characters; otherwise, <b>False</b>.
+' @remarks Starting from the end of <i>Path</i>, this method searches for a period (.) followed by at least one character.
+' If this pattern is found before a <a href="Path.Get.DirectorySeparatorChar.html">DirectorySeparatorChar</a>, <a href="Path.Get.AltDirectorySeparatorChar.html">AltDirectorySeparatorChar</a>,
+' or <a href="Path.Get.VolumeSeparatorChar.html">VolumeSeparatorChar</a> character is encountered, this method returns <b>True</b>.
+' @see #DirectorySeparatorChar
+' @see #AltDirectorySeparatorChar
+' @see #VolumeSeparatorChar
+' @include "..\DocIncludes\Path.HasExtension.html"
 Public Function HasExtension(ByRef Path As String) As Boolean
     Dim Index As Long
     
@@ -207,19 +250,14 @@ Public Function HasExtension(ByRef Path As String) As Boolean
 End Function
 
 ''
-' Combintes two paths into a single path.
+' Combines two or more strings into a path.
 '
-' @param Path1 The left-hand side of the two paths to be joined.
-' @param Path2 The right-hand side of the two paths to be joined.
-' @param Paths Additional paths to be joined.
-' @return The joined paths.
-' @remarks <p>If Path1 is an empty string, then Path2 is returned as is. If Path2
-' is empty, but not Path1, then Path1 is returned as is.</p>
-' <p>If Path2 is rooted (starts with a volume, UNC identifier or directory
-' separator), then Path2 is returned, regardless of Path1.</p>
-' <p>If Path1 does not end with a directory separator, one will be inserted.</p>
-' <p>This function does not verify that the paths exist.</p>
-'
+' @param Path1 The first path to combine.
+' @param Path2 The second path to combine.
+' @param Paths Zero or more additional paths to be combined.
+' @return The combined paths.
+' @see #CombineArray
+' @include "..\DocIncludes\Path.Combine.html"
 Public Function Combine(ByRef Path1 As String, ByRef Path2 As String, ParamArray Paths() As Variant) As String
     Dim Result  As String
     Dim Part    As Variant
@@ -235,10 +273,12 @@ Public Function Combine(ByRef Path1 As String, ByRef Path2 As String, ParamArray
 End Function
 
 ''
-' Combines an array of path fragments returning a complete path.
+' Combines an array of strings into a path.
 '
-' @param Paths The array of path fragments to be combined.
-' @return Returns a concatenated string of the path fragments.
+' @param Paths An array of parts of the path.
+' @return The combined paths.
+' @see #Combine
+' @include "..\DocIncludes\Path.CombineArray.html"
 Public Function CombineArray(ByRef Paths() As String) As String
     Dim Index   As Long
     Dim Result  As String
@@ -259,12 +299,12 @@ Public Function CombineArray(ByRef Paths() As String) As String
 End Function
 
 ''
-' Returns the directory portion of a file path.
+' Returns the directory information for the specified path string.
 '
-' @param Path The path to parse the directory from.
-' @return The directory parsed from the path.
+' @param Path The path of a file or directory.
+' @return Directory information for <i>Path</i>, or empty string if <i>Path</i> denotes a root directory. Returns empty string if <i>Path</i> does not contain directory information.
 ' @remarks The function does not verify that the directory exists.
-'
+' @include "..\DocIncludes\Path.GetDirectoryName.html"
 Public Function GetDirectoryName(ByRef Path As String) As String
     Dim NormalizedPath  As String
     Dim PathLength      As Long
@@ -293,11 +333,12 @@ Public Function GetDirectoryName(ByRef Path As String) As String
 End Function
 
 ''
-' Returns the extension of a filename.
+' Returns the extension of the specified path string.
 '
-' @param Path The filename to retrieve the extension of.
-' @return The extension of the filename
-'
+' @param Path The path string from which to get the extension.
+' @return The extension of the specified path (including the period "."), or an empty string.
+' If <i>Path</i> is empty, <b>GetExtension</b> returns an empty string. If <i>Path</i> does not have extension information, <b>GetExtension</b> returns an empty string.
+' @include "..\DocIncludes\Path.GetExtension.html"
 Public Function GetExtension(ByRef Path As String) As String
     Dim Index As Long
     
@@ -309,12 +350,12 @@ Public Function GetExtension(ByRef Path As String) As String
 End Function
 
 ''
-' Returns the filename portion of the specified path.
+' Returns the file name and extension of the specified path string.
 '
-' @param Path The path to retrieve the filename from.
-' @return The filetime portion of the specified path.
-' @remarks This function does not verify that the file exists.
-'
+' @param Path The path string from which to obtain the file name and extension.
+' @return The characters after the last directory character in <i>Path</i>. If the last character of <i>Path</i> is a directory or volume separator character,
+' this method returns an empty string. If <i>Path</i> is empty, this method returns an empty string.
+' @include "..\DocIncludes\Path.GetFileName.html"
 Public Function GetFileName(ByRef Path As String) As String
     Dim Index As Long
     
@@ -333,8 +374,8 @@ End Function
 '
 ' @param Path The path to parse the filename from.
 ' @return A filename without the extension present.
-' @remarks This function does not verify the file exists.
-'
+' @remarks This function does not verify that the path or file exists.
+' @include "..\DocIncludes\Path.GetFileNameWithoutExtension.html"
 Public Function GetFileNameWithoutExtension(ByRef Path As String) As String
     Dim FileName As String
     Dim Index    As Long
@@ -350,15 +391,11 @@ Public Function GetFileNameWithoutExtension(ByRef Path As String) As String
 End Function
 
 ''
-' Creates a full path to the specified filename.
+' Returns the absolute path for the specified path string.
 '
-' @param Path The filename to prepend any path to.
-' @return A fully qualified path to a filename.
-' @remarks The filename is prepended with the current directory to
-' give a full path. The file does not need to exists, nor is the
-' existence verified.
-' <p>If <i>Path</i> is already rooted, then <i>Path</i> is returned.</p>
-'
+' @param Path The file or directory for which to obtain absolute path information.
+' @return The fully qualified location of path, such as "C:\MyFile.txt".
+' @include "..\DocIncludes\Path.GetFullPath.html"
 Public Function GetFullPath(ByRef Path As String) As String
     Dim FullPath As String
     
@@ -371,13 +408,11 @@ Public Function GetFullPath(ByRef Path As String) As String
 End Function
 
 ''
-' Returns the root directory of the specified path.
+' Returns the root directory information of the specified path.
 '
-' @param Path The path to retrieve the root directory from.
-' @return The root directory of the specified path.
-' @remarks <i>Path</i> is not checked if it exists. The root is
-' derived from what information is in <i>Path</i>.
-'
+' @param Path The path from which to obtain root directory information.
+' @return The root directory of <i>Path</i>, such as "C:\", or an empty string if <i>Path</i> does not contain root directory information.
+' @include "..\DocIncludes\Path.GetPathRoot.html"
 Public Function GetPathRoot(ByRef Path As String) As String
     Dim NormalizedPath As String
     
@@ -386,12 +421,26 @@ Public Function GetPathRoot(ByRef Path As String) As String
 End Function
 
 ''
-' Returns the filename for a temporary file.
+' Creates a uniquely named, zero-byte temporary file on disk and returns the full path of that file.
 '
-' @return The temporary file's filename.
-' @remark This function creates a 0 byte temporary file of the returned name.
-' The file is placed in the temporary path of the current user.
-'
+' @return The full path of the temporary file.
+' @remark This method creates a temporary file with a .TMP file extension.
+' <p>The <b>GetTempFileName</b> method will raise an <a href="IOException.html">IOException</a> if it is used to create more than 65535 files without deleting previous temporary files.</p>
+' <p>The <b>GetTempFileName</b> method will raise an IOException if no unique temporary file name is available. To resolve this error, delete all unneeded temporary files.</p>
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th><th>Condition</th>
+'   </tr>
+'   <tr>
+'       <td><a href="IOException.html">IOException</a></td>
+'       <td>
+'           An I/O error occurs, such as no unique temporary file name is available.<br/>
+'           -or-<br/>
+'           This method was unable to create a temporary file.
+'       </td>
+'   </tr>
+' </table>
 Public Function GetTempFileName() As String
     Dim FileName As String
     
@@ -407,8 +456,14 @@ End Function
 ''
 ' Returns the path to the temporary folder for the current user.
 '
-' @return The temporary path for the current user.
-'
+' @return The path to the temporary folder, ending with a backslash.
+' @remarks This method checks for the existence of environment variables in the following order and uses the first path found:
+' <ol>
+'   <li>The path specified by the TMP environment variable.</li>
+'   <li>The path specified by the TEMP environment variable.</li>
+'   <li>The path specified by the USERPROFILE environment variable.</li>
+'   <li>The Windows directory.</li>
+' </ol>
 Public Function GetTempPath() As String
     Dim PathName    As String
     Dim Size        As Long
@@ -424,15 +479,19 @@ Public Function GetTempPath() As String
 End Function
 
 ''
-' Returns an array of invalid path characters.
+' Gets an array containing the characters that are not allowed in path names.
 '
+' @return An array containing the characters that are not allowed in path names.
+' @include "..\DocIncludes\Path.GetInvalidPathChars.html"
 Public Function GetInvalidPathChars() As Integer()
     GetInvalidPathChars = mInvalidPathChars
 End Function
 
 ''
-' Returns an array of invalid filename characters.
+' Gets an array containing the characters that are not allowed in file names.
 '
+' @return An array containing the characters that are not allowed in file names.
+' @include "..\DocIncludes\Path.GetInvalidFileNameChars.html"
 Public Function GetInvalidFileNameChars() As Integer()
     GetInvalidFileNameChars = mInvalidFileNameChars
 End Function
@@ -607,7 +666,7 @@ Private Function HasIllegalCharacters(ByRef Path As String) As Boolean
     PathChars = AllocChars(Path)
     
     For i = 0 To Len(Path) - 1
-        Select Case PathChars(i)
+        Select Case PathChars(i) And &HFFFF&
             Case vbQuoteChar, vbLessThanChar, vbGreaterThanChar, vbPipeChar, Is < vbSpaceChar
                 HasIllegalCharacters = True
                 Exit For

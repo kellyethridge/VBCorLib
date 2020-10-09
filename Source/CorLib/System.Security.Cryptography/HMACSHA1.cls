@@ -340,8 +340,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = GetHashCode
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String
@@ -445,7 +445,7 @@ Private Property Let KeyedHashAlgorithm_Key(Value() As Byte)
 End Property
 
 Private Property Get KeyedHashAlgorithm_Key() As Byte()
-    KeyedHashAlgorithm = Key
+    KeyedHashAlgorithm_Key = mBase.GetKey
 End Property
 
 Private Property Get KeyedHashAlgorithm_CanReuseTransform() As Boolean

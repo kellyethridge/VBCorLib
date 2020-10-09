@@ -74,11 +74,11 @@ Public Const CSIDL_MYMUSIC                  As Long = &HD
 Public Const CSIDL_MYPICTURES               As Long = &H27
 
 
-Public Function MakeHRFromErrorCode(ByVal ErrorCode As Long)
+Public Function MakeHRFromErrorCode(ByVal ErrorCode As Long) As Long
     MakeHRFromErrorCode = &H80070000 Or ErrorCode
 End Function
 
-Public Function SafeCreateFile(FileName As String, ByVal DesiredAccess As FileAccess, ByVal ShareMode As FileShare, ByVal CreationDisposition As FileMode, Optional ByVal FlagsAndAttributes = FILE_ATTRIBUTE_NORMAL) As SafeFileHandle
+Public Function SafeCreateFile(FileName As String, ByVal DesiredAccess As FileAccess, ByVal ShareMode As FileShare, ByVal CreationDisposition As FileMode, Optional ByVal FlagsAndAttributes As Long = FILE_ATTRIBUTE_NORMAL) As SafeFileHandle
     Dim AccessFlag As Long
     Select Case DesiredAccess
         Case FileAccess.ReadAccess

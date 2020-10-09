@@ -78,16 +78,13 @@ Friend Function Format(ByVal TotalMilliseconds As Currency, ByRef FormatString A
             FormatCustom
     End Select
     
-    GoSub Finally
+    FreeChars mFormatChars
     Format = StringBuilderCache.GetStringAndRelease(mOutput)
     Exit Function
     
 Catch:
-    GoSub Finally
-    Throw
-Finally:
     FreeChars mFormatChars
-    Return
+    ThrowOrErr Err
 End Function
 
 Private Sub InitComponents(ByVal TotalMilliseconds As Currency)

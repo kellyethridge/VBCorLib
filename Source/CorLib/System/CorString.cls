@@ -39,11 +39,7 @@ Attribute VB_Exposed = True
 ' Provides static functions to format and manipulate string values.
 '
 ' @remarks This class cannot be directly instantiated. The methods are accessed through the class name itself.
-' @examples
-' <pre>
-' s = CorString.Trim(s, "\")
-' </pre>
-'
+' @include "..\DocIncludes\CorString.html"
 Option Explicit
 
 ''
@@ -486,16 +482,16 @@ End Function
 Public Function LastIndexOfAny(ByRef s As String, ByRef OfAny As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As Long
     Dim Range As ListRange
     
-    Range = MakeStringRange(s, StartIndex, Count)
-    
-    If Range.Index < 0 Then _
-        Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_NeedNonNegNum
-    If Range.Count < 0 Then _
-        Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_NeedNonNegNum
-    If Range.Index - Range.Count + 1 < 0 Then _
-        Error.ArgumentOutOfRange "", ArgumentOutOfRange_Count
-    
     If Len(s) > 0 Then
+        Range = MakeStringRange(s, StartIndex, Count)
+        
+        If Range.Index < 0 Then _
+            Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_NeedNonNegNum
+        If Range.Count < 0 Then _
+            Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_NeedNonNegNum
+        If Range.Index - Range.Count + 1 < 0 Then _
+            Error.ArgumentOutOfRange "", ArgumentOutOfRange_Count
+        
         LastIndexOfAny = IndexOfAnyCore(s, OfAny, Range.Index, Range.Index - Range.Count + 1, -1)
     Else
         LastIndexOfAny = -1
@@ -677,7 +673,12 @@ Public Function Split(ByRef s As String, ByRef Separator As Variant, Optional By
         Dim SeparatorIndexes()  As Long
         Dim SeparatorLengths()  As Long
         Dim MatchCount          As Long
-                
+        Dim MaxIndexes          As Long
+        
+        MaxIndexes = Len(s) \ 2 + 1
+        ReDim SeparatorIndexes(0 To MaxIndexes)
+        ReDim SeparatorLengths(0 To MaxIndexes)
+        
         If VarType(Separator) = vbString Then
             If Len(Separator) = 0 Then
                 MatchCount = FindWhitespaceSeparatorIndexes(s, SeparatorIndexes, SeparatorLengths)
@@ -712,46 +713,66 @@ Private Function FindSeparatorIndexes(ByRef s As String, ByRef Separator As Vari
     On Error GoTo Catch
     
     Select Case VarType(Separator)
+        Case vbString
+            FindSeparatorIndexes = FindStringSeparatorIndexes(s, Separator, SeparatorIndexes, SeparatorLengths)
         Case vbStringArray
             SAPtr(StringSeparator) = SAPtrV(Separator)
-            FindSeparatorIndexes = FindStringSeparatorIndexes(s, StringSeparator, SeparatorIndexes, SeparatorLengths)
+            
+            If Len1D(Separator) = 1 Then
+                FindSeparatorIndexes = FindStringSeparatorIndexes(s, StringSeparator(LBound(StringSeparator)), SeparatorIndexes, SeparatorLengths)
+            Else
+                FindSeparatorIndexes = FindStringSeparatorsIndexes(s, StringSeparator, SeparatorIndexes, SeparatorLengths)
+            End If
         Case vbIntegerArray
             SAPtr(CharSeparator) = SAPtrV(Separator)
-            FindSeparatorIndexes = FindCharSeparatorIndexes(s, CharSeparator, SeparatorIndexes, SeparatorLengths)
-        Case vbString
-            ReDim StringSeparator(0)
-            StringSeparator(0) = Separator
-            FindSeparatorIndexes = FindStringSeparatorIndexes(s, StringSeparator, SeparatorIndexes, SeparatorLengths)
+            FindSeparatorIndexes = FindCharSeparatorsIndexes(s, CharSeparator, SeparatorIndexes, SeparatorLengths)
         Case Else
             Error.Argument Argument_CharArrayRequired, "Separator"
     End Select
 
-    GoSub Finally
     Exit Function
     
 Catch:
-    GoSub Finally
-    ThrowOrErr Err
-Finally:
     SAPtr(StringSeparator) = vbNullPtr
     SAPtr(CharSeparator) = vbNullPtr
-    Return
+    ThrowOrErr Err
 End Function
 
-Private Function FindStringSeparatorIndexes(ByRef s As String, ByRef Separator() As String, ByRef SeparatorIndexes() As Long, ByRef SeparatorLengths() As Long) As Long
-    Dim CharIndex       As Long
-    Dim SLength         As Long
-    Dim SeparatorUB     As Long
-    Dim SeparatorLB     As Long
-    Dim MatchCount      As Long
-    Dim Sep             As String
-    Dim SepLength       As Long
+Private Function FindStringSeparatorIndexes(ByRef s As String, ByRef Separator As Variant, ByRef SeparatorIndexes() As Long, ByRef SeparatorLengths() As Long) As Long
+    Dim MatchCount As Long
+    Dim SepLength  As Long
+    Dim MatchIndex As Long
     
+    SepLength = Len(Separator)
+        
+    Do
+        MatchIndex = InStr(MatchIndex + 1, s, Separator) - 1
+        
+        If MatchIndex >= 0 Then
+            SeparatorIndexes(MatchCount) = MatchIndex
+            SeparatorLengths(MatchCount) = SepLength
+            MatchCount = MatchCount + 1
+            MatchIndex = MatchIndex + SepLength
+        Else
+            Exit Do
+        End If
+    Loop
+    
+    FindStringSeparatorIndexes = MatchCount
+End Function
+
+Private Function FindStringSeparatorsIndexes(ByRef s As String, ByRef Separator() As String, ByRef SeparatorIndexes() As Long, ByRef SeparatorLengths() As Long) As Long
+    Dim CharIndex   As Long
+    Dim SLength     As Long
+    Dim SeparatorUB As Long
+    Dim SeparatorLB As Long
+    Dim MatchCount  As Long
+    Dim Sep         As String
+    Dim SepLength   As Long
+        
     SeparatorUB = UBound(Separator)
     SeparatorLB = LBound(Separator)
     SLength = Len(s)
-    ReDim SeparatorIndexes(0 To SLength \ 2 + 1)
-    ReDim SeparatorLengths(0 To SLength \ 2 + 1)
     
     Do While CharIndex < SLength
         Dim i As Long
@@ -772,14 +793,14 @@ Private Function FindStringSeparatorIndexes(ByRef s As String, ByRef Separator()
                 Exit For
             End If
         Next
-        
+
         CharIndex = CharIndex + 1
     Loop
     
-    FindStringSeparatorIndexes = MatchCount
+    FindStringSeparatorsIndexes = MatchCount
 End Function
 
-Private Function FindCharSeparatorIndexes(ByRef s As String, ByRef Separator() As Integer, ByRef SeparatorIndexes() As Long, ByRef SeparatorLengths() As Long) As Long
+Private Function FindCharSeparatorsIndexes(ByRef s As String, ByRef Separator() As Integer, ByRef SeparatorIndexes() As Long, ByRef SeparatorLengths() As Long) As Long
     Dim Chars()     As Integer
     Dim CharIndex   As Long
     Dim SLength     As Long
@@ -790,8 +811,6 @@ Private Function FindCharSeparatorIndexes(ByRef s As String, ByRef Separator() A
     SeparatorUB = UBound(Separator)
     SeparatorLB = LBound(Separator)
     SLength = Len(s)
-    ReDim SeparatorIndexes(0 To SLength \ 2 + 1)
-    ReDim SeparatorLengths(0 To SLength \ 2 + 1)
     Chars = AllocChars(s)
     
     On Error GoTo Catch
@@ -811,16 +830,13 @@ Private Function FindCharSeparatorIndexes(ByRef s As String, ByRef Separator() A
         CharIndex = CharIndex + 1
     Loop
     
-    GoSub Finally
-    FindCharSeparatorIndexes = MatchCount
+    FreeChars Chars
+    FindCharSeparatorsIndexes = MatchCount
     Exit Function
     
 Catch:
-    GoSub Finally
-    ThrowOrErr Err
-Finally:
     FreeChars Chars
-    Return
+    ThrowOrErr Err
 End Function
 
 Private Function FindWhitespaceSeparatorIndexes(ByRef s As String, ByRef SeparatorIndexes() As Long, ByRef SeparatorLengths() As Long) As Long
@@ -830,8 +846,6 @@ Private Function FindWhitespaceSeparatorIndexes(ByRef s As String, ByRef Separat
     Dim MatchCount  As Long
     
     SLength = Len(s)
-    ReDim SeparatorIndexes(0 To SLength \ 2 + 1)
-    ReDim SeparatorLengths(0 To SLength \ 2 + 1)
     Chars = AllocChars(s)
     
     On Error GoTo Catch
@@ -846,16 +860,13 @@ Private Function FindWhitespaceSeparatorIndexes(ByRef s As String, ByRef Separat
         CharIndex = CharIndex + 1
     Loop
     
-    GoSub Finally
+    FreeChars Chars
     FindWhitespaceSeparatorIndexes = MatchCount
     Exit Function
     
 Catch:
-    GoSub Finally
-    ThrowOrErr Err
-Finally:
     FreeChars Chars
-    Return
+    ThrowOrErr Err
 End Function
 
 Private Function SplitWithEmpties(ByRef s As String, ByVal MatchCount As Long, ByRef SeparatorIndexes() As Long, ByRef SeparatorLengths() As Long, ByVal Count As Long) As String()
@@ -884,7 +895,7 @@ Private Function SplitWithoutEmpties(ByRef s As String, ByVal MatchCount As Long
     
     MaxSubstrings = CountSubstrings(s, MatchCount, SeparatorIndexes, SeparatorLengths)
     MaxSubstrings = IIf(MaxSubstrings < Count, MaxSubstrings, Count)
-    SplitWithoutEmpties = CreateSubstrings(s, MaxSubstrings, SeparatorIndexes, SeparatorLengths)
+    SplitWithoutEmpties = CreateSubstrings(s, MatchCount, MaxSubstrings, SeparatorIndexes, SeparatorLengths)
 End Function
 
 Private Function CountSubstrings(ByRef s As String, ByVal MatchCount As Long, ByRef SeparatorIndexes() As Long, ByRef SeparatorLengths() As Long) As Long
@@ -904,7 +915,7 @@ Private Function CountSubstrings(ByRef s As String, ByVal MatchCount As Long, By
     End If
 End Function
 
-Private Function CreateSubstrings(ByRef s As String, ByVal MaxSubstrings As Long, ByRef SeparatorIndexes() As Long, ByRef SeparatorLengths() As Long) As String()
+Private Function CreateSubstrings(ByRef s As String, ByVal MatchCount As Long, ByVal MaxSubstrings As Long, ByRef SeparatorIndexes() As Long, ByRef SeparatorLengths() As Long) As String()
     Dim Result()            As String
     Dim SubstringStartIndex As Long
     Dim ResultIndex         As Long
@@ -912,7 +923,7 @@ Private Function CreateSubstrings(ByRef s As String, ByVal MaxSubstrings As Long
     ReDim Result(0 To MaxSubstrings - 1)
     
     Dim i As Long
-    For i = 0 To MaxSubstrings - 1
+    For i = 0 To MatchCount - 1
         If SeparatorIndexes(i) - SubstringStartIndex > 0 Then
             Result(ResultIndex) = Mid$(s, SubstringStartIndex + 1, SeparatorIndexes(i) - SubstringStartIndex)
             ResultIndex = ResultIndex + 1
@@ -1079,7 +1090,7 @@ End Function
 ' @param StrB The second string to compare.
 ' @param Culture The culture that supplies culture-specific comparison information.
 ' @param Options Options to use when performing the comparison (such as ignoring case or symbols).
-' @return A 32-bit signed integer that indicates the lexical relationship between strA and strB, as shown in the following table
+' @return A 32-bit signed integer that indicates the lexical relationship between <i>StrA</i> and <i>StrB</i>, as shown in the following table
 ' <table style="width: auto">
 '   <tr>
 '       <th>Value</th>
@@ -1147,7 +1158,7 @@ End Function
 '
 ' @param StrA The first string to compare.
 ' @param StrB The second string to compare.
-' @return A 32-bit signed integer that indicates the lexical relationship between strA and strB, as shown in the following table
+' @return A 32-bit signed integer that indicates the lexical relationship between <i>StrA</i> and <i>StrB</i>, as shown in the following table
 ' <table style="width: auto">
 '   <tr>
 '       <th>Value</th>
@@ -1336,23 +1347,22 @@ Private Function IndexOfAnyCore(ByRef s As String, ByRef OfAny As Variant, ByVal
         For j = OfAnyLB To OfAnyUB
             If Ch = OfAnyChars(j) Then
                 IndexOfAnyCore = i
-                GoSub Finally
-                Exit Function
+                GoTo CleanExit
             End If
         Next
     Next
     
     IndexOfAnyCore = -1
-    GoSub Finally
-    Exit Function
+    GoTo CleanExit
     
 Catch:
-    GoSub Finally
-    ThrowOrErr Err
-Finally:
     FreeChars OfAnyChars
     FreeChars Chars
-    Return
+    ThrowOrErr Err
+    
+CleanExit:
+    FreeChars OfAnyChars
+    FreeChars Chars
 End Function
 
 Private Function TrimCore(ByRef s As String, ByRef TrimChars As Variant, ByVal TrimHead As Boolean, ByVal TrimTail As Boolean) As String

@@ -1,0 +1,56 @@
+@remarks Given a string and a file path, this method opens the specified file, appends the string to the end of the file using the specified encoding, and then closes the file. The file handle is guaranteed to be closed by this method, even if exceptions are raised.
+@exceptions
+<table style="width: auto">
+	<tr>
+		<th>Exception</th><th>Condition</th>
+	</tr>
+	<tr>
+		<td><a href="UnauthorizedAccessException.html">UnauthorizedAccessException</a></td>
+		<td>
+			<i>Path</i> is read-only.<br/>
+			-or-<br/>
+			<i>Path</i> is a directory.
+		</td>
+	</tr>
+	<tr>
+		<td><a href="ArgumentException.html">ArgumentException</a></td>
+		<td><i>Path</i> is a zero-length string, contains only white space, or contains one or more invalid characters as defined by <a href="Path.GetInvalidPathChars.html">GetInvalidPathChars</a>.</td>
+	</tr>
+	<tr>
+		<td><a href="PathTooLongException">PathTooLongException</a></td>
+		<td>The specified path, file name, or both exceed the system-defined maximum length. On Windows-based platforms, paths must be less than 248 characters, and file names must be less than 260 characters.</td>
+	</tr>
+	<tr>
+		<td><a href="DirectoryNotFoundException.html">DirectoryNotFoundException</a></td>
+		<td>The specified path is invalid (for example, it is on an unmapped drive).</td>
+	</tr>
+	<tr>
+		<td><a href="NotSupportedException.html">NotSupportedException</a></td>
+		<td><i>Path</i> is in an invalid format.</td>
+</table>
+@examples The following code example demonstrates the use of the AppendAllText method to add extra text to the end of a file. In this example a file is created, if it doesn't already exist, and text is added to it.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Const</span> Path <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span> = <span style="color: #a31515">&quot;c:\temp\MyTest.txt&quot;</span>
+    <span style="color: #0000ff">Dim</span> sw <span style="color: #0000ff">As</span> StreamWriter
+
+    <span style="color: #008000">&#39; This text is added only once to the file.</span>
+    <span style="color: #0000ff">If</span> <span style="color: #0000ff">Not</span> File.Exists(Path) <span style="color: #0000ff">Then</span>
+
+        <span style="color: #008000">&#39; Create a file to write to.</span>
+        <span style="color: #0000ff">Dim</span> CreateText <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+        CreateText = <span style="color: #a31515">&quot;Hello and Welcome&quot;</span> &amp; Environment.NewLine
+        File.WriteAllText Path, CreateText, Encoding.UTF8
+    <span style="color: #0000ff">End</span> <span style="color: #0000ff">If</span>
+
+    <span style="color: #008000">&#39; This text is always added, making the file longer over time</span>
+    <span style="color: #008000">&#39; if it is not deleted.</span>
+    <span style="color: #0000ff">Dim</span> AppendText <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+    AppendText = <span style="color: #a31515">&quot;This is extra text&quot;</span> &amp; Environment.NewLine
+    File.AppendAllText Path, AppendText, Encoding.UTF8
+
+    <span style="color: #008000">&#39; Open the file to read from.</span>
+    <span style="color: #0000ff">Dim</span> ReadText <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+    ReadText = File.ReadAllText(Path)
+    Debug.Print ReadText
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+</pre></div>

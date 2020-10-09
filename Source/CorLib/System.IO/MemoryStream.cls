@@ -367,6 +367,7 @@ End Property
 '    </tr>
 ' </table>
 Public Property Get Length() As Currency
+    EnsureOpen
     Length = mLength
 End Property
 
@@ -587,6 +588,8 @@ End Function
 '    </tr>
 ' </table>
 Public Function ReadByte() As Long
+    EnsureOpen
+    
     If mPosition >= mLength Then
         ReadByte = -1
         Exit Function

@@ -128,6 +128,16 @@ Public Sub GetBytes_WithMultipleCalls_ReturnsContinuedGeneration(ByVal Size1 As 
     Assert.That Actual2, Iz.EqualTo(Expected2)
 End Sub
 
+Public Sub GetBytes_WithNegativeValue_ThrowsArgumentOutOfRangeException()
+    Dim Rfc As Rfc2898DeriveBytes
+    Set Rfc = MakeRfc
+    
+    On Error Resume Next
+    Rfc.GetBytes -1
+    
+    AssertArgumentOutOfRangeException Err, "cb"
+End Sub
+
 Private Function MakeRfc() As Rfc2898DeriveBytes
     Set MakeRfc = Cor.NewRfc2898DeriveBytes("abc", NewBytes(1, 2, 3, 4, 5, 6, 7, 8), 10)
 End Function

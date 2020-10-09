@@ -327,15 +327,12 @@ Private Sub ComputeHashOnBytes(ByRef Source As Variant, ByRef Index As Variant, 
     Range = MakeArrayRange(Source, Index, Count)
     HashCore Buffer, Range.Index, Range.Count
     
-    GoSub Finally
+    SAPtr(Buffer) = vbNullPtr
     Exit Sub
     
 Catch:
-    GoSub Finally
-    ThrowOrErr Err
-Finally:
     SAPtr(Buffer) = vbNullPtr
-    Return
+    ThrowOrErr Err
 End Sub
 
 Private Sub VerifyNotDisposed()

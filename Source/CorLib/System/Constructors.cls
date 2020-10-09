@@ -1345,9 +1345,12 @@ Public Function NewChars(ParamArray Values() As Variant) As Integer()
     
     For i = 0 To UBound(Values)
         If VarType(Values(i)) = vbString Then
+            If Len(Values(i)) <> 1 Then _
+                Error.Format Format_NeedSingleChar
+                
             Result(i) = AscW(Values(i))
         Else
-            Result(i) = AsWord(CLng(Values(i)))
+            Result(i) = Char.ConvertFromInt32(Values(i))
         End If
     Next
     
@@ -1532,13 +1535,13 @@ Public Function NewCspKeyContainerInfo(ByVal Parameters As CspParameters) As Csp
 End Function
 
 ''
-' Creates a new <a href="Rfc2898DeriveBytes.html">Rfc2898DeriveBytes</a> object.
+' Initializes a new instance of the <a href="Rfc2898DeriveBytes.html">Rfc2898DeriveBytes</a> class using a password, a salt or salt size, and number of iterations to derive the key.
 '
-' @param Password This can be a <b>String</b> password or a <b>Byte</b> array.
-' @param Salt This can be a <b>Byte</b> array to be used as salt or an <b>Integer</b> value indicating the size of the salt to be generated.
-' @param Iterations The number of times the operation should be performed when generating a password.
-' @return A new <a href="Rfc2898DeriveBytes.html">Rfc2898DeriveBytes</a> object.
-' @remarks This is used to create <b>Byte</b> array passwords from standard plain text passwords.
+' @param Password The password used to derive the key. This can be a <b>String</b> or a <b>Byte</b> array.
+' @param Salt The key salt used to derive the key. This can be a <b>Byte</b> array or a numeric value indicating the size of the salt to be generated.
+' @param Iterations The number of iterations for the operation.
+' @return A new instance of the <a href="Rfc2898DeriveBytes.html">Rfc2898DeriveBytes</a> class.
+' @include "..\DocIncludes\Constructors.NewRfc2898DeriveBytes.html"
 Public Function NewRfc2898DeriveBytes(ByRef Password As Variant, ByRef Salt As Variant, Optional ByVal Iterations As Long = 1000) As Rfc2898DeriveBytes
     Set NewRfc2898DeriveBytes = New Rfc2898DeriveBytes
     NewRfc2898DeriveBytes.Init Password, Salt, Iterations

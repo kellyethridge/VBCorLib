@@ -38,19 +38,12 @@ Attribute VB_Exposed = True
 ''
 ' Provides a set of methods used to encode and decode chars to and from bytes in ASCII format.
 '
-' @remarks
-' Encoding characters to bytes using ASCII encoding will produce a 1:1 ratio for each
-' character-to-byte encoding. If the character is greater than 127, then it will be
-' replaced with character 63 (?).
-' <p>To create a new <b>ASCIIEncoding</b> use the New function.
-' <pre>
-' Set en = New ASCIIEncoding
-' </pre></p>
 ' @see Encoding
 ' @see UTF8Encoding
 ' @see UTF7Encoding
+' @see UTF32Encoding
 ' @see UnicodeEncoding
-'
+' @include "..\DocIncludes\ASCIIEncoding.html"
 Option Explicit
 Implements IObject
 Implements Encoding
@@ -241,15 +234,17 @@ Public Property Get WindowsCodePage() As Long
 End Property
 
 ''
-' Returns the number of bytes that would be produced from the set of characters using this encoding.
+' Calculates the number of bytes produced by encoding the characters in the specified string or character array.
 '
-' @param Chars A set of characters used to calculated the number of bytes once encoded with this encoding.
-' @param Index The starting index of the first character to be used.
-' @param Count The number of characters to include in the calculation.
-' @return The number of bytes that would be produced by encoding the set of characters.
-' @remarks The <i>Chars</i> parameter will accept either a String or an Integer array.
-' <p>If a string is passed in, then the Index and Count parameters are ignored.</p>
+' @param Chars The string or character array containg the characters to encode.
+' @param Index The index of the first character to encode.
+' @param Count The number of characters to encode.
+' @return The number of bytes produced by encoding the specified characters.
 ' @see Encoding
+' @see #GetBytes
+' @see #GetMaxByteCount
+' @see #GetEncoder
+' @include "..\DocIncludes\ASCIIEncoding.GetByteCount.html"
 Public Function GetByteCount(ByRef Chars As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Long
     Dim LocalChars()    As Integer
     Dim Range           As ListRange
@@ -260,34 +255,32 @@ Public Function GetByteCount(ByRef Chars As Variant, Optional ByRef Index As Var
     Range = ValidateGetBytes(LocalChars, Index, Count)
     GetByteCount = GetByteCountCore(LocalChars, Range.Index, Range.Count)
     
-    GoSub Finally
+    FreeChars LocalChars
     Exit Function
     
 Catch:
-    GoSub Finally
-    Throw
-Finally:
     FreeChars LocalChars
-    Return
+    ThrowOrErr Err
 End Function
 
 ''
 ' Encodes a set of characters into an array of bytes.
 '
-' @param Chars The set of characters to be encoded into an array of bytes. This can
-' be either an Integer array or a String.
-' @param Index The index of the first character to begin encoding from.
-' @param Count The number of characters to be encoded.
-' @return A byte array containing the encoded characters as bytes.
-' @remarks The <i>Chars</i> parameter will accept either a String or an Integer array. The Index
-' is zero based for both the String and Integer array, not 1 based like Mid$.
+' @param Chars The Integer array or String containing the set of characters to encode.
+' @param Index The index of the first character to encode.
+' @param Count The number of characters to encode.
+' @return A byte array containing the results of encoding the specified set of characters.
 ' @see Encoding
+' @see #GetBytesEx
+' @see #GetEncoder
+' @see #GetByteCount
+' @see #GetMaxByteCount
+' @include "..\DocIncludes\Encoding.GetBytes.html"
 Public Function GetBytes(ByRef Chars As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Byte()
     Dim LocalChars()    As Integer
     Dim Range           As ListRange
     Dim ByteCount       As Long
-    
-    
+        
     LocalChars = AsChars(Chars)
     
     On Error GoTo Catch
@@ -297,15 +290,12 @@ Public Function GetBytes(ByRef Chars As Variant, Optional ByRef Index As Variant
     SAPtr(GetBytes) = SafeArrayCreateVectorEx(vbByte, 0, ByteCount)
     GetBytesCore LocalChars, Range.Index, Range.Count, GetBytes, 0
     
-    GoSub Finally
+    FreeChars LocalChars
     Exit Function
     
 Catch:
-    GoSub Finally
-    ThrowOrErr Err
-Finally:
     FreeChars LocalChars
-    Return
+    ThrowOrErr Err
 End Function
 
 ''
@@ -336,15 +326,12 @@ Public Function GetBytesEx(ByRef Chars As Variant, ByVal CharIndex As Long, ByVa
         GetBytesEx = GetBytesCore(LocalChars, CharIndex, CharCount, Bytes, ByteIndex)
     End If
     
-    GoSub Finally
+    FreeChars LocalChars
     Exit Function
     
 Catch:
-    GoSub Finally
-    ThrowOrErr Err
-Finally:
     FreeChars LocalChars
-    Return
+    ThrowOrErr Err
 End Function
 
 ''
@@ -556,15 +543,12 @@ Public Function GetString(ByRef Bytes() As Byte, Optional ByRef Index As Variant
     On Error GoTo Catch
     GetCharsCore Bytes, Range.Index, Range.Count, Chars, 0
     
-    GoSub Finally
+    FreeChars Chars
     Exit Function
     
 Catch:
-    GoSub Finally
-    ThrowOrErr Err
-Finally:
     FreeChars Chars
-    Return
+    ThrowOrErr Err
 End Function
 
 ''
@@ -667,19 +651,19 @@ Private Function GetByteCountCore(ByRef Chars() As Integer, ByVal Index As Long,
             Case ASCIIStart To ASCIIEnd
                 ByteCount = ByteCount + 1
             Case Else
-                ByteCount = ByteCount + GetEncoderFallbackCount(Ch, Fallback)
+                ByteCount = ByteCount + GetEncoderFallbackCount(Ch, i, Fallback)
         End Select
     Next
     
     GetByteCountCore = ByteCount
 End Function
 
-Private Function GetEncoderFallbackCount(ByVal Ch As Integer, ByRef Fallback As EncoderFallbackBuffer) As Long
+Private Function GetEncoderFallbackCount(ByVal Ch As Integer, ByVal CharIndex As Long, ByRef Fallback As EncoderFallbackBuffer) As Long
     If Fallback Is Nothing Then
         Set Fallback = mEncoderFallback.CreateFallbackBuffer
     End If
     
-    If Fallback.Fallback(Ch) Then
+    If Fallback.Fallback(Ch, Index:=CharIndex) Then
         GetEncoderFallbackCount = Fallback.Remaining
         Fallback.Reset
     End If
@@ -710,7 +694,7 @@ Private Function GetBytesCore(ByRef Chars() As Integer, ByVal CharIndex As Long,
                     Bytes(ByteIndex) = Ch
                     ByteIndex = ByteIndex + 1
                 Case Else
-                    ByteIndex = InsertEncoderFallback(Ch, Bytes, ByteIndex, Fallback)
+                    ByteIndex = InsertEncoderFallback(Ch, CharIndex, Bytes, ByteIndex, Fallback)
             End Select
             
             CharIndex = CharIndex + 1
@@ -720,12 +704,12 @@ Private Function GetBytesCore(ByRef Chars() As Integer, ByVal CharIndex As Long,
     End If
 End Function
 
-Private Function InsertEncoderFallback(ByVal Ch As Integer, ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByRef Fallback As EncoderFallbackBuffer) As Long
+Private Function InsertEncoderFallback(ByVal Ch As Integer, ByVal CharIndex As Long, ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByRef Fallback As EncoderFallbackBuffer) As Long
     If Fallback Is Nothing Then
         Set Fallback = mEncoderFallback.CreateFallbackBuffer
     End If
     
-    If Fallback.Fallback(Ch) Then
+    If Fallback.Fallback(Ch, Index:=CharIndex) Then
         If ByteIndex + Fallback.Remaining - 1 > UBound(Bytes) Then _
             Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_EncodingConversionOverflowBytes, EncodingName, TypeName(mEncoderFallback)), "Bytes")
         
@@ -808,14 +792,16 @@ Private Function GetCharsCore(ByRef Bytes() As Byte, ByVal ByteIndex As Long, By
     Dim b           As Byte
     Dim ByteEnd     As Long
     Dim Fallback    As DecoderFallbackBuffer
+    Dim CharsUB     As Long
     
+    CharsUB = UBound(Chars)
     ByteEnd = ByteIndex + ByteCount
 
     Do While ByteIndex < ByteEnd
         b = Bytes(ByteIndex)
         
         If b <= ASCIIEnd Then
-            If CharIndex > UBound(Chars) Then _
+            If CharIndex > CharsUB Then _
                 Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_EncodingConversionOverflowChars, EncodingName, TypeName(mDecoderFallback)), "Chars")
         
             Chars(CharIndex) = b

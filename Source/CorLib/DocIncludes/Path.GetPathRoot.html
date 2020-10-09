@@ -1,0 +1,45 @@
+@remarks This method does not verify that the path or file name exists.
+<p>Possible patterns for the string returned by this method are as follows:</p>
+<ul>
+	<li>An empty string (path specified a relative path on the current drive or volume).</li>
+	<li>"/" (path specified an absolute path on the current drive).</li>
+	<li>"X:" (path specified a relative path on a drive, where X represents a drive or volume letter).</li>
+	<li>"X:/" (path specified an absolute path on a given drive).</li>
+	<li>"\\ComputerName\SharedFolder" (a UNC path).</li>
+</ul>
+@exceptions
+<table style="width: auto">
+	<tr>
+		<th>Exception</th><th>Condition</th>
+	</tr>
+	<tr>
+		<td><a href="ArgumentException.html">ArgumentException</a></td>
+		<td><i>Path</i> contains one or more of the invalid characters defined in <a href="Path.GetInvalidPathChars.html">GetInvalidPathChars</a>.<br/>
+			-or-<br/>
+			<i>Path</i> is an empty string.</td>
+	</tr>
+</table>
+@examples The following code example demonstrates a use of the <b>GetPathRoot</b> method.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Const</span> FileName <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span> = <span style="color: #a31515">&quot;MyFile.Ext&quot;</span>
+    <span style="color: #0000ff">Const</span> PathName <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span> = <span style="color: #a31515">&quot;\MyDir\&quot;</span>
+    <span style="color: #0000ff">Const</span> FullPath <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span> = <span style="color: #a31515">&quot;C:\MyDir\MyFile.Ext&quot;</span>
+    
+    <span style="color: #0000ff">Dim</span> PathNameRoot <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+    
+    PathNameRoot = Path.GetPathRoot(PathName)
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;GetPathRoot(&#39;{0}&#39;) returns &#39;{1}&#39;&quot;</span>, PathName, PathNameRoot)
+    
+    PathNameRoot = Path.GetPathRoot(FileName)
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;GetPathRoot(&#39;{0}&#39;) returns &#39;{1}&#39;&quot;</span>, FileName, PathNameRoot)
+    
+    PathNameRoot = Path.GetPathRoot(FullPath)
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;GetPathRoot(&#39;{0}&#39;) returns &#39;{1}&#39;&quot;</span>, FullPath, PathNameRoot)
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; This example code produces output similar to the following:</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    GetPathRoot(&#39;\MyDir\&#39;) returns &#39;\&#39;</span>
+<span style="color: #008000">&#39;    GetPathRoot(&#39;MyFile.Ext&#39;) returns &#39;&#39;</span>
+<span style="color: #008000">&#39;    GetPathRoot(&#39;C:\MyDir\MyFile.Ext&#39;) returns &#39;C:\&#39;</span>
+</pre></div>

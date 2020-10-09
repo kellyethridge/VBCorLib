@@ -174,6 +174,8 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "abc\def  ", "c:\windows\abc\def"
             Test.Use "c:\foo\.", "c:\foo"
             Test.Use "c:\.", "c:\"
+            Test.Use "c:\abc_" & ChrW$(&H8BDD) & "\file.txt", "c:\abc_" & ChrW$(&H8BDD) & "\file.txt"
+            Test.Use "c:\abc_" & ChrW$(&H8BDD&) & "\file.txt", "c:\abc_" & ChrW$(&H8BDD&) & "\file.txt"
             
         Case "GetFullPath_WithInvalidPath_ThrowsArgumentException"
             Test.Use "\\server"

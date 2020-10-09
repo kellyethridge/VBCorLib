@@ -101,6 +101,18 @@ Public Sub ReadByte_WithGivenPositionInSubset_ReturnsExpected(ByVal Position As 
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
+Public Sub ReadByte_WhenClosed_ThrowsObjectDisposedException()
+    Dim ms As MemoryStream
+    Set ms = MakeMemoryStream
+    
+    ms.CloseStream
+    
+    On Error Resume Next
+    ms.ReadByte
+    
+    AssertObjectDisposedException Err
+End Sub
+
 Public Sub WriteByte_WhenCalled_WritesToBuffer()
     Dim Source() As Byte
     Source = NewBytes(1, 2, 3, 4, 5)
@@ -624,6 +636,17 @@ Public Sub Position_WhenReadWithClosedStream_ThrowsObjectDisposedException()
     AssertObjectDisposedException Err
 End Sub
 
+Public Sub Length_WhenCalledWithClosedStream_ThrowsObjectDisposedException()
+    Dim ms As New MemoryStream
+    Dim p As Long
+    
+    ms.CloseStream
+    
+    On Error Resume Next
+    p = ms.Length
+    
+    AssertObjectDisposedException Err
+End Sub
 
 Private Function MakeMemoryStream() As MemoryStream
     Dim Source() As Byte

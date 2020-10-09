@@ -1,0 +1,62 @@
+@remarks If the <a href="Hashtable.html">Hashtable</a> does not contain an element with the specified key, the <a href="Hashtable.html">Hashtable</a> remains unchanged. No exception is thrown.
+<p>This method is an O(1) operation.</p>
+@examples The following example shows how to remove elements from the <a href="Hashtable.html">Hashtable</a>.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #008000">&#39; Creates and initializes a new Hashtable.</span>
+    <span style="color: #0000ff">Dim</span> MyHT <span style="color: #0000ff">As</span> <span style="color: #0000ff">New</span> Hashtable
+        
+    MyHT.Add <span style="color: #a31515">&quot;1a&quot;</span>, <span style="color: #a31515">&quot;The&quot;</span>
+    MyHT.Add <span style="color: #a31515">&quot;1b&quot;</span>, <span style="color: #a31515">&quot;quick&quot;</span>
+    MyHT.Add <span style="color: #a31515">&quot;1c&quot;</span>, <span style="color: #a31515">&quot;brown&quot;</span>
+    MyHT.Add <span style="color: #a31515">&quot;2a&quot;</span>, <span style="color: #a31515">&quot;fox&quot;</span>
+    MyHT.Add <span style="color: #a31515">&quot;2b&quot;</span>, <span style="color: #a31515">&quot;jumped&quot;</span>
+    MyHT.Add <span style="color: #a31515">&quot;2c&quot;</span>, <span style="color: #a31515">&quot;over&quot;</span>
+    MyHT.Add <span style="color: #a31515">&quot;3a&quot;</span>, <span style="color: #a31515">&quot;the&quot;</span>
+    MyHT.Add <span style="color: #a31515">&quot;3b&quot;</span>, <span style="color: #a31515">&quot;lazy&quot;</span>
+    MyHT.Add <span style="color: #a31515">&quot;3c&quot;</span>, <span style="color: #a31515">&quot;dog&quot;</span>
+
+    <span style="color: #008000">&#39; Displays the Hashtable.</span>
+    Debug.Print <span style="color: #a31515">&quot;The Hashtable initially contains the following:&quot;</span>
+    PrintKeysAndValues MyHT
+
+    <span style="color: #008000">&#39; Removes the element with the key &quot;3b&quot;.</span>
+    MyHT.Remove <span style="color: #a31515">&quot;3b&quot;</span>
+
+    <span style="color: #008000">&#39; Displays the current state of the Hashtable.</span>
+    Debug.Print <span style="color: #a31515">&quot;After removing &quot;&quot;lazy&quot;&quot;:&quot;</span>
+    PrintKeysAndValues MyHT
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> PrintKeysAndValues(<span style="color: #0000ff">ByVal</span> MyHT <span style="color: #0000ff">As</span> Hashtable)
+    <span style="color: #0000ff">Dim</span> de <span style="color: #0000ff">As</span> DictionaryEntry
+    
+    <span style="color: #0000ff">For</span> <span style="color: #0000ff">Each</span> de <span style="color: #0000ff">In</span> MyHT
+        Debug.Print CorString.Format(t(<span style="color: #a31515">&quot;\t{0}:\t{1}&quot;</span>), de.Key, de.Value)
+    <span style="color: #0000ff">Next</span> de
+    
+    Debug.Print
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; This example code produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;   The Hashtable initially contains the following:</span>
+<span style="color: #008000">&#39;       2a: fox</span>
+<span style="color: #008000">&#39;       2b: jumped</span>
+<span style="color: #008000">&#39;       2c: over</span>
+<span style="color: #008000">&#39;       3a: the</span>
+<span style="color: #008000">&#39;       3b: lazy</span>
+<span style="color: #008000">&#39;       3c: dog</span>
+<span style="color: #008000">&#39;       1a: The</span>
+<span style="color: #008000">&#39;       1b: quick</span>
+<span style="color: #008000">&#39;       1c: brown</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;   After removing &quot;lazy&quot;:</span>
+<span style="color: #008000">&#39;       2a: fox</span>
+<span style="color: #008000">&#39;       2b: jumped</span>
+<span style="color: #008000">&#39;       2c: over</span>
+<span style="color: #008000">&#39;       3a: the</span>
+<span style="color: #008000">&#39;       3c: dog</span>
+<span style="color: #008000">&#39;       1a: The</span>
+<span style="color: #008000">&#39;       1b: quick</span>
+<span style="color: #008000">&#39;       1c: brown</span>
+</pre></div>

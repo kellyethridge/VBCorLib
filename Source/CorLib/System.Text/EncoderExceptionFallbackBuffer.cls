@@ -83,7 +83,7 @@ Public Function Fallback(ByVal UnknownCharOrHighSurrogate As Long, Optional ByRe
     End If
     
     Throw Cor.NewEncoderFallbackException2( _
-        Environment.GetResourceString(Argument_InvalidCodePageConversionIndex, UnknownCharOrHighSurrogate, Index), _
+        Environment.GetResourceString(Argument_InvalidCodePageConversionIndex, Char.ConvertFromInt32(UnknownCharOrHighSurrogate), Index), _
         UnknownCharOrHighSurrogate, Index)
 End Function
 

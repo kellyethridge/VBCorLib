@@ -263,7 +263,7 @@ Friend Function ToCspBlob() As Byte()
     End If
 End Function
 
-Friend Function ToXmlString()
+Friend Function ToXmlString() As String
     Dim Root As SecurityElement
     Set Root = MakeXmlRoot
     AddPublicXmlParameters Root
@@ -290,7 +290,7 @@ Private Sub LoadPrivateParameter(ByRef Blob() As Byte)
 End Sub
 
 Private Sub LoadPublicParameters(ByVal Reader As BinaryReader, ByVal ByteLength As Long)
-    Dim DssSeed     As DssSeed
+    Dim DssSeed As DssSeed
     
     mP = ReadBytesReverse(Reader, ByteLength)
     mQ = ReadBytesReverse(Reader, SizeOfQ)

@@ -796,7 +796,7 @@ Private Function Calendar_GetDaysInYear(ByVal Year As Long, Optional Era As Vari
 End Function
 
 Private Function Calendar_GetEra(Time As Variant) As Long
-    Call Calendar_GetEra(Time)
+    Calendar_GetEra = GetEra(Time)
 End Function
 
 Private Function Calendar_GetHashCode() As Long

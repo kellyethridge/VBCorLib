@@ -36,7 +36,7 @@ Attribute VB_Exposed = True
 '
 
 ''
-' Represents string comparison operations based on a specific case or ordinal comparison rules.
+' Represents string comparison operations based on a specific case and culture-based or ordinal comparison rules.
 '
 ' @remarks Implement this interface when a specific string comparison rule is necessary. The implementation
 ' should still allow the default processing of other value types other than string.
