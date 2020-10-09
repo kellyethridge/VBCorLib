@@ -53,17 +53,18 @@ Option Explicit
 ''
 ' When implemented in a derived class, gets a value indicating whether the current encoding is read-only.
 '
-' @return <b>true</b> if the current <a href="Encoding.html">Encoding</a> is read-only; otherwise, <b>false</b>. The default is <b>true</b>.
-'
+' @return <b>True</b> if the current <a href="Encoding.html">Encoding</a> is read-only; otherwise, <b>False</b>. The default is <b>True</b>.
 Public Property Get IsReadOnly() As Boolean: End Property
 
 ''
-' Returns a shallow copy of the current <a href="Encoding.html">Encoding</a> object.
+' Creates a shallow copy of the current <a href="Encoding.html">Encoding</a> object.
 '
-' @return A copy of the <a href="Encoding.html">Encoding</a> object.
-' @remarks <p>An <a href="Encoding.html">Encoding</a> object is read-only by default.
-' A clone of the <a href="Encoding.html">Encoding</a> object will become writable.</p>
-'
+' @return A copy of the current <a href="Encoding.html">Encoding</a> object.
+' @remarks The clone is writable even if the original <a href="Encoding.html">Encoding</a> object is read-only.
+' Therefore, the properties of the clone can be modified.
+' <p>A shallow copy of an object is a copy of the object only. If the object contains references to other objects,
+' the shallow copy does not create copies of the referred objects. It refers to the original objects instead.
+' In contrast, a deep copy of an object creates a copy of the object and a copy of everything directly or indirectly referenced by that object.</p>
 Public Function Clone() As Encoding: End Function
 
 ''
@@ -81,7 +82,7 @@ Public Property Get BodyName() As String: End Property
 Public Property Get CodePage() As Long: End Property
 
 ''
-' When overridden in a derived class, gets the human-readable description of the current encoding.
+' When implemented in a derived class, gets the human-readable description of the current encoding.
 '
 ' @include "..\DocIncludes\Encoding.EncodingName.html"
 Public Property Get EncodingName() As String: End Property
@@ -228,57 +229,83 @@ Public Function GetChars(ByRef Bytes() As Byte, Optional ByRef Index As Variant,
 Public Function GetCharsEx(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, ByRef Chars() As Integer, ByVal CharIndex As Long) As Long: End Function
 
 ''
-' Returns a decoder that maintains state.
+' When implemented in a derived class, obtains a decoder that converts an encoded sequence of bytes into a sequence of characters.
 '
-' @return The stateful decoder.
-'
+' @return A <a href="Decoder.html">Decoder</a> that converts an encoded sequence of bytes into a sequence of characters.
+' @remarks The <a href="Decoder.GetChars.html">Decoder.GetChars</a> method converts sequential blocks of bytes into sequential
+' blocks of characters, in a manner similar to the <a href="Encoding.GetChars.html">GetChars</a> method of this class.
+' However, a <a href="Decoder.html">Decoder</a> maintains state information between calls so it correctly
+' decodes byte sequences that span blocks. The <a href="Decoder.html">Decoder</a> also preserves trailing bytes at the end of
+' data blocks and uses the trailing bytes in the next decoding operation. Therefore, <b>GetDecoder</b>
+' and <a href="Encoding.GetEncoder.html">GetEncoder</a> are useful for network transmission and file operations, because those
+' operations often deal with blocks of data instead of a complete data stream.
+' @see Decoder
+' @see #GetChars
+' @see #GetString
+' @see #GetCharCount
+' @see #GetEncoder
 Public Function GetDecoder() As Decoder: End Function
 
 ''
-' Returns an encoder that maintains state.
+' When implemented in a derived class, obtains an encoder that converts a sequence of Unicode characters into an encoded sequence of bytes.
 '
-' @return The stateful encoder.
-'
+' @return A <a href="Encoder.html">Encoder</a> that converts a sequence of Unicode characters into an encoded sequence of bytes.
+' @remarks The <a href="Encoder.GetBytes.html">Encoder.GetBytes</a> method converts sequential blocks of characters into sequential
+' blocks of bytes, in a manner similar to the GetBytes method of this class. However, an <a href="Encoder.html">Encoder</a> maintains
+' state information between calls so it correctly encodes character sequences that span blocks. The <a href="Encoder.html">Encoder</a>
+' also preserves trailing characters at the end of data blocks and uses the trailing characters in the next encoding operation. For example,
+' a data block might end with an unmatched high surrogate, and the matching low surrogate might be in the next data block.
+' Therefore, <a href="Encoding.GetDecoder.html">GetDecoder</a> and <b>GetEncoder</b> are useful for network transmission and file operations,
+' because those operations often deal with blocks of data instead of a complete data stream.
+' @see Encoder
+' @see #GetBytes
+' @see #GetByteCount
+' @see #GetDecoder
 Public Function GetEncoder() As Encoder: End Function
 
 ''
-' Returns the <a href="DecoderFallback.html">DecoderFallback</a> instance for the current Encoding object.
+' Gets the <a href="DecoderFallback.html">DecoderFallback</a> object for the current <a href="Encoding.html">Encoding</a> object.
 '
-' @return An instance of a <a href="DecoderFallback.html">DecoderFallback</a>.
-' @see Encoding
-' @see DecoderFallBack
+' @return The decoder fallback object for the current <a href="Encoding.html">Encoding</a> object.
+' @see DecoderFallback
+' @see DecoderFallBackBuffer
+' @include "..\DocIncludes\Encoding.Get.DecoderFallback.html"
 Public Property Get DecoderFallback() As DecoderFallback: End Property
 
 ''
-' Sets the <a href="DecoderFallback.html">DecoderFallback</a> for the current Encoding object.
+' Sets the <a href="DecoderFallback.html">DecoderFallback</a> object for the current <a href="Encoding.html">Encoding</a> object.
 '
 ' @param Value The <a href="DecoderFallback.html">DecoderFallback</a> object to set.
-' @remarks Assigning to a <i>read-only</i> Encoding object will cause an <a href="InvalidOperationException.html">InvalidOperationException</a> to be thrown.
-'
+' @see DecoderFallback
+' @see DecoderFallBackBuffer
+' @include "..\DocIncludes\Encoding.Set.DecoderFallback.html"
 Public Property Set DecoderFallback(ByVal Value As DecoderFallback): End Property
 
 ''
-' Returns the <a href="EncodingFallback.html">EncodingFallback</a> for the current <a href="Encoding.html">Encoding</a> object.
+' Gets the <a href="EncoderFallback.html">EncoderFallback</a> object for the current <a href="Encoding.html">Encoding</a> object.
 '
 ' @Return The encoder fallback object for the current <a href="Encoding.html">Encoding</a> object.
-' @see Encoding
 ' @see EncoderFallback
+' @see EncoderFallbackBuffer
+' @include "..\DocIncludes\Encoding.Get.EncoderFallback.html"
 Public Property Get EncoderFallback() As EncoderFallback: End Property
 
 ''
-' Sets the <a href="EncoderFallback.html">EncoderFallback</a> for the current Encoding object.
+' Sets the <a href="EncoderFallback.html">EncoderFallback</a> for the current <a href="Encoding.html">Encoding</a> object.
 '
 ' @param Value The <a href="EncoderFallback.html">EncoderFallback</a> object to set.
-' @remarks Assigning to a <i>read-only</i> Encoding object will cause an <a href="InvalidOperationException.html">InvalidOperationException</a> to be thrown.
-'
+' @see EncoderFallback
+' @see EncoderFallbackBuffer
+' @include "..\DocIncludes\Encoding.Set.EncoderFallback.html"
 Public Property Set EncoderFallback(ByVal Value As EncoderFallback): End Property
 
 ''
-' Returns the maximum number of bytes that can be created from a specific number of characters.
+' When implemented in a derived class, calculates the maximum number of bytes produced by encoding the specified number of characters.
 '
 ' @param CharCount The number of characters to be encoded.
-' @return The maximum number of bytes that can be generated from the specified number of characters.
-'
+' @see #GetBytes
+' @see #GetByteCount
+' @include "..\DocIncludes\Encoding.GetMaxByteCount.html"
 Public Function GetMaxByteCount(ByVal CharCount As Long) As Long: End Function
 
 ''
@@ -286,16 +313,20 @@ Public Function GetMaxByteCount(ByVal CharCount As Long) As Long: End Function
 '
 ' @param ByteCount The number of bytes to be decoded.
 ' @return The maximum number of characters that can be decoded from the specified number of bytes.
-'
+' @see #GetChars
+' @see #GetString
+' @see #GetCharCount
+' @see #GetDecoder
+' @include "..\DocIncludes\Encoding.GetMaxCharCount.html"
 Public Function GetMaxCharCount(ByVal ByteCount As Long) As Long: End Function
 
 ''
-' Returns an array of bytes that represents this encoding.
+' When implemented in a derived class, returns a sequence of bytes that specifies the encoding used.
 '
-' @return A byte array containg the bytes to be used to identify this encoding type.
-' @remarks If no bytes are to be returned, then an empty Byte array should
-' be returned, not a null array.
-'
+' @return A byte array containg the bytes to be used to identify this encoding type.<br>
+' -or-<br>
+' A byte array of length zero, if a preamble is not required.
+' @include "..\DocIncludes\Encoding.GetPreamble.html"
 Public Function GetPreamble() As Byte(): End Function
 
 ''

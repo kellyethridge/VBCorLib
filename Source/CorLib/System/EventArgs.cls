@@ -34,6 +34,14 @@ Attribute VB_Exposed = True
 '
 ' Module: EventArgs
 '
+
+''
+' Represents the base class for classes that contain event data, and provides a value to use for events that do not include event data.
+'
+' @remarks This class serves as the base class for all classes that represent event data. To create a custom event data class, create a
+' class that implements from the <b>EventArgs</b> class and provide the properties to store the necessary data. The name of your custom
+' event data class should end with <b>EventArgs</b>.
+' <p>To pass an object that does not contain any data, use the <a href="EventArgsStatic.Get.EmptyArgs.html">EmptyArgs</a> field.</p>
 Option Explicit
 Implements IObject
 
@@ -47,6 +55,8 @@ Implements IObject
 ' An example would be if this class contained a Name property
 ' and equality is determined by the names.
 '
+' @param Value The value to compare this instance to.
+' @return <b>True</b> if <i>Value</i> is equal to this instance, <b>False</i> otherwise.
 Public Function Equals(ByRef Value As Variant) As Boolean
     Equals = MyBase.Equals(Me, Value)
 End Function
@@ -60,6 +70,7 @@ End Function
 ' An override might be necessary if the hashcode should be
 ' derived from a value contained within the class.
 '
+' @return A hash code for the current object.
 Public Function GetHashCode() As Long
     GetHashCode = MyBase.GetHashCode(Me)
 End Function
@@ -71,6 +82,7 @@ End Function
 '
 ' A Person class may return the person's name instead.
 '
+' @return A string that represents the current object.
 Public Function ToString() As String
     ToString = MyBase.ToString(Me, App)
 End Function

@@ -38,9 +38,9 @@ Attribute VB_Exposed = True
 ''
 ' Provides a failure-handling mechanism, called a fallback, for an encoded input byte sequence that cannot be converted to an output character.
 '
+' @see DecoderFallbackStatic
 ' @see DecoderExceptionFallback
 ' @see DecoderReplacementFallback
-'
 Option Explicit
 
 ''

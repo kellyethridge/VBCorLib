@@ -168,6 +168,14 @@ End Sub
 ' The binary data is formatted that the first two bytes is the count in lo/hi byte format.
 ' The encoding data is the name in ascii characters terminated by a null followed by two bytes
 ' for the code page in lo/hi byte format.
+'
+' ---- Number of Encodings
+' Count: 2 bytes (lo/hi)
+'
+' ---- Encoding name/Code page (repeated Count times)
+' Name      : N bytes zero terminated
+' Code Page : 2 bytes (lo/hi)
+'
 Private Sub LoadCodePageLookup()
     Dim Data()      As Byte
     Dim Ch          As Byte
@@ -191,10 +199,11 @@ Private Sub LoadCodePageLookup()
         If Ch = 0 Then
             CodePage = Data(Index) Or (Data(Index + 1) * vbShift8Bits)
             Index = Index + 2
+            
             mCodePageItems(CPIndex).WebName = Name
             mCodePageItems(CPIndex).CodePage = CodePage
-            
             CPIndex = CPIndex + 1
+            
             Name = vbNullString
         Else
             Name = Name & Chr$(Ch)
