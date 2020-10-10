@@ -1,0 +1,34 @@
+@remarks The <a href="Encoder.GetBytes.html">Encoder.GetBytes</a> method converts sequential blocks of characters into sequential blocks of bytes, in a manner similar to the <a href="UTF8Encoding.GetBytesEx.html">GetBytesEx</a> method. However, an <a href="Encoder.html">Encoder</a> maintains state information between calls so it can correctly encode character sequences that span blocks. The <a href="Encoder.html">Encoder</a> also preserves trailing characters at the end of data blocks and uses the trailing characters in the next encoding operation. For example, a data block might end with an unmatched high surrogate, and the matching low surrogate might be in the next data block. Therefore, <a href="UTF8Encoding.GetDecoder.html">GetDecoder</a> and <b>GetEncoder</b> are useful for network transmission and file operations, because those operations often deal with blocks of data instead of a complete data stream.
+<p>If error detection is enabled, that is, the <i>ThrowOnInvalidCharacters</i> parameter of the constructor is set to true, error detection is also enabled in the <a href="Encoder.html">Encoder</a> returned by this method. If error detection is enabled and an invalid sequence is encountered, the state of the encoder is undefined and processing must stop.</p>
+@examples The following example demonstrates how to use the <b>GetEncoder</b> method to obtain an encoder to convert a sequence of characters into a UTF-8 encoded sequence of bytes.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> Chars()             <span style="color: #0000ff">As</span> <span style="color: #2b91af">Integer</span>
+    <span style="color: #0000ff">Dim</span> Bytes()             <span style="color: #0000ff">As</span> <span style="color: #2b91af">Byte</span>
+    <span style="color: #0000ff">Dim</span> UTF8Encoder         <span style="color: #0000ff">As</span> Encoder
+    <span style="color: #0000ff">Dim</span> ByteCount           <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
+    <span style="color: #0000ff">Dim</span> BytesEncodedCount   <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
+    <span style="color: #0000ff">Dim</span> b                   <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>
+    
+    Chars = NewChars(<span style="color: #a31515">&quot;a&quot;</span>, <span style="color: #a31515">&quot;b&quot;</span>, <span style="color: #a31515">&quot;c&quot;</span>, &amp;H300, &amp;HA0A0)
+    <span style="color: #0000ff">Set</span> UTF8Encoder = Encoding.UTF8.GetEncoder
+    
+    ByteCount = UTF8Encoder.GetByteCount(Chars, 2, 3, <span style="color: #0000ff">True</span>)
+    <span style="color: #0000ff">ReDim</span> Bytes(0 <span style="color: #0000ff">To</span> ByteCount - 1)
+    BytesEncodedCount = UTF8Encoder.GetBytes(Chars, 2, 3, Bytes, 0, <span style="color: #0000ff">True</span>)
+    
+    Console.WriteLine <span style="color: #a31515">&quot;{0} bytes used to encode characters.&quot;</span>, BytesEncodedCount
+    
+    Console.WriteValue <span style="color: #a31515">&quot;Encoded bytes: &quot;</span>
+    <span style="color: #0000ff">For</span> <span style="color: #0000ff">Each</span> b <span style="color: #0000ff">In</span> Bytes
+        Console.WriteValue <span style="color: #a31515">&quot;[{0}]&quot;</span>, b
+    <span style="color: #0000ff">Next</span>
+    
+    Console.WriteLine
+    Console.ReadKey
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; This code produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    6 bytes used to encode characters.</span>
+<span style="color: #008000">&#39;    Encoded bytes: [99][204][128][234][130][160]</span>
+</pre></div>

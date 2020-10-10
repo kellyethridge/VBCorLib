@@ -157,7 +157,6 @@ Public Function GetByteCount(ByRef Chars As Variant, Optional ByRef Index As Var
 ' @param Index The index of the first character to encode.
 ' @param Count The number of characters to encode.
 ' @return A byte array containing the results of encoding the specified set of characters.
-' @see Encoding
 ' @see #GetBytesEx
 ' @see #GetEncoder
 ' @see #GetByteCount
@@ -174,7 +173,6 @@ Public Function GetBytes(ByRef Chars As Variant, Optional ByRef Index As Variant
 ' @param Bytes The byte array to contain the resulting sequence of bytes.
 ' @param ByteIndex The index as which to start writing the resulting sequence of bytes.
 ' @return The number of bytes produce by the encoding.
-' @see Encoding
 ' @see #GetBytes
 ' @see #GetEncoder
 ' @see #GetByteCount
@@ -189,7 +187,6 @@ Public Function GetBytesEx(ByRef Chars As Variant, ByVal CharIndex As Long, ByVa
 ' @param Index The index of the first byte to decode.
 ' @param Count The number of bytes to decode.
 ' @return The number of characters produced by decoding the specified sequence of bytes.
-' @see Encoding
 ' @see #GetCharsEx
 ' @see #GetMaxCharCount
 ' @see #GetDecoder

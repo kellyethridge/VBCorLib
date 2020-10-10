@@ -1,0 +1,82 @@
+@remarks To calculate the exact array size required by <b>GetBytesEx</b> to store the resulting bytes, the application uses <a href="UTF8Encoding.GetByteCount.html">GetByteCount</a>. To calculate the maximum array size, the application should use <a href="UTF8Encoding.GetMaxByteCount.html">GetMaxByteCount</a>. The <a href="UTF8Encoding.GetByteCount.html">GetByteCount</a> method generally allows allocation of less memory, while the <a href="UTF8Encoding.GetMaxByteCount.html">GetMaxByteCount</a> method generally executes faster.
+<p>With error detection, an invalid sequence causes this method to throw a <a href="ArgumentException.html">ArgumentException</a>. Without error detection, invalid sequences are ignored, and no exception is thrown.</p>
+<p>Data to be converted, such as data read from a stream, might be available only in sequential blocks. In this case, or if the amount of data is so large that it needs to be divided into smaller blocks, the application uses the <a href="Decoder.html">Decoder</a> or the <a href="Encoder.html">Encoder</a> provided by the <a href="UTF8Encoding.GetDecoder.html">GetDecoder</a> method or the <a href="UTF8Encoding.GetEncoder.html">GetEncoder</a> method, respectively.</p>
+<table style="width: auto">
+	<tr>
+		<th>Note</th>
+	</tr>
+	<tr>
+		<td>To ensure that the encoded bytes are decoded properly, the application should prefix encoded bytes with a preamble.</td>
+	</tr>
+</table>
+@exceptions
+<table style="width: auto">
+	<tr>
+		<th>Exception</th><th>Condition</th>
+	</tr>
+	<tr>
+		<td><a href="ArgumentNullException.html">ArgumentNullException</a></td>
+		<td><i>Chars</i> is an unintialized array.<br>
+			-or-<br>
+			<i>Byte</i> is an uninitialized array.
+		</td>
+	</tr>
+	<tr>
+		<td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+		<td><i>CharIndex</i> is less than the lower-bound of <i>Chars</i>.<br>
+			-or-<br>
+			<i>ByteIndex</i> is less than the lower-bound of <i>Bytes</i>.<br>
+			-or-<br>
+			<i>CharCount</i> is less than zero.<br>
+			-or-<br>
+			<i>CharIndex</i> and <i>CharCount</i> do not denote a valid range in <i>Chars</i>.<br>
+			-or-<br>
+			<i>ByteIndex</i> is not a valid index in <i>Bytes</i>.
+		</td>
+	</tr>
+	<tr>
+		<td><a href="ArgumentException.html">ArgumentException</a></td>
+		<td>Error detection is enabled, and <i>Chars</i> contains an invalid sequence of characters.<br>
+			-or-<br>
+			<i>Bytes</i> does not have enough capacity from <i>ByteIndex</i> to the end of the array to accommodate the resulting bytes.
+		</td>
+	</tr>
+	<tr>
+		<td><a href="EncoderFallbackException.html">EncoderFallbackException</a></td>
+		<td>A fallback occurred<br>
+			-and-<br>
+			<a href="UTF8Encoding.Get.EncoderFallback.html">EncoderFallback</a> is set to <a href="EncoderExceptionFallback.html">EncoderExceptionFallback</a>.
+		</td>
+	</tr>
+</table>
+@examples The following example demonstrates how to use the <b>GetBytesEx</b> method to encode a range of characters from a String and store the encoded bytes in a range of elements in a byte array.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> Bytes()             <span style="color: #0000ff">As</span> <span style="color: #2b91af">Byte</span>
+    <span style="color: #0000ff">Dim</span> Chars               <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+    <span style="color: #0000ff">Dim</span> ByteCount           <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
+    <span style="color: #0000ff">Dim</span> BytesEncodedCount   <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
+    <span style="color: #0000ff">Dim</span> UTF8                <span style="color: #0000ff">As</span> <span style="color: #0000ff">New</span> UTF8Encoding
+    <span style="color: #0000ff">Dim</span> b                   <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>
+    
+    Chars = <span style="color: #a31515">&quot;UTF8 Encoding Example&quot;</span>
+    
+    ByteCount = UTF8.GetByteCount(CorString.ToCharArray(Chars), 0, 13)
+    <span style="color: #0000ff">ReDim</span> Bytes(1 <span style="color: #0000ff">To</span> ByteCount)
+    BytesEncodedCount = UTF8.GetBytesEx(Chars, 0, 13, Bytes, 1)
+    
+    Console.WriteLine <span style="color: #a31515">&quot;{0} bytes used to encode string.&quot;</span>, BytesEncodedCount
+    
+    Console.WriteValue <span style="color: #a31515">&quot;Encoded bytes: &quot;</span>
+    <span style="color: #0000ff">For</span> <span style="color: #0000ff">Each</span> b <span style="color: #0000ff">In</span> Bytes
+        Console.WriteValue <span style="color: #a31515">&quot;[{0}]&quot;</span>, b
+    <span style="color: #0000ff">Next</span>
+    
+    Console.WriteLine
+    Console.ReadKey
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; This code produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    13 bytes used to encode string.</span>
+<span style="color: #008000">&#39;    Encoded bytes: [85][84][70][56][32][69][110][99][111][100][105][110][103]</span>
+</pre></div>

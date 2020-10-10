@@ -46,6 +46,7 @@ Option Explicit
 ''
 ' When implemented in a derived class, initializes a new instance of the <a href="DecoderFallbackBuffer.html">DecoderFallbackBuffer</a> class.
 '
+' @returns An object that provides a fallback buffer for a decoder.
 Public Function CreateFallbackBuffer() As DecoderFallbackBuffer: End Function
 
 ''
@@ -53,7 +54,6 @@ Public Function CreateFallbackBuffer() As DecoderFallbackBuffer: End Function
 '
 ' @return The maximum number of characters the current <b>DecoderFallback</b> object can return.
 ' @remarks For an exception fallback handler, this property should return zero.
-'
 Public Property Get MaxCharCount() As Long: End Property
 
 ''
