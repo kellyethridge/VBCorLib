@@ -1,6 +1,6 @@
 ** VBCorLib **
 
-version 3.x
+version 3.1
 	* Fixed CorArray.Clear not releasing reference types correctly for Variant().
 	* Fixed BigInteger default output formatting was falling back to exponent when is should never.
 	* Fixed BigInteger default output formatting was not padding with leading zeros.
@@ -26,6 +26,8 @@ version 3.x
 	* Fixed #71 - Addressed UTF8Encoding performance. Enhanced additional Encodings' performances as well.
 	* Fixed #72 - Remove all GoSub usage from project as it would cause severe performance issues when compiled.
 	* Fixed #69 - Added additional encodings by name, improving the retrieval of an Encoding.
+	* Fixed #75 - Incorporated Encoding Fallbacks when calculating max chars and max bytes.
+	* Fixed #77 - Validated calculated max chars and max bytes to be within 32-bit values.
 
 version 3.0 (BREAKING CHANGES)
 	* Renamed cArray to CorArray.
