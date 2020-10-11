@@ -417,11 +417,20 @@ End Function
 ' @return The maximum number of bytes that can be generated from the specified number of characters.
 '
 Public Function GetMaxByteCount(ByVal CharCount As Long) As Long
+    Dim ByteCount As Currency
+    
     If CharCount < 0 Then _
         Error.ArgumentOutOfRange "CharCount", ArgumentOutOfRange_NeedNonNegNum
-
-    Dim ByteCount As Currency
-    ByteCount = 1@ + CharCount
+    
+    ByteCount = CharCount + 1@
+    
+    ' A fallback could have a count of zero meaning we could create
+    ' a zero length buffer, even if the fallback is never needed.
+    ' So do a check here first.
+    If mEncoderFallback.MaxCharCount > 1 Then
+        ByteCount = ByteCount * mEncoderFallback.MaxCharCount
+    End If
+    
     ByteCount = ByteCount * 2
     
     If ByteCount > &H7FFFFFFF Then _
@@ -437,14 +446,15 @@ End Function
 ' @return The maximum number of characters that can be decoded from the specified number of bytes.
 '
 Public Function GetMaxCharCount(ByVal ByteCount As Long) As Long
+    Dim CharCount As Currency
+    
     If ByteCount < 0 Then _
         Error.ArgumentOutOfRange "ByteCount", ArgumentOutOfRange_NeedNonNegNum
 
-    Dim CharCount As Currency
     CharCount = CCur(CLng(ByteCount \ 2)) + (ByteCount And 1) + 1
     
-    If DecoderFallback.MaxCharCount > 1 Then
-        CharCount = CharCount * DecoderFallback.MaxCharCount
+    If mDecoderFallback.MaxCharCount > 1 Then
+        CharCount = CharCount * mDecoderFallback.MaxCharCount
     End If
     
     If CharCount > &H7FFFFFFF Then _

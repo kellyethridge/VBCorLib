@@ -395,6 +395,15 @@ Public Sub GetMaxCharCount_With50_Returns50()
     Assert.That Actual, Iz.EqualTo(50)
 End Sub
 
+Public Sub GetMaxCharCount_WithZero_Returns1()
+    Dim Encoding    As New UTF7Encoding
+    Dim Actual      As Long
+    
+    Actual = Encoding.GetMaxCharCount(0)
+    
+    Assert.That Actual, Iz.EqualTo(1)
+End Sub
+
 Public Sub GetMaxByteCount_With50_Returns152()
     Dim Encoding    As New UTF7Encoding
     Dim Actual      As Long

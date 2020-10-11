@@ -481,11 +481,28 @@ End Function
 ' @see #GetEncoder
 ' @include "..\DocIncludes\UTF8Encoding.GetMaxByteCount.html"
 Public Function GetMaxByteCount(ByVal CharCount As Long) As Long
+    Dim ByteCount As Currency
+    
     If CharCount < 0 Then _
         Error.ArgumentOutOfRange "CharCount", ArgumentOutOfRange_NeedNonNegNum
     
+    ' plus one incase the first char part of a surrogate pair from a previous operation.
+    ByteCount = CharCount + 1@
+    
+    ' A fallback could have a count of zero meaning we could create
+    ' a zero length buffer, even if the fallback is never needed.
+    ' So do a check here first.
+    If mEncoderFallback.MaxCharCount > 1 Then
+        ByteCount = ByteCount * mEncoderFallback.MaxCharCount
+    End If
+    
     ' chars are a max 3 bytes each.
-    GetMaxByteCount = (CharCount + 1) * 3 ' plus one incase the first char part of a surrogate pair from a previous operation.
+    ByteCount = ByteCount * 3
+    
+    If ByteCount > &H7FFFFFFF Then _
+        Error.ArgumentOutOfRange "CharCount", ArgumentOutOfRange_GetByteCountOverflow
+    
+    GetMaxByteCount = ByteCount
 End Function
 
 ''
@@ -499,10 +516,22 @@ End Function
 ' @see #GetDecoder
 ' @include "..\DocIncludes\UTF8Encoding.GetMaxCharCount.html"
 Public Function GetMaxCharCount(ByVal ByteCount As Long) As Long
+    Dim CharCount As Currency
+    
     If ByteCount < 0 Then _
         Error.ArgumentOutOfRange "ByteCount", ArgumentOutOfRange_NeedNonNegNum
-        
-    GetMaxCharCount = ByteCount + 1 ' plus one incase the first byte is the last byte of a surrogate pair from a previous operation.
+    
+    ' plus one incase the first byte is the last byte of a surrogate pair from a previous operation.
+    CharCount = ByteCount + 1@
+    
+    If mDecoderFallback.MaxCharCount > 1 Then
+        CharCount = CharCount * mDecoderFallback.MaxCharCount
+    End If
+    
+    If CharCount > &H7FFFFFFF Then _
+        Error.ArgumentOutOfRange "ByteCount", ArgumentOutOfRange_GetCharCountOverflow
+    
+    GetMaxCharCount = CharCount
 End Function
 
 ''

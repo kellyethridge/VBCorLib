@@ -162,6 +162,16 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use " \uD802", 1, &HD802
             Test.Use " \uDC02", 1, &HDC02
             
+        Case "GetMaxByteCount_WithCustomReplacementFallback_ReturnsExpected"
+            Test.Use 0, 6
+            Test.Use 1, 12
+            Test.Use 10, 66
+            
+        Case "GetMaxCharCount_WithCustomReplacementFallback_ReturnsExpected"
+            Test.Use 0, 3
+            Test.Use 1, 6
+            Test.Use 10, 18
+            
     End Select
 End Sub
 
@@ -487,10 +497,32 @@ Public Sub GetMaxCharCount_WhenCalled_ReturnsExpected()
     Assert.That Enc.GetMaxCharCount(51), Iz.EqualTo(27)
 End Sub
 
+Public Sub GetMaxCharCount_WithCustomReplacementFallback_ReturnsExpected(ByVal Count As Long, ByVal Expected As Long)
+    Dim Enc As UnicodeEncoding
+    Dim Actual As Long
+    
+    Set Enc = MakeEncoding(False, "abc")
+    
+    Actual = Enc.GetMaxCharCount(Count)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
 Public Sub GetMaxByteCount_WhenCalled_ReturnsExpected()
     Dim Enc As New UnicodeEncoding
     
     Assert.That Enc.GetMaxByteCount(50), Iz.EqualTo(102)
+End Sub
+
+Public Sub GetMaxByteCount_WithCustomReplacementFallback_ReturnsExpected(ByVal Count As Long, ByVal Expected As Long)
+    Dim Enc As UnicodeEncoding
+    Dim Actual As Long
+    
+    Set Enc = MakeEncoding(False, "abc")
+    
+    Actual = Enc.GetMaxByteCount(Count)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
 Public Sub ZeroLengthArrays()
@@ -620,6 +652,7 @@ End Sub
 Private Function MakeEncoding(Optional ByVal BigEndian As Boolean, Optional ByVal Replacement As String = "?") As UnicodeEncoding
     Set MakeEncoding = Cor.NewUnicodeEncoding(BigEndian, True).Clone
     Set MakeEncoding.EncoderFallback = Cor.NewEncoderReplacementFallback(Replacement)
+    Set MakeEncoding.DecoderFallback = Cor.NewDecoderReplacementFallback(Replacement)
 End Function
 
 
