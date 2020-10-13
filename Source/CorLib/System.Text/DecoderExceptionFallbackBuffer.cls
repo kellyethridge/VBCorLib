@@ -49,7 +49,10 @@ Implements DecoderFallbackBuffer
 ' @param BytesUnknown An input array of bytes.
 ' @param Index The index position of a byte in the input.
 ' @return None. No value is returned because the <b>Fallback</b> method always throws an exception.<br/>
-' <h4>Exceptions</h4>
+' @remarks The <a href="Encoding.GetBytes.html">GetBytes</a> and <a href="EncodingStatic.Convert.html">Convert</a> methods call <b>Fallback</b> if they encounter an unknown byte in their input.
+' In response, the <b>Fallback</b> method always throws <a href="DecoderFallbackException.html">DecoderFallbackException</a> and displays the input data.
+' The <b>Fallback</b> method nominally indicates whether an exception is thrown if an input byte sequence cannot be decoded.
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
 '       <th>Exception</th>
@@ -59,9 +62,6 @@ Implements DecoderFallbackBuffer
 '        <td><a href="DecoderFallbackException.html">DecoderFallbackException</a></td><td>This method always throws an exception that reports the value and index position of the input byte that cannot be decoded.</td>
 '   </tr>
 ' </table>
-' @remarks The <a href="Encoding.GetBytes.html">GetBytes</a> and <a href="EncodingStatic.Convert.html">Convert</a> methods call <b>Fallback</b> if they encounter an unknown byte in their input.
-' In response, the <b>Fallback</b> method always throws <a href="DecoderFallbackException.html">DecoderFallbackException</a> and displays the input data.
-' The <b>Fallback</b> method nominally indicates whether an exception is thrown if an input byte sequence cannot be decoded.
 Public Function Fallback(ByRef BytesUnknown() As Byte, ByVal Index As Long) As Boolean
     Dim Message As String
     

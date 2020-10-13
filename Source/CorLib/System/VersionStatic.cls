@@ -49,7 +49,7 @@ Private mParser As New VersionParser
 '
 ' @param s A string that contains a version number to convert.
 ' @return An object that is equivalent to the version number specified in the <i>s</i> parameter.
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
 '       <th>Exception</th>

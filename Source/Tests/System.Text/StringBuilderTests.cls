@@ -57,6 +57,10 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
         Case "AppendString_WithValue_AppendText"
             Test.Use "bye", "hellobye"
             Test.Use "", "hello"
+            
+        Case "AppendChar_WithInvalidChar_ThrowsOverflowException"
+            Test.Use 65536
+            Test.Use -32769
     End Select
 End Sub
 
@@ -185,6 +189,15 @@ Public Sub AppendChar_WithCountLessThanZero_ThrowsArgumentOutOfRangeException()
     sb.AppendChar CHARACTER_ZERO, -1
     
     AssertArgumentOutOfRangeException Err, "Count"
+End Sub
+
+Public Sub AppendChar_WithInvalidChar_ThrowsOverflowException(ByVal InvalidChar As Long)
+    Dim sb As New StringBuilder
+    
+    On Error Resume Next
+    sb.AppendChar InvalidChar
+    
+    AssertOverflowException Err
 End Sub
 
 Public Sub Chars_WithGet_ReturnsCharacter()

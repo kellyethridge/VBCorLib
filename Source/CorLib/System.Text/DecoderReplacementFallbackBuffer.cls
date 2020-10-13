@@ -55,7 +55,7 @@ Private mFallbackIndex      As Long
 ' @param Index The index position of the byte in <i>BytesUnknown</i>. This parameter is ignored in this operation.
 ' @return <b>True</b> if the replacement string is not empty; <b>False</b> if the replacement string is empty.
 ' @remarks The <a href="Encoding.GetBytes.html">GetBytes</a> and <a href="Encoder.Convert.html">Convert</a> methods call <b>Fallback</b> if they encounter an unknown input byte sequence that cannot be decoded. If the return value of <b>Fallback</b> is <b>True</b>, the calling method can invoke the <a href="DecoderReplacementFallbackBuffer.GetNextChar.html">GetNextChar</a> method to obtain each character of the fallback buffer.
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
 '       <th>Exception</th>

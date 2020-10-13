@@ -64,7 +64,7 @@ End Property
 ' @param Value An object that represents the culture for the current thread.
 ' @remarks The CultureInfo object that is returned by this property, together with its associated objects,
 ' determine the default format for dates, times, numbers, and currency values.
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
 '       <th>Exception</th>

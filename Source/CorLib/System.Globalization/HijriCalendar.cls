@@ -148,8 +148,7 @@ End Property
 ' Sets the number of days to add or subtract from the calendar to accommodate the variances in the start and the end of Ramadan and to accommodate the date difference between countries/regions.
 '
 ' @param Value An integer from -2 to 2 that represents the number of days to add or subtract from the calendar.
-' @remarks
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
 '       <th>Exception</th>
@@ -570,7 +569,6 @@ End Function
 ' @param Year The year to check if is a leap year.
 ' @param Era The era the year is in.
 ' @return Boolean indication if the year is a leap year.
-'
 Public Function IsLeapYear(ByVal Year As Long, Optional ByRef Era As Variant) As Boolean
     ValidateEra Era
     ValidateYear Year
@@ -587,7 +585,6 @@ End Function
 ' @param Year A year.
 ' @param Era An era.
 ' @return Always 0 because the <a href="HijriCalendar.html">HijriCalendar</a> does not recognize leap months.
-'
 Public Function GetLeapMonth(ByVal Year As Long, Optional ByRef Era As Variant) As Long
     ValidateEra Era
     ValidateYear Year

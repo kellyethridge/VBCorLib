@@ -321,6 +321,7 @@ Public Enum ResourceStringKey
     
     Overflow_TimeSpan = 1300
     Overflow_Int64 = 1301
+    Overflow_Char = 1302
     
     UnknownError_Num = 1500
     

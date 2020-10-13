@@ -1,5 +1,9 @@
 ** VBCorLib **
 
+version Next
+	* Optimize StringBuilder.AppendChar for Release build.
+	* Validate Char parameter in StringBuilder.AppendChar. Must be within -32768 to 65535 or OverflowException is thrown.
+
 version 3.1
 	* Fixed CorArray.Clear not releasing reference types correctly for Variant().
 	* Fixed BigInteger default output formatting was falling back to exponent when is should never.
