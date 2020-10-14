@@ -223,6 +223,17 @@ Public Sub ReadString_WhenCalled_ReturnsExpected()
     Assert.That Actual, Iz.EqualTo("hello" & ChrW$(&H2030))
 End Sub
 
+Public Sub ReadString_WithInvalid7BitEncodedLength_ThrowsFormatException()
+    Dim Reader As BinaryReader
+    Set Reader = MakeReader(NewBytes(&H81, &H81, &H81, &H81, &H81, 0))
+    
+    On Error GoTo Catch
+    Reader.ReadString
+    
+Catch:
+    AssertFormatException Err
+End Sub
+
 Public Sub ReadXxx_WithMultipleCalled_ReturnsExpected()
     Dim Reader As BinaryReader
     Set Reader = MakeReader(NewBytes(&H44, &H0, &H0, &H0, &H8, &H68, &H65, &H6C, &H6C, &H6F, &HE2, &H80, &HB0, &HCD, &HCC, &HCC, &HCC, &HCC, &H1C, &H51, &H40))
@@ -285,6 +296,29 @@ Public Sub ReadChars_WhenCalled_ReturnsArrayOfChars()
     Actual = Reader.ReadChars(2)
     
     Assert.That Actual, Iz.EqualTo(NewIntegers(&H2030, &H65))
+End Sub
+
+Public Sub ReadChars_WithLargeAmountUTF8_ReturnsChars()
+    Const Count As Long = 1024
+    Dim Reader As BinaryReader
+    Dim Bytes() As Byte
+    Dim Expected() As Integer
+    Dim i As Long
+    
+    ReDim Bytes(0 To Count - 1)
+    ReDim Expected(0 To Count - 1)
+    
+    For i = 0 To Count - 1
+        Expected(i) = i
+    Next
+    
+    Bytes = Encoding.UTF8.GetBytes(Expected)
+    Set Reader = MakeReader(Bytes)
+    
+    Dim Actual() As Integer
+    Actual = Reader.ReadChars(Count)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
 Public Sub ReadChars_WhenMoreCharsRequestedThanAvailable_ReturnsAvailableChars()

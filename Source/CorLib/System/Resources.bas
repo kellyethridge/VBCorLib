@@ -276,6 +276,7 @@ Public Enum ResourceStringKey
     Format_IndexOutOfRange = 609
     Format_BadFormatSpecifier = 610
     Format_NeedSingleChar = 611
+    Format_Bad7BitInt32 = 612
     
     IndexOutOfRange_Dimension = 300
     IndexOutOfRange_ArrayBounds = 301
