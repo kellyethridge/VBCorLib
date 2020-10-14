@@ -43,7 +43,7 @@ Attribute VB_Exposed = True
 ' the number of bytes have been read, they are assembled into the requested
 ' data type, advancing the position in the stream the required number of bytes.
 ' <p>Characters can be read from the stream using the specified <a href="Encoding.html">Encoding</a>.
-' If <i>Encoding</i> is not specified then the <b>BinaryReader</b> is created using <a href="UTF8Encoding.html">UTF8Encoding</a>.</p>
+' If no <a href="Encoding.html">Encoding</a> is specified then the <b>BinaryReader</b> is created using <a href="UTF8Encoding.html">UTF8Encoding</a>.</p>
 ' @see Constructors
 ' @see BinaryWriter
 ' @see Stream
@@ -209,7 +209,7 @@ Public Function ReadBytes(ByVal Count As Long) As Byte()
 End Function
 
 ''
-' Reads the specified number of characters from the current stream, returns the data in a character array, and advances the current position in accordance with the <b>Encoding</b> used and the specific character being read from the stream.
+' Reads the specified number of characters from the current stream, returns the data in a character array, and advances the current position in accordance with the <a href="Encoding.html">Encoding</a> used and the specific character being read from the stream.
 '
 ' @param Count The number of characters to read.
 ' @return A character array containing data read from the underlying stream. This might be less than the number of characters requested if the end of the stream is reached.
@@ -597,33 +597,25 @@ Catch:
 End Function
 
 ''
-' Returns a string representation of this object instance.
+' Returns a string representation of the current object.
 '
-' @return String representing this instance.
-' @see IObject
-'
+' @include "..\DocIncludes\IObject.ToString.html"
 Public Function ToString() As String
     ToString = MyBase.ToString(Me, App)
 End Function
 
 ''
-' Returns a boolean indicating if the value and this object
-' instance are the same instance.
+' Determines whether the specified value is equal to the current <a href="IObject.html">IObject</a>.
 '
-' @param value The value to compare equalit to.
-' @return Boolean indicating equality.
-' @see IObject
-'
+' @include "..\DocIncludes\IObject.Equals.html"
 Public Function Equals(ByRef Value As Variant) As Boolean
     Equals = MyBase.Equals(Me, Value)
 End Function
 
 ''
-' Returns a pseudo-unique number identifying this instance.
+' Serves as a hash function for a particular type.
 '
-' @return Pseudo-unique number identifying this instance.
-' @see IObject
-'
+' @include "..\DocIncludes\IObject.GetHashCode.html"
 Public Function GetHashCode() As Long
     GetHashCode = MyBase.GetHashCode(Me)
 End Function
