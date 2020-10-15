@@ -423,17 +423,44 @@ Private Function Encoding_GetHashCode() As Long
 End Function
 
 Private Function Encoding_GetMaxByteCount(ByVal CharCount As Long) As Long
+    Dim ByteCount As Currency
+    
     If CharCount < 0 Then _
         Error.ArgumentOutOfRange "CharCount", ArgumentOutOfRange_NeedNonNegNum
     
-    Encoding_GetMaxByteCount = CharCount
+    ' Add one incase a high-surrogate is stored in encoder.
+    ByteCount = CharCount + 1@
+    
+    If mEncoderFallback.MaxCharCount > 1 Then
+        ByteCount = ByteCount * mEncoderFallback.MaxCharCount
+    End If
+    
+    ' Being a double-byte encoding, each character needs two bytes, multiply them out.
+    ByteCount = ByteCount * 2
+    
+    If ByteCount > &H7FFFFFFF Then _
+        Error.ArgumentOutOfRange "CharCount", ArgumentOutOfRange_GetByteCountOverflow
+    
+    Encoding_GetMaxByteCount = ByteCount
 End Function
 
 Private Function Encoding_GetMaxCharCount(ByVal ByteCount As Long) As Long
+    Dim CharCount As Currency
+    
     If ByteCount < 0 Then _
         Error.ArgumentOutOfRange "ByteCount", ArgumentOutOfRange_NeedNonNegNum
     
-    Encoding_GetMaxCharCount = ByteCount
+    ' Add one incase a high-surrogate is stored in encoder.
+    CharCount = ByteCount + 1@
+    
+    If mDecoderFallback.MaxCharCount > 1 Then
+        CharCount = CharCount * mDecoderFallback.MaxCharCount
+    End If
+    
+    If CharCount > &H7FFFFFFF Then _
+        Error.ArgumentOutOfRange "ByteCount", ArgumentOutOfRange_GetCharCountOverflow
+    
+    Encoding_GetMaxCharCount = CharCount
 End Function
 
 Private Function Encoding_GetPreamble() As Byte()

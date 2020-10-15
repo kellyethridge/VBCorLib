@@ -1,0 +1,35 @@
+@remarks The <a href="Decoder.GetChars.html">Decoder.GetChars</a> method converts sequential blocks of bytes into sequential blocks of characters, in a manner similar to the <a href="UTF8Encoding.GetCharsEx.html">GetCharsEx</a> method of this class. However, a <a href="Decoder.html">Decoder</a> maintains state information between calls so it can correctly decode byte sequences that span blocks. The <a href="Decoder.html">Decoder</a> also preserves trailing bytes at the end of data blocks and uses the trailing bytes in the next decoding operation. Therefore, <b>GetDecoder</b> and <a href="UTF8Encoding.GetEncoder.html">GetEncoder</a> are useful for network transmission and file operations, because those operations often deal with blocks of data instead of a complete data stream.
+<p>If error detection is enabled, that is, the <i>ThrowOnInvalidCharacters</i> parameter of the constructor is set to <b>True</b>, error detection is also enabled in the <a href="Decoder.html">Decoder</a> returned by this method. If error detection is enabled and an invalid sequence is encountered, the state of the decoder is undefined and processing must stop.</p>
+@examples The following example demonstrates how to use the <b>GetDecoder</b> method to obtain a UTF-8 decoder. The decoder converts a sequence of bytes into a sequence of characters.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> Chars()             <span style="color: #0000ff">As</span> <span style="color: #2b91af">Integer</span>
+    <span style="color: #0000ff">Dim</span> Bytes()             <span style="color: #0000ff">As</span> <span style="color: #2b91af">Byte</span>
+    <span style="color: #0000ff">Dim</span> UTF8Decoder         <span style="color: #0000ff">As</span> Decoder
+    <span style="color: #0000ff">Dim</span> CharCount           <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
+    <span style="color: #0000ff">Dim</span> CharsDecodedCount   <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
+    <span style="color: #0000ff">Dim</span> c                   <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>
+
+    <span style="color: #0000ff">Set</span> Console.OutputEncoding = Encoding.UTF8
+    Bytes = NewBytes(99, 204, 128, 234, 130, 160)
+    <span style="color: #0000ff">Set</span> UTF8Decoder = Encoding.UTF8.GetDecoder
+    
+    CharCount = UTF8Decoder.GetCharCount(Bytes, 0, CorArray.Length(Bytes))
+    <span style="color: #0000ff">ReDim</span> Chars(0 <span style="color: #0000ff">To</span> CharCount - 1)
+    CharsDecodedCount = UTF8Decoder.GetChars(Bytes, 0, CorArray.Length(Bytes), Chars, 0)
+    
+    Console.WriteLine <span style="color: #a31515">&quot;{0} characters used to decode bytes.&quot;</span>, CharsDecodedCount
+    
+    Console.WriteValue <span style="color: #a31515">&quot;Decoded chars: &quot;</span>
+    <span style="color: #0000ff">For</span> <span style="color: #0000ff">Each</span> c <span style="color: #0000ff">In</span> Chars
+        Console.WriteValue <span style="color: #a31515">&quot;[{0:$}]&quot;</span>, c
+    <span style="color: #0000ff">Next</span>
+    
+    Console.WriteLine
+    Console.ReadKey
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; This code produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    3 characters used to decode bytes.</span>
+<span style="color: #008000">&#39;    Decoded chars: [c][`][&#xA0A0;]</span>
+</pre></div>

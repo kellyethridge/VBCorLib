@@ -1,3 +1,17 @@
+@return A hash code for the current <a href="IObject.html">IObject</a>.
+@remarks A hash code is a numeric value that is used to identify an object during equality testing. It can also serve as an index for an object in a collection.
+<p>The <b>GetHashCode</b> method is suitable for use in hashing algorithms and data structures such as a hash table.</p>
+<p>The default implementation of the <b>GetHashCode</b> method does not guarantee unique return values for different values. Furthermore, VBCorLib does not guarantee the default implementation of the <b>GetHashCode</b> method, and the value it returns will be the same between different versions of VBCorLib. Consequently, the default implementation of this method must not be used as a unique object identifier for hashing purposes.</p>
+<h5>Notes to Implementers</h5>
+A hash function is used to quickly generate a number (hash code) that corresponds to the value of an object. Hash functions are usually specific to each Type and, for uniqueness, must use at least one of the instance fields as input.
+A hash function must have the following properties:
+<ul>
+  <li>If two values compare as equal, the <b>GetHashCode</b> method for each value must return the same value. However, if two values do not compare as equal, the <b>GetHashCode</b> methods for the two values do not have to return different values.</li>
+  <li>The <b>GetHashCode</b> method for an object must consistently return the same hash code as long as there is no modification to the object state that determines the return value of the object's <a href="IObject.Equals.html">Equals</a> method. Note that this is true only for the current execution of an application, and that a different hash code can be returned if the application is run again.</li>
+  <li>For the best performance, a hash function must generate a random distribution for all input.</li>
+</ul>
+<p>Implementations of the <b>GetHashCode</b> method must not result in circular references. For example, if <b>ClassA.GetHashCode</b> calls <b>ClassB.GetHashCode</b>, </b>ClassB.GetHashCode</b> must not call <b>ClassA.GetHashCode</b> either directly or indirectly.</p>
+<p>Implementations of the <b>GetHashCode</b> method must not throw exceptions.</p>
 @examples The following code demonstrates an implementation of the <b>GetHashCode</b> method. This does not show the complete implementation of the <a href="IObject.html">IObject</a> interface.
 <!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Implements</span> IObject
 

@@ -1,0 +1,74 @@
+@remarks To calculate the exact array size required by <b>GetCharsEx</b> to store the resulting characters, the application uses <a href="UTF8Encoding.GetCharCount.html">GetCharCount</a>. To calculate the maximum array size, the application should use <a href="UTF8Encoding.GetMaxCharCount.html">GetMaxCharCount</a>. The <a href="UTF8Encoding.GetCharCount.html">GetCharCount</a> method generally allows allocation of less memory, while the <a href="UTF8Encoding.GetMaxCharCount.html">GetMaxCharCount</a> method generally executes faster.
+<p>With error detection, an invalid sequence causes this method to throw a <a href="ArgumentException.html">ArgumentException</a>. Without error detection, invalid sequences are ignored, and no exception is thrown.</p>
+<p>Data to be converted, such as data read from a stream, might be available only in sequential blocks. In this case, or if the amount of data is so large that it needs to be divided into smaller blocks, the application uses the <a href="Decoder.html">Decoder</a> or the <a href="Encoder.html">Encoder</a> provided by the <a href="UTF8Encoding.GetDecoder.html">GetDecoder</a> method or the <a href="UTF8Encoding.GetEncoder.html">GetEncoder</a> method, respectively.</p>
+@exceptions
+<table style="width: auto">
+	<tr>
+		<th>Exception</th><th>Condition</th>
+	</tr>
+	<tr>
+		<td><a href="ArgumentNullException.html">ArgumentNullException</a></td>
+		<td><i>Bytes</i> is uninitialized.<br>
+			-or-<br>
+			<i>Chars</i> is uninitailized.
+		</td>
+	</tr>
+	<tr>
+		<td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+		<td><i>ByteIndex</i> is less than the lower-bound of <i>Bytes</i>.<br>
+			-or-<br>
+			<i>CharIndex</i> is less than the lower-bound of <i>Chars</i>.<br>
+			-or-<br>
+			<i>ByteCount</i> is less than zero.<br>
+			-or-<br>
+			<i>ByteIndex</i> and <i>ByteCount</i> do not denote a valid range in <i>Bytes</i>.<br>
+			-or-<br>
+			<i>CharIndex</i> is not a valid index in <i>Chars</i>.
+		</td>
+	</tr>
+		<tr>
+		<td><a href="ArgumentException.html">ArgumentException</a></td>
+		<td>
+			Error detection is enabled, and <i>Bytes</i> contains an invalid sequence of bytes.<br>
+			-or-<br>
+			<i>Chars</i> does not have enough capacity from <i>CharIndex</i> to the end of the array to accommodate the resulting characters.
+		</td>
+	</tr>
+	<tr>
+		<td><a href="DecoderFallbackException.html">DecoderFallbackException</a></td>
+		<td>A fallback occurred<br>
+			-and-<br>
+			<a href="UTF8Encoding.Get.DecoderFallback.html">DecoderFallback</a> is set to <a href="DecoderExceptionFallback.html">DecoderExceptionFallback</a>.
+		</td>
+	</tr>
+</table>
+@examples The following example demonstrates how to use the <b>GetCharsEx</b> method to decode a range of elements in a byte array and store the result in a character array.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> Bytes()             <span style="color: #0000ff">As</span> <span style="color: #2b91af">Byte</span>
+    <span style="color: #0000ff">Dim</span> Chars()             <span style="color: #0000ff">As</span> <span style="color: #2b91af">Integer</span>
+    <span style="color: #0000ff">Dim</span> UTF8                <span style="color: #0000ff">As</span> <span style="color: #0000ff">New</span> UTF8Encoding
+    <span style="color: #0000ff">Dim</span> CharCount           <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
+    <span style="color: #0000ff">Dim</span> CharsDecodedCount   <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
+    <span style="color: #0000ff">Dim</span> c <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>
+    
+    Bytes = NewBytes(85, 84, 70, 56, 32, 69, 110, 99, 111, 100, 105, 110, 103, 32, 69, 120, 97, 109, 112, 108, 101)
+    
+    CharCount = UTF8.GetCharCount(Bytes, 2, 13)
+    <span style="color: #0000ff">ReDim</span> Chars(1 <span style="color: #0000ff">To</span> CharCount)
+    CharsDecodedCount = UTF8.GetCharsEx(Bytes, 2, 13, Chars, 1)
+    
+    Console.WriteLine <span style="color: #a31515">&quot;{0} characters used to decode bytes.&quot;</span>, CharsDecodedCount
+    
+    <span style="color: #0000ff">For</span> <span style="color: #0000ff">Each</span> c <span style="color: #0000ff">In</span> Chars
+        Console.WriteValue <span style="color: #a31515">&quot;[{0:$}]&quot;</span>, c
+    <span style="color: #0000ff">Next</span>
+
+    Console.WriteLine
+    Console.ReadKey
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; This code produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    13 characters used to decode bytes.</span>
+<span style="color: #008000">&#39;    [F][8][ ][E][n][c][o][d][i][n][g][ ][E]</span>
+</pre></div>

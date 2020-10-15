@@ -256,14 +256,15 @@ Public Sub ReadChar_WhenReadingASurrogateFromAPair_RestoresPositionInUnderlyingS
     Dim Reader As BinaryReader
     Set Reader = MakeReader(NewBytes(240, 144, 128, 128)) ' UTF-8 U+D800 - U+DC00
 
-    On Error Resume Next
+    On Error GoTo Catch
     Reader.ReadChar
-    On Error GoTo 0
     
+Catch:
     Dim Actual As Long
     Actual = Reader.BaseStream.Position
     
     Assert.That Actual, Iz.EqualTo(0)
+    Assert.Pass
 End Sub
 
 Public Sub ReadChars_WithCountLessThanZero_ThrowsArgumentOutOfRangeException()

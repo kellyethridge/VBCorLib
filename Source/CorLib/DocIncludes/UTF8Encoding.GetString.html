@@ -1,0 +1,63 @@
+@remarks With error detection, an invalid sequence causes this method to throw a <a href="ArgumentException.html">ArgumentException</a>. Without error detection, invalid sequences are ignored, and no exception is thrown.
+<p>If the range of bytes to be decoded includes the byte order mark (BOM) and the byte array was returned by a method of a non-BOM aware type, the character U+FFFE is included in the character array returned by this method. You can remove it by calling the <a href="CorString.TrimStart.html">CorString.TrimStart</a> method.</p>
+<p>Data to be converted, such as data read from a stream, might be available only in sequential blocks. In this case, or if the amount of data is so large that it needs to be divided into smaller blocks, the application uses the <a href="Decoder.html">Decoder</a> or the <a href="Encoder.html">Encoder</a> provided by the <a href="UTF8Encoding.GetDecoder.html">GetDecoder</a> method or the <a href="UTF8Encoding.GetEncoder.html">GetEncoder</a> method, respectively.</p>
+@exceptions
+<table style="width: auto">
+	<tr>
+		<th>Exception</th><th>Condition</th>
+	</tr>
+	<tr>
+		<td><a href="ArgumentNullException.html">ArgumentNullException</a></td>
+		<td><i>Bytes</i> is uninitialized.</td>
+	</tr>
+	<tr>
+		<td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+		<td><i>Index</i> is less than the lower-bound of <i>Bytes</i>.<br>
+			-or-<br>
+			<i>Count</i> is less than zero.<br>
+			-or-<br>
+			<i>Index</i> and <i>Count</i> do not denote a valid range in <i>Bytes</i>.
+		</td>
+	</tr>
+	<tr>
+		<td><a href="ArgumentException.html">ArgumentException</a></td>
+		<td>Error detection is enabled, and <i>Bytes</i> contains an invalid sequence of bytes.</td>
+	</tr>
+	<tr>
+		<td><a href="DecoderFallbackException.html">DecoderFallbackException</a></td>
+		<td>A fallback occurred<br>
+			-and-<br>
+			<a href="UTF8Encoding.Get.DecoderFallback.html">DecoderFallback</a> is set to <a href="DecoderExceptionFallback.html">DecoderExceptionFallback.html</a>.
+		</td>
+	</tr>
+</table>
+@examples The following example initializes an array by calling the <a href="UTF8Encoding.GetByteCount.html">GetByteCount</a> method to determine exactly how many bytes are required for an encoded string and then adding the size of the byte order mark (BOM). The example then calls the <a href="UTF8Encoding.GetPreamble.html">GetPreamble</a> method to store the BOM to the array before calling the <a href="UTF8Encoding.GetBytesEx.html">GetBytesEx</a> method to store the encoded bytes to the array. The example then calls the <b>GetString</b> method to decode the string.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> UTF8    <span style="color: #0000ff">As</span> UTF8Encoding
+    <span style="color: #0000ff">Dim</span> Bytes() <span style="color: #0000ff">As</span> <span style="color: #2b91af">Byte</span>
+    <span style="color: #0000ff">Dim</span> s       <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+    <span style="color: #0000ff">Dim</span> s2      <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+    
+    <span style="color: #0000ff">Set</span> UTF8 = NewUTF8Encoding(<span style="color: #0000ff">True</span>, <span style="color: #0000ff">True</span>)
+    
+    s = <span style="color: #a31515">&quot;It was the best of times, it was the worst of times...&quot;</span>
+    
+    <span style="color: #008000">&#39; We need to dimension the array, since we&#39;ll populate it with 2 method calls.</span>
+    <span style="color: #0000ff">ReDim</span> Bytes(0 <span style="color: #0000ff">To</span> UTF8.GetByteCount(s) + CorArray.Length(UTF8.GetPreamble) - 1)
+    
+    <span style="color: #008000">&#39; Encode the string</span>
+    CorArray.Copy UTF8.GetPreamble, Bytes, CorArray.Length(UTF8.GetPreamble)
+    UTF8.GetBytesEx s, 0, Len(s), Bytes, CorArray.Length(UTF8.GetPreamble)
+    
+    <span style="color: #008000">&#39; Decode the byte array.</span>
+    s2 = UTF8.GetString(Bytes)
+    Console.WriteLine s2
+    
+    Console.ReadKey
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; This code produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    ?It was the best of times, it was the worst of times...</span>
+</pre></div>
+Note that in this case the decoded string differs from the original string, since it begins with a 16-bit byte order mark U+FFFD. This means that the two strings will compare as unequal, and that if the string is output, the BOM will be displayed as the replacement character "?". To remove the BOM at the beginning of the string, you can call the <a href="CorString.TrimStart.html">CorString.TrimStart</a> method.

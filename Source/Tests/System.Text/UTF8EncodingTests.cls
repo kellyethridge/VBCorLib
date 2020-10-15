@@ -255,6 +255,16 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use NewBytes(&HF0, &H8F, &HBF, &HBF), 0, NewBytes(&HF0, &H8F)
             Test.Use NewBytes(1, 2, &HF0, &H90), 2, NewBytes(&HF0, &H90) ' hanging 2 bytes of surrogate pair
         
+        Case "GetMaxCharCount_WithCustomReplacementFallback_ReturnsExpected"
+            Test.Use 0, 3
+            Test.Use 1, 6
+            Test.Use 10, 33
+            
+        Case "GetMaxByteCount_WithCustomReplacementFallback_ReturnsExpected"
+            Test.Use 0, 9
+            Test.Use 1, 18
+            Test.Use 10, 99
+            
     End Select
 End Sub
 
@@ -836,7 +846,7 @@ Public Sub GetChars_WhenCalled_ReturnsDecoded()
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub MaxCharCount_With50AndNoBOM_Returns51()
+Public Sub GetMaxCharCount_With50AndNoBOM_Returns51()
     Dim UTF8Enc As New UTF8Encoding
     
     Dim Actual As Long
@@ -845,7 +855,18 @@ Public Sub MaxCharCount_With50AndNoBOM_Returns51()
     Assert.That Actual, Iz.EqualTo(51)
 End Sub
 
-Public Sub MaxByteCount_With50AndBOM_Returns153()
+Public Sub GetMaxCharCount_WithCustomReplacementFallback_ReturnsExpected(ByVal Count As Long, ByVal Expected As Long)
+    Dim Enc As UTF8Encoding
+    Dim Actual As Long
+    
+    Set Enc = MakeEncoding("abc")
+    
+    Actual = Enc.GetMaxCharCount(Count)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub GetMaxByteCount_With50AndBOM_Returns153()
     Dim UTF8Enc As UTF8Encoding
     Set UTF8Enc = Cor.NewUTF8Encoding(True)
     
@@ -855,13 +876,24 @@ Public Sub MaxByteCount_With50AndBOM_Returns153()
     Assert.That Actual, Iz.EqualTo(153)
 End Sub
 
-Public Sub MaxByteCount_With50AndNoBOM_Returns153()
+Public Sub GetMaxByteCount_With50AndNoBOM_Returns153()
     Dim UTF8Enc As New UTF8Encoding
     
     Dim Actual As Long
     Actual = UTF8Enc.GetMaxByteCount(50)
     
     Assert.That Actual, Iz.EqualTo(153)
+End Sub
+
+Public Sub GetMaxByteCount_WithCustomReplacementFallback_ReturnsExpected(ByVal Count As Long, ByVal Expected As Long)
+    Dim Enc As UTF8Encoding
+    Dim Actual As Long
+    
+    Set Enc = MakeEncoding("abc")
+    
+    Actual = Enc.GetMaxByteCount(Count)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
 Public Sub RegressionTest_Bug_59648()
@@ -1289,6 +1321,11 @@ Public Sub Serialization_WhenCalled_DoesNotDuplicateExceptionFallbacks()
     Assert.That Copy.EncoderFallback, Iz.SameAs(EncoderFallback.ExceptionFallback)
 End Sub
 
+Private Function MakeEncoding(ByVal Replacement As String) As UTF8Encoding
+    Set MakeEncoding = Encoding.UTF8.Clone
+    Set MakeEncoding.EncoderFallback = Cor.NewEncoderReplacementFallback(Replacement)
+    Set MakeEncoding.DecoderFallback = Cor.NewDecoderReplacementFallback(Replacement)
+End Function
 
 
 

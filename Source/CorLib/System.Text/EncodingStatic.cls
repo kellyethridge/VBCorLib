@@ -308,6 +308,8 @@ Private Function NewCodePageEncoding(ByVal CodePage As Long) As Encoding
             Set NewCodePageEncoding = Cor.NewSBCSCodePageEncoding(CodePage)
         Case 2
             Set NewCodePageEncoding = Cor.NewDBCSCodePageEncoding(CodePage)
+        Case Else
+            Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_EncodingNotSupported, CodePage))
     End Select
 End Function
 

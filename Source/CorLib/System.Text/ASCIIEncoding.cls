@@ -409,21 +409,21 @@ End Function
 ' </table>
 ' @see Encoding
 Public Function GetMaxCharCount(ByVal ByteCount As Long) As Long
-    Dim Result As Currency
+    Dim CharCount As Currency
     
     If ByteCount < 0 Then _
         Error.ArgumentOutOfRange "ByteCount", ArgumentOutOfRange_NeedNonNegNum
     
-    Result = ByteCount
+    CharCount = ByteCount
     
     If mDecoderFallback.MaxCharCount > 1 Then
-        Result = Result * mDecoderFallback.MaxCharCount
+        CharCount = CharCount * mDecoderFallback.MaxCharCount
     End If
     
-    If Result > &H7FFFFFFF Then _
+    If CharCount > &H7FFFFFFF Then _
         Error.ArgumentOutOfRange "ByteCount", ArgumentOutOfRange_GetCharCountOverflow
     
-    GetMaxCharCount = Result
+    GetMaxCharCount = CharCount
 End Function
 
 ''
@@ -443,13 +443,13 @@ Public Function GetMaxByteCount(ByVal CharCount As Long) As Long
     ' encoder. If the next character is a low surrogate then the two will
     ' count as a single character, however, if the cached high surrogate
     ' is left hanging, then it needs to be counted on its own. We do that here.
-    ByteCount = CharCount + 1
+    ByteCount = CharCount + 1@
     
     If mEncoderFallback.MaxCharCount > 1 Then
         ByteCount = ByteCount * mEncoderFallback.MaxCharCount
     End If
     
-    If ByteCount > CCur(&H7FFFFFFF) Then _
+    If ByteCount > &H7FFFFFFF Then _
         Error.ArgumentOutOfRange "CharCount", ArgumentOutOfRange_GetByteCountOverflow
     
     GetMaxByteCount = ByteCount
