@@ -302,7 +302,13 @@ Private Sub MultiplyPositives(ByRef u As BigNumber, ByRef v As BigNumber, ByRef 
             Result.Digits(i + j) = k And &HFFFF&
             k = ((k And &HFFFF0000) \ vbShift16Bits) And &HFFFF&
 #Else
-            k = UInt16x16To32(d, u.Digits(j)) + (Result.Digits(i + j) And &HFFFF&) + k
+'            k = UInt16x16To32(d, u.Digits(j)) + (Result.Digits(i + j) And &HFFFF&) + k
+            
+            Dim t As Long
+            t = UInt16x16To32(d, u.Digits(j))
+            t = UInt32p32To32(t, Result.Digits(i + j) And &HFFFF&)
+            k = UInt32p32To32(t, k)
+            
             Result.Digits(i + j) = AsWord(k)
             k = RightShift16(k)
 #End If
@@ -1073,6 +1079,18 @@ Private Function UInt32x16To32(ByVal x As Long, ByVal y As Integer) As Long
     w = (v * x) * 0.0001@
     
     UInt32x16To32 = AsLong(w)
+End Function
+
+Private Function UInt32p32To32(ByVal x As Long, ByVal y As Long) As Long
+    Dim u As Currency
+    Dim v As Currency
+    Dim w As Currency
+    
+    AsLong(u) = x
+    AsLong(v) = y
+    w = u + v
+    
+    UInt32p32To32 = AsLong(w)
 End Function
 
 Private Function UInt32Compare(ByVal x As Long, ByVal y As Long) As Long

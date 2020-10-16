@@ -1702,12 +1702,20 @@ Private Sub AppendExponent(ByVal Places As Long, ByVal ExpChar As Integer, ByVal
     End If
     
     ' Determine how many characters is in Places.
+    ' BigInteger could be huge.
     Dim Digits As Long
     Select Case Places
-        Case 0:         Digits = 0
-        Case Is < 10:   Digits = 1
-        Case Is < 100:  Digits = 2
-        Case Else:      Digits = 3
+        Case 0:                 Digits = 0
+        Case Is < 10:           Digits = 1
+        Case Is < 100:          Digits = 2
+        Case Is < 1000:         Digits = 3
+        Case Is < 10000:        Digits = 4
+        Case Is < 100000:       Digits = 5
+        Case Is < 1000000:      Digits = 6
+        Case Is < 10000000:     Digits = 7
+        Case Is < 100000000:    Digits = 8
+        Case Is < 1000000000:   Digits = 9
+        Case Else:              Digits = 10
     End Select
     
     ' To make sure we have the MinDigits of characters in
