@@ -6,6 +6,7 @@ version Next
 	* Optimize BinaryWriter.WriteChar method. Changed using mEncoding.GetBytes method to mEncoding.GetBytesEx to re-use Byte array instead of re-creating it each call.
 	* Optimize BinaryReader.ReadChars by reading up to 128 bytes at a time instead of a single byte at a time.
 	* Optimize BinaryWriter when writing strings and Integer arrays.
+	* Fixed #78 - BigInteger not correctly formatting with large exponent.
 
 version 3.1
 	* Fixed CorArray.Clear not releasing reference types correctly for Variant().

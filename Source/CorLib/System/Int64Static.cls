@@ -937,36 +937,53 @@ Private Function MaxBit(ByRef Value As Int64) As Long
 End Function
 
 Private Function MaxLongBit(ByVal Value As Long) As Long
-    If Value And &H80000000 Then
-        MaxLongBit = 32
-    ElseIf Value And &HFF000000 Then
-        MaxLongBit = MaxByteBit((Value And &HFF000000) \ vbShift24Bits) + 24
+    Debug.Assert Value <> 0
+    
+    If Value And &HFF000000 Then
+        MaxLongBit = MaxByteBit(((Value And &HFF000000) \ vbShift24Bits) And &HFF&) + 24
     ElseIf Value And &HFF0000 Then
         MaxLongBit = MaxByteBit((Value And &HFF0000) \ vbShift16Bits) + 16
     ElseIf Value And &HFF00& Then
         MaxLongBit = MaxByteBit((Value And &HFF00&) \ vbShift8Bits) + 8
-    ElseIf Value And &HFF& Then
+    Else
+        ' A zero value will never be passed in here so we
+        ' know that if we get here then this is the only
+        ' valid option left.
         MaxLongBit = MaxByteBit(Value And &HFF&)
     End If
 End Function
 
 Private Function MaxByteBit(ByVal Value As Byte) As Long
-    If Value And &H80 Then
-        MaxByteBit = 8
-    ElseIf Value And &H40 Then
-        MaxByteBit = 7
-    ElseIf Value And &H20 Then
-        MaxByteBit = 6
-    ElseIf Value And &H10 Then
-        MaxByteBit = 5
-    ElseIf Value And &H8 Then
-        MaxByteBit = 4
-    ElseIf Value And &H4 Then
-        MaxByteBit = 3
-    ElseIf Value And &H2 Then
-        MaxByteBit = 2
-    ElseIf Value And &H1 Then
-        MaxByteBit = 1
+    Debug.Assert Value <> 0
+    
+    ' Do a manual binary search. This will be a constant of three comparisons.
+    If Value And &HF0 Then
+        If Value And &HC0 Then
+            If Value And &H80 Then
+                MaxByteBit = 8
+            Else
+                MaxByteBit = 7
+            End If
+        ElseIf Value And &H20 Then
+            MaxByteBit = 6
+        Else
+            MaxByteBit = 5
+        End If
+    Else
+        If Value And &HC Then
+            If Value And &H8 Then
+                MaxByteBit = 4
+            Else
+                MaxByteBit = 3
+            End If
+        ElseIf Value And &H2 Then
+            MaxByteBit = 2
+        Else
+            ' A zero value will never be passed in here so we
+            ' know that if we get here then this is the only
+            ' valid option left.
+            MaxByteBit = 1
+        End If
     End If
 End Function
 
