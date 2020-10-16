@@ -3,6 +3,9 @@
 version Next
 	* Optimize StringBuilder.AppendChar for Release build.
 	* Validate Char parameter in StringBuilder.AppendChar. Must be within -32768 to 65535 or OverflowException is thrown.
+	* Optimize BinaryWriter.WriteChar method. Changed using mEncoding.GetBytes method to mEncoding.GetBytesEx to re-use Byte array instead of re-creating it each call.
+	* Optimize BinaryReader.ReadChars by reading up to 128 bytes at a time instead of a single byte at a time.
+	* Optimize BinaryWriter when writing strings and Integer arrays.
 
 version 3.1
 	* Fixed CorArray.Clear not releasing reference types correctly for Variant().
