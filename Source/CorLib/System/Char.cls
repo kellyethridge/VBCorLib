@@ -530,7 +530,7 @@ Public Function ConvertFromInt32(ByVal Value As Long) As Integer
         ThrowInvalidChar "Value"
 
     ConvertFromInt32 = Value And &H7FFF&
-    
+
     If Value And &H8000& Then
         ConvertFromInt32 = ConvertFromInt32 Or &H8000
     End If

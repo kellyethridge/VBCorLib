@@ -1,0 +1,56 @@
+@remarks Optionally, the <a href="UTF8Encoding.html">UTF8Encoding</a> object provides a preamble, which is an array of bytes that can be prefixed to the sequence of bytes resulting from the encoding process. If the preamble contains a byte order mark (code point U+FEFF), it helps the decoder determine the byte order and the transformation format or UTF. The Unicode byte order mark (BOM) is serialized as EF BB BF (in hexadecimal).
+<p>Your applications are recommended to use the BOM, as it provides nearly certain identification of an encoding for files that otherwise have lost reference to the <b>UTF8Encoding</b> object, for example, untagged or improperly tagged web data or random text files stored when a business did not have international concerns or other data. Often user problems might be avoided if data is consistently and properly tagged.</p>
+<p>For standards that provide an encoding type, a BOM is somewhat redundant. However, it can be used to help a server send the correct encoding header. Alternatively, it can be used as a fallback in case the encoding is otherwise lost.</p>
+<p>There are some disadvantages to using a BOM. For example, knowing how to limit the database fields that use a BOM can be difficult. Concatenation of files can be a problem also, for example, when files are merged in such a way that an unnecessary character can end up in the middle of data. In spite of the few disadvantages, however, the use of a BOM is highly recommended.</p>
+<p>For more information on byte order and the byte order mark, see The Unicode Standard at the <a href="https://home.unicode.org/">Unicode home page</a>.</p>
+<table style="width: auto">
+	<tr>
+		<th>Caution</th>
+	</tr>
+	<tr>
+		<td>To ensure that the encoded bytes are decoded properly, your application should prefix encoded bytes with a preamble.</td>
+	</tr>
+</table>
+@examples The following example demonstrates how to use the <b>GetPreamble</b> method to return the Unicode byte order mark encoded in UTF-8 format. Notice that the default constructor for <a href="UTF8Encoding.html">UTF8Encoding</a> does not provide a preamble.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> UTF8NoPreamble      <span style="color: #0000ff">As</span> UTF8Encoding
+    <span style="color: #0000ff">Dim</span> UTF8WithPreamble    <span style="color: #0000ff">As</span> UTF8Encoding
+    <span style="color: #0000ff">Dim</span> preamble()          <span style="color: #0000ff">As</span> <span style="color: #2b91af">Byte</span>
+    
+    <span style="color: #0000ff">Set</span> UTF8NoPreamble = <span style="color: #0000ff">New</span> UTF8Encoding
+    <span style="color: #0000ff">Set</span> UTF8WithPreamble = NewUTF8Encoding(<span style="color: #0000ff">True</span>)
+    
+    preamble = UTF8NoPreamble.GetPreamble
+    Console.WriteLine <span style="color: #a31515">&quot;UTF8NoPreamble&quot;</span>
+    Console.WriteLine <span style="color: #a31515">&quot; preamble length: {0}&quot;</span>, CorArray.Length(preamble)
+    Console.WriteValue <span style="color: #a31515">&quot; preamble: &quot;</span>
+    ShowArray preamble
+    
+    preamble = UTF8WithPreamble.GetPreamble
+    Console.WriteLine <span style="color: #a31515">&quot;UTF8WithPreamble&quot;</span>
+    Console.WriteLine <span style="color: #a31515">&quot; preamble length: {0}&quot;</span>, CorArray.Length(preamble)
+    Console.WriteValue <span style="color: #a31515">&quot; preamble: &quot;</span>
+    ShowArray preamble
+    
+    Console.ReadKey
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> ShowArray(<span style="color: #0000ff">ByRef</span> Arr() <span style="color: #0000ff">As</span> <span style="color: #2b91af">Byte</span>)
+    <span style="color: #0000ff">Dim</span> Element <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>
+    
+    <span style="color: #0000ff">For</span> <span style="color: #0000ff">Each</span> Element <span style="color: #0000ff">In</span> Arr
+        Console.WriteValue <span style="color: #a31515">&quot;[{0:X2}]&quot;</span>, Element
+    <span style="color: #0000ff">Next</span>
+    
+    Console.WriteLine
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; This code produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    UTF8NoPreamble</span>
+<span style="color: #008000">&#39;     preamble length: 0</span>
+<span style="color: #008000">&#39;     preamble:</span>
+<span style="color: #008000">&#39;    UTF8WithPreamble</span>
+<span style="color: #008000">&#39;     preamble length: 3</span>
+<span style="color: #008000">&#39;     preamble: [EF][BB][BF]</span>
+</pre></div>

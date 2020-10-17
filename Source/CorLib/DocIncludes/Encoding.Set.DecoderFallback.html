@@ -1,0 +1,26 @@
+@remarks The <a href="DecoderFallback.html">DecoderFallback</a> object represents an error handler that is invoked when an
+encoded byte sequence cannot be decoded into a character. Any one of the following handler types is supported:
+<ul>
+  <li>A replacement fallback handler, which replaces bytes that cannot be decoded with some arbitrary replacement character.
+      VBCorLib includes one replacement fallback handler, <a href="DecoderFallback.html">DecoderFallback</a>, which by default
+      replaces bytes that cannot be decoded with a question mark ("?") character.
+  </li>
+  <li>An exception fallback handler, which throws an exception when bytes cannot be decoded. VBCorLib includes one exception
+      fallback handler, <a href="DecoderExceptionFallback.html">DecoderExceptionFallback</a>, which throws a
+      <a href="DecoderFallbackException.html">DecoderFallbackException</a> when bytes cannot be decoded.
+  </li>
+</ul>
+@exceptions
+<table style="width: auto">
+	<tr>
+		<th>Exception</th><th>Condition</th>
+	</tr>
+	<tr>
+		<td><a href="ArgumentNullException.html">ArgumentNullException</a></td>
+		<td>The value in a set operation is <b>Nothing</b>.</td>
+	</tr>
+	<tr>
+		<td><a href="InvalidOperationException.html">InvalidOperationException</a></td>
+		<td>A value cannot be assigned in a set operation because the current <a href="Encoding.html">Encoding</a> object is read-only.</td>
+	</tr>
+</table>

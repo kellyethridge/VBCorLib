@@ -1,0 +1,34 @@
+@exceptions
+<table style="width: auto">
+	<tr>
+		<th>Exception</th><th>Condition</th>
+	</tr>
+	<tr>
+		<td><a href="ArgumentException.html">ArgumentException</a></td>
+		<td><i>Path</i> contains one or more of the invalid characters defined in <a href="Path.GetInvalidPathChars.html">GetInvalidPathChars</a>.</td>
+	</tr>
+</table>
+@examples The following code example demonstrates the use of the <b>HasExtension</b> method.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Const</span> FileName1 <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span> = <span style="color: #a31515">&quot;MyFile.Ext&quot;</span>
+    <span style="color: #0000ff">Const</span> FileName2 <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span> = <span style="color: #a31515">&quot;MyDir\MyFile&quot;</span>
+    <span style="color: #0000ff">Const</span> AbsolutePath <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span> = <span style="color: #a31515">&quot;C:\MyDir.Ext\&quot;</span>
+    
+    <span style="color: #0000ff">Dim</span> Result <span style="color: #0000ff">As</span> <span style="color: #2b91af">Boolean</span>
+    
+    Result = Path.HasExtension(FileName1)
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;HasExtension(&#39;{0}&#39;) returns {1}&quot;</span>, FileName1, Result)
+    
+    Result = Path.HasExtension(FileName2)
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;HasExtension(&#39;{0}&#39;) returns {1}&quot;</span>, FileName2, Result)
+    
+    Result = Path.HasExtension(AbsolutePath)
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;HasExtension(&#39;{0}&#39;) returns {1}&quot;</span>, AbsolutePath, Result)
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; This example code produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    HasExtension(&#39;MyFile.Ext&#39;) returns True</span>
+<span style="color: #008000">&#39;    HasExtension(&#39;MyDir\MyFile&#39;) returns False</span>
+<span style="color: #008000">&#39;    HasExtension(&#39;C:\MyDir.Ext\&#39;) returns False</span>
+</pre></div>

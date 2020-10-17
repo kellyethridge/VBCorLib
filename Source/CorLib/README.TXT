@@ -1,9 +1,40 @@
 ** VBCorLib **
 
-version 3.x
+version Next
+	* Optimize StringBuilder.AppendChar for Release build.
+	* Validate Char parameter in StringBuilder.AppendChar. Must be within -32768 to 65535 or OverflowException is thrown.
+	* Optimize BinaryWriter.WriteChar method. Changed using mEncoding.GetBytes method to mEncoding.GetBytesEx to re-use Byte array instead of re-creating it each call.
+	* Optimize BinaryReader.ReadChars by reading up to 128 bytes at a time instead of a single byte at a time.
+	* Optimize BinaryWriter when writing strings and Integer arrays.
+
+version 3.1
 	* Fixed CorArray.Clear not releasing reference types correctly for Variant().
 	* Fixed BigInteger default output formatting was falling back to exponent when is should never.
 	* Fixed BigInteger default output formatting was not padding with leading zeros.
+	* Fixed #19 - SortedList.CopyTo to throw InvalidCastException when cannot copy to destination array.
+	* Fixed SortedList.Capacity to not ReDim internal arrays when new capacity is same as current capacity.
+	* Fixed #24 - Object.ToString to handle unspecified types by returning the TypeName result. Also fixes #25.
+	* Fixed #26 - CorString.LastIndexOfAny with an empty string should return -1.
+	* Fixed #66 - StringBuilder not storing capacity when being set causing severe performance issues.
+	* Fixed #63 - Declare DSAParameters.ToXmlString return type explicitly to String.
+	* Fixed #62 - Declare DBCSCodePageEncoding.ConvertBytesToChars method parameter CharIndex as Long.
+	* Fixed #54 - UnicodeEncoding.HeaderName property was incorrectly accessing underlying encoding table causing 13-Type Mismatch error.
+	* Fixed #39 - StreamWriter and StringWriter were not setting NewLine property to vbCrLf when being set to vbNullString.
+	* Fixed #38 - MemoryStream.ReadByte should throw ObjectDisposedException when closed.
+	* Fixed #37 - MemoryStream.Length should throw ObjectDisposedException when closed.
+	* Fixed #31 - Added validation to Constructors.NewChars method.
+	* Fixed #33 - Added validation to BinaryWriter.WriteChar method. Was allowing out-of-range values to be converted.
+	* Fixed #53 - CorString.Split with RemoveEmptyEntries fails with multiple contiguous separators.
+	* Closed #47 - Optimized CorString.Split when using string separator or one-dimension array.
+	* Fixed #58 - UTF32Encoding should include character and index When throwing EncoderFallbackException.
+	* Fixed #66 - StringBuilder was not storing the updated capacity causing the backing field to be conintually re-allocated.
+	* Fixed #68 - Path class was not taking into consideration that characters can be negative when checking for illegal characters.
+	* Fixed #70 - Encoding fallbacks now correctly set Index and BytesUnknown when thrown.
+	* Fixed #71 - Addressed UTF8Encoding performance. Enhanced additional Encodings' performances as well.
+	* Fixed #72 - Remove all GoSub usage from project as it would cause severe performance issues when compiled.
+	* Fixed #69 - Added additional encodings by name, improving the retrieval of an Encoding.
+	* Fixed #75 - Incorporated Encoding Fallbacks when calculating max chars and max bytes.
+	* Fixed #77 - Validated calculated max chars and max bytes to be within 32-bit values.
 
 version 3.0 (BREAKING CHANGES)
 	* Renamed cArray to CorArray.

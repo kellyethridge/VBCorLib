@@ -47,9 +47,14 @@ Attribute VB_Exposed = True
 Option Explicit
 Implements IObject
 
+Private Const LargeBufferSize As Long = 256
+
 Private mOutStream      As Stream
 Private mEncoding       As Encoding
 Private mSingleChar(0)  As Integer
+Private mCharBytes(5)   As Byte
+Private mLargeBuffer()  As Byte
+Private mMaxChars       As Long
 
 
 ''
@@ -158,7 +163,7 @@ End Sub
 ' @remarks The character is encoded and the byte array is written to the stream.
 '
 Public Sub WriteChar(ByRef Value As Variant)
-    Dim Bytes() As Byte
+    Dim BytesRead As Long
     
     Select Case VarType(Value)
         Case vbString
@@ -167,13 +172,16 @@ Public Sub WriteChar(ByRef Value As Variant)
             
             mSingleChar(0) = AscW(CStr(Value))
         Case vbLong, vbInteger, vbByte
-            mSingleChar(0) = AsWord(CLng(Value))
+            mSingleChar(0) = Char.ConvertFromInt32(Value)
         Case Else
             Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidValueType, "String or Integer"), "Value")
     End Select
     
-    Bytes = mEncoding.GetBytes(mSingleChar, 0, 1)
-    mOutStream.WriteBlock Bytes, 0, Len1D(Bytes)
+    BytesRead = mEncoding.GetBytesEx(mSingleChar, 0, 1, mCharBytes, 0)
+    
+    If BytesRead > 0 Then
+        mOutStream.WriteBlock mCharBytes, 0, BytesRead
+    End If
 End Sub
 
 ''
@@ -225,6 +233,9 @@ Friend Sub Init(ByVal Output As Stream, ByVal Encoding As Encoding)
     Else
         Set mEncoding = Encoding
     End If
+    
+    ReDim mLargeBuffer(0 To LargeBufferSize - 1)
+    mMaxChars = LargeBufferSize \ mEncoding.GetMaxByteCount(1)
 End Sub
 
 
@@ -263,7 +274,7 @@ Private Sub WriteIntrinsic(ByRef Value As Variant)
         Case vbCurrency
             WriteCurrency Value
         Case vbString
-            WriteString CStr(Value)
+            WriteString Value
         Case vbDecimal
             WriteDecimal Value
         Case Else
@@ -276,8 +287,7 @@ Private Sub WriteIntrinsic(ByRef Value As Variant)
 End Sub
 
 Private Sub WriteInt64(ByRef Value As Variant)
-    WriteInt32 Value.LowPart
-    WriteInt32 Value.HighPart
+    mOutStream.WriteBlock AsOByteArr(ByVal DataPtr(Value)).Bytes, 0, vbSizeOfInt64
 End Sub
 
 Private Sub WriteBoolean(ByVal Value As Boolean)
@@ -323,25 +333,40 @@ Private Sub WriteDecimal(ByRef Value As Variant)
     mOutStream.WriteBlock BitConverter.GetBytes(Value), 0, vbSizeOfDecimal
 End Sub
 
-Private Sub WriteString(ByRef Value As String)
+' Keep the string in the Variant type since all our methods will
+' accept a variant type, thus preventing string re-allocation.
+Private Sub WriteString(ByRef Value As Variant)
     WriteStringLength mEncoding.GetByteCount(Value)
-    WriteBytes mEncoding.GetBytes(Value)
+    
+    If Len(Value) > mMaxChars Then
+        ' This is a larger than expected string so we will
+        ' go the old route and let a buffer be created and destroyed.
+        Dim Bytes() As Byte
+
+        Bytes = mEncoding.GetBytes(Value)
+        mOutStream.WriteBlock Bytes, 0, Len1D(Bytes)
+    Else
+        ' Most strings aren't going to be very long, so we try to
+        ' re-use an existing buffer so not to constantly reallocate one.
+        Dim ByteCount As Long
+
+        ByteCount = mEncoding.GetBytesEx(Value, 0, Len(Value), mLargeBuffer, 0)
+        mOutStream.WriteBlock mLargeBuffer, 0, ByteCount
+    End If
 End Sub
 
 Private Sub WriteArray(ByRef Value As Variant, ByRef Index As Variant, ByRef Count As Variant)
     Select Case VarType(Value)
         Case vbByteArray
             WriteBytes Value, Index, Count
-        
         Case vbIntegerArray
-            WriteBytes mEncoding.GetBytes(Value, Index, Count)
-            
+            WriteIntegers Value, Index, Count
         Case Else
             Error.Argument Argument_UnsupportedArray, "Value"
     End Select
 End Sub
 
-Private Sub WriteBytes(ByRef Buffer As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant)
+Private Sub WriteBytes(ByRef Buffer As Variant, ByRef Index As Variant, ByRef Count As Variant)
     Dim Bytes() As Byte
     Dim Range   As ListRange
     
@@ -351,15 +376,28 @@ Private Sub WriteBytes(ByRef Buffer As Variant, Optional ByRef Index As Variant,
     On Error GoTo Catch
     mOutStream.WriteBlock Bytes, Range.Index, Range.Count
     
-    GoSub Finally
+    SAPtr(Bytes) = vbNullPtr
     Exit Sub
     
 Catch:
-    GoSub Finally
-    Throw Err
-Finally:
     SAPtr(Bytes) = vbNullPtr
-    Return
+    ThrowOrErr Err
+End Sub
+
+Private Sub WriteIntegers(ByRef Value As Variant, ByRef Index As Variant, ByRef Count As Variant)
+    If Len1D(Value) > mMaxChars Then
+        Dim Bytes() As Byte
+        
+        Bytes = mEncoding.GetBytes(Value, Index, Count)
+        mOutStream.WriteBlock Bytes, 0, Len1D(Bytes)
+    Else
+        Dim ByteCount   As Long
+        Dim Range       As ListRange
+        
+        Range = MakeArrayRange(Value, Index, Count)
+        ByteCount = mEncoding.GetBytesEx(Value, Range.Index, Range.Count, mLargeBuffer, 0)
+        mOutStream.WriteBlock mLargeBuffer, 0, ByteCount
+    End If
 End Sub
 
 

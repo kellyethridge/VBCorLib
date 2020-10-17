@@ -36,18 +36,15 @@ Attribute VB_Exposed = True
 '
 
 ''
-' The Hashtable represents a repository of key/value pairs.
-'
-' @remarks This class is persistable.
+' Represents a collection of key/value pairs that are organized based on the hash code of the key.
 '
 ' @see Constructors
 ' @see IDictionary
 ' @see ICollection
 ' @see IEnumerable
 ' @see ICloneable
-' @see CaseInsensitiveHashCodePrvdr
 ' @see CaseInsensitiveComparer
-'
+' @include "..\DocIncludes\Hashtable.html"
 Option Explicit
 Implements IObject
 Implements IDictionary
@@ -77,28 +74,21 @@ Private mKeyComparer    As IEqualityComparer
 
 
 ''
-' Adds a new key/value pair to the table.
+' Adds an element with the specified key and value into the <a href="Hashtable.html">Hashtable</a>.
 '
-' @param Key The key used to identify the value.
-' @param Value The value to be added to the table.
-' @remarks The key can be any datatype other than vbUserDefinedType.
-' If an object is being used as a key, then it should implement the
-' IObject interface to allow for custom hashcode creation. If the
-' object does not implement the interface, then the objects memory
-' location is used for a hashcode. If two different objects should
-' represent the same hashcode, then they need to implement the IObject
-' interface and override the GetHashCode function.
-'
+' @param Key The key of the element to add.
+' @param Value The value of the element to add.
+' @see #Remove
+' @see #Item
+' @include "..\DocIncludes\Hashtable.Add.html"
 Public Sub Add(ByRef Key As Variant, ByRef Value As Variant)
     InsertItem Key, Value, True, False
 End Sub
 
 ''
-' Clears all of the elements from the table.
+' Removes all elements from the <a href="Hashtable.html">Hashtable</a>.
 '
-' @remarks When clearing the table, the count is set to 0, but the
-' capacity remains unchanged.
-'
+' @include "..\DocIncludes\Hashtable.Clear.html"
 Public Sub Clear()
     ReDim mBuckets(0 To mCapacity - 1)
     mCount = 0
@@ -106,76 +96,68 @@ Public Sub Clear()
 End Sub
 
 ''
-' Causes the Hashtable to clean up deleted buckets to improve
-' searching capabilities.
+' Removes <b>Deleted</b> buckets from the internal array.
 '
 ' @remarks When many items have been deleted from the table, the
 ' buckets that contained the items are marked as Deleted. When many
-' buckets are marked as Deleted, the search routine cannot stop
+' buckets are marked as <b>Deleted</b>, the search routine cannot stop
 ' searching the buckets for a duplicate key even if an empty Deleted
 ' bucket has been found. So to prevent the unnessecary searching past
 ' Deleted buckets, the table should be cleaned to remove the Deleted
-' buckets and only have Empty and Occupied buckets remaining.
+' buckets and only have <b>Empty</b> and <i>Occupied</b> buckets remaining.
 ' <p>This is recommended when a large number of items are deleted.</p>
-'
 Public Sub Clean()
     ReinsertItems
     mVersion = mVersion + 1
 End Sub
 
 ''
-' Returns a clone of the current instance.
+' Creates a shallow copy of the <a href="Hashtable.html">Hashtable</a>.
 '
-' @return The clone of the current instance.
-'
+' @return A shallow copy of the <a href="Hashtable.html">Hashtable</a>.
+' @remarks A shallow copy of a collection copies only the elements of the collection, whether they are reference types or value types,
+' but it does not copy the objects that the references refer to. The references in the new collection point to the same objects that
+' the references in the original collection point to.
+' <p>In contrast, a deep copy of a collection copies the elements and everything directly or indirectly referenced by the elements.</p>
+' <p>The Hashtable clone has the same count, the same capacity, the same <a href="IEqualityComparer.html">IEqualityComparer</a>
+' implementation, and the same IComparer implementation as the original <a href="Hashtable.html">Hashtable</a>.</p>
+' <p>This method is an O(<i>n</i>) operation, where <i>n</i> is <a href="Hashtable.Get.Count.html">Count</a>.</p>
+' @see #CopyTo
 Public Function Clone() As Hashtable
     Set Clone = New Hashtable
     Clone.InitClone mBuckets, mCount, mLoadFactor, mLoadSize, mKeyComparer
 End Function
 
 ''
-' Checks if the current instance contains a specific key.
+' Determines whether the <a href="Hashtable.html">Hashtable</a> contains a specific key.
 '
-' @param Key The key to check for.
-' @return Indicates if the key was found.
-' @remarks The key can be any datatype other than vbUserDefinedType.
-' If an object is being used as a key, then it should implement the
-' IObject interface to allow for custom hashcode creation. If the
-' object doesn't not implement the interface, then the objects memory
-' location is used for a hashcode. If two different objects should
-' represent the same hashcode, then they need to implement the IObject
-' interface and override the GetHashCode function.
-'
+' @param Key The key to locate in the <a href="Hashtable.html">Hashtable</a>.
+' @return <b>True</b> if the <a href="Hashtable.html">Hashtable</a> contains an element with the specified key; otherwise, <b>False</b>.
+' @see #ContainsKey
+' @include "..\DocIncludes\Hashtable.Contains.html"
 Public Function Contains(ByRef Key As Variant) As Boolean
     Contains = ContainsKey(Key)
 End Function
 
 ''
-' Checks if the current instance contains a specific key.
+' Determines whether the <a href="Hashtable.html">Hashtable</a> contains a specific key.
 '
-' @param Key The key to check for.
-' @return Indicates if the key was found.
-' @remarks The key can be any datatype other than vbUserDefinedType.
-' If an object is being used as a key, then it should implement the
-' IObject interface to allow for custom hashcode creation. If the
-' object doesn't not implement the interface, then the objects memory
-' location is used for a hashcode. If two different objects should
-' represent the same hashcode, then they need to implement the IObject
-' interface and override the GetHashCode function.
-'
+' @param Key The key to locate in the <a href="Hashtable.html">Hashtable</a>.
+' @return <b>True</b> if the <a href="Hashtable.html">Hashtable</a> contains an element with the specified key; otherwise, <b>False</b>.
+' @see #Contains
+' @see #ContainsValue
+' @include "..\DocIncludes\Hashtable.ContainsKey.html"
 Public Function ContainsKey(ByRef Key As Variant) As Boolean
     ContainsKey = (GetKeyIndex(Key) >= 0)
 End Function
 
 ''
-' Checks if the current instance contains a specific value.
+' Determines whether the <a href="Hashtable.html">Hashtable</a> contains a specific value.
 '
-' @param Value The value to search for.
-' @return Indicates if the value was found.
-' @remarks The table is searched linearly checking each value. Once
-' a matching value is found, True is returned. If there is more than
-' one of the same values, only the first is detected.
-'
+' @param Value The value to locate in the <a href="Hashtable.html">Hashtable</a>.
+' @return <b>True</b> if the <a href="Hashtable.html">Hashtable</a> contains an element with the specified value; otherwise, <b>False</b>.
+' @see #ContainsKey
+' @include "..\DocIncludes\Hashtable.ContainsValue.html"
 Public Function ContainsValue(ByRef Value As Variant) As Boolean
     Dim i As Long
     
@@ -192,22 +174,22 @@ Public Function ContainsValue(ByRef Value As Variant) As Boolean
 End Function
 
 ''
-' Copies the contents of the table to an array.
+' Copies the <a href="Hashtable.html">Hashtable</a> elements to a one-dimensional Array instance at the specified index.
 '
-' @param Arr The array to copy the contents to.
-' @param ArrayIndex The starting index in dstArray to begin copying to.
-' @remarks The elements that are copied to the array are DictionaryEntry
-' elements. Each DictionaryEntry contains a key and value from the table.
-'
+' @param Arr The one-dimensional array that is the destination of the <a href="DictionaryEntry.html">DictionaryEntry</a>
+' objects copied from <a href="Hashtable.html">Hashtable</a>. The Array must have zero-based indexing.
+' @param ArrayIndex The lowerbound-based index in <i>Arr</i> at which copying begins.
+' @see DictionaryEntry
+' @include "..\DocIncludes\Hashtable.CopyTo.html"
 Public Sub CopyTo(ByRef Arr As Variant, ByVal ArrayIndex As Long)
     CopyToCore Arr, ArrayIndex, EnumEntries
 End Sub
 
 ''
-' Returns the number of elements in the table.
+' Gets the number of key/value pairs contained in the <a href="Hashtable.html">Hashtable</a>.
 '
-' @return The number of elements in the table.
-'
+' @return The number of key/value pairs contained in the <a href="Hashtable.html">Hashtable</a>.
+' @remarks Retrieving the value of this property is an O(1) operation.
 Public Property Get Count() As Long
     Count = mCount
 End Property
@@ -223,12 +205,10 @@ Public Function Equals(ByRef Value As Variant) As Boolean
 End Function
 
 ''
-' Returns an enumerator for the table.
+' Returns an <a href="IDictionaryEnumerator.html">IDictionaryEnumerator</a> that iterates through the <a href="Hashtable.html">Hashtable</a>.
 '
-' @return An IEnumerator object that enumerates over the table.
-' @remarks The values enumerated are DictionaryEntry object each
-' containing a key/value pair.
-'
+' @return An <a href="IDictionaryEnumerator.html">IDictionaryEnumerator</a> for the <a href="Hashtable.html">Hashtable</a>.
+' @remarks The elements enumerated are <a href="DictionaryEntry.html">DictionaryEntry</a> objects each containing a key/value pair.
 Public Function GetEnumerator() As Object
     Dim Ret As New HashtableEnumerator
     Ret.Init Me, mBuckets, EnumEntries
@@ -245,39 +225,36 @@ Public Function GetHashCode() As Long
 End Function
 
 ''
-' Returns if this instance is fixed size.
+' Gets a value indicating whether the <a href="Hashtable.html">Hashtable</a> has a fixed size.
 '
-' @return Default is False.
-' @remarks This is to satisfy the IList interface.
-'
+' @return <b>True</b> if the <a href="Hashtable.html">Hashtable</a> is read-only; otherwise, <b>False</b>. The default is <b>False</b>.
+' @remarks This implements the <a href="IList.Get.IsFixedSize.html">IList.IsFixedSize</a>.
 Public Property Get IsFixedSize() As Boolean
     IsFixedSize = False
 End Property
 
 ''
-' Returns if this instance is readonly
+' Gets a value indicating whether the <a href="Hashtable.html">Hashtable</a> is read-only.
 '
-' @return Default is False.
-' @remarks This is to satisfy the IList interface.
-'
+' @return <b>True</b> if the <a href="Hashtable.html">Hashtable</a> is read-only; otherwise, <b>False</b>. The default is <b>False</b>.
+' @remarks This implements the <a href="IList.Get.IsReadOnly.html">IList.IsReadOnly</a>.
 Public Property Get IsReadOnly() As Boolean
     IsReadOnly = False
 End Property
 
 ''
-' Returns a value associated with the specified key.
+' Gets the value associated with the specified key.
 '
-' @param Key The key used to look up a value.
-' @return The value associated with the Key.
-' @remarks If the key does not exist, then Empty is returned.
-' <p>The key can be any datatype other than vbUserDefinedType.
-' If an object is being used as a key, then it should implement the
-' IObject interface to allow for custom hashcode creation. If the
-' object doesn't not implement the interface, then the objects memory
-' location is used for a hashcode. If two different objects should
-' represent the same hashcode, then they need to implement the IObject
-' interface and override the GetHashCode function.</p>
-'
+' @param Key The key whose value to get.
+' @return The value associated with the specified key. If the specified key is not found, attempting to get it returns <b>Empty</b>, and attempting to set it creates a new element using the specified key.
+' @remarks This property provides the ability to access a specific element in the collection by using the following syntax: <code>myCollection(key)</code>.
+' <p>You can also use the <b>Item</b> property to add new elements by setting the value of a key that does not exist in the <a href="Hashtable.html">Hashtable</a>; for example,
+' <code>myCollection("myNonexistentKey") = myValue</code>. However, if the specified key already exists in the <a href="Hashtable.html">Hashtable</a>,
+' setting the <b>Item</b> property overwrites the old value. In contrast, the <a href="Hashtable.Add.html">Add</a> method does not modify existing elements.</p>
+' <p>To distinguish between <b>Empty</b> that is returned because the specified key is not found and <b>Empty</b> that is returned because the value of the specified key is <b>Empty</b>,
+' use the <a href="Hashtable.Contains.html">Contains</a> method or the <a href="Hashtable.ContainsKey.html">ContainsKey</a> method to determine if the key exists in the list.</p>
+' <p>Retrieving the value of this property is an O(1) operation; setting the property is also an O(1) operation.</p>
+' @see #Add
 Public Property Get Item(ByRef Key As Variant) As Variant
 Attribute Item.VB_UserMemId = 0
     Dim Index As Long
@@ -288,50 +265,48 @@ Attribute Item.VB_UserMemId = 0
 End Property
 
 ''
-' Sets the value associated to the specified key.
+' Sets the value associated with the specified key.
 '
-' @param Key The key used to look up a value.
-' @param Value The value to associate with the key.
-' @remarks If the key is not found, then the key/value are added to
-' the table. If the key IS found, then the associated value with the
-' key is replaced with the new value.
-' <p>The key can be any datatype other than vbUserDefinedType.
-' If an object is being used as a key, then it should implement the
-' IObject interface to allow for custom hashcode creation. If the
-' object doesn't not implement the interface, then the objects memory
-' location is used for a hashcode. If two different objects should
-' represent the same hashcode, then they need to implement the IObject
-' interface and override the GetHashCode function.</p>
-'
+' @param Key The key whose value to get.
+' @param Value The value associated with the specified key. If the specified key is not found, attempting to get it returns <b>Empty</b>, and attempting to set it creates a new element using the specified key.
+' @remarks This property provides the ability to access a specific element in the collection by using the following syntax: <code>myCollection(key)</code>.
+' <p>You can also use the <b>Item</b> property to add new elements by setting the value of a key that does not exist in the <a href="Hashtable.html">Hashtable</a>; for example,
+' <code>myCollection("myNonexistentKey") = myValue</code>. However, if the specified key already exists in the <a href="Hashtable.html">Hashtable</a>,
+' setting the <b>Item</b> property overwrites the old value. In contrast, the <a href="Hashtable.Add.html">Add</a> method does not modify existing elements.</p>
+' <p>To distinguish between <b>Empty</b> that is returned because the specified key is not found and <b>Empty</b> that is returned because the value of the specified key is <b>Empty</b>,
+' use the <a href="Hashtable.Contains.html">Contains</a> method or the <a href="Hashtable.ContainsKey.html">ContainsKey</a> method to determine if the key exists in the list.</p>
+' <p>Retrieving the value of this property is an O(1) operation; setting the property is also an O(1) operation.</p>
+' @see #Add
 Public Property Let Item(ByRef Key As Variant, ByRef Value As Variant)
     InsertItem Key, Value, False, False
 End Property
 
 ''
-' Sets the value associated to the specified key.
+' Sets the value associated with the specified key.
 '
-' @param Key The key used to look up a value.
-' @param Value The value to associate with the key.
-' @remarks If the key is not found, then the key/value are added to
-' the table. If the key IS found, then the associated value with the
-' key is replaced with the new value.
-' <p>The key can be any datatype other than vbUserDefinedType.
-' If an object is being used as a key, then it should implement the
-' IObject interface to allow for custom hashcode creation. If the
-' object does not implement the interface, then the objects memory
-' location is used for a hashcode. If two different objects should
-' represent the same hashcode, then they need to implement the IObject
-' interface and override the GetHashCode function.</p>
-'
+' @param Key The key whose value to get.
+' @param Value The value associated with the specified key. If the specified key is not found, attempting to get it returns <b>Empty</b>, and attempting to set it creates a new element using the specified key.
+' @remarks This property provides the ability to access a specific element in the collection by using the following syntax: <code>myCollection(key)</code>.
+' <p>You can also use the <b>Item</b> property to add new elements by setting the value of a key that does not exist in the <a href="Hashtable.html">Hashtable</a>; for example,
+' <code>myCollection("myNonexistentKey") = myValue</code>. However, if the specified key already exists in the <a href="Hashtable.html">Hashtable</a>,
+' setting the <b>Item</b> property overwrites the old value. In contrast, the <a href="Hashtable.Add.html">Add</a> method does not modify existing elements.</p>
+' <p>To distinguish between <b>Empty</b> that is returned because the specified key is not found and <b>Empty</b> that is returned because the value of the specified key is <b>Empty</b>,
+' use the <a href="Hashtable.Contains.html">Contains</a> method or the <a href="Hashtable.ContainsKey.html">ContainsKey</a> method to determine if the key exists in the list.</p>
+' <p>Retrieving the value of this property is an O(1) operation; setting the property is also an O(1) operation.</p>
+' @see #Add
 Public Property Set Item(ByRef Key As Variant, ByRef Value As Variant)
     InsertItem Key, Value, False, False
 End Property
 
 ''
-' Retuns an ICollection object used to access the keys of the table.
+' Gets an <a href="ICollection.html">ICollection</a> containing the keys in the <a href="Hashtable.html">Hashtable</a>.
 '
-' @return An ICollection object used to access the keys of the table.
-'
+' @return An <a href="ICollection.html">ICollection</a> containing the keys in the <a href="Hashtable.html">Hashtable</a>.
+' @remarks The order of the keys in the <a href="ICollection.html">ICollection</a> is unspecified, but it is the same order
+' as the associated values in the <a href="ICollection.html">ICollection</a> returned by the <a href="Hashtable.Get.Values.html">Values</a> method.
+' <p>The returned <a href="ICollection.html">ICollection</a> is not a static copy; instead, the <a href="ICollection.html">ICollection</a> refers back
+' to the keys in the original <a href="Hashtable.html">Hashtable</a>. Therefore, changes to the <a href="Hashtable.html">Hashtable</a> continue to be reflected in the <a href="ICollection.html">ICollection</a>.</p>
+' @see #Values
 Public Property Get Keys() As ICollection
     Dim Ret As New HashtableKeyCollection
     Ret.Init Me
@@ -350,10 +325,11 @@ Attribute NewEnum.VB_MemberFlags = "40"
 End Function
 
 ''
-' Removes a key/value pair associated with a specific key.
+' Removes the element with the specified key from the <a href="Hashtable.html">Hashtable</a>.
 '
-' @param Key The key use to lookup the key/value pair to be removed.
-'
+' @param Key The key of the element to remove.
+' @see #Add
+' @include "..\DocIncludes\Hashtable.Remove.html"
 Public Sub Remove(ByRef Key As Variant)
     Dim Index As Long
     Index = GetKeyIndex(Key)
@@ -390,10 +366,14 @@ Public Function ToString() As String
 End Function
 
 ''
-' Retuns an ICollection object used to access the values of the table.
+' Gets an <a href="ICollection.html">ICollection</a> containing the values in the <a href="Hashtable.html">Hashtable</a>.
 '
-' @return An ICollection object used to access the values of the table.
-'
+' @return An <a href="ICollection.html">ICollection</a> containing the values in the <a href="Hashtable.html">Hashtable</a>.
+' @remarks The order of the values in the <a href="ICollection.html">ICollection</a> is unspecified, but it is the same order
+' as the associated keys in the <a href="ICollection.html">ICollection</a> returned by the <a href="Hashtable.Get.Keys.html">Keys</a> method.
+' <p>The returned <a href="ICollection.html">ICollection</a> is not a static copy; instead, the <a href="ICollection.html">ICollection</a> refers back
+' to the values in the original <a href="Hashtable.html">Hashtable</a>. Therefore, changes to the <a href="Hashtable.html">Hashtable</a> continue to be reflected in the <a href="ICollection.html">ICollection</a>.</p>
+' @see #Keys
 Public Property Get Values() As ICollection
     Dim Ret As New HashtableValueCollection
     Ret.Init Me

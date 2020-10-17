@@ -59,7 +59,7 @@ Option Explicit
 ' two values x and z if it is <b>True</b> for x and y and also <b>True</b> for y and z.</p>
 ' <p>Implementations are required to ensure that if the <b>Equals</b> method returns true for two values x and y,
 ' then the value returned by the <a href="IEqualityComparer.GetHashCode.html">GetHashCode</a> method for x must equal the value returned for y.</p>
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
 '       <th>Exception</th>

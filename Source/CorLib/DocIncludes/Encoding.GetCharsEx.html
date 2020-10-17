@@ -1,0 +1,92 @@
+@remarks <p>To calculate the exact array size required by <b>GetCharsEx</b> to store the resulting characters, the application should use <a href="Encoding.GetCharCount.html">GetCharCount</a>. To calculate the maximum array size, the application should use <a href="Encoding.GetMaxCharCount.html">GetMaxCharCount</a>. The <a href="Encoding.GetCharCount.html">GetCharCount</a> method generally allows allocation of less memory, while the <a href="Encoding.GetMaxCharCount.html">GetMaxCharCount</a> method generally executes faster.</p>
+<p><b>Encoding.GetCharsEx</b> gets characters from an input byte sequence. <b>Encoding.GetCharsEx</b> is different than <a href="Decoder.GetChars.html">Decoder.GetChars</a> because <a href="Encoding.html">Encoding</a> expects discrete conversions, while <a href="Decoder.html">Decoder</a> is designed for multiple passes on a single input stream.</p>
+<p>If the data to be converted is available only in sequential blocks (such as data read from a stream) or if the amount of data is so large that it needs to be divided into smaller blocks, the application should use the <a href="Decoder.html">Decoder</a> or the <a href="Encoder.html">Encoder</a> provided by the <a href="Encoding.GetDecoder.html">GetDecoder</a> method or the <a href="Encoding.GetEncoder.html">GetEncoder</a> method, respectively, of a derived class.</p>
+<p><b>Note</b> This method is intended to operate on Unicode characters, not on arbitrary binary data, such as byte arrays. If your application needs to encode arbitrary binary data into text, it should use a protocol such as uuencode, which is implemented by methods such as <a href="Convert.ToBase64CharArray.html">Convert.ToBase64CharArray</a>.</p>
+<p>The <a href="Encoding.GetCharCount.html">GetCharCount</a> method determines how many characters result in decoding a sequence of bytes, and the <b>GetCharsEx</b> method performs the actual decoding. The <b>Encoding.GetCharsEx</b> method expects discrete conversions, in contrast to the <a href="Decoder.GetChars.html">Decoder.GetChars</a> method, which handles multiple passes on a single input stream.</p>
+<p>Several versions of <a href="Encoding.GetCharCount.html">GetCharCount</a> and <b>GetCharsEx</b> are supported. The following are some programming considerations for use of these methods:</p>
+<ul>
+	<li>The application might need to decode multiple input bytes from a code page and process the bytes using multiple calls. In this case, your application probably needs to maintain state between calls, because byte sequences can be interrupted when processed in batches. (For example, part of an ISO-2022 shift sequence may end one <b>GetCharsEx</b> call and continue at the beginning of the next <b>GetCharsEx</b> call. <b>Encoding.GetCharsEx</b> will call the fallback for those incomplete sequences, but <a href="Decoder.html">Decoder</a> will remember those sequences for the next call.)</li>
+	<li>If the application handles string outputs, it is recommended to use the <a href="Encoding.GetString.html">GetString</a> method. Since this method must check string length and allocate a buffer, it is slightly slower, but the resulting <b>String</b> type is to be preferred.</li>
+	<li>If your application must convert a large amount of data, it should reuse the output buffer. In this case, the <a href="Encoding.GetCharsEx.html">GetCharsEx</a> version that supports output character buffers is the best choice.</li>
+	<li>Consider using the <a href="Decoder.Convert.html">Decoder.Convert</a> method instead of <a href="Encoding.GetCharCount.html">GetCharCount</a>. The conversion method converts as much data as possible and throws an exception if the output buffer is too small. For continuous decoding of a stream, this method is often the best choice.</li>
+</ul>
+@exceptions
+<table style="width: auto">
+	<tr>
+		<th>Exception</th><th>Condition</th>
+	</tr>
+	<tr>
+		<td><a href="ArgumentNullException.html">ArgumentNullException</a></td>
+		<td>
+			<i>Bytes</i> is uninitialized.<br>
+			-or-<br>
+			<i>Chars</i> is uninitialized.
+		</td>
+	</tr>
+	<tr>
+		<td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+		<td>
+			<i>ByteIndex</i> is less than the lower-bound of <i>Bytes</i>.<br>
+			-or-<br>
+			<i>CharIndex</i> is less than the lower-bound of <i>Chars</i>.<br>
+			-or-<br>
+			<i>ByteCount</i> is less than zero.<br>
+			-or-<br>
+			<i>ByteIndex</i> and <i>ByteCount</i> do not denote a valie range in <i>Bytes</i>.<br>
+			-or-<br>
+			<i>CharIndex</i> is not a valid index in <i>Chars</i>
+		</td>
+	</tr>
+	<tr>
+		<td><a href="ArgumentException.html">ArgumentException</a></td>
+		<td><i>Chars</i> does not have enough capacity from <i>CharIndex</i> to the end of the array to accommodate the resulting characters.</td>
+	</tr>
+	<tr>
+		<td><a href="DecoderFallbackException.html">DecoderFallbackException</a></td>
+		<td>A fallback occurred<br>
+			-and-<br>
+			<a href="Encoding.Get.DecoderFallback.html">DecoderFallback</a> is set to <a href="DecoderExceptionFallback.html">DecoderExceptionFallback</a>.
+		</td>
+	</tr>
+</table>
+@examples The following example converts a string from one encoding to another.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> UnicodeString   <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+    <span style="color: #0000ff">Dim</span> ASCII           <span style="color: #0000ff">As</span> Encoding
+    <span style="color: #0000ff">Dim</span> Unicode         <span style="color: #0000ff">As</span> Encoding
+    <span style="color: #0000ff">Dim</span> UnicodeBytes()  <span style="color: #0000ff">As</span> <span style="color: #2b91af">Byte</span>
+    <span style="color: #0000ff">Dim</span> ASCIIBytes()    <span style="color: #0000ff">As</span> <span style="color: #2b91af">Byte</span>
+    <span style="color: #0000ff">Dim</span> ASCIIChars()    <span style="color: #0000ff">As</span> <span style="color: #2b91af">Integer</span>
+    <span style="color: #0000ff">Dim</span> ASCIIString     <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+    
+    <span style="color: #0000ff">Set</span> Console.OutputEncoding = Encoding.UTF8
+    UnicodeString = <span style="color: #a31515">&quot;This string contains the unicode character Pi (&quot;</span> &amp; ChrW$(&amp;H3A0) &amp; <span style="color: #a31515">&quot;)&quot;</span>
+
+    <span style="color: #008000">&#39; Create two different encodings.</span>
+    <span style="color: #0000ff">Set</span> ASCII = Encoding.ASCII
+    <span style="color: #0000ff">Set</span> Unicode = Encoding.Unicode
+
+    <span style="color: #008000">&#39; Convert the string into a byte array.</span>
+    UnicodeBytes = Unicode.GetBytes(UnicodeString)
+    
+    <span style="color: #008000">&#39; Perform the conversion from one encoding to the other.</span>
+    ASCIIBytes = Encoding.Convert(Unicode, ASCII, UnicodeBytes)
+    
+    <span style="color: #008000">&#39; Convert the new byte array into a char array and then into a string.</span>
+    <span style="color: #0000ff">ReDim</span> ASCIIChars(0 <span style="color: #0000ff">To</span> ASCII.GetCharCount(ASCIIBytes) - 1)
+    
+    ASCII.GetCharsEx ASCIIBytes, 0, CorArray.Length(ASCIIBytes), ASCIIChars, 0
+    ASCIIString = NewString(ASCIIChars)
+    
+    <span style="color: #008000">&#39; Display the strings created before and after the conversion.</span>
+    Console.WriteLine <span style="color: #a31515">&quot;Original string: {0}&quot;</span>, UnicodeString
+    Console.WriteLine <span style="color: #a31515">&quot;Ascii converted string: {0}&quot;</span>, ASCIIString
+    
+    Console.ReadKey
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; This example code produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    Original string: This string contains the unicode character Pi (&Pi;)</span>
+<span style="color: #008000">&#39;    Ascii converted string: This string contains the unicode character Pi (?)</span>
+</pre></div>

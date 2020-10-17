@@ -43,7 +43,7 @@ Attribute VB_Exposed = True
 ' the number of bytes have been read, they are assembled into the requested
 ' data type, advancing the position in the stream the required number of bytes.
 ' <p>Characters can be read from the stream using the specified <a href="Encoding.html">Encoding</a>.
-' If <i>Encoding</i> is not specified then the <b>BinaryReader</b> is created using <a href="UTF8Encoding.html">UTF8Encoding</a>.</p>
+' If no <a href="Encoding.html">Encoding</a> is specified then the <b>BinaryReader</b> is created using <a href="UTF8Encoding.html">UTF8Encoding</a>.</p>
 ' @see Constructors
 ' @see BinaryWriter
 ' @see Stream
@@ -59,6 +59,8 @@ Private mLeaveOpen      As Boolean
 Private mDecoder        As Decoder
 Private mBuffer()       As Byte
 Private mSingleChar(0)  As Integer
+Private mCharBytes()    As Byte
+Private mIs2ByteChars   As Boolean
 
 
 ''
@@ -156,7 +158,7 @@ End Function
 
 ''
 ' Reads the next decode character in the stream, and advances the position
-' the number of bytes requirece to assemble a single character.
+' the number of bytes required to assemble a single character.
 '
 ' @return The next character in the stream.
 ' @remarks If no characters are left in the stream, and EndOfStreamException is thrown.
@@ -207,7 +209,7 @@ Public Function ReadBytes(ByVal Count As Long) As Byte()
 End Function
 
 ''
-' Reads the specified number of characters from the current stream, returns the data in a character array, and advances the current position in accordance with the <b>Encoding</b> used and the specific character being read from the stream.
+' Reads the specified number of characters from the current stream, returns the data in a character array, and advances the current position in accordance with the <a href="Encoding.html">Encoding</a> used and the specific character being read from the stream.
 '
 ' @param Count The number of characters to read.
 ' @return A character array containing data read from the underlying stream. This might be less than the number of characters requested if the end of the stream is reached.
@@ -586,45 +588,34 @@ Public Function ReadString() As String
         mDecoder.GetChars EncodedBytes, 0, NumberOfBytesRead, Chars, 0, True
     End If
     
-    GoSub Finally
+    FreeChars Chars
     Exit Function
     
 Catch:
-    GoSub Finally
-    ThrowOrErr Err
-Finally:
     FreeChars Chars
-    Return
+    ThrowOrErr Err
 End Function
 
 ''
-' Returns a string representation of this object instance.
+' Returns a string representation of the current object.
 '
-' @return String representing this instance.
-' @see IObject
-'
+' @include "..\DocIncludes\IObject.ToString.html"
 Public Function ToString() As String
     ToString = MyBase.ToString(Me, App)
 End Function
 
 ''
-' Returns a boolean indicating if the value and this object
-' instance are the same instance.
+' Determines whether the specified value is equal to the current <a href="IObject.html">IObject</a>.
 '
-' @param value The value to compare equalit to.
-' @return Boolean indicating equality.
-' @see IObject
-'
+' @include "..\DocIncludes\IObject.Equals.html"
 Public Function Equals(ByRef Value As Variant) As Boolean
     Equals = MyBase.Equals(Me, Value)
 End Function
 
 ''
-' Returns a pseudo-unique number identifying this instance.
+' Serves as a hash function for a particular type.
 '
-' @return Pseudo-unique number identifying this instance.
-' @see IObject
-'
+' @include "..\DocIncludes\IObject.GetHashCode.html"
 Public Function GetHashCode() As Long
     GetHashCode = MyBase.GetHashCode(Me)
 End Function
@@ -647,6 +638,7 @@ Friend Sub Init(ByVal Stream As Stream, ByVal Encoding As Encoding, ByVal LeaveO
         Set Encoding = New UTF8Encoding
     End If
     
+    mIs2ByteChars = TypeOf Encoding Is UnicodeEncoding
     Set mStream = Stream
     Set mDecoder = Encoding.GetDecoder
     mLeaveOpen = LeaveOpen
@@ -688,7 +680,7 @@ Private Function ReadOneChar() As Long
     If ReadCharBytes(mSingleChar, 0, 1) = 0 Then
         ReadOneChar = NoChars
     Else
-        AsWord(ReadOneChar) = mSingleChar(0)
+        ReadOneChar = mSingleChar(0) And &HFFFF&
     End If
 End Function
 
@@ -716,15 +708,12 @@ Private Function ReadToByteBuffer(ByVal BufferPtr As Long, ByRef BufferRange As 
     SAPtr(Buffer) = BufferPtr
     ReadToByteBuffer = mStream.ReadBlock(Buffer, BufferRange.Index, BufferRange.Count)
     
-    GoSub Finally
+    SAPtr(Buffer) = vbNullPtr
     Exit Function
     
 Catch:
-    GoSub Finally
-    ThrowOrErr Err
-Finally:
     SAPtr(Buffer) = vbNullPtr
-    Return
+    ThrowOrErr Err
 End Function
 
 Private Function ReadToCharBuffer(ByVal BufferPtr As Long, ByRef BufferRange As ListRange) As Long
@@ -734,65 +723,93 @@ Private Function ReadToCharBuffer(ByVal BufferPtr As Long, ByRef BufferRange As 
     SAPtr(Buffer) = BufferPtr
     ReadToCharBuffer = ReadCharBytes(Buffer, BufferRange.Index, BufferRange.Count)
     
-    GoSub Finally
+    SAPtr(Buffer) = vbNullPtr
     Exit Function
     
 Catch:
-    GoSub Finally
-    ThrowOrErr Err
-Finally:
     SAPtr(Buffer) = vbNullPtr
-    Return
+    ThrowOrErr Err
 End Function
 
 Private Function ReadCharBytes(ByRef Chars() As Integer, ByVal Index As Long, ByVal Count As Long) As Long
-    Dim SingleByte          As Long
-    Dim BufferPos           As Long
-    Dim TotalCharsRead      As Long
-    Dim NumberOfCharsRead   As Long
+    Const MaxCharBytes      As Long = 128
+    Dim SavedPosition       As Long
+    Dim CharsRemaining      As Long
+    Dim BytesToRead         As Long
+    Dim BytesRead           As Long
+    Dim CharsRead           As Long
     
-    Do While TotalCharsRead < Count
-        SingleByte = mStream.ReadByte
+    If mStream.CanSeek Then
+        SavedPosition = mStream.Position
+    End If
+    
+    If SAPtr(mCharBytes) = vbNullPtr Then
+        ReDim mCharBytes(MaxCharBytes - 1)
+    End If
+    
+    On Error GoTo Catch
+    
+    CharsRemaining = Count
+    
+    Do While CharsRemaining > 0
+        ' We are assuming a max of one byte per character.
+        ' If the encoding uses multiple bytes per character
+        ' then we will decoder fewer characters from the
+        ' bytes read in this loop. We'll get'em next loop.
+        BytesToRead = CharsRemaining
         
-        If SingleByte < 0 Then
+        ' We want to check if using UnicodeEncoding because
+        ' we know all characters are two bytes and we should
+        ' double the BytesToRead here.
+        If mIs2ByteChars Then
+            BytesToRead = BytesToRead * 2
+        End If
+        
+        ' Don't overfill our buffer.
+        If BytesToRead > MaxCharBytes Then
+            BytesToRead = MaxCharBytes
+        End If
+    
+        BytesRead = mStream.ReadBlock(mCharBytes, 0, BytesToRead)
+        
+        ' Nothing left to read, so we are done.
+        If BytesRead = 0 Then
             Exit Do
         End If
         
-        mBuffer(BufferPos) = SingleByte
-        BufferPos = BufferPos + 1
-        
-        NumberOfCharsRead = mDecoder.GetChars(mBuffer, BufferPos - 1, 1, Chars, Index)
-        
-        If NumberOfCharsRead > 0 Then
-            TotalCharsRead = TotalCharsRead + NumberOfCharsRead
-            Index = Index + NumberOfCharsRead
-            BufferPos = 0
-            NumberOfCharsRead = 0
-        End If
+        CharsRead = mDecoder.GetChars(mCharBytes, 0, BytesRead, Chars, Index)
+        CharsRemaining = CharsRemaining - CharsRead
+        Index = Index + CharsRead
     Loop
     
-    ReadCharBytes = TotalCharsRead
+    ReadCharBytes = Count - CharsRemaining
+    Exit Function
+    
+Catch:
+    If mStream.CanSeek Then
+        mStream.Position = SavedPosition
+    End If
+    
+    ThrowOrErr Err
 End Function
 
 Private Function ReadStringLength() As Long
     Const BitsShiftedAtATime    As Long = 7
     Const BitsToShiftMask       As Long = &H7F
+    Const MaxShiftCount         As Long = 35
     
     Dim StringLength    As Long
     Dim SingleByte      As Long
     Dim ShiftCount      As Long
     
-    SingleByte = mStream.ReadByte
-    
-    Do While SingleByte >= &H80
-        StringLength = StringLength + Helper.ShiftLeft(SingleByte And BitsToShiftMask, ShiftCount)
+    Do
+        If ShiftCount = MaxShiftCount Then _
+            Error.Format Format_Bad7BitInt32
+            
         SingleByte = mStream.ReadByte
+        StringLength = StringLength + ShiftLeftInt32(SingleByte And BitsToShiftMask, ShiftCount)
         ShiftCount = ShiftCount + BitsShiftedAtATime
-    Loop
-    
-    If SingleByte > 0 Then
-        StringLength = StringLength + Helper.ShiftLeft(SingleByte, ShiftCount)
-    End If
+    Loop While SingleByte And &H80
     
     ReadStringLength = StringLength
 End Function

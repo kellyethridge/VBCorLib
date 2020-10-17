@@ -79,6 +79,33 @@ Public Sub GetCharCount_WithPartialCharsAndNotFlushing_IgnoresPartialChars()
     Assert.That Actual, Iz.EqualTo(2)
 End Sub
 
+Public Sub GetCharCount_WithMultipleCalls_ReturnsExpected()
+    Dim Dec As Decoder
+    Dim Bytes() As Byte
+    Dim Chars() As Integer
+    
+    Set Dec = MakeDecoder
+    Bytes = NewBytes(97, 0, 0, 0, 98, 0, 0, 0, 99, 0, 0, 0)
+    
+    Assert.That Dec.GetCharCount(Bytes, 0, 5, False), Iz.EqualTo(1), "#1"
+    
+    ReDim Chars(0 To 0)
+    Dec.GetChars Bytes, 0, 5, Chars, 0, False
+    Assert.That Chars, Iz.EqualTo(NewChars(97))
+    
+    Assert.That Dec.GetCharCount(Bytes, 5, 2, False), Iz.EqualTo(0), "#2"
+    
+    ReDim Chars(0 To 0)
+    Dec.GetChars Bytes, 5, 2, Chars, 0, False
+    Assert.That Chars(0), Iz.EqualTo(0)
+    
+    Assert.That Dec.GetCharCount(Bytes, 7, 5, True), Iz.EqualTo(2), "#3"
+    
+    ReDim Chars(0 To 1)
+    Dec.GetChars Bytes, 7, 5, Chars, 0, True
+    Assert.That Chars, Iz.EqualTo(NewChars(98, 99))
+End Sub
+
 Public Sub GetChars_WithSingleCallAndFlushing_ReturnsExpected(ByRef Bytes() As Byte, ByRef Expected() As Integer)
     Dim Dec As Decoder
     Dim ActualLength As Long
@@ -111,22 +138,24 @@ Public Sub GetChars_WithMultipleCalls_ReturnsExpected()
     Dim ActualChars2() As Integer
     Dim ActualLength1 As Long
     Dim ActualLength2 As Long
-    Dim Bytes1() As Byte
-    Dim Bytes2() As Byte
+    Dim Bytes() As Byte
+    Dim Chars() As Integer
     
     Set Dec = MakeDecoder
-    Bytes1 = NewBytes(97, 0, 0, 0, 98)
-    Bytes2 = NewBytes(0, 0, 0)
+    Bytes = NewBytes(97, 0, 0, 0, 98, 0, 0, 0, 99, 0, 0, 0)
     
-    ActualChars1 = CorArray.CreateInstance(vbInteger, Dec.GetCharCount(Bytes1, 0, 5))
-    ActualLength1 = Dec.GetChars(Bytes1, 0, 5, ActualChars1, 0)
-    ActualChars2 = CorArray.CreateInstance(vbInteger, Dec.GetCharCount(Bytes2, 0, 3, True))
-    ActualLength2 = Dec.GetChars(Bytes2, 0, 3, ActualChars2, 0, True)
+    ReDim Chars(0 To 0)
+    Assert.That Dec.GetChars(Bytes, 0, 5, Chars, 0, False), Iz.EqualTo(1)
     
-    Assert.That ActualLength1, Iz.EqualTo(1), "#1"
-    Assert.That ActualChars1, Iz.EqualTo(NewChars("a")), "#2"
-    Assert.That ActualLength2, Iz.EqualTo(1), "#3"
-    Assert.That ActualChars2, Iz.EqualTo(NewChars("b")), "#4"
+'    ActualChars1 = CorArray.CreateInstance(vbInteger, Dec.GetCharCount(Bytes1, 0, 5))
+'    ActualLength1 = Dec.GetChars(Bytes1, 0, 5, ActualChars1, 0)
+'    ActualChars2 = CorArray.CreateInstance(vbInteger, Dec.GetCharCount(Bytes2, 0, 3, True))
+'    ActualLength2 = Dec.GetChars(Bytes2, 0, 3, ActualChars2, 0, True)
+'
+'    Assert.That ActualLength1, Iz.EqualTo(1), "#1"
+'    Assert.That ActualChars1, Iz.EqualTo(NewChars("a")), "#2"
+'    Assert.That ActualLength2, Iz.EqualTo(1), "#3"
+'    Assert.That ActualChars2, Iz.EqualTo(NewChars("b")), "#4"
 End Sub
 
 Private Function MakeDecoder() As Decoder

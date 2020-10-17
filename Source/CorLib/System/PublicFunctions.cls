@@ -93,7 +93,7 @@ Public Function t(ByRef Text As String) As String
     Dim Chars() As Integer
     
     mTextOut.Length = 0
-    mTextOut.Capacity = LenB(Text)
+    mTextOut.EnsureCapacity LenB(Text)
     Chars = AllocChars(Text)
     
     Dim i       As Long
@@ -147,15 +147,12 @@ Continue:
         Error.Format Format_UnrecognizedEscapeSequence
     
     t = mTextOut.ToString
-    GoSub Finally
+    FreeChars Chars
     Exit Function
     
 Catch:
-    GoSub Finally
-    Throw
-Finally:
     FreeChars Chars
-    Return
+    ThrowOrErr Err
 End Function
 
 Private Function ReadHexChar(ByRef Chars() As Integer, ByVal Index As Long) As Long
@@ -182,7 +179,7 @@ Private Function ReadHexChar(ByRef Chars() As Integer, ByVal Index As Long) As L
         Count = Count + 1
     Loop
     
-    mTextOut.AppendChar AsWord(Result)
+    mTextOut.AppendChar Result
     ReadHexChar = Index
 End Function
 

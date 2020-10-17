@@ -1,0 +1,103 @@
+@remarks <p>ASCII characters are limited to the lowest 128 Unicode characters, from U+0000 to U+007F.</p>
+<p>When selecting the ASCII encoding for your applications, consider the following:</p>
+<ul>
+	<li>The ASCII encoding is usually appropriate for protocols that require ASCII.</li>
+	<li>If your application requires 8-bit encoding (which is sometimes incorrectly referred to as "ASCII"), the UTF-8 encoding is recommended over the ASCII encoding. For the characters 0-7F, the results are identical, but use of UTF-8 avoids data loss by allowing representation of all Unicode characters that are representable. Note that the ASCII encoding has an 8th bit ambiguity that can allow malicious use, but the UTF-8 encoding removes ambiguity about the 8th bit.</li>
+</ul>
+<p>The <a href="ASCIIEncoding.html">ASCIIEncoding</a> object that is returned by this property might not have the appropriate behavior for your application. It uses replacement fallback to replace each string that it cannot encode and each byte that it cannot decode with a question mark ("?") character. Instead, you can call the <a href="Encoding.GetEncoding.html">GetEncoding</a> method to instantiate an <a href="ASCIIEncoding.html">ASCIIEncoding</a> object whose fallback is either an <a href="EncoderFallbackException.html">EncoderFallbackException</a> or a <a href="DecoderFallbackException.html">DecoderFallbackException</a>, as the following example illustrates.</p>
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> Enc     <span style="color: #0000ff">As</span> Encoding
+    <span style="color: #0000ff">Dim</span> Value   <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+    <span style="color: #0000ff">Dim</span> Value2  <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+    <span style="color: #0000ff">Dim</span> Bytes() <span style="color: #0000ff">As</span> <span style="color: #2b91af">Byte</span>
+    <span style="color: #0000ff">Dim</span> Byt     <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>
+    
+    <span style="color: #0000ff">Set</span> Enc = Encoding.GetEncoding(<span style="color: #a31515">&quot;us-ascii&quot;</span>, <span style="color: #0000ff">New</span> EncoderExceptionFallback, <span style="color: #0000ff">New</span> DecoderExceptionFallback)
+    Value = t(<span style="color: #a31515">&quot;\u00C4 \u00F6 \u00AE&quot;</span>)
+    
+    <span style="color: #0000ff">On</span> <span style="color: #0000ff">Error</span> <span style="color: #0000ff">GoTo</span> <span style="color: #0000ff">Catch</span>
+    Bytes = Enc.GetBytes(Value)
+    
+    <span style="color: #0000ff">For</span> <span style="color: #0000ff">Each</span> Byt <span style="color: #0000ff">In</span> Bytes
+        Debug.Print <span style="color: #2b91af">Object</span>.ToString(Byt, <span style="color: #a31515">&quot;X2&quot;</span>)
+    <span style="color: #0000ff">Next</span>
+    Debug.Print
+    
+    Value2 = Enc.GetString(Bytes)
+    Debug.Print Value2
+    <span style="color: #0000ff">Exit</span> <span style="color: #0000ff">Sub</span>
+    
+Catch:
+    <span style="color: #0000ff">Dim</span> Ex <span style="color: #0000ff">As</span> EncoderFallbackException
+    <span style="color: #0000ff">Catch</span> Ex, Err
+    
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;Unable to encode {0} at index {1}&quot;</span>, IIf(Ex.CharUnknownHigh &lt;&gt; 0, _
+                                CorString.Format(<span style="color: #a31515">&quot;U+{0:X4} U+{1:X4}&quot;</span>, Ex.CharUnknownHigh, Ex.CharUnknownLow), _
+                                CorString.Format(<span style="color: #a31515">&quot;U+{0:X4}&quot;</span>, Ex.CharUnknown)), _
+                                Ex.Index)
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; This example displays the following output:</span>
+<span style="color: #008000">&#39;       Unable to encode U+00C4 at index 0</span>
+</pre></div>
+@examples The following example demonstrates the effect of the ASCII encoding on characters that are outside the ASCII range.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> ASCII           <span style="color: #0000ff">As</span> Encoding
+    <span style="color: #0000ff">Dim</span> UnicodeString   <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+    <span style="color: #0000ff">Dim</span> IndexOfPi       <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
+    <span style="color: #0000ff">Dim</span> IndexOfSigma    <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
+    <span style="color: #0000ff">Dim</span> EncodedBytes()  <span style="color: #0000ff">As</span> <span style="color: #2b91af">Byte</span>
+    <span style="color: #0000ff">Dim</span> DecodedString   <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+    <span style="color: #0000ff">Dim</span> b <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>
+    
+    <span style="color: #0000ff">Set</span> Console.OutputEncoding = Encoding.UTF8
+    <span style="color: #0000ff">Set</span> ASCII = Encoding.ASCII
+    
+    <span style="color: #008000">&#39; A Unicode string with two characters outside the ASCII code range.</span>
+    UnicodeString = t(<span style="color: #a31515">&quot;This unicode string contains two characters with codes outside the ASCII code range, Pi (\u03a0) and Sigma (\u03a3).&quot;</span>)
+    Console.WriteLine <span style="color: #a31515">&quot;Original string:&quot;</span>
+    Console.WriteLine UnicodeString
+    
+    <span style="color: #008000">&#39; Save the positions of the special characters for later reference.</span>
+    IndexOfPi = InStr(UnicodeString, ChrW$(&amp;H3A0))
+    IndexOfSigma = InStr(UnicodeString, ChrW$(&amp;H3A3))
+    
+    <span style="color: #008000">&#39; Encode the string.</span>
+    EncodedBytes = ASCII.GetBytes(UnicodeString)
+    Console.WriteLine
+    Console.WriteLine <span style="color: #a31515">&quot;Encoded bytes:&quot;</span>
+    
+    <span style="color: #0000ff">For</span> <span style="color: #0000ff">Each</span> b <span style="color: #0000ff">In</span> EncodedBytes
+        Console.WriteValue <span style="color: #a31515">&quot;[{0}]&quot;</span>, b
+    <span style="color: #0000ff">Next</span>
+    Console.WriteLine
+    
+    <span style="color: #008000">&#39; Notice that the special characters have been replaced with</span>
+    <span style="color: #008000">&#39; the value 63, which is the ASCII character code for &#39;?&#39;.</span>
+    Console.WriteLine
+    Console.WriteLine <span style="color: #a31515">&quot;Value as position of Pi character: {0}&quot;</span>, EncodedBytes(IndexOfPi - 1)
+    Console.WriteLine <span style="color: #a31515">&quot;Value as position of Sigma character: {0}&quot;</span>, EncodedBytes(IndexOfSigma - 1)
+    
+    <span style="color: #008000">&#39; Decode bytes back to a string.</span>
+    <span style="color: #008000">&#39; Notice missing the Pi and Sigma characters.</span>
+    DecodedString = ASCII.GetString(EncodedBytes)
+    Console.WriteLine
+    Console.WriteLine <span style="color: #a31515">&quot;Decoded bytes:&quot;</span>
+    Console.WriteLine DecodedString
+    Console.ReadKey
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; This example displays the following output:</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39; Original string:</span>
+<span style="color: #008000">&#39; This unicode string contains two characters with codes outside the ASCII code range, Pi (&Pi;) and Sigma (&Sigma;).</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39; Encoded Bytes:</span>
+<span style="color: #008000">&#39; [84][104][105][115][32][117][110][105][99][111][100][101][32][115][116][114][105][110][103][32][99][111][110][116][97][105][110][115][32][116][119][111][32][99][104][97][114][97][99][116][101][114][115][32][119][105][116][104][32][99][111][100][101][115][32][111][117][116][115][105][100][101][32][116][104][101][32][65][83][67][73][73][32][99][111][100][101][32][114][97][110][103][101][44][32][80][105][32][40][63][41][32][97][110][100][32][83][105][103][109][97][32][40][63][41][46]</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39; Value at position of Pi character: 63</span>
+<span style="color: #008000">&#39; Value at position of Sigma character: 63</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39; Decoded Bytes:</span>
+<span style="color: #008000">&#39; This unicode string contains two characters with codes outside the ASCII code range, Pi (?) and Sigma (?).</span>
+</pre></div>

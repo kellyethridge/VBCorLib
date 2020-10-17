@@ -1,0 +1,22 @@
+@examples The following example demonstrates how to use the <b>GetHashCode</b> method to return a hash code for an instance of <a href="UTF8Encoding.html">UTF8Encoding</a>. Notice that the hash code returned by this method varies depending on the constructor used to create the <a href="UTF8Encoding.html">UTF8Encoding</a>.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> UTF8A <span style="color: #0000ff">As</span> UTF8Encoding
+    <span style="color: #0000ff">Dim</span> UTF8B <span style="color: #0000ff">As</span> UTF8Encoding
+    <span style="color: #0000ff">Dim</span> UTF8C <span style="color: #0000ff">As</span> UTF8Encoding
+    <span style="color: #0000ff">Dim</span> UTF8D <span style="color: #0000ff">As</span> UTF8Encoding
+    
+    <span style="color: #008000">&#39; Many ways to instantiate a UTF8 encoding.</span>
+    <span style="color: #0000ff">Set</span> UTF8A = <span style="color: #0000ff">New</span> UTF8Encoding
+    <span style="color: #0000ff">Set</span> UTF8B = NewUTF8Encoding(<span style="color: #0000ff">True</span>)
+    <span style="color: #0000ff">Set</span> UTF8C = NewUTF8Encoding(<span style="color: #0000ff">True</span>, <span style="color: #0000ff">True</span>)
+    <span style="color: #0000ff">Set</span> UTF8D = NewUTF8Encoding(<span style="color: #0000ff">False</span>, <span style="color: #0000ff">True</span>)
+    
+    <span style="color: #008000">&#39; But not all are the same.</span>
+    Console.WriteLine UTF8A.GetHashCode
+    Console.WriteLine UTF8B.GetHashCode
+    Console.WriteLine UTF8C.GetHashCode
+    Console.WriteLine UTF8C.GetHashCode
+    
+    Console.ReadKey
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+</pre></div>

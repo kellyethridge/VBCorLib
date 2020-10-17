@@ -89,20 +89,27 @@ End Function
 ' @remarks <p>The <b>AppendChar(Char)</b> method modifies the existing instance of this class; it does not return a new class instance.</p>
 ' <p>The <i>Char</i> argument accepts a <b>Long</b> datatype, however, it converts the value to an <b>Integer</b> by taking only the lower 16 bits.</p>
 Public Function AppendChar(ByVal Char As Long, Optional ByVal Count As Long = 1) As StringBuilder
-    Dim LocalChar As Integer
-    
     If Count < 0 Then _
         Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_NeedNonNegNum
-    
-    LocalChar = AsWord(Char)
+    If Char < MinCharValue Or Char > MaxCharValue Then _
+        Error.Overflow Overflow_Char
+        
     EnsureCapacity mLength + Count
     
     ' appending 1 character at a time happens 99%
     ' of the time, so optimize for it.
     If Count = 1 Then
-        mString(mLength) = LocalChar
+#If Release Then
+        mString(mLength) = Char And &HFFFF&
+#Else
+        mString(mLength) = AsWord(Char)
+#End If
     Else
-        Fill mLength, LocalChar, Count
+#If Release Then
+        Fill mLength, Char And &HFFFF&, Count
+#Else
+        Fill mLength, AsWord(Char), Count
+#End If
     End If
     
     mLength = mLength + Count
@@ -243,6 +250,8 @@ Public Property Let Capacity(ByVal Value As Long)
             Erase mString
             SAPtr(mString) = SafeArrayCreateVector(vbString, 0, 0)
         End If
+        
+        mCapacity = Value
     End If
 End Property
 
@@ -268,6 +277,7 @@ End Property
 ' @remarks <p><i>Index</i> is zero-based.</p>
 ' <p>Setting a character can only replace an existing character. A character cannot be appended using this method.
 ' To append a character use <a href="StringBuilder.AppendChar.html">StringBuilder.AppendChar</a>.</p>
+' @see #AppendChar
 Public Property Let Chars(ByVal Index As Long, ByVal Char As Integer)
     If Index < 0 Or Index >= mLength Then _
         Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_Index
@@ -741,15 +751,12 @@ Public Function AppendFormatArrayEx(ByVal Provider As IFormatProvider, ByRef For
     End If
     
     Set AppendFormatArrayEx = Me
-    GoSub Finally
+    FreeChars FormatChars
     Exit Function
     
 Catch:
-    GoSub Finally
-    Throw
-Finally:
     FreeChars FormatChars
-    Return
+    ThrowOrErr Err
 End Function
 
 
@@ -834,15 +841,12 @@ Private Sub AppendCharsValue(ByRef Value As Variant, ByRef StartIndex As Variant
 
     AppendCharsCore Chars, Range.Index, Range.Count
     
-    GoSub Finally
+    FreeChars Chars
     Exit Sub
 
 Catch:
-    GoSub Finally
-    Throw
-Finally:
     FreeChars Chars
-    Return
+    ThrowOrErr Err
 End Sub
 
 Private Sub AppendStringValue(ByRef Value As Variant, ByRef StartIndex As Variant, ByRef Count As Variant)

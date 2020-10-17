@@ -1,0 +1,71 @@
+@remarks <p>If the data to be converted is available only in sequential blocks (such as data read from a stream) or if the amount of data is so large that it needs to be divided into smaller blocks, the application should use the <a href="Decoder.html">Decoder</a> or the <a href="Encoder.html">Encoder</a> provided by the <a href="Encoding.GetDecoder.html">GetDecoder</a> method or the <a href="Encoding.GetEncoder.html">GetEncoder</a> method, respectively, of a derived class.</p>
+<p>See the Remarks under <a href="Encoding.GetChars.html">Encoding.GetChars</a> for more discussion of decoding techniques and considerations.</p>
+@exceptions
+<table style="width: auto">
+	<tr>
+		<th>Exception</th><th>Condition</th>
+	</tr>
+	<tr>
+		<td><a href="ArgumentException.html">ArgumentException</a></td>
+		<td>The byte array contains invalid Unicode code points.</td>
+	</tr>
+	<tr>
+		<td><a href="ArgumentNullException.html">ArgumentNullException</a></td>
+		<td><i>Bytes</i> is uninitialized.</td>
+	</tr>
+	<tr>
+		<td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+		<td>
+			<i>Index</i> is less than the lower-bound of <i>Bytes</i>.<br>
+			-or-<br>
+			<i>Count</i> is less than zero.<br>
+			-or-<br>
+			<i>Index</i> and <i>Count</i> do not denote a valid range in <i>Bytes</i>.
+		</td>
+	</tr>
+	<tr>
+		<td><a href="DecoderFallbackException.html">DecoderFallbackException</a></td>
+		<td>A fallback occurred<br>
+			-and-<br>
+			<a href="Encoding.Get.DecoderFallback.html">DecoderFallback</a> is set to <a href="DecoderExceptionFallback.html">DecoderExceptionFallback</a>.
+		</td>
+	</tr>
+</table>
+@examples The following example converts a string from one encoding to another.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> UnicodeString   <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+    <span style="color: #0000ff">Dim</span> ASCII           <span style="color: #0000ff">As</span> Encoding
+    <span style="color: #0000ff">Dim</span> Unicode         <span style="color: #0000ff">As</span> Encoding
+    <span style="color: #0000ff">Dim</span> UnicodeBytes()  <span style="color: #0000ff">As</span> <span style="color: #2b91af">Byte</span>
+    <span style="color: #0000ff">Dim</span> ASCIIBytes()    <span style="color: #0000ff">As</span> <span style="color: #2b91af">Byte</span>
+    <span style="color: #0000ff">Dim</span> ASCIIChars()    <span style="color: #0000ff">As</span> <span style="color: #2b91af">Integer</span>
+    <span style="color: #0000ff">Dim</span> ASCIIString     <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+    
+    <span style="color: #0000ff">Set</span> Console.OutputEncoding = Encoding.UTF8
+    UnicodeString = <span style="color: #a31515">&quot;This string contains the unicode character Pi (&quot;</span> &amp; ChrW$(&amp;H3A0) &amp; <span style="color: #a31515">&quot;)&quot;</span>
+
+    <span style="color: #008000">&#39; Create two different encodings.</span>
+    <span style="color: #0000ff">Set</span> ASCII = Encoding.ASCII
+    <span style="color: #0000ff">Set</span> Unicode = Encoding.Unicode
+
+    <span style="color: #008000">&#39; Convert the string into a byte array.</span>
+    UnicodeBytes = Unicode.GetBytes(UnicodeString)
+    
+    <span style="color: #008000">&#39; Perform the conversion from one encoding to the other.</span>
+    ASCIIBytes = Encoding.Convert(Unicode, ASCII, UnicodeBytes)
+    
+    <span style="color: #008000">&#39; Convert the new byte array into a string.</span>
+    ASCIIString = ASCII.GetString(ASCIIBytes)
+    
+    <span style="color: #008000">&#39; Display the strings created before and after the conversion.</span>
+    Console.WriteLine <span style="color: #a31515">&quot;Original string: {0}&quot;</span>, UnicodeString
+    Console.WriteLine <span style="color: #a31515">&quot;Ascii converted string: {0}&quot;</span>, ASCIIString
+    
+    Console.ReadKey
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; This example code produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    Original string: This string contains the unicode character Pi (&Pi;)</span>
+<span style="color: #008000">&#39;    Ascii converted string: This string contains the unicode character Pi (?)</span>
+</pre></div>

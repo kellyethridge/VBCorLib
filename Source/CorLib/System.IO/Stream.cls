@@ -260,7 +260,7 @@ Public Sub WriteByte(ByVal Value As Byte): End Sub
 ' @param Destination The stream to which the contents of the current stream will be copied.
 ' @param BufferSize The size of the buffer. This value must be greater than zero. The default size is 81920.
 ' @remarks Copying begins at the current position in the current stream, and does not reset the position of the destination stream after the copy operation is complete.
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
 '       <th>Exception</th>

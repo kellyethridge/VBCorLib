@@ -1,0 +1,64 @@
+@remarks <p>Encoding is the process of transforming a set of Unicode characters into a sequence of bytes. Decoding is the process of transforming a sequence of encoded bytes into a set of Unicode characters.</p>
+<p><b>ASCIIEncoding</b> corresponds to the Windows code page 20127. Because ASCII is a 7-bit encoding, ASCII characters are limited to the lowest 128 Unicode characters, from U+0000 to U+007F. If you use the default encoder returned by the <a href="EncodingStatic.Get.ASCII.html">Encoding.ASCII</a> property or the <b>ASCIIEncoding</b> constructor, characters outside that range are replaced with a question mark (?) before the encoding operation is performed. Because the <b>ASCIIEncoding</b> class supports only a limited character set, the <a href="UTF8Encoding.html">UTF8Encoding</a>, <a href="UnicodeEncoding.html">UnicodeEncoding</a>, and <a href="UTF32Encoding.html">UTF32Encoding</a> classes are better suited for globalized applications. The following considerations can help you to decide whether to use <b>ASCIIEncoding</b>:</p>
+<ul>
+	<li>Some protocols require ASCII or a subset of ASCII. In these cases, ASCII encoding is appropriate.</li>
+	<li>If an 8-bit encoding is expected, ASCII probably isn't the correct choice. Instead, consider using UTF-8. For the characters U+0000 through U+007F, the results are identical, but all Unicode characters are representable in UTF-8, which avoids data loss.</li>
+</ul>
+<table style="width: auto">
+	<tr>
+		<th>Caution</th>
+	</tr>
+	<tr>
+		<td><b>ASCIIEncoding</b> does not provide error detection. For security reasons, you should use <a href="UTF8Encoding.html">UTF8Encoding</a>, <a href="UnicodeEncoding.html">UnicodeEncoding</a>, or <a href="UTF32Encoding.html">UTF32Encoding</a> and enable error detection.</td>
+	</tr>
+</table>
+<p>The <a href="ASCIIEncoding.GetByteCount.html">GetByteCount</a> method determines how many bytes result in encoding a set of Unicode characters, and the <a href="ASCIIEncoding.GetBytes.html">GetBytes</a> method performs the actual encoding.</p>
+<p>Likewise, the <a href="ASCIIEncoding.GetCharCount.html">GetCharCount</a> method determines how many characters result in decoding a sequence of bytes, and the <a href="ASCIIEncoding.GetChars.html">GetChars</a> and <a href="ASCIIEncoding.GetString.html">GetString</a> methods perform the actual decoding.</p>
+<p>Note that the default <b>ASCIIEncoding</b> constructor by itself might not have the appropriate behavior for your application. You might want to consider setting the <a href="ASCIIEncoding.Get.EncoderFallback.html">EncoderFallback</a> or <a href="ASCIIEncoding.Get.DecoderFallback.html">DecoderFallback</a> property to <a href="EncoderExceptionFallback.html">EncoderExceptionFallback</a> or <a href="DecoderExceptionFallback.html">DecoderExceptionFallback</a> to prevent sequences with the 8th bit set. Custom behavior might also be appropriate for these cases.</p>
+@examples The following example demonstrates how to encode Unicode characters into ASCII. Notice the loss of data that occurs when your application uses <b>ASCIIEncoding</b> to encode Unicode characters outside of the ASCII range.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> ASCII           <span style="color: #0000ff">As</span> <span style="color: #0000ff">New</span> ASCIIEncoding
+    <span style="color: #0000ff">Dim</span> UnicodeString   <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+    <span style="color: #0000ff">Dim</span> IndexOfPi       <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
+    <span style="color: #0000ff">Dim</span> IndexOfSigma    <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
+    <span style="color: #0000ff">Dim</span> EncodedBytes()  <span style="color: #0000ff">As</span> <span style="color: #2b91af">Byte</span>
+    <span style="color: #0000ff">Dim</span> DecodedString   <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+    <span style="color: #0000ff">Dim</span> b               <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>
+    
+    <span style="color: #0000ff">Set</span> Console.OutputEncoding = Encoding.UTF8
+    
+    <span style="color: #008000">&#39; A Unicode string with two characters outside the ASCII code range.</span>
+    UnicodeString = t(<span style="color: #a31515">&quot;This Unicode string contains two characters with codes outside the ASCII code range, Pi (\u03a0) and Sigma (\u03a3).&quot;</span>)
+    
+    Console.WriteLine <span style="color: #a31515">&quot;Original string:&quot;</span>
+    Console.WriteLine UnicodeString
+    
+    <span style="color: #008000">&#39; Save positions of the special characters for later reference.</span>
+    IndexOfPi = InStr(UnicodeString, ChrW$(&amp;H3A0))
+    IndexOfSigma = InStr(UnicodeString, ChrW$(&amp;H3A3))
+    
+    <span style="color: #008000">&#39; Encode string</span>
+    EncodedBytes = ASCII.GetBytes(UnicodeString)
+    Console.WriteLine
+    Console.WriteLine <span style="color: #a31515">&quot;Encoded bytes:&quot;</span>
+    
+    <span style="color: #0000ff">For</span> <span style="color: #0000ff">Each</span> b <span style="color: #0000ff">In</span> EncodedBytes
+        Console.WriteValue <span style="color: #a31515">&quot;[{0}]&quot;</span>, b
+    <span style="color: #0000ff">Next</span>
+    Console.WriteLine
+    
+    <span style="color: #008000">&#39; Notice that the special characters have been replaced with</span>
+    <span style="color: #008000">&#39; the value 63, which is the ASCII character code for &#39;?&#39;</span>
+    Console.WriteLine
+    Console.WriteLine <span style="color: #a31515">&quot;Value as position of Pi characters: {0}&quot;</span>, EncodedBytes(IndexOfPi - 1)
+    Console.WriteLine <span style="color: #a31515">&quot;Value as position of Sigma character: {0}&quot;</span>, EncodedBytes(IndexOfSigma - 1)
+    
+    <span style="color: #008000">&#39; Decode bytes back to string.</span>
+    <span style="color: #008000">&#39; Notice missing Pi and Sigma characters.</span>
+    DecodedString = ASCII.GetString(EncodedBytes)
+    Console.WriteLine
+    Console.WriteLine <span style="color: #a31515">&quot;Decoded bytes:&quot;</span>
+    Console.WriteLine DecodedString
+    Console.ReadKey
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+</pre></div>

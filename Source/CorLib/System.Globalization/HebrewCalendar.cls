@@ -106,7 +106,7 @@ End Property
 ' @remarks The <b>TwoDigitYearMax</b> property allows a 2-digit year to be properly translated to a 4-digit year. For example, if this property is set to 5729, the 100-year range is from 5630 to 5729. Therefore, a 2-digit value of 30 is interpreted as 5630, while a 2-digit value of 29 is interpreted as 5729.
 ' The initial value of this property is derived from the settings in the regional and language options portion of Control Panel. If the initial system setting changes during the life of your application the <a href="HebrewCalendar.html">HebrewCalendar</a> class does not automatically detect the change.
 ' The special value 99 causes the ToFourDigitYear method to ignore the system settings and return the specified year unchanged.
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
 '       <th>Exception</th>
@@ -497,7 +497,7 @@ End Function
 ' @remarks <p>This implementation of the <a href="HebrewCalendar.html">HebrewCalendar</a> class recognizes only the Hebrew years 5343 to 5999 (1583 to 2239 in the Gregorian calendar).</p>
 ' <p>In every 19-year cycle that ends with a year that is evenly divisible by 19, the 3rd, 6th, 8th, 11th, 14th, 17th, and 19th years are leap years. A common year can have from 353 to 355 days, depending on the placement of Jewish holidays. A leap year can have from 383 to 385 days.</p>
 ' <p>A leap month is an entire month that occurs only in a leap year. In the Hebrew calendar, Adar Beit is the only leap month.</p>
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
 '       <th>Exception</th>
@@ -528,7 +528,7 @@ End Function
 ' @remarks <p>This implementation of the HebrewCalendar class recognizes only the Hebrew years 5343 to 5999 (1583 to 2239 in the Gregorian calendar).</p>
 ' <p>In every 19-year cycle that ends with a year that is evenly divisible by 19, the 3rd, 6th, 8th, 11th, 14th, 17th, and 19th years are leap years. A common year can have from 353 to 355 days, depending on the placement of Jewish holidays. A leap year can have from 383 to 385 days.</p>
 ' <p>A leap day is a day that occurs only in a leap year. In the Hebrew calendar, the last day of Adar Alef and all the days in Adar Beit are considered leap days.</p>
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
 '       <th>Exception</th>

@@ -113,15 +113,12 @@ Public Function CallFunc_T_T_Long(ByVal lpFunc As Long, ByVal lpArg1 As Long, By
     On Error GoTo Catch
     CallFunc_T_T_Long = Caller.Invoke(ByVal lpArg1, ByVal lpArg2)
     
-    GoSub Finally
+    ObjectPtr(Caller) = vbNullPtr
     Exit Function
     
 Catch:
-    GoSub Finally
-    ThrowOrErr Err
-Finally:
     ObjectPtr(Caller) = vbNullPtr
-    Return
+    ThrowOrErr Err
 End Function
 
 Public Function CallFunc_T_T_T_String(ByVal lpFunc As Long, ByVal lpArg1 As Long, ByVal lpArg2 As Long, ByVal lpArg3 As Long) As String
@@ -134,15 +131,12 @@ Public Function CallFunc_T_T_T_String(ByVal lpFunc As Long, ByVal lpArg1 As Long
     On Error GoTo Catch
     CallFunc_T_T_T_String = Caller.Invoke(ByVal lpArg1, ByVal lpArg2, ByVal lpArg3)
     
-    GoSub Finally
+    ObjectPtr(Caller) = vbNullPtr
     Exit Function
     
 Catch:
-    GoSub Finally
-    ThrowOrErr Err
-Finally:
     ObjectPtr(Caller) = vbNullPtr
-    Return
+    ThrowOrErr Err
 End Function
 
 

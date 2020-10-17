@@ -57,6 +57,10 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
         Case "AppendString_WithValue_AppendText"
             Test.Use "bye", "hellobye"
             Test.Use "", "hello"
+            
+        Case "AppendChar_WithInvalidChar_ThrowsOverflowException"
+            Test.Use 65536
+            Test.Use -32769
     End Select
 End Sub
 
@@ -185,6 +189,15 @@ Public Sub AppendChar_WithCountLessThanZero_ThrowsArgumentOutOfRangeException()
     sb.AppendChar CHARACTER_ZERO, -1
     
     AssertArgumentOutOfRangeException Err, "Count"
+End Sub
+
+Public Sub AppendChar_WithInvalidChar_ThrowsOverflowException(ByVal InvalidChar As Long)
+    Dim sb As New StringBuilder
+    
+    On Error Resume Next
+    sb.AppendChar InvalidChar
+    
+    AssertOverflowException Err
 End Sub
 
 Public Sub Chars_WithGet_ReturnsCharacter()
@@ -831,6 +844,15 @@ Public Sub AppendFormat_PlaceHolderWithMissingIndex_ThrowsFormatException()
     AssertFormatException Err
 End Sub
 
+Public Sub AppendFormat_WithArray_AppendsArrayTypeName()
+    Dim sb As New StringBuilder
+    Dim Arr(0) As Long
+    
+    sb.AppendFormat "{0}", Arr
+    
+    Assert.That sb.ToString, Iz.EqualTo("Long()")
+End Sub
+
 Public Sub AppendFormatEx_WithCustomFormatter_RequestsCorrectProvider()
     Dim sb As New StringBuilder
     Dim f As New FakeCustomFormatter
@@ -1017,5 +1039,13 @@ Public Sub ToString_WithSubString_ReturnsSubPortion()
     Actual = sb.ToString(2, 2)
     
     Assert.That Actual, Iz.EqualTo("cd")
+End Sub
+
+Public Sub Capacity_WhenSet_StoresCapacity()
+    Dim sb As New StringBuilder
+    
+    sb.Capacity = 1024
+    
+    Assert.That sb.Capacity, Iz.EqualTo(1024)
 End Sub
 

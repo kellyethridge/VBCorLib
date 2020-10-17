@@ -1,0 +1,49 @@
+@remarks An object that has no correlation between its state and its hash code value should typically not be used as the key. For example, String values are better than <a href="StringBuilder.html">StringBuilder</a> objects for use as keys.
+<p>You can also use the <a href="Hashtable.Let.Item.html">Item</a> property to add new elements by setting the value of a key that does not exist in the <a href="Hashtable.html">Hashtable</a>; for example, <code>myCollection("myNonexistentKey") = myValue</code>. However, if the specified key already exists in the <a href="Hashtable.html">Hashtable</a>, setting the <a href="Hashtable.Let.Item.html">Item</a> property overwrites the old value. In contrast, the <b>Add</b> method does not modify existing elements.</p>
+<p>If <a href="Hashtable.Get.Count.html">Count</a> is less than the capacity of the <a href="Hashtable.html">Hashtable</a>, this method is an O(1) operation. If the capacity needs to be increased to accommodate the new element, this method becomes an O(<i>n</i>) operation, where <i>n</i> is <a href="Hashtable.Get.Count.html">Count</a>.</p>
+@exceptions
+<table style="width: auto">
+	<tr>
+		<th>Exception</th><th>Condition</th>
+	</tr>
+	<tr>
+		<td><a href="ArgumentException.html">ArgumentException</a></td>
+		<td>An element with the same key already exists in the <a href="Hashtable.html">Hashtable</a>.</td>
+	</tr>
+</table>
+@examples The following example shows how to add elements to the <a href="Hashtable.html">Hashtable</a>.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #008000">&#39; Creates and initializes a new Hashtable.</span>
+    <span style="color: #0000ff">Dim</span> MyHT <span style="color: #0000ff">As</span> <span style="color: #0000ff">New</span> Hashtable
+    MyHT.Add <span style="color: #a31515">&quot;one&quot;</span>, <span style="color: #a31515">&quot;The&quot;</span>
+    MyHT.Add <span style="color: #a31515">&quot;two&quot;</span>, <span style="color: #a31515">&quot;quick&quot;</span>
+    MyHT.Add <span style="color: #a31515">&quot;three&quot;</span>, <span style="color: #a31515">&quot;brown&quot;</span>
+    MyHT.Add <span style="color: #a31515">&quot;four&quot;</span>, <span style="color: #a31515">&quot;fox&quot;</span>
+
+    <span style="color: #008000">&#39; Displays the Hashtable.</span>
+    Debug.Print <span style="color: #a31515">&quot;The Hashtable contains the following:&quot;</span>
+    PrintKeysAndValues MyHT
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> PrintKeysAndValues(<span style="color: #0000ff">ByVal</span> MyHT <span style="color: #0000ff">As</span> Hashtable)
+    <span style="color: #0000ff">Dim</span> de <span style="color: #0000ff">As</span> DictionaryEntry
+    
+    Debug.Print t(<span style="color: #a31515">&quot;\t-KEY-\t-VALUE-&quot;</span>)
+    
+    <span style="color: #0000ff">For</span> <span style="color: #0000ff">Each</span> de <span style="color: #0000ff">In</span> MyHT
+        Debug.Print CorString.Format(t(<span style="color: #a31515">&quot;\t{0}:\t{1}&quot;</span>), de.Key, de.Value)
+    <span style="color: #0000ff">Next</span> de
+    
+    Debug.Print
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+
+<span style="color: #008000">&#39; This example code produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    The Hashtable contains the following:</span>
+<span style="color: #008000">&#39;        -KEY-   -VALUE-</span>
+<span style="color: #008000">&#39;        one:    The</span>
+<span style="color: #008000">&#39;        two:    quick</span>
+<span style="color: #008000">&#39;        four:   fox</span>
+<span style="color: #008000">&#39;        three:  brown</span>
+</pre></div>

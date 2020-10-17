@@ -1,0 +1,32 @@
+@examples The following code example determines whether a specified directory exists, deletes it if it exists, and creates it if it does not exist. This example then moves the directory, creates a file in the directory, and counts the files in the directory.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Const</span> Source <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span> = <span style="color: #a31515">&quot;c:\MyDir&quot;</span>
+    <span style="color: #0000ff">Const</span> Target <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span> = <span style="color: #a31515">&quot;c:\TestDir&quot;</span>
+    
+    <span style="color: #0000ff">On</span> <span style="color: #0000ff">Error</span> <span style="color: #0000ff">GoTo</span> <span style="color: #0000ff">Catch</span>
+    
+    <span style="color: #0000ff">If</span> <span style="color: #0000ff">Not</span> Directory.Exists(Source) <span style="color: #0000ff">Then</span>
+        Directory.CreateDirectory Source
+    <span style="color: #0000ff">End</span> <span style="color: #0000ff">If</span>
+    
+    File.CreateText Path.Combine(Source, <span style="color: #a31515">&quot;MyDirFile.txt&quot;</span>)
+    
+    <span style="color: #0000ff">If</span> Directory.Exists(Target) <span style="color: #0000ff">Then</span>
+        Directory.Delete Target, <span style="color: #0000ff">True</span>
+    <span style="color: #0000ff">End</span> <span style="color: #0000ff">If</span>
+    
+    Directory.Move Source, Target
+    
+    File.CreateText Path.Combine(Target, <span style="color: #a31515">&quot;TestDirFile.txt&quot;</span>)
+    
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;The number of files in {0} is {1}&quot;</span>, _
+        Target, CorArray.Length(Directory.GetFiles(Target)))
+    
+    <span style="color: #0000ff">Exit</span> <span style="color: #0000ff">Sub</span>
+    
+Catch:
+    <span style="color: #0000ff">Dim</span> Ex <span style="color: #0000ff">As</span> Exception
+    <span style="color: #0000ff">Catch</span> Ex, Err
+    Debug.Print <span style="color: #a31515">&quot;The process failed: &quot;</span> &amp; Ex.Message
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+</pre></div>

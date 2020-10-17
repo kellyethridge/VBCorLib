@@ -1,0 +1,32 @@
+@remarks The <a href="Rfc2898DeriveBytes.html">Rfc2898DeriveBytes</a> class implements PBKDF2 functionality by using a pseudorandom number generator based on <a href="HMACSHA1.html">HMACSHA1</a>. The <a href="Rfc2898DeriveBytes.html">Rfc2898DeriveBytes</a> class takes a password, a salt, and an iteration count, and then generates keys through calls to the <b>GetBytes</b> method. Repeated calls to this method will not generate the same key; instead, appending two calls of the <b>GetBytes</b> method with a <i>cb</i> parameter value of 20 is the equivalent of calling the <b>GetBytes</b> method once with a <i>cb</i> parameter value of 40.
+@exceptions
+<table style="width: auto">
+	<tr>
+		<th>Exception</th><th>Condition</th>
+	</tr>
+	<tr>
+		<td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+		<td><i>cb</i> is out of range. This parameter requires a non-negative number.</td>
+	</tr>
+</table>
+@examples The following example shows how to use the <b>GetBytes</b> method to get the key for an instance of <a href="Rfc2898DeriveBytes.html">Rfc2898DeriveBytes</a>. This code example is part of a larger example provided for the <a href="Rfc2898DeriveBytes.html">Rfc2898DeriveBytes</a> class.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">    <span style="color: #0000ff">On</span> <span style="color: #0000ff">Error</span> <span style="color: #0000ff">GoTo</span> <span style="color: #0000ff">Catch</span>
+    
+    <span style="color: #0000ff">Dim</span> K1 <span style="color: #0000ff">As</span> Rfc2898DeriveBytes
+    <span style="color: #0000ff">Dim</span> K2 <span style="color: #0000ff">As</span> Rfc2898DeriveBytes
+    
+    <span style="color: #0000ff">Set</span> K1 = NewRfc2898DeriveBytes(Pwd1, Salt1, MyIterations)
+    <span style="color: #0000ff">Set</span> K2 = NewRfc2898DeriveBytes(Pwd1, Salt1)
+    
+    <span style="color: #008000">&#39; Encrypt the data.</span>
+    <span style="color: #0000ff">Dim</span> EncAlg <span style="color: #0000ff">As</span> TripleDES
+    <span style="color: #0000ff">Dim</span> EncryptionStream <span style="color: #0000ff">As</span> <span style="color: #0000ff">New</span> MemoryStream
+    <span style="color: #0000ff">Dim</span> Encrypt <span style="color: #0000ff">As</span> CryptoStream
+    <span style="color: #0000ff">Dim</span> UtfD1() <span style="color: #0000ff">As</span> <span style="color: #2b91af">Byte</span>
+    
+    <span style="color: #0000ff">Set</span> EncAlg = TripleDES.Create()
+    EncAlg.Key = K1.GetBytes(16)
+    <span style="color: #0000ff">Set</span> Encrypt = NewCryptoStream(EncryptionStream, EncAlg.CreateEncryptor(), CryptoStreamMode.WriteMode)
+    UtfD1 = NewUTF8Encoding(<span style="color: #0000ff">False</span>).GetBytes(Data1)
+</pre></div>
+

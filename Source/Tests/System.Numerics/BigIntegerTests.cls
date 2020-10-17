@@ -594,6 +594,17 @@ Public Sub ToString_WithFormatting_ReturnsFormattedNumber(ByVal Value As Variant
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
+Public Sub ToString_WithLargeExponent_ReturnsFormattedNumber()
+    Dim Number As BigInteger
+    Dim Actual As String
+    
+    Set Number = BigInteger.Pow(CBigInt(Int64.MaxValue), 53)           ' "1.377703e+1005"
+
+    Actual = Number.ToString("e")
+    
+    Assert.That Actual, Iz.EqualTo("1.377703e+1005")
+End Sub
+
 Public Function Compare_WithWithValues_ReturnsExpected(ByVal x As BigInteger, ByVal y As BigInteger) As Long
     Dim Actual As Long
     

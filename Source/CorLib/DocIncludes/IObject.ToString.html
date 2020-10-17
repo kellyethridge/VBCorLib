@@ -1,0 +1,36 @@
+@return A string representation of the current object.
+@remarks <b>ToString</b> is the major formatting method in VBCorLib. It converts an object to its string representation so that it is suitable for display.
+<p>A default implementation of the <b>ToString</b> method would be to call the <a href="ObjectBase.ToString.html">MyBase.ToString</a> method as the following example shows.</p>
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Implements</span> IObject
+
+<span style="color: #0000ff">Public</span> <span style="color: #0000ff">Function</span> ToString() <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+    ToString = <span style="color: #0000ff">MyBase</span>.ToString(<span style="color: #0000ff">Me</span>, App)
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Function</span>
+
+
+<span style="color: #008000">&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;</span>
+<span style="color: #008000">&#39;   IObject Implementation</span>
+<span style="color: #008000">&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;</span>
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Function</span> IObject_ToString() <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+    IObject_ToString = ToString
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Function</span>
+</pre></div>
+<p>Types commonly implement the <b>ToString</b> method to return a string that represents the object instance. For example, the types such as <a href="CorDateTime.html">CorDateTime</a>, and <a href="StringBuilder.html">StringBuilder</a> provide <b>ToString</b> implementations that return the string form of the value that the object represents. The following example defines a class, Class2, that customizes the <b>ToString</b> method to return the type name along with its value.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Implements</span> IObject
+
+<span style="color: #0000ff">Public</span> Value <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>
+
+
+<span style="color: #0000ff">Public</span> <span style="color: #0000ff">Function</span> ToString() <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+    ToString = <span style="color: #0000ff">MyBase</span>.ToString(<span style="color: #0000ff">Me</span>, App) &amp; <span style="color: #a31515">&quot;: &quot;</span> &amp; <span style="color: #2b91af">Object</span>.ToString(Value)
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Function</span>
+
+
+<span style="color: #008000">&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;</span>
+<span style="color: #008000">&#39;   IObject Implementation</span>
+<span style="color: #008000">&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;</span>
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Function</span> IObject_ToString() <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+    IObject_ToString = ToString
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Function</span>
+</pre></div>
+

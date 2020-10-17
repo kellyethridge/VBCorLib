@@ -1,0 +1,50 @@
+@remarks The absolute path includes all information required to locate a file or directory on a system.
+<p>The file or directory specified by <i>Path</i> is not required to exist. For example, if c:\temp\newdir is the current directory, calling <b>GetFullPath</b> on a file name such as test.txt returns c:\temp\newdir\test.txt. The file need not exist.</p>
+<p>However, if <i>Path</i> does exist, the caller must have permission to obtain path information for path. Note that unlike most members of the <a href="Path.html">Path</a> class, this method accesses the file system.</p>
+<p>This method uses current directory and current volume information to fully qualify <i>Path</i>. If you specify a file name only in <i>Path</i>, <b>GetFullPath</b> returns the fully qualified path of the current directory.</p>
+<p>If you pass in a short file name, it is expanded to a long file name.</p>
+<p>If a path contains no significant characters it is invalid unless it contains one or more "." characters followed by any number of spaces, then it will be parsed as either "." or "..".</p>
+@exceptions
+<table style="width: auto">
+	<tr>
+		<th>Exception</th><th>Condition</th>
+	</tr>
+	<tr>
+		<td><a href="ArgumentException.html">ArgumentException</a></td>
+		<td>
+			<i>Path</i> is a zero-length string, contains only white space, or contains one or more of the invalid characters defined in <a href="Path.GetInvalidPathChars.html">GetInvalidPathChars</a>.<br/>
+			-or-<br/>
+			The system could not retrieve the absolute path.
+		</td>
+	</tr>
+	<tr>
+		<td><a href="NotSupportedException.html">NotSupportedException</a></td>
+		<td><i>Path</i> contains a colon (":") that is not part of a volume identifier (for example, "c:\").</td>
+	</tr>
+</table>
+@examples The following code example demonstrates the <b>GetFullPath</b> method.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Const</span> FileName <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span> = <span style="color: #a31515">&quot;MyFile.Ext&quot;</span>
+    <span style="color: #0000ff">Const</span> Path1 <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span> = <span style="color: #a31515">&quot;MyDir&quot;</span>
+    <span style="color: #0000ff">Const</span> Path2 <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span> = <span style="color: #a31515">&quot;\MyDir&quot;</span>
+    
+    <span style="color: #0000ff">Dim</span> FullPath <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+    
+    FullPath = Path.GetFullPath(Path1)
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;GetFullPath(&#39;{0}&#39;) returns &#39;{1}&#39;&quot;</span>, Path1, FullPath)
+    
+    FullPath = Path.GetFullPath(FileName)
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;GetFullPath(&#39;{0}&#39;) returns &#39;{1}&#39;&quot;</span>, FileName, FullPath)
+    
+    FullPath = Path.GetFullPath(Path2)
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;GetFullPath(&#39;{0}&#39;) returns &#39;{1}&#39;&quot;</span>, Path2, FullPath)
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; Output is based on your current directory, except</span>
+<span style="color: #008000">&#39; in the last case, where it is based on the root drive.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    GetFullPath(&#39;MyDir&#39;) returns &#39;C:\Program Files (x86)\Microsoft Visual Studio\VB98\MyDir&#39;</span>
+<span style="color: #008000">&#39;    GetFullPath(&#39;MyFile.Ext&#39;) returns &#39;C:\Program Files (x86)\Microsoft Visual Studio\VB98\MyFile.Ext&#39;</span>
+<span style="color: #008000">&#39;    GetFullPath(&#39;\MyDir&#39;) returns &#39;C:\MyDir&#39;</span>
+</pre></div>
+

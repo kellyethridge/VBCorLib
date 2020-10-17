@@ -1,0 +1,33 @@
+@remarks Queues are useful for storing messages in the order they were received for sequential processing. This class implements a queue as a circular array. Values stored in a <b>Queue</b> are inserted at one end and removed from the other.
+<p>The capacity of a <b>Queue</b> is the number of elements the <b>Queue</b> can hold. As elements are added to a <b>Queue</b>, the capacity is automatically increased as required through reallocation. The capacity can be decreased by calling <a href="Queue.TrimToSize.html">TrimToSize</a>.</p>
+@examples The following example shows how to create and add values to a <b>Queue</b> and how to print out its values.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #008000">&#39; Creates and initializesa new Queue.</span>
+    <span style="color: #0000ff">Dim</span> MyQ <span style="color: #0000ff">As</span> <span style="color: #0000ff">New</span> Queue
+    MyQ.Enqueue <span style="color: #a31515">&quot;Hello&quot;</span>
+    MyQ.Enqueue <span style="color: #a31515">&quot;World&quot;</span>
+    MyQ.Enqueue <span style="color: #a31515">&quot;!&quot;</span>
+    
+    <span style="color: #008000">&#39; Displays the properties and values of the Queue.</span>
+    Debug.Print <span style="color: #a31515">&quot;MyQ&quot;</span>
+    Debug.Print <span style="color: #a31515">&quot;    Count:    &quot;</span> &amp; MyQ.Count
+    Debug.Print <span style="color: #a31515">&quot;   Values:&quot;</span>;
+    PrintValues MyQ
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> PrintValues(<span style="color: #0000ff">ByVal</span> MyCollection <span style="color: #0000ff">As</span> IEnumerable)
+    <span style="color: #0000ff">Dim</span> Item <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>
+    
+    <span style="color: #0000ff">For</span> <span style="color: #0000ff">Each</span> Item <span style="color: #0000ff">In</span> MyCollection
+        Debug.Print <span style="color: #a31515">&quot;    &quot;</span> &amp; Item;
+    <span style="color: #0000ff">Next</span>
+    
+    Debug.Print
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; The example code produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    MyQ</span>
+<span style="color: #008000">&#39;        Count:    3</span>
+<span style="color: #008000">&#39;       Values:    Hello    World    !</span>
+</pre></div>

@@ -36,13 +36,13 @@ Attribute VB_Exposed = True
 '
 
 ''
-' Represents a first-in-last-out collection of values.
+' Represents a simple last-in-first-out (LIFO) non-generic collection of items.
 '
 ' @see Constructors
 ' @see ICollection
 ' @see IEnumerable
 ' @see ICloneable
-'
+' @include "..\DocIncludes\Stack.html"
 Option Explicit
 Implements IObject
 Implements ICloneable
@@ -61,26 +61,10 @@ Private mVersion    As Long
 Private mCapacity   As Long
 
 
-Private Sub Class_InitProperties()
-    EnsureCapacity DefaultCapacity
-End Sub
-
-Friend Sub InitClone(ByRef OtherItems() As Variant, ByVal OtherCount As Long)
-    mCount = OtherCount
-    mItems = OtherItems
-    mCapacity = UBound(mItems) + 1
-End Sub
-
-Friend Sub Init(ByRef Source As Variant)
-    WriteRange Source
-End Sub
-
-
 ''
-' Removes all values from the collection.
+' Removes all items from the <a href="Stack.html">Stack</a>.
 '
-' @remarks The count is reset to zero, but the capacity remains unchanged.
-'
+' @include "..\DocIncludes\Stack.Clear.html"
 Public Sub Clear()
     ReDim mItems(0 To mCapacity - 1)
     mCount = 0
@@ -88,33 +72,36 @@ Public Sub Clear()
 End Sub
 
 ''
-' Returns a copy of this instance.
+' Creates a shallow copy of the <a href="Stack.html">Stack</a>.
 '
-' @return The copy of this instance.
-'
+' @return A shallow copy of the <a href="Stack.html">Stack</a>.
+' @remarks Returns a second stack with the same contents as the original.
+' <p>A shallow copy of a collection copies only the elements of the collection, whether they are reference types or value types,
+' but it does not copy the objects that the references refer to. The references in the new collection point to the same objects
+' that the references in the original collection point to.</p>
 Public Function Clone() As Stack
     Set Clone = New Stack
     Clone.InitClone mItems, mCount
 End Function
 
 ''
-' Returns whether the collection contains a value.
+' Determines whether an element is in the <a href="Stack.html">Stack</a>.
 '
-' @param value The value to search for.
-' @return Boolean indicating if the value was found in the collection.
-' @remarks The user can use a custom IComparer object for special comparison
-' rules, such as finding user-defined types.
-'
+' @param Value The value to locate in the <a href="Stack.html">Stack</a>.
+' @return <b>True</b> if <i>Value</i> is found in the <a href="Stack.html">Stack</a>; otherwise, <b>False</b>.
+' @remarks This method determines equality by calling <a href="ObjectStatic.Equals.html">Object.Equals</a>.
+' <p>This method performs a linear search; therefore, this method is an O(<i>n</i>) operation, where <i>n</i> is <a href="Stack.Get.Count.html">Count</a>.
 Public Function Contains(ByRef Value As Variant) As Boolean
     Contains = CorArray.IndexOf(mItems, Value, 0, mCount) >= 0
 End Function
 
 ''
-' Copies the values to an array.
+' Copies the <a href="Stack.html">Stack</a> to an existing one-dimensional array, starting at the specified array index.
 '
-' @param Arr The array to receive the values.
-' @param index The starting position in dstArray to start placing the values.
-'
+' @param Arr The one-dimensional array that is the destination of the elements copied from <a href="Stack.html">Stack</a>.
+' @param index The lowerbound-based index in array at which copying begins.
+' @see #ToArray
+' @include "..\DocIncludes\Stack.CopyTo.html"
 Public Sub CopyTo(ByRef Arr As Variant, ByVal Index As Long)
     If CorArray.IsNull(Arr) Then _
         Error.ArgumentNull "Arr", ArgumentNull_Array
@@ -129,20 +116,21 @@ Public Sub CopyTo(ByRef Arr As Variant, ByVal Index As Long)
 End Sub
 
 ''
-' Returns the number of items on the stack.
+' Gets the number of elements contained in the <a href="Stack.html">Stack</a>.
 '
-' @return The number of items.
-'
+' @return The number of elements contained in the <a href="Stack.html">Stack</a>.
+' @remarks The capacity is the number of elements that the Stack can store. <b>Count</b> is the number of elements that are actually in the <a href="Stack.html">Stack</a>.
+' <p>The capacity is always greater than or equal to <b>Count</b>. If <b>Count</b> exceeds the capacity while adding elements,
+' the capacity is automatically increased by reallocating the internal array before copying the old elements and adding the new elements.</p>
 Public Property Get Count() As Long
     Count = mCount
 End Property
 
 ''
-' Returns a boolean indicating if the value and this object
-' instance are the same instance.
+' Determines whether the specified value is equal to the current object.
 '
-' @param value The value to compare this object to.
-' @return Boolean indicating equality.
+' @param value The value to compare with the current object.
+' @return <b>True</b> if the specified value is equal to the current object; otherwise, <b>False</b>.
 Public Function Equals(ByRef Value As Variant) As Boolean
     Equals = MyBase.Equals(Me, Value)
 End Function
@@ -178,11 +166,12 @@ Attribute NewEnum.VB_MemberFlags = "40"
 End Function
 
 ''
-' Returns the next to be removed value from the stack without
-' removing the value.
+' Returns the item at the top of the <a href="Stack.html">Stack</a> without removing it.
 '
-' @return The next value to be removed from the stack.
-'
+' @return The item at the top of the <a href="Stack.html">Stack</a>.
+' @see #Pop
+' @see #Push
+' @include "..\DocIncludes\Stack.Peek.html"
 Public Function Peek() As Variant
     If mCount = 0 Then _
         Error.InvalidOperation InvalidOperation_EmptyStack
@@ -191,10 +180,12 @@ Public Function Peek() As Variant
 End Function
 
 ''
-' Returns the next value from the stack, removing the item from the collection.
+' Removes and returns the item at the top of the <a href="Stack.html">Stack</a>.
 '
-' @return The value just removed from the collection.
-'
+' @return The item removed from the top of the <a href="Stack.html">Stack</a>.
+' @see #Push
+' @see #Peek
+' @include "..\DocIncludes\Stack.Pop.html"
 Public Function Pop() As Variant
     If mCount = 0 Then _
         Error.InvalidOperation InvalidOperation_EmptyStack
@@ -205,11 +196,12 @@ Public Function Pop() As Variant
 End Function
 
 ''
-' Places a value into the collection and becomes the next to be
-' removed value from the collection.
+' Inserts an item at the top of the <a href="Stack.html">Stack</a>.
 '
-' @param value The value to add to the collection
-'
+' @param value The item to push onto the <a href="Stack.html">Stack</a>.
+' @see #Pop
+' @see #Peek
+' @include "..\DocIncludes\Stack.Push.html"
 Public Sub Push(ByRef Value As Variant)
     EnsureCapacity mCount + 1
     VariantCopyInd mItems(mCount), Value
@@ -218,12 +210,11 @@ Public Sub Push(ByRef Value As Variant)
 End Sub
 
 ''
-' Returns a Variant array copy of the stack.
+' Copies the <a href="Stack.html">Stack</a> to a new array.
 '
-' @return A Variant type array containing all of the values in the collection.
-' @remarks The order of the returned array is the first element corrisponds to
-' the next value to be Popped off the stack.
-'
+' @return A new array containing copies of the elements of the <a href="Stack.html">Stack</a>.
+' @see #CopyTo
+' @include "..\DocIncludes\Stack.ToArray.html"
 Public Function ToArray() As Variant()
     Dim Result() As Variant
     Result = CorArray.CreateInstance(vbVariant, mCount)
@@ -243,6 +234,24 @@ End Function
 Public Function ToString() As String
     ToString = MyBase.ToString(Me, App)
 End Function
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Constructors
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Sub Class_InitProperties()
+    EnsureCapacity DefaultCapacity
+End Sub
+
+Friend Sub InitClone(ByRef OtherItems() As Variant, ByVal OtherCount As Long)
+    mCount = OtherCount
+    mItems = OtherItems
+    mCapacity = UBound(mItems) + 1
+End Sub
+
+Friend Sub Init(ByRef Source As Variant)
+    WriteRange Source
+End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

@@ -275,6 +275,8 @@ Public Enum ResourceStringKey
     Format_BadQuote = 608
     Format_IndexOutOfRange = 609
     Format_BadFormatSpecifier = 610
+    Format_NeedSingleChar = 611
+    Format_Bad7BitInt32 = 612
     
     IndexOutOfRange_Dimension = 300
     IndexOutOfRange_ArrayBounds = 301
@@ -282,6 +284,7 @@ Public Enum ResourceStringKey
     InvalidCast_FromTo = 1400
     InvalidCast_DownCastArrayElement = 1401
     InvalidCast_IComparer = 1402
+    InvalidCast_StoreArrayElement = 1403
     
     InvalidOperation_EmptyStack = 1100
     InvalidOperation_EnumNotStarted = 1101
@@ -319,6 +322,7 @@ Public Enum ResourceStringKey
     
     Overflow_TimeSpan = 1300
     Overflow_Int64 = 1301
+    Overflow_Char = 1302
     
     UnknownError_Num = 1500
     
@@ -625,7 +629,7 @@ Private Function SaveHICONtoArray(ByVal hIcon As Long, OutArray() As Byte, ByVal
                             CopyMemory OutArray(62), Bits(x), .biSizeImage
                         Else
                             ' we can loop & transfer 3 of 4 bytes for each pixel or just call the API one more time
-                            Call GetDIBits(tDC, ICI.hbmColor, 0&, .biHeight, OutArray(62), BHI, 0&)
+                            GetDIBits tDC, ICI.hbmColor, 0&, .biHeight, OutArray(62), BHI, 0&
                         End If
                     End If
                     Erase Bits()

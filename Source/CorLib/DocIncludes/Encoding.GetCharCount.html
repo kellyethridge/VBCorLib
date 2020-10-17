@@ -1,0 +1,90 @@
+@remarks <p>To calculate the exact array size required by <a href="Encoding.GetChars.html">GetChars</a> to store the resulting characters, the application should use <b>GetCharCount</b>. To calculate the maximum array size, the application should use <a href="Encoding.GetMaxCharCount.html">GetMaxCharCount</a>. The <b>GetCharCount</b> method generally allows allocation of less memory, while the <a href="Encoding.GetMaxCharCount.html">GetMaxCharCount</a> method generally executes faster.</p>
+<p>The <b>GetCharCount</b> method determines how many characters result in decoding a sequence of bytes, and the <a href="Encoding.GetChars.html">GetChars</a> method performs the actual decoding. The <a href="Encoding.GetChars.html">GetChars</a> method expects discrete conversions, in contrast to the <a href="Decoder.GetChars.html">Decoder.GetChars</a> method, which handles multiple passes on a single input stream.</p>
+@exceptions
+<table style="width: auto">
+	<tr>
+		<th>Exception</th><th>Condition</th>
+	</tr>
+	<tr>
+		<td><a href="ArgumentNullException.html">ArgumentNullException</a></td>
+		<td><i>Bytes</i> is <b>null</b>.</td>
+	</tr>
+	<tr>
+		<td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+		<td>
+			<i>Index</i> is less than the lower-bound of <i>Bytes</i>.<br>
+			-or-<br>
+			<i>Count</i> is less than zero.
+		</td>
+	</tr>
+	<tr>
+		<td><a href="DecoderFallbackException.html">DecoderFallbackException</a></td>
+		<td>
+			A fallback occurred<br>
+			-and-<br>
+			<a href="Encoding.Get.DecoderFallback.html">DecoderFallback</a> is set to <a href="DecoderExceptionFallback.html">DecoderExceptionFallback</a>.
+		</td>
+	</tr>
+</table>
+@examples The following example encodes a string into an array of bytes, and then decodes the bytes into an array of characters.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Const</span> Sigma <span style="color: #0000ff">As</span> <span style="color: #2b91af">Integer</span> = &amp;H3A3
+    <span style="color: #0000ff">Dim</span> Chars() <span style="color: #0000ff">As</span> <span style="color: #2b91af">Integer</span>
+    <span style="color: #0000ff">Dim</span> Bytes() <span style="color: #0000ff">As</span> <span style="color: #2b91af">Byte</span>
+    <span style="color: #0000ff">Dim</span> ASCII   <span style="color: #0000ff">As</span> <span style="color: #0000ff">New</span> ASCIIEncoding
+    <span style="color: #0000ff">Dim</span> U8      <span style="color: #0000ff">As</span> <span style="color: #0000ff">New</span> UTF8Encoding
+    
+    <span style="color: #0000ff">Set</span> Console.OutputEncoding = Encoding.UTF8
+    
+    Chars = NewChars(<span style="color: #a31515">&quot;A&quot;</span>, <span style="color: #a31515">&quot;Z&quot;</span>, Sigma)
+    Bytes = U8.GetBytes(Chars)
+    
+    PrintCountsAndChars Bytes, ASCII
+    PrintCountsAndChars Bytes, U8
+    
+    Console.ReadKey
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> PrintCountsAndChars(<span style="color: #0000ff">ByRef</span> Bytes() <span style="color: #0000ff">As</span> <span style="color: #2b91af">Byte</span>, <span style="color: #0000ff">ByVal</span> Enc <span style="color: #0000ff">As</span> Encoding)
+    Console.WriteValue <span style="color: #a31515">&quot;{0,-25} :&quot;</span>, Enc
+    Console.WriteValue <span style="color: #a31515">&quot; {0,-3}&quot;</span>, Enc.GetCharCount(Bytes)
+    Console.WriteValue <span style="color: #a31515">&quot; {0,-3} :&quot;</span>, Enc.GetMaxByteCount(CorArray.Length(Bytes))
+    Console.WriteLine Enc.GetString(Bytes)
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; The previous example code outputs the following.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    CorLib.ASCIIEncoding      : 4   5   :AZ??</span>
+<span style="color: #008000">&#39;    CorLib.UTF8Encoding       : 3   15  :AZ&Pi;</span>
+</pre></div>
+<p>The following encodes a string into an array of bytes, and then decodes a sub-section of the bytes into an array of characters.</p>
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Const</span> Sigma <span style="color: #0000ff">As</span> <span style="color: #2b91af">Integer</span> = &amp;H3A3
+    <span style="color: #0000ff">Dim</span> Chars() <span style="color: #0000ff">As</span> <span style="color: #2b91af">Integer</span>
+    <span style="color: #0000ff">Dim</span> Bytes() <span style="color: #0000ff">As</span> <span style="color: #2b91af">Byte</span>
+    <span style="color: #0000ff">Dim</span> ASCII   <span style="color: #0000ff">As</span> <span style="color: #0000ff">New</span> ASCIIEncoding
+    <span style="color: #0000ff">Dim</span> U8      <span style="color: #0000ff">As</span> <span style="color: #0000ff">New</span> UTF8Encoding
+    
+    <span style="color: #0000ff">Set</span> Console.OutputEncoding = Encoding.UTF8
+    
+    Chars = NewChars(<span style="color: #a31515">&quot;A&quot;</span>, <span style="color: #a31515">&quot;Z&quot;</span>, Sigma)
+    Bytes = U8.GetBytes(Chars)
+    
+    PrintCountsAndChars Bytes, 2, 2, ASCII
+    PrintCountsAndChars Bytes, 2, 2, U8
+    
+    Console.ReadKey
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> PrintCountsAndChars(<span style="color: #0000ff">ByRef</span> Bytes() <span style="color: #0000ff">As</span> <span style="color: #2b91af">Byte</span>, <span style="color: #0000ff">ByVal</span> StartIndex <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>, <span style="color: #0000ff">ByVal</span> Count <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>, <span style="color: #0000ff">ByVal</span> Enc <span style="color: #0000ff">As</span> Encoding)
+    Console.WriteValue <span style="color: #a31515">&quot;{0,-25} :&quot;</span>, Enc
+    Console.WriteValue <span style="color: #a31515">&quot; {0,-3}&quot;</span>, Enc.GetCharCount(Bytes, StartIndex, Count)
+    Console.WriteValue <span style="color: #a31515">&quot; {0,-3} :&quot;</span>, Enc.GetMaxByteCount(Count)
+    Console.WriteLine Enc.GetString(Bytes, StartIndex, Count)
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; The previous example code outputs the following.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    CorLib.ASCIIEncoding      : 2   3   :??</span>
+<span style="color: #008000">&#39;    CorLib.UTF8Encoding       : 1   9   :&Pi;</span>
+</pre></div>

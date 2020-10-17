@@ -41,29 +41,30 @@ Attribute VB_Exposed = True
 ' encoded characters in certain situations without integerity loss.
 '
 ' @see EncodingStatic
-' @see UTF8Encoding
-' @see UTF7Encoding
-' @see UnicodeEncoding
 ' @see ASCIIEncoding
+' @see UTF7Encoding
+' @see UTF8Encoding
 ' @see UTF32Encoding
-'
+' @see UnicodeEncoding
+' @include "..\DocIncludes\Encoding.html"
 Option Explicit
 
 
 ''
 ' When implemented in a derived class, gets a value indicating whether the current encoding is read-only.
 '
-' @return <b>true</b> if the current <a href="Encoding.html">Encoding</a> is read-only; otherwise, <b>false</b>. The default is <b>true</b>.
-'
+' @return <b>True</b> if the current <a href="Encoding.html">Encoding</a> is read-only; otherwise, <b>False</b>. The default is <b>True</b>.
 Public Property Get IsReadOnly() As Boolean: End Property
 
 ''
-' Returns a shallow copy of the current <a href="Encoding.html">Encoding</a> object.
+' Creates a shallow copy of the current <a href="Encoding.html">Encoding</a> object.
 '
-' @return A copy of the <a href="Encoding.html">Encoding</a> object.
-' @remarks <p>An <a href="Encoding.html">Encoding</a> object is read-only by default.
-' A clone of the <a href="Encoding.html">Encoding</a> object will become writable.</p>
-'
+' @return A copy of the current <a href="Encoding.html">Encoding</a> object.
+' @remarks The clone is writable even if the original <a href="Encoding.html">Encoding</a> object is read-only.
+' Therefore, the properties of the clone can be modified.
+' <p>A shallow copy of an object is a copy of the object only. If the object contains references to other objects,
+' the shallow copy does not create copies of the referred objects. It refers to the original objects instead.
+' In contrast, a deep copy of an object creates a copy of the object and a copy of everything directly or indirectly referenced by that object.</p>
 Public Function Clone() As Encoding: End Function
 
 ''
@@ -81,10 +82,9 @@ Public Property Get BodyName() As String: End Property
 Public Property Get CodePage() As Long: End Property
 
 ''
-' The name of this encoding.
+' When implemented in a derived class, gets the human-readable description of the current encoding.
 '
-' @return The encoding's name.
-'
+' @include "..\DocIncludes\Encoding.EncodingName.html"
 Public Property Get EncodingName() As String: End Property
 
 ''
@@ -140,133 +140,169 @@ Public Property Get WindowsCodePage() As Long: End Property
 ''
 ' Returns the number of bytes that would be produced from the set of characters using this encoding.
 '
-' @param Chars A set of characters used to calculated the number of bytes once encoded with this encoding.
-' @param Index The starting index of the first character to be used.
-' @param Count The number of characters to include in the calculation.
-' @return The number of bytes that would be produced by encoding the set of characters.
-' @remarks The <i>Chars</i> parameter will accept either a String or an Integer array. The Index
-' is zero based for both the String and Integer array, not 1 based like Mid$.
-'
+' @param Chars The Integer() or String containing the set of characters to encode.
+' @param Index The index of the first character to encode.
+' @param Count The number of characters to encode.
+' @return The number of bytes produced by encoding the specified of characters.
+' @see #GetBytesEx
+' @see #GetMaxByteCount
+' @see #GetEncoder
+' @include "..\DocIncludes\Encoding.GetByteCount.html"
 Public Function GetByteCount(ByRef Chars As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Long: End Function
 
 ''
 ' Encodes a set of characters into an array of bytes.
 '
-' @param Chars The set of characters to be encoded into an array of bytes. This can
-' be either an Integer array or a String.
-' @param Index The index of the first character to begin encoding from.
-' @param Count The number of characters to be encoded.
-' @return A byte array containing the encoded characters as bytes.
-' @remarks The <i>Chars</i> parameter will accept either a String or an Integer array. The Index
-' is zero based for both the String and Integer array, not 1 based like Mid$.
-'
+' @param Chars The Integer array or String containing the set of characters to encode.
+' @param Index The index of the first character to encode.
+' @param Count The number of characters to encode.
+' @return A byte array containing the results of encoding the specified set of characters.
+' @see #GetBytesEx
+' @see #GetEncoder
+' @see #GetByteCount
+' @see #GetMaxByteCount
+' @include "..\DocIncludes\Encoding.GetBytes.html"
 Public Function GetBytes(ByRef Chars As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Byte(): End Function
 
 ''
 ' Encodes a set of characters into an array of bytes, returning the number of bytes produced.
 '
-' @param Chars the set of characters to be encoded into bytes. This can
-' be either an Integer array or a String.
-' @param CharIndex The index of the first character to begin encoding from.
-' @param CharCount The number of characters to be encoded.
-' @param Bytes The destination for the encoded characters.
-' @param ByteIndex The index of the first byte stored in the destination array.
+' @param Chars The Integer array or String containing the set of characters to encode.
+' @param CharIndex The index of the first character to encode.
+' @param CharCount The number of characters to encode.
+' @param Bytes The byte array to contain the resulting sequence of bytes.
+' @param ByteIndex The index as which to start writing the resulting sequence of bytes.
 ' @return The number of bytes produce by the encoding.
-' @remarks The <i>Bytes</i> array cannot be null and must be large enough to hold the encoded
-' set of characters. To obtain the size required, use GetByteCount to find the necessary size.
-' Or, use GetMaxByteCount to get the largest size that could be produced. The largest size is not
-' the perfect size, only the maximum number of bytes that could ever be produced by a number of
-' characters. Resizing of the resultant <i>Bytes</i> array may be necessary.
-'
+' @see #GetBytes
+' @see #GetEncoder
+' @see #GetByteCount
+' @see #GetMaxByteCount
+' @include "..\DocIncludes\Encoding.GetBytesEx.html"
 Public Function GetBytesEx(ByRef Chars As Variant, ByVal CharIndex As Long, ByVal CharCount As Long, ByRef Bytes() As Byte, ByVal ByteIndex As Long) As Long: End Function
 
 ''
-' Returns the number of characters that would be produced by decoding a byte array.
+' When implemented in a derived class, calculates the number of characters produced by decoding a sequence of bytes from the specified byte array.
 '
-' @param Bytes The bytes to use when calculating the number of characters.
-' @param Index The starting index in <i>Bytes</i> to being calculating from.
-' @param Count The number of bytes to be used in the calculation.
-' @return The number of characters that would be decoded from the set of bytes.
-'
+' @param Bytes The byte array containing the sequence of bytes to decode.
+' @param Index The index of the first byte to decode.
+' @param Count The number of bytes to decode.
+' @return The number of characters produced by decoding the specified sequence of bytes.
+' @see #GetCharsEx
+' @see #GetMaxCharCount
+' @see #GetDecoder
+' @include "..\DocIncludes\Encoding.GetCharCount.html"
 Public Function GetCharCount(ByRef Bytes() As Byte, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Long: End Function
 
 ''
-' Decodes a set of bytes into a set of characters.
+' When implemented in a derived class, decodes all the bytes in the specified byte array into a set of characters.
 '
-' @param Bytes The set of bytes to be decoded into characters.
-' @param Index The index of the first byte to be used in decoding.
-' @param Count The number of bytes to be used in decoding.
-' @return An array of characters decoded from the set of bytes.
-'
+' @param Bytes The byte array containing the sequence of bytes to decode.
+' @param Index The index of the first byte to decode.
+' @param Count The number of bytes to decode.
+' @return A character array containing the results of decoding the specified sequence of bytes.
+' @see #GetCharsEx
+' @see #GetCharCount
+' @see #GetMaxCharCount
+' @see #GetDecoder
+' @see #GetString
+' @include "..\DocIncludes\Encoding.GetChars.html"
 Public Function GetChars(ByRef Bytes() As Byte, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Integer(): End Function
 
 ''
-' Decodes a set of bytes into the supplied Integer array.
+' When implemented in a derived class, decodes a sequence of bytes from the specified byte array into the specified character array.
 '
-' @param Bytes The set of bytes to be decoded into characters.
-' @param ByteIndex The index of the first byte to begin decoding from.
-' @param ByteCount The number of bytes to be used in decoding.
-' @param Chars The destination character array for the decoded bytes.
-' @param CharIndex The first index to begin storing decoded bytes in <i>Chars</i>.
-' @return The number of characters decoded from the array of bytes.
-' @remarks The <i>Chars</i> array must be large enough to handle all the bytes that will
-' be decoded. To ensure the <i>Chars</i> array is large enough, use either GetCharCount or
-' GetMaxCharCount to determine a size that will hold the decoded bytes.
-'
+' @param Bytes The byte array containing the sequence of bytes to decode.
+' @param ByteIndex The index of the first byte to decode.
+' @param ByteCount The number of bytes to decode.
+' @param Chars The character array to contain the resulting set of characters.
+' @param CharIndex The index at which to start writing the resulting set of characters.
+' @return The actual number of characters written into <i>Chars</i>.
+' @see #GetChars
+' @see #GetCharCount
+' @see #GetMaxCharCount
+' @see #GetDecoder
+' @see #GetString
+' @include "..\DocIncludes\Encoding.GetCharsEx.html"
 Public Function GetCharsEx(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, ByRef Chars() As Integer, ByVal CharIndex As Long) As Long: End Function
 
 ''
-' Returns a decoder that maintains state.
+' When implemented in a derived class, obtains a decoder that converts an encoded sequence of bytes into a sequence of characters.
 '
-' @return The stateful decoder.
-'
+' @return A <a href="Decoder.html">Decoder</a> that converts an encoded sequence of bytes into a sequence of characters.
+' @remarks The <a href="Decoder.GetChars.html">Decoder.GetChars</a> method converts sequential blocks of bytes into sequential
+' blocks of characters, in a manner similar to the <a href="Encoding.GetChars.html">GetChars</a> method of this class.
+' However, a <a href="Decoder.html">Decoder</a> maintains state information between calls so it correctly
+' decodes byte sequences that span blocks. The <a href="Decoder.html">Decoder</a> also preserves trailing bytes at the end of
+' data blocks and uses the trailing bytes in the next decoding operation. Therefore, <b>GetDecoder</b>
+' and <a href="Encoding.GetEncoder.html">GetEncoder</a> are useful for network transmission and file operations, because those
+' operations often deal with blocks of data instead of a complete data stream.
+' @see Decoder
+' @see #GetChars
+' @see #GetString
+' @see #GetCharCount
+' @see #GetEncoder
 Public Function GetDecoder() As Decoder: End Function
 
 ''
-' Returns an encoder that maintains state.
+' When implemented in a derived class, obtains an encoder that converts a sequence of Unicode characters into an encoded sequence of bytes.
 '
-' @return The stateful encoder.
-'
+' @return A <a href="Encoder.html">Encoder</a> that converts a sequence of Unicode characters into an encoded sequence of bytes.
+' @remarks The <a href="Encoder.GetBytes.html">Encoder.GetBytes</a> method converts sequential blocks of characters into sequential
+' blocks of bytes, in a manner similar to the GetBytes method of this class. However, an <a href="Encoder.html">Encoder</a> maintains
+' state information between calls so it correctly encodes character sequences that span blocks. The <a href="Encoder.html">Encoder</a>
+' also preserves trailing characters at the end of data blocks and uses the trailing characters in the next encoding operation. For example,
+' a data block might end with an unmatched high surrogate, and the matching low surrogate might be in the next data block.
+' Therefore, <a href="Encoding.GetDecoder.html">GetDecoder</a> and <b>GetEncoder</b> are useful for network transmission and file operations,
+' because those operations often deal with blocks of data instead of a complete data stream.
+' @see Encoder
+' @see #GetBytes
+' @see #GetByteCount
+' @see #GetDecoder
 Public Function GetEncoder() As Encoder: End Function
 
 ''
-' Returns the <a href="DecoderFallback.html">DecoderFallback</a> instance for the current Encoding object.
+' Gets the <a href="DecoderFallback.html">DecoderFallback</a> object for the current <a href="Encoding.html">Encoding</a> object.
 '
-' @return An instance of a <a href="DecoderFallback.html">DecoderFallback</a>.
-' @see Encoding
-' @see DecoderFallBack
+' @return The decoder fallback object for the current <a href="Encoding.html">Encoding</a> object.
+' @see DecoderFallback
+' @see DecoderFallBackBuffer
+' @include "..\DocIncludes\Encoding.Get.DecoderFallback.html"
 Public Property Get DecoderFallback() As DecoderFallback: End Property
 
 ''
-' Sets the <a href="DecoderFallback.html">DecoderFallback</a> for the current Encoding object.
+' Sets the <a href="DecoderFallback.html">DecoderFallback</a> object for the current <a href="Encoding.html">Encoding</a> object.
 '
 ' @param Value The <a href="DecoderFallback.html">DecoderFallback</a> object to set.
-' @remarks Assigning to a <i>read-only</i> Encoding object will cause an <a href="InvalidOperationException.html">InvalidOperationException</a> to be thrown.
-'
+' @see DecoderFallback
+' @see DecoderFallBackBuffer
+' @include "..\DocIncludes\Encoding.Set.DecoderFallback.html"
 Public Property Set DecoderFallback(ByVal Value As DecoderFallback): End Property
 
 ''
-' Returns the <a href="EncodingFallback.html">EncodingFallback</a> for the current <a href="Encoding.html">Encoding</a> object.
+' Gets the <a href="EncoderFallback.html">EncoderFallback</a> object for the current <a href="Encoding.html">Encoding</a> object.
 '
 ' @Return The encoder fallback object for the current <a href="Encoding.html">Encoding</a> object.
-' @see Encoding
 ' @see EncoderFallback
+' @see EncoderFallbackBuffer
+' @include "..\DocIncludes\Encoding.Get.EncoderFallback.html"
 Public Property Get EncoderFallback() As EncoderFallback: End Property
 
 ''
-' Sets the <a href="EncoderFallback.html">EncoderFallback</a> for the current Encoding object.
+' Sets the <a href="EncoderFallback.html">EncoderFallback</a> for the current <a href="Encoding.html">Encoding</a> object.
 '
 ' @param Value The <a href="EncoderFallback.html">EncoderFallback</a> object to set.
-' @remarks Assigning to a <i>read-only</i> Encoding object will cause an <a href="InvalidOperationException.html">InvalidOperationException</a> to be thrown.
-'
+' @see EncoderFallback
+' @see EncoderFallbackBuffer
+' @include "..\DocIncludes\Encoding.Set.EncoderFallback.html"
 Public Property Set EncoderFallback(ByVal Value As EncoderFallback): End Property
 
 ''
-' Returns the maximum number of bytes that can be created from a specific number of characters.
+' When implemented in a derived class, calculates the maximum number of bytes produced by encoding the specified number of characters.
 '
 ' @param CharCount The number of characters to be encoded.
-' @return The maximum number of bytes that can be generated from the specified number of characters.
-'
+' @see #GetBytes
+' @see #GetByteCount
+' @include "..\DocIncludes\Encoding.GetMaxByteCount.html"
 Public Function GetMaxByteCount(ByVal CharCount As Long) As Long: End Function
 
 ''
@@ -274,26 +310,34 @@ Public Function GetMaxByteCount(ByVal CharCount As Long) As Long: End Function
 '
 ' @param ByteCount The number of bytes to be decoded.
 ' @return The maximum number of characters that can be decoded from the specified number of bytes.
-'
+' @see #GetChars
+' @see #GetString
+' @see #GetCharCount
+' @see #GetDecoder
+' @include "..\DocIncludes\Encoding.GetMaxCharCount.html"
 Public Function GetMaxCharCount(ByVal ByteCount As Long) As Long: End Function
 
 ''
-' Returns an array of bytes that represents this encoding.
+' When implemented in a derived class, returns a sequence of bytes that specifies the encoding used.
 '
-' @return A byte array containg the bytes to be used to identify this encoding type.
-' @remarks If no bytes are to be returned, then an empty Byte array should
-' be returned, not a null array.
-'
+' @return A byte array containg the bytes to be used to identify this encoding type.<br>
+' -or-<br>
+' A byte array of length zero, if a preamble is not required.
+' @include "..\DocIncludes\Encoding.GetPreamble.html"
 Public Function GetPreamble() As Byte(): End Function
 
 ''
-' Decodes a set of bytes into a String.
+' When implemented in a derived class, decodes all the bytes in the specified byte array into a string.
 '
-' @param Bytes The set of bytes to be decoded into a string.
-' @param Index The index of the first byte to be decoded.
-' @param Count The number of bytes to be used in the decoding.
-' @return A string containing the decoded set of bytes.
-'
+' @param Bytes The byte array containing the sequence of bytes to decode.
+' @param Index The index of the first byte to decode.
+' @param Count The number of bytes to decode.
+' @return A String containing the results of decoding the specified sequence of bytes.
+' @see #GetChars
+' @see #GetDecoder
+' @see #GetCharCount
+' @see #GetMaxCharCount
+' @include "..\DocIncludes\Encoding.GetString.html"
 Public Function GetString(ByRef Bytes() As Byte, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As String: End Function
 
 ''

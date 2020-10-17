@@ -39,8 +39,18 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "us-ascii", Encoding.ASCII
             Test.Use "utf-7", Encoding.UTF7
             Test.Use "utf-32", Encoding.UTF32
+            Test.Use "ascii", Encoding.ASCII
             
     End Select
+End Sub
+
+Public Sub GetEncoding_WithLatin5_ReturnsEncoding28599()
+    Dim Actual As Encoding
+    
+    Set Actual = Encoding.GetEncoding("latin5")
+    
+    Assert.That Actual.CodePage, Iz.EqualTo(28599)
+    Assert.That Actual.WebName, Iz.EqualTo("iso-8859-9")
 End Sub
 
 Public Sub Unicode_WhenCalled_ReturnsLittleEndianUnicodeEncoding()
@@ -94,3 +104,35 @@ Public Sub GetEncoding_WithUTF32BigEndianName_ReturnsUTF32EncodingInBigEndian()
     Assert.That TypeOf Actual Is UTF32Encoding, Iz.True
     Assert.That Actual.CodePage, Iz.EqualTo(12001)
 End Sub
+
+Public Sub GetEncodings_WhenCalled_ReturnsCachedVersion()
+    Dim Infos1() As EncodingInfo
+    Dim Infos2() As EncodingInfo
+    
+    Infos1 = Encoding.GetEncodings
+    Infos2 = Encoding.GetEncodings
+    
+    Assert.That Infos1(0), Iz.Not.Nothing
+    Assert.That Infos1(0), Iz.SameAs(Infos2(0))
+End Sub
+
+Public Sub WebName_WhenCalled_ReturnsInfoName()
+    Dim Infos() As EncodingInfo
+    Dim Enc As Encoding
+    
+    Infos = Encoding.GetEncodings
+    Set Enc = Infos(0).GetEncoding
+    
+    Assert.That Enc.WebName, Iz.EqualTo(Infos(0).Name)
+End Sub
+
+Public Sub EncodingName_WhenCalled_ReturnsInfoDisplayName()
+    Dim Infos() As EncodingInfo
+    Dim Enc As Encoding
+    
+    Infos = Encoding.GetEncodings
+    Set Enc = Infos(0).GetEncoding
+    
+    Assert.That Enc.EncodingName, Iz.EqualTo(Infos(0).DisplayName)
+End Sub
+

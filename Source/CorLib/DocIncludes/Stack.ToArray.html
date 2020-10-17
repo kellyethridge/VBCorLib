@@ -1,0 +1,54 @@
+@remarks The elements are copied onto the array in last-in-first-out (LIFO) order, similar to the order of the elements returned by a succession of calls to <a href="Stack.Pop.html">Pop</a>.
+@examples The following example shows how to copy a Stack into a one-dimensional array.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> MySourceQ <span style="color: #0000ff">As</span> <span style="color: #0000ff">New</span> Stack
+    <span style="color: #0000ff">Dim</span> MyTargetArray() <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+    <span style="color: #0000ff">Dim</span> MyStandardArray() <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>
+    
+    <span style="color: #008000">&#39; Initializes the source Stack.</span>
+    MySourceQ.Push <span style="color: #a31515">&quot;barn&quot;</span>
+    MySourceQ.Push <span style="color: #a31515">&quot;the&quot;</span>
+    MySourceQ.Push <span style="color: #a31515">&quot;in&quot;</span>
+    MySourceQ.Push <span style="color: #a31515">&quot;cats&quot;</span>
+    MySourceQ.Push <span style="color: #a31515">&quot;napping&quot;</span>
+    MySourceQ.Push <span style="color: #a31515">&quot;three&quot;</span>
+
+    MyTargetArray = NewStrings(<span style="color: #a31515">&quot;The&quot;</span>, <span style="color: #a31515">&quot;quick&quot;</span>, <span style="color: #a31515">&quot;brown&quot;</span>, <span style="color: #a31515">&quot;fox&quot;</span>, <span style="color: #a31515">&quot;jumped&quot;</span>, <span style="color: #a31515">&quot;over&quot;</span>, <span style="color: #a31515">&quot;the&quot;</span>, <span style="color: #a31515">&quot;lazy&quot;</span>, <span style="color: #a31515">&quot;dog&quot;</span>)
+    <span style="color: #0000ff">ReDim</span> Preserve MyTargetArray(0 <span style="color: #0000ff">To</span> 14)
+    
+    <span style="color: #008000">&#39; Displays the values of the target array.</span>
+    Debug.Print <span style="color: #a31515">&quot;The target Array contains the following (before and after copying):&quot;</span>
+    PrintValues MyTargetArray
+    
+    <span style="color: #008000">&#39; Copies the entire source stack to the target array, starting at index 6.</span>
+    MySourceQ.CopyTo MyTargetArray, 6
+    
+    <span style="color: #008000">&#39; Displays the values of the target array.</span>
+    PrintValues MyTargetArray
+    
+    <span style="color: #008000">&#39; Copies the entire source stack to a new standard array.</span>
+    MyStandardArray = MySourceQ.ToArray
+    
+    <span style="color: #008000">&#39; Displays the values of the new standard array.</span>
+    Debug.Print <span style="color: #a31515">&quot;The new standard array contains the following:&quot;</span>
+    PrintValues MyStandardArray
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> PrintValues(<span style="color: #0000ff">ByRef</span> MyArr <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>)
+    <span style="color: #0000ff">Dim</span> Item <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>
+    
+    <span style="color: #0000ff">For</span> <span style="color: #0000ff">Each</span> Item <span style="color: #0000ff">In</span> MyArr
+        Debug.Print <span style="color: #a31515">&quot; &quot;</span> &amp; Item
+    <span style="color: #0000ff">Next</span>
+    
+    Debug.Print
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; This example code produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    The target Array contains the following (before and after copying):</span>
+<span style="color: #008000">&#39;     The quick brown fox jumped over the lazy dog</span>
+<span style="color: #008000">&#39;     The quick brown fox jumped over three napping cats in the barn</span>
+<span style="color: #008000">&#39;    The new standard array contains the following:</span>
+<span style="color: #008000">&#39;     three napping cats in the barn</span>
+</pre></div>

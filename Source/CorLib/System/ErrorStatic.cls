@@ -104,3 +104,6 @@ Friend Sub UnauthorizedAccess(ByVal Key As ResourceStringKey)
     Throw Cor.NewUnauthorizedAccessException(Environment.GetResourceString(Key))
 End Sub
 
+Friend Sub Overflow(ByVal Key As ResourceStringKey)
+    Throw Cor.NewOverflowException(Environment.GetResourceString(Key))
+End Sub

@@ -1,0 +1,33 @@
+@remarks The capacity of a <a href="Stack.html">Stack</a> is the number of elements the <a href="Stack.html">Stack</a> can hold. As elements are added to a <a href="Stack.html">Stack</a>, the capacity is automatically increased as required through reallocation.
+<p>If <a href="Stack.Get.Count.html">Count</a> is less than the capacity of the stack, <a href="Stack.Push.html">Push</a> is an O(1) operation. If the capacity needs to be increased to accommodate the new element, <a href="Stack.Push.html">Push</a> becomes an O(<i>n</i>) operation, where <i>n</i> is <a href="Stack.Get.Count.html">Count</a>. <a href="Stack.Pop.html">Pop</a> is an O(1) operation.</p>
+@examples The following example shows how to create and add values to a <b>Stack</b> and how to print out its values.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #008000">&#39; Creates an initializes a new Stack.</span>
+    <span style="color: #0000ff">Dim</span> MyStack <span style="color: #0000ff">As</span> <span style="color: #0000ff">New</span> Stack
+    MyStack.Push <span style="color: #a31515">&quot;Hello&quot;</span>
+    MyStack.Push <span style="color: #a31515">&quot;World&quot;</span>
+    MyStack.Push <span style="color: #a31515">&quot;!&quot;</span>
+    
+    <span style="color: #008000">&#39; Displays the properties and values of the Stack.</span>
+    Debug.Print <span style="color: #a31515">&quot;MyStack&quot;</span>
+    Debug.Print vbTab &amp; <span style="color: #a31515">&quot;Count:    &quot;</span> &amp; MyStack.Count
+    Debug.Print vbTab &amp; <span style="color: #a31515">&quot;Values:&quot;</span>;
+    PrintValues MyStack
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> PrintValues(<span style="color: #0000ff">ByVal</span> MyCollection <span style="color: #0000ff">As</span> IEnumerable)
+    <span style="color: #0000ff">Dim</span> Item <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>
+    
+    <span style="color: #0000ff">For</span> <span style="color: #0000ff">Each</span> Item <span style="color: #0000ff">In</span> MyCollection
+        Debug.Print <span style="color: #a31515">&quot;    &quot;</span> &amp; Item;
+    <span style="color: #0000ff">Next</span>
+    
+    Debug.Print
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; This example code produce the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    MyStack</span>
+<span style="color: #008000">&#39;        Count:    3</span>
+<span style="color: #008000">&#39;        Values:    !    World    Hello</span>
+</pre></div>

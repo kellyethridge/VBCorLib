@@ -1,0 +1,36 @@
+@remarks The <b>IsPathRooted</b> method returns <b>True</b> if the first character is a directory separator character such as "\", or if the path starts with a drive letter and colon (:). For example, it returns <b>True</b> for <i>Path</i> strings such as "\\MyDir\\MyFile.txt", "C:\\MyDir", or "C:MyDir". It returns <b>False</b> for <i>Path</i> strings such as "MyDir".
+<p>The method does not verify that the path or file name exists.</p>
+@exceptions
+<table style="width: auto">
+  <tr>
+      <th>Exception</th><th>Condition</th>
+  </tr>
+  <tr>
+       <td><a href="ArgumentException.html">ArgumentException</a></td>
+       <td><i>Path</i> contains one or more of the invalid characters defined in <a href="Path.GetInvalidPathChars.html">GetInvalidPathChars</a>.</td>
+  </tr>
+</table>
+@examples The following code example demonstrates how the <b>IsPathRooted</b> method can be used to test three strings.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Const</span> FileName <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span> = <span style="color: #a31515">&quot;C:\MyDir\MyFile.Ext&quot;</span>
+    <span style="color: #0000ff">Const</span> UncPath <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span> = <span style="color: #a31515">&quot;\\MyPC\MyDir\MyFile&quot;</span>
+    <span style="color: #0000ff">Const</span> RelativePath <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span> = <span style="color: #a31515">&quot;MyDir\SubDir\&quot;</span>
+    
+    <span style="color: #0000ff">Dim</span> Result <span style="color: #0000ff">As</span> <span style="color: #2b91af">Boolean</span>
+    
+    Result = Path.IsPathRooted(FileName)
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;IsPathRooted(&#39;{0}&#39;) returns {1}&quot;</span>, FileName, Result)
+    
+    Result = Path.IsPathRooted(UncPath)
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;IsPathRooted(&#39;{0}&#39;) returns {1}&quot;</span>, UncPath, Result)
+    
+    Result = Path.IsPathRooted(RelativePath)
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;IsPathRooted(&#39;{0}&#39;) returns {1}&quot;</span>, RelativePath, Result)
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; This example code produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    IsPathRooted(&#39;C:\MyDir\MyFile.Ext&#39;) returns True</span>
+<span style="color: #008000">&#39;    IsPathRooted(&#39;\\MyPC\MyDir\MyFile&#39;) returns True</span>
+<span style="color: #008000">&#39;    IsPathRooted(&#39;MyDir\SubDir\&#39;) returns False</span>
+</pre></div>

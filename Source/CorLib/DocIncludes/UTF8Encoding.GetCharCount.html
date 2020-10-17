@@ -1,0 +1,53 @@
+@remarks To calculate the exact array size required by <a href="UTF8Encoding.GetCharsEx.html">GetCharsEx</a> to store the resulting characters, the application uses <b>GetCharCount</b>. To calculate the maximum array size, the application should use <a href="UTF8Encoding.GetMaxCharCount.html">GetMaxCharCount</a>. The <b>GetCharCount</b> method generally allows allocation of less memory, while the <a href="UTF8Encoding.GetMaxCharCount.html">GetMaxCharCount</a> method generally executes faster.
+<p>With error detection, an invalid sequence causes this method to throw a <a href="ArgumentException.html">ArgumentException</a>. Without error detection, invalid sequences are ignored, and no exception is thrown.</p>
+@exceptions
+<table style="width: auto">
+	<tr>
+		<th>Exception</th><th>Condition</th>
+	</tr>
+	<tr>
+		<td><a href="ArgumentNullException.html">ArgumentNullException</a></td>
+		<td><i>Bytes</i> is uninitialized.</td>
+	</tr>
+	<tr>
+		<td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+		<td><i>Index</i> is less than the lower-bound of <i>Bytes</i>.<br>
+			-or-<br>
+			<i>Count</i> is less than zero.<br>
+			-or-<br>
+			<i>Index</i> and <i>Count</i> do not denote a valid range in <i>Bytes</i>.<br>
+			-or-<br>
+			The resulting number of bytes is greater than the maximum number that can be returned as an integer.
+		</td>
+	</tr>
+	<tr>
+		<td><a href="ArgumentException.html">ArgumentException</a></td>
+		<td>Error detection is enabled, and <i>Bytes</i> contains an invalid sequence of bytes.</td>
+	</tr>
+	<tr>
+		<td><a href="DecoderFallbackException.html">DecoderFallbackException</a></td>
+		<td>A fallback occurred<br>
+			-and-<br>
+			<a href="UTF8Encoding.Get.DecoderFallback.html">DecoderFallback</a> is set to <a href="DecoderExceptionFallback.html">DecoderExceptionFallback.html</a>.
+		</td>
+	</tr>
+</table>
+@examples The following example demonstrates how to use the <b>GetCharCount</b> method to return the number of characters produced by decoding a range of elements in a byte array.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> Bytes()     <span style="color: #0000ff">As</span> <span style="color: #2b91af">Byte</span>
+    <span style="color: #0000ff">Dim</span> UTF8        <span style="color: #0000ff">As</span> <span style="color: #0000ff">New</span> UTF8Encoding
+    <span style="color: #0000ff">Dim</span> CharCount   <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
+    
+    Bytes = NewBytes(85, 84, 70, 56, 32, 69, 110, 99, 111, 100, 105, 110, 103, 32, 69, 120, 97, 109, 112, 108, 101)
+    
+    CharCount = UTF8.GetCharCount(Bytes, 2, 8)
+    
+    Console.WriteLine <span style="color: #a31515">&quot;{0} characters needed to decode bytes.&quot;</span>, CharCount
+
+    Console.ReadKey
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; This code produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    8 characters needed to decode bytes.</span>
+</pre></div>

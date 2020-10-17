@@ -1,0 +1,44 @@
+When overridden in a derived class, gets the human-readable description of the current encoding.
+
+@return The human-readable description of the current <a href="Encoding.html">Encoding</a>.
+@remarks The <b>EncodingName</b> property is intended for display. To find a name that can be passed to the <a href="EncodingStatic.GetEncoding.html">GetEncoding</a> method, use the <a href="Encoding.WebName.html">WebName</a> property.
+@examples The following example retrieves the different names for each encoding and displays the encodings with one or more names that are different from <a href="EncodingInfo.Get.Name.html">EncodingInfo.Name</a>. It displays <b>EncodingName</b> but does not compare against it.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    Debug.Print <span style="color: #a31515">&quot;Name                &quot;</span>;
+    Debug.Print <span style="color: #a31515">&quot;CodePage  &quot;</span>;
+    Debug.Print <span style="color: #a31515">&quot;BodyName            &quot;</span>;
+    Debug.Print <span style="color: #a31515">&quot;HeaderName          &quot;</span>;
+    Debug.Print <span style="color: #a31515">&quot;WebName             &quot;</span>;
+    Debug.Print <span style="color: #a31515">&quot;Encoding.EncodingName&quot;</span>
+    
+    <span style="color: #0000ff">Dim</span> Item    <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>
+    <span style="color: #0000ff">Dim</span> ei      <span style="color: #0000ff">As</span> EncodingInfo
+    <span style="color: #0000ff">Dim</span> e       <span style="color: #0000ff">As</span> Encoding
+    
+    <span style="color: #0000ff">For</span> <span style="color: #0000ff">Each</span> Item <span style="color: #0000ff">In</span> Encoding.GetEncodings
+        <span style="color: #0000ff">Set</span> ei = Item
+        <span style="color: #0000ff">Set</span> e = ei.GetEncoding
+        
+        <span style="color: #0000ff">If</span> (ei.Name &lt;&gt; e.BodyName) <span style="color: #0000ff">Or</span> (ei.Name &lt;&gt; e.HeaderName) <span style="color: #0000ff">Or</span> (ei.Name &lt;&gt; e.WebName) <span style="color: #0000ff">Then</span>
+            Debug.Print CorString.Format(<span style="color: #a31515">&quot;{0,-18}&quot;</span>, ei.Name);
+            Debug.Print CorString.Format(<span style="color: #a31515">&quot;{0,-9}&quot;</span>, e.CodePage);
+            Debug.Print CorString.Format(<span style="color: #a31515">&quot;{0,-18}&quot;</span>, e.BodyName);
+            Debug.Print CorString.Format(<span style="color: #a31515">&quot;{0,-18}&quot;</span>, e.HeaderName);
+            Debug.Print CorString.Format(<span style="color: #a31515">&quot;{0,-18}&quot;</span>, e.WebName);
+            Debug.Print e.EncodingName
+        <span style="color: #0000ff">End</span> <span style="color: #0000ff">If</span>
+    <span style="color: #0000ff">Next</span>
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; This code produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    Name               CodePage  BodyName           HeaderName         WebName            Encoding.EncodingName</span>
+<span style="color: #008000">&#39;    shift_jis          932       iso-2022-jp        iso-2022-jp        shift_jis          Japanese (Shift-JIS)</span>
+<span style="color: #008000">&#39;    windows-1250       1250      iso-8859-2         windows-1250       windows-1250       Central European (Windows)</span>
+<span style="color: #008000">&#39;    windows-1251       1251      koi8-r             windows-1251       windows-1251       Cyrillic (Windows)</span>
+<span style="color: #008000">&#39;    Windows-1252       1252      iso-8859-1         Windows-1252       Windows-1252       Western European (Windows)</span>
+<span style="color: #008000">&#39;    windows-1253       1253      iso-8859-7         windows-1253       windows-1253       Greek (Windows)</span>
+<span style="color: #008000">&#39;    windows-1254       1254      iso-8859-9         windows-1254       windows-1254       Turkish (Windows)</span>
+<span style="color: #008000">&#39;    csISO2022JP        50221     iso-2022-jp        iso-2022-jp        csISO2022JP        Japanese (JIS-Allow 1 byte Kana)</span>
+<span style="color: #008000">&#39;    iso-2022-kr        50225     iso-2022-kr        euc-kr             iso-2022-kr        Korean (ISO)</span>
+</pre></div>

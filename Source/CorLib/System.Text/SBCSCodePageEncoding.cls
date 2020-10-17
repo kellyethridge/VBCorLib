@@ -220,18 +220,14 @@ Private Function Encoding_GetByteCount(Chars As Variant, Optional Index As Varia
     
     On Error GoTo Catch
     Range = ValidateGetBytes(LocalChars, Index, Count)
-    
     Encoding_GetByteCount = GetByteCountCore(LocalChars, Range.Index, Range.Count)
     
-    GoSub Finally
+    FreeChars LocalChars
     Exit Function
     
 Catch:
-    GoSub Finally
-    ThrowOrErr Err
-Finally:
     FreeChars LocalChars
-    Return
+    ThrowOrErr Err
 End Function
 
 Private Function Encoding_GetBytes(Chars As Variant, Optional Index As Variant, Optional Count As Variant) As Byte()
@@ -242,19 +238,15 @@ Private Function Encoding_GetBytes(Chars As Variant, Optional Index As Variant, 
     
     On Error GoTo Catch
     Range = ValidateGetBytes(LocalChars, Index, Count)
-    
     SAPtr(Encoding_GetBytes) = SafeArrayCreateVectorEx(vbByte, 0, GetByteCountCore(LocalChars, Range.Index, Range.Count))
     GetBytesCore LocalChars, Range.Index, Range.Count, Encoding_GetBytes, 0
     
-    GoSub Finally
+    FreeChars LocalChars
     Exit Function
     
 Catch:
-    GoSub Finally
-    ThrowOrErr Err
-Finally:
     FreeChars LocalChars
-    Return
+    ThrowOrErr Err
 End Function
 
 Private Function Encoding_GetBytesEx(Chars As Variant, ByVal CharIndex As Long, ByVal CharCount As Long, Bytes() As Byte, ByVal ByteIndex As Long) As Long
@@ -266,15 +258,12 @@ Private Function Encoding_GetBytesEx(Chars As Variant, ByVal CharIndex As Long, 
     ValidateGetBytesEx LocalChars, CharIndex, CharCount, Bytes, ByteIndex
     Encoding_GetBytesEx = GetBytesCore(LocalChars, CharIndex, CharCount, Bytes, ByteIndex)
     
-    GoSub Finally
+    FreeChars LocalChars
     Exit Function
     
 Catch:
-    GoSub Finally
-    ThrowOrErr Err
-Finally:
     FreeChars LocalChars
-    Return
+    ThrowOrErr Err
 End Function
 
 Private Function Encoding_GetCharCount(Bytes() As Byte, Optional Index As Variant, Optional Count As Variant) As Long
@@ -311,17 +300,40 @@ Private Function Encoding_GetHashCode() As Long
 End Function
 
 Private Function Encoding_GetMaxByteCount(ByVal CharCount As Long) As Long
+    Dim ByteCount As Currency
+    
     If CharCount < 0 Then _
         Error.ArgumentOutOfRange "CharCount", ArgumentOutOfRange_NeedNonNegNum
     
-    Encoding_GetMaxByteCount = CharCount
+    ' incase we have a high-surrogate stored in the encoder.
+    ByteCount = 1@ + CharCount
+    
+    If mEncoderFallback.MaxCharCount > 1 Then
+        ByteCount = ByteCount * mEncoderFallback.MaxCharCount
+    End If
+    
+    If ByteCount > &H7FFFFFFF Then _
+        Error.ArgumentOutOfRange "CharCount", ArgumentOutOfRange_GetByteCountOverflow
+    
+    Encoding_GetMaxByteCount = ByteCount
 End Function
 
 Private Function Encoding_GetMaxCharCount(ByVal ByteCount As Long) As Long
+    Dim CharCount As Currency
+    
     If ByteCount < 0 Then _
         Error.ArgumentOutOfRange "ByteCount", ArgumentOutOfRange_NeedNonNegNum
     
-    Encoding_GetMaxCharCount = ByteCount
+    CharCount = ByteCount
+    
+    If mDecoderFallback.MaxCharCount > 1 Then
+        CharCount = CharCount * mDecoderFallback.MaxCharCount
+    End If
+    
+    If CharCount > &H7FFFFFFF Then _
+        Error.ArgumentOutOfRange "ByteCount", ArgumentOutOfRange_GetCharCountOverflow
+
+    Encoding_GetMaxCharCount = CharCount
 End Function
 
 Private Function Encoding_GetPreamble() As Byte()
@@ -339,15 +351,12 @@ Private Function Encoding_GetString(Bytes() As Byte, Optional Index As Variant, 
     On Error GoTo Catch
     GetCharsCore Bytes, Range.Index, Range.Count, Chars, 0
     
-    GoSub Finally
+    FreeChars Chars
     Exit Function
     
 Catch:
-    GoSub Finally
-    ThrowOrErr Err
-Finally:
     FreeChars Chars
-    Return
+    ThrowOrErr Err
 End Function
 
 Private Property Get Encoding_HeaderName() As String

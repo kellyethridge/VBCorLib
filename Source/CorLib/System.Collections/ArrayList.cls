@@ -40,7 +40,7 @@ Attribute VB_Exposed = True
 '
 ' @remarks This class contains an internal array of <b>Variants</b>. As new items are added to the list, the capacity will increase as necessary.
 ' <p>The capacity of the list is the current number of elements in the internal array.</p>
-' <p>To lower the capacity to save memory, use the <a href="ArrayList.TrimToSize.html">TrimToSize</a> method, or set <a href="ArrayList.Set.Capacity.html">Capacity</a> directly.</p>
+' <p>To lower the capacity to save memory, use the <a href="ArrayList.TrimToSize.html">TrimToSize</a> method, or set <a href="ArrayList.Let.Capacity.html">Capacity</a> directly.</p>
 ' <p>The default capacity is 16.</p>
 ' <p>Elements in this collection can be accessed using an integer index. Indexes in this collection are zero-based.</p>
 '
@@ -482,6 +482,7 @@ End Property
 ' @include "..\DocIncludes\ArrayList.Get.Item.html"
 Public Property Get Item(ByVal Index As Long) As Variant
 Attribute Item.VB_UserMemId = 0
+Attribute Item.VB_MemberFlags = "40"
     If Index < 0 Or Index >= mCount Then _
         Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_Index
     
@@ -1047,3 +1048,4 @@ End Sub
 Private Property Get IVersionable_Version() As Long
     IVersionable_Version = mVersion
 End Property
+

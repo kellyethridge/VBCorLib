@@ -1,0 +1,103 @@
+@remarks <p>To calculate the exact array size required by <a href="UTF8Encoding.GetBytesEx.html">GetBytesEx</a> to store the resulting bytes, the application uses <b>GetByteCount</b>. To calculate the maximum array size, the application should use <a href="UTF8Encoding.GetMaxByteCount.html">GetMaxByteCount</a>. The <b>GetByteCount</b> method generally allows allocation of less memory, while the <a href="UTF8Encoding.GetMaxByteCount.html">GetMaxByteCount</a> method generally executes faster.</p>
+<p>With error detection, an invalid sequence causes this method to throw a <a href="ArgumentException.html">ArgumentException</a>. Without error detection, invalid sequences are ignored, and no exception is thrown.</p>
+<table style="width: auto">
+	<tr>
+		<th>Note</th>
+	</tr>
+	<tr>
+		<td>To ensure that the encoded bytes are decoded properly, the application should prefix encoded bytes with a preamble.</td>
+	</tr>
+</table>
+@exceptions
+<table style="width: auto">
+	<tr>
+		<th>Exception</th><th>Condition</th>
+	</tr>
+	<tr>
+		<td><a href="ArgumentNullException.html">ArgumentNullException</a></td>
+		<td><i>Chars</i> is a <b>null</b> array.</td>
+	</tr>
+	<tr>
+		<td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+		<td>
+			<i>Index</i> is less than the lower-bound of <i>Chars</i>.<br>
+			-or-<br>
+			<i>Count</i> is less than zero.<br>
+			-or-<br>
+			<i>Index</i> and <i>Count</i> do not denote a valid range in <i>Chars</i>.<br>
+		</td>
+	</tr>
+	<tr>
+		<td><a href="ArgumentException.html">ArgumentException</a></td>
+		<td>
+			A fallback occurred<br>
+			-and-<br>
+			<a href="Encoding.Get.EncoderFallback.html">EncoderFallback</a> is set to <a href="EncoderExceptionFallback.html">EncoderExceptionFallback</a>.
+		</td>
+	</tr>
+</table>
+@examples The following example demonstrates how to use the <b>GetByteCount</b> method to return the number of bytes required to encode an array of Unicode characters, using <a href="UTF8Encoding.html">UTF8Encoding</a>.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">    GetByteCountForString
+    GetByteCountForChars
+    GetByteCountForSubChars
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> GetByteCountForString()
+    <span style="color: #0000ff">Const</span> Chars     <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span> = <span style="color: #a31515">&quot;UTF8 Encoding Example&quot;</span>
+    <span style="color: #0000ff">Dim</span> UTF8        <span style="color: #0000ff">As</span> <span style="color: #0000ff">New</span> UTF8Encoding
+    <span style="color: #0000ff">Dim</span> ByteCount   <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
+    
+    ByteCount = UTF8.GetByteCount(Chars)
+    
+    Debug.Print <span style="color: #a31515">&quot;GetByteCount for String.&quot;</span>
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;{0} bytes needed to encode string.&quot;</span>, ByteCount)
+    Debug.Print
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> GetByteCountForChars()
+    <span style="color: #0000ff">Dim</span> Chars()     <span style="color: #0000ff">As</span> <span style="color: #2b91af">Integer</span>
+    <span style="color: #0000ff">Dim</span> UTF8        <span style="color: #0000ff">As</span> <span style="color: #0000ff">New</span> UTF8Encoding
+    <span style="color: #0000ff">Dim</span> ByteCount   <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
+    
+    <span style="color: #008000">&#39; The characters to encode:</span>
+    <span style="color: #008000">&#39;    Latin Small Letter Z (U+007A)</span>
+    <span style="color: #008000">&#39;    Latin Small Letter A (U+0061)</span>
+    <span style="color: #008000">&#39;    Combining Breve (U+0306)</span>
+    <span style="color: #008000">&#39;    Latin Small Letter AE With Acute (U+01FD)</span>
+    <span style="color: #008000">&#39;    Greek Small Letter Beta (U+03B2)</span>
+    <span style="color: #008000">&#39;    a high-surrogate value (U+D8FF)</span>
+    <span style="color: #008000">&#39;    a low-surrogate value (U+DCFF)</span>
+    Chars = NewChars(<span style="color: #a31515">&quot;z&quot;</span>, <span style="color: #a31515">&quot;a&quot;</span>, &amp;H306, &amp;H1FD, &amp;H3B2, &amp;HD8FF, &amp;HDCFF)
+    
+    ByteCount = UTF8.GetByteCount(Chars)
+    
+    Debug.Print <span style="color: #a31515">&quot;GetByteCount for character array.&quot;</span>
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;{0} bytes needed to encode characters.&quot;</span>, ByteCount)
+    Debug.Print
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> GetByteCountForSubChars()
+    <span style="color: #0000ff">Dim</span> Chars()     <span style="color: #0000ff">As</span> <span style="color: #2b91af">Integer</span>
+    <span style="color: #0000ff">Dim</span> UTF8        <span style="color: #0000ff">As</span> <span style="color: #0000ff">New</span> UTF8Encoding
+    <span style="color: #0000ff">Dim</span> ByteCount   <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
+
+    <span style="color: #008000">&#39; Unicode characters: #, %, Pi, Sigma</span>
+    Chars = NewChars(<span style="color: #a31515">&quot;#&quot;</span>, <span style="color: #a31515">&quot;%&quot;</span>, &amp;H3A0, &amp;H3A3)
+    
+    ByteCount = UTF8.GetByteCount(Chars, 1, 2)
+        
+    Debug.Print <span style="color: #a31515">&quot;GetByteCount for character sub-array.&quot;</span>
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;{0} bytes needed to encode characters.&quot;</span>, ByteCount)
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; This code example produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    GetByteCount for String.</span>
+<span style="color: #008000">&#39;    21 bytes needed to encode string.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    GetByteCount for character array.</span>
+<span style="color: #008000">&#39;    12 bytes needed to encode characters.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    GetByteCount for character sub-array.</span>
+<span style="color: #008000">&#39;    3 bytes needed to encode characters.</span>
+</pre></div>

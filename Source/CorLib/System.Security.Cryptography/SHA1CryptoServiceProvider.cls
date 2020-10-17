@@ -316,8 +316,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = GetHashCode
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String
@@ -337,7 +337,7 @@ Private Property Get SHA1_CanTransformMultipleBlocks() As Boolean
 End Property
 
 Private Sub SHA1_Clear()
-    Call Clear
+    Clear
 End Sub
 
 Function SHA1_ComputeHash(Source As Variant, Optional Index As Variant, Optional Count As Variant) As Byte()

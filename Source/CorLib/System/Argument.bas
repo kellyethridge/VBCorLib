@@ -46,7 +46,7 @@ Public Function ShiftArguments(ByRef Args() As Variant) As Variant()
         .cLocks = 1
         
         If Length > 1 Then
-            .pvData = VarPtr(Args(LBound(Args) + 1))
+            .PVData = VarPtr(Args(LBound(Args) + 1))
             .cElements = Length - 1
         Else
             .cbElements = 0
@@ -57,11 +57,11 @@ Public Function ShiftArguments(ByRef Args() As Variant) As Variant()
 End Function
 
 Public Sub FreeArguments(ByRef Arguments() As Variant)
-    mShiftedArgumentsSA.pvData = vbNullPtr
+    mShiftedArgumentsSA.PVData = vbNullPtr
     SAPtr(Arguments) = vbNullPtr
 End Sub
 
-Public Function MakeArrayRange(ByRef Arr As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As ListRange
+Public Function MakeArrayRange(ByRef Arr As Variant, ByRef Index As Variant, ByRef Count As Variant) As ListRange
     If IsMissing(Index) Then
         MakeArrayRange.Index = LBound(Arr)
     Else

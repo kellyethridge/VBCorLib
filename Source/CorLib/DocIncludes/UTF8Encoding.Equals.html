@@ -1,0 +1,70 @@
+@remarks Two <a href="UTF8Encoding.html">UTF8Encoding</a> objects are considered equal if all of the following conditions are true:
+<ul>
+	<li>Both objects use the same byte order.</li>
+	<li>Both objects provide the byte order mark, or both do not.</li>
+	<li>Both objects throw an exception when encountering invalid encoding, or both do not.</li>
+</ul>
+@examples The following example demonstrates how to use the <b>Equals</b> method to test whether the current <a href="UTF8Encoding.html">UTF8Encoding</a> object is equal to a different <a href="UTF8Encoding.html">UTF8Encoding</a> object. Four <a href="UTF8Encoding.html">UTF8Encoding</a> objects are created and compared and the results of the comparisons are displayed.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> UTF8 <span style="color: #0000ff">As</span> UTF8Encoding
+    <span style="color: #0000ff">Dim</span> UTF8True <span style="color: #0000ff">As</span> UTF8Encoding
+    <span style="color: #0000ff">Dim</span> UTF8TrueTrue <span style="color: #0000ff">As</span> UTF8Encoding
+    <span style="color: #0000ff">Dim</span> UTF8FalseTrue <span style="color: #0000ff">As</span> UTF8Encoding
+    
+    <span style="color: #0000ff">Set</span> UTF8 = <span style="color: #0000ff">New</span> UTF8Encoding
+    <span style="color: #0000ff">Set</span> UTF8True = NewUTF8Encoding(<span style="color: #0000ff">True</span>)
+    <span style="color: #0000ff">Set</span> UTF8TrueTrue = NewUTF8Encoding(<span style="color: #0000ff">True</span>, <span style="color: #0000ff">True</span>)
+    <span style="color: #0000ff">Set</span> UTF8FalseTrue = NewUTF8Encoding(<span style="color: #0000ff">False</span>, <span style="color: #0000ff">True</span>)
+    
+    DescribeEquivalence UTF8.Equals(UTF8)
+    DescribeEquivalence UTF8.Equals(UTF8True)
+    DescribeEquivalence UTF8.Equals(UTF8TrueTrue)
+    DescribeEquivalence UTF8.Equals(UTF8FalseTrue)
+    Console.WriteLine
+
+    DescribeEquivalence UTF8True.Equals(UTF8)
+    DescribeEquivalence UTF8True.Equals(UTF8True)
+    DescribeEquivalence UTF8True.Equals(UTF8TrueTrue)
+    DescribeEquivalence UTF8True.Equals(UTF8FalseTrue)
+    Console.WriteLine
+
+    DescribeEquivalence UTF8TrueTrue.Equals(UTF8)
+    DescribeEquivalence UTF8TrueTrue.Equals(UTF8True)
+    DescribeEquivalence UTF8TrueTrue.Equals(UTF8TrueTrue)
+    DescribeEquivalence UTF8TrueTrue.Equals(UTF8FalseTrue)
+    Console.WriteLine
+
+    DescribeEquivalence UTF8FalseTrue.Equals(UTF8)
+    DescribeEquivalence UTF8FalseTrue.Equals(UTF8True)
+    DescribeEquivalence UTF8FalseTrue.Equals(UTF8TrueTrue)
+    DescribeEquivalence UTF8FalseTrue.Equals(UTF8FalseTrue)
+    
+    Console.ReadKey
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> DescribeEquivalence(<span style="color: #0000ff">ByVal</span> IsEquivalent <span style="color: #0000ff">As</span> <span style="color: #2b91af">Boolean</span>)
+    Console.WriteLine <span style="color: #a31515">&quot;{0} equivalent encoding.&quot;</span>, IIf(IsEquivalent, <span style="color: #a31515">&quot;An&quot;</span>, <span style="color: #a31515">&quot;Not an&quot;</span>)
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; This code produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    An equivalent encoding.</span>
+<span style="color: #008000">&#39;    Not an equivalent encoding.</span>
+<span style="color: #008000">&#39;    Not an equivalent encoding.</span>
+<span style="color: #008000">&#39;    Not an equivalent encoding.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    Not an equivalent encoding.</span>
+<span style="color: #008000">&#39;    An equivalent encoding.</span>
+<span style="color: #008000">&#39;    Not an equivalent encoding.</span>
+<span style="color: #008000">&#39;    Not an equivalent encoding.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    Not an equivalent encoding.</span>
+<span style="color: #008000">&#39;    Not an equivalent encoding.</span>
+<span style="color: #008000">&#39;    An equivalent encoding.</span>
+<span style="color: #008000">&#39;    Not an equivalent encoding.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    Not an equivalent encoding.</span>
+<span style="color: #008000">&#39;    Not an equivalent encoding.</span>
+<span style="color: #008000">&#39;    Not an equivalent encoding.</span>
+<span style="color: #008000">&#39;    An equivalent encoding.</span>
+</pre></div>

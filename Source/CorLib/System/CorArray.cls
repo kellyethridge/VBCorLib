@@ -1245,13 +1245,11 @@ Public Sub SortKeyEx(ByRef Keys As Variant, ByRef Items As Variant, ByVal Index 
             ' use specialized sorting for different types of string comparisons.
             If (VarType(Keys) And &HFF) = vbString Then
                 SortStringsWithComparer Keys, Left, Right, Comparer
-                GoSub Finally
-                Exit Sub
+                GoTo CleanExit
             ElseIf Comparer Is Nothing Or Comparer Is Statics.Comparer.Default Then
                 ' try specialized sorting using default comparisons.
                 If TrySZSort(Keys, Left, Right) Then
-                    GoSub Finally
-                    Exit Sub
+                    GoTo CleanExit
                 End If
             End If
             
@@ -1281,17 +1279,18 @@ Public Sub SortKeyEx(ByRef Keys As Variant, ByRef Items As Variant, ByVal Index 
             Error.Argument Argument_InvalidComparer, "Comparer"
     End Select
     
-    GoSub Finally
-    Exit Sub
+    GoTo CleanExit
     
 Catch:
-    GoSub Finally
-    ThrowOrErr Err
-Finally:
     ClearSortKeys
     ClearSortItems
     Set SortComparer = Nothing
-    Return
+    ThrowOrErr Err
+    
+CleanExit:
+    ClearSortKeys
+    ClearSortItems
+    Set SortComparer = Nothing
 End Sub
 
 

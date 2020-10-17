@@ -48,7 +48,7 @@ Option Explicit
 ' the subsets as offsets of the input array and the number of elements in the input array to process.
 '
 ' @param InArray The bytes to be converted to a base-64 character array.
-' @param Offset Offset within <em>Bytes</em> to begin encoding to base-64 characters.
+' @param Offset Offset within <i>InArray</i> to begin encoding to base-64 characters.
 ' @param Length The number of bytes to encode.
 ' @param InsertLineBreaks Indicates if a vbCrLf should be inserted every 76 characters to conform with MIME line formatting.
 ' @return A string containg the byte array encoded as base-64 characters.
@@ -203,15 +203,12 @@ Public Function FromBase64String(ByRef s As String) As Byte()
     On Error GoTo Catch
     FromBase64String = FromBase64CharArray(Chars, 0, Len(s))
     
-    GoSub Finally
+    FreeChars Chars
     Exit Function
     
 Catch:
-    GoSub Finally
-    Throw
-Finally:
     FreeChars Chars
-    Return
+    ThrowOrErr Err
 End Function
 
 ''
@@ -238,14 +235,14 @@ Public Function ToDateTime(ByRef Value As Variant, Optional ByVal Provider As IF
             ElseIf TypeOf Value Is CorDateTime Then
                 Set ToDateTime = Value
             Else
-                Throw New InvalidCastException
+                Throw Cor.NewInvalidCastException(Environment.GetResourceString(InvalidCast_FromTo, TypeName(Value), "CorDateTime"))
             End If
         Case vbDate
             Set ToDateTime = CorDateTime.FromOADate(Value)
         Case vbString
             Set ToDateTime = CorDateTime.Parse(CStr(Value))
         Case Else
-            Throw New InvalidCastException
+            Throw Cor.NewInvalidCastException(Environment.GetResourceString(InvalidCast_FromTo, Value, "CorDateTime"))
     End Select
 End Function
 

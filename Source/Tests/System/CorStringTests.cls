@@ -317,6 +317,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "a b c", NullStrings, NewStrings("a", "b", "c")
             Test.Use "a,b,c", ",", NewStrings("a", "b", "c")
             Test.Use "a b c", "", NewStrings("a", "b", "c")
+            Test.Use "abcde", NewStrings("d", "b"), NewStrings("a", "c", "e")
             
         Case "Split_WithRemoveEmptyEntries_ReturnsFilledStringsOnly"
             Test.Use "abbc", NewStrings("b"), NewStrings("a", "c")
@@ -329,6 +330,9 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "abcd", NewStrings("de"), NewStrings("abcd")
             Test.Use "", NewStrings("b"), NewStrings()
             Test.Use "", NewStrings(""), NewStrings()
+            Test.Use "  word  word", NewStrings(" "), NewStrings("word", "word")
+            Test.Use "  word  word  ", " ", NewStrings("word", "word")
+            Test.Use "word  word  ", " ", NewStrings("word", "word")
             
         Case "Split_WithCount_ReturnsLimitedNumberOfSubstrings"
             Test.Use "abc", NewStrings("b"), 2, NewStrings("a", "c")
@@ -352,6 +356,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "abcd", NullChars, NewStrings("abcd")
             Test.Use "", NewChars("b"), NewStrings("")
             Test.Use vbNullString, NewChars("b"), NewStrings("")
+            Test.Use "abcde", NewChars("d", "b"), NewStrings("a", "c", "e")
             
         Case "Compare_WithValues_ReturnsExpected"
             Test.Use "abc", "abc", StringComparison.Ordinal, 0
@@ -876,6 +881,14 @@ Public Sub IndexOfAny_WithStartIndexPlusCountGreaterThanLengthOfString_ThrowsArg
     AssertArgumentOutOfRangeException Err
 End Sub
 
+Public Sub IndexOfAny_WithEmptyString_ReturnsMinusOne()
+    Dim Actual As Long
+    
+    Actual = CorString.IndexOfAny("", "a")
+    
+    Assert.That Actual, Iz.EqualTo(-1)
+End Sub
+
 Public Sub IndexOfAny_WithEmptyStringAndNegativeStartIndex_ThrowsArgumentOutOfRangeException()
     On Error Resume Next
     
@@ -898,6 +911,14 @@ Public Sub LastIndexOfAny_WithValue_ReturnsExpected(ByRef OfAny As Variant, ByVa
     Actual = CorString.LastIndexOfAny("1234512345", OfAny)
     
     Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub LastIndexOfAny_WithEmptyString_ReturnsMinusOne()
+    Dim Actual As Long
+    
+    Actual = CorString.LastIndexOfAny("", "a")
+    
+    Assert.That Actual, Iz.EqualTo(-1)
 End Sub
 
 Public Sub LastIndexOfAny_WithStartIndexAndCount_ReturnsExpected(ByVal Value As Variant, ByVal Expected As Long)
@@ -1104,7 +1125,7 @@ Public Sub Split_WithCount_ReturnsLimitedNumberOfSubstrings(ByVal StringToSplit 
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub Split_WithRemoveEmptyEntries_ReturnsFilledStringsOnly(ByVal StringToSplit As String, ByRef Separators() As String, ByRef Expected() As String)
+Public Sub Split_WithRemoveEmptyEntries_ReturnsFilledStringsOnly(ByVal StringToSplit As String, ByRef Separators As Variant, ByRef Expected() As String)
     Dim Actual() As String
     
     Actual = CorString.Split(StringToSplit, Separators, , StringSplitOptions.RemoveEmptyEntries)

@@ -55,6 +55,16 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use NewChars(&H41), NewBytes(&H41)
             Test.Use NewChars(&H4E02, &H41), NewBytes(&H81, &H40, &H41)
             
+        Case "GetMaxCharCount_WithCustomReplacementFallback_ReturnsExpected"
+            Test.Use 0, 3
+            Test.Use 1, 6
+            Test.Use 10, 33
+            
+        Case "GetMaxByteCount_WithCustomReplacementFallback_ReturnsExpected"
+            Test.Use 0, 6
+            Test.Use 1, 12
+            Test.Use 10, 66
+            
     End Select
 End Sub
 
@@ -154,8 +164,34 @@ Public Sub GetBytes_WithUntranslatableCharacter_ThrowsEncoderFallbackException()
     AssertEncoderFallbackException Err
 End Sub
 
+Public Sub GetMaxCharCount_WithCustomReplacementFallback_ReturnsExpected(ByVal Count As Long, ByVal Expected As Long)
+    Dim Enc As Encoding
+    Dim Actual As Long
+    
+    Set Enc = MakeEncoding("abc")
+    
+    Actual = Enc.GetMaxCharCount(Count)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
 
+Public Sub GetMaxByteCount_WithCustomReplacementFallback_ReturnsExpected(ByVal Count As Long, ByVal Expected As Long)
+    Dim Enc As Encoding
+    Dim Actual As Long
+    
+    Set Enc = MakeEncoding("abc")
+    
+    Actual = Enc.GetMaxByteCount(Count)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
 
-Private Function MakeEncoding() As Encoding
+Private Function MakeEncoding(Optional ByVal Replacement As String) As Encoding
     Set MakeEncoding = Encoding.GetEncoding(ChineseSimplified)
+    
+    If Len(Replacement) > 0 Then
+        Set MakeEncoding = MakeEncoding.Clone
+        Set MakeEncoding.DecoderFallback = Cor.NewDecoderReplacementFallback(Replacement)
+        Set MakeEncoding.EncoderFallback = Cor.NewEncoderReplacementFallback(Replacement)
+    End If
 End Function

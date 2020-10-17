@@ -131,7 +131,11 @@ End Property
 ' @param Value The new new-line value.
 '
 Public Property Let NewLine(ByVal Value As String)
-    mNewLine = Value
+    If StrPtr(Value) = vbNullPtr Then
+        mNewLine = vbCrLf
+    Else
+        mNewLine = Value
+    End If
 End Property
 
 ''

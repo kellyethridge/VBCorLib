@@ -249,15 +249,12 @@ Private Function GetStream(ByRef Source As Variant, ByVal Mode As FileMode, ByVa
             Error.Argument Argument_StreamRequired
     End Select
     
-    GoSub Finally
+    SAPtr(Bytes) = vbNullPtr
     Exit Function
     
 Catch:
-    GoSub Finally
-    ThrowOrErr Err
-Finally:
     SAPtr(Bytes) = vbNullPtr
-    Return
+    ThrowOrErr Err
 End Function
 
 Private Sub VerifyReader()

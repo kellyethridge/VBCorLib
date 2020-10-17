@@ -39,6 +39,10 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Set Obj = NewInt32(10)
             Test.Use Obj, NewBytes(49, 48)
             
+        Case "NewLine_WhenSet_StoresExpected"
+            Test.Use "a", "a"
+            Test.Use "", ""
+            
     End Select
 End Sub
 
@@ -310,5 +314,25 @@ Public Sub AutoFlush_WhenSetToTrue_ImmediatelyFlushes()
     Assert.That Store.ToArray, Iz.EqualTo(NewBytes(49))
 End Sub
 
+Public Sub NewLine_WhenSet_StoresExpected(ByVal Value As String, ByVal Expected As String)
+    Dim Store As New MemoryStream
+    Dim Writer As StreamWriter
+    Set Writer = Cor.NewStreamWriter(Store)
+    
+    Writer.NewLine = Value
+    
+    Assert.That Writer.NewLine, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub NewLine_WhenSetToNullString_StoresCrLf()
+    Dim Store As New MemoryStream
+    Dim Writer As StreamWriter
+    Set Writer = Cor.NewStreamWriter(Store)
+    
+    Writer.NewLine = "a"
+    Writer.NewLine = vbNullString
+    
+    Assert.That Writer.NewLine, Iz.EqualTo(vbCrLf)
+End Sub
 
 

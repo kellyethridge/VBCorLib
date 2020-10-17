@@ -28,7 +28,6 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use #2/25/2014#, False
             Test.Use #5/1/2014#, True
             Test.Use #11/25/2014#, False
-            Test.Use #6/1/2014#, False
             
     End Select
 End Sub

@@ -16,9 +16,19 @@ Attribute VB_Exposed = False
 '
 Option Explicit
 Implements ICategorizable
+Implements ITestCaseSource
 
 Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
     Cat.ForFixture "System"
+End Sub
+
+Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseCollector)
+    Select Case Test.MethodName
+        Case "NewChars_WithStringWithLengthNotEqualToOne_ThrowsFormatException"
+            Test.Use ""
+            Test.Use "aa"
+            
+    End Select
 End Sub
 
 Public Sub NewDecimals_WithInt64_ReturnsDecimalArray()
@@ -35,5 +45,21 @@ Public Sub NewInt64s_WhenCalled_ReturnsInt64Array()
     Actual = NewInt64s(1, 2, 3)
     
     Assert.That Actual, Iz.EqualTo(Array(CInt64(1), CInt64(2), CInt64(3)))
+End Sub
+
+Public Sub NewChars_WithOutOfRangeValue_ThrowsArgumentOutOfRangeException()
+    On Error Resume Next
+    
+    NewChars &H10040
+    
+    AssertArgumentOutOfRangeException Err
+End Sub
+
+Public Sub NewChars_WithStringWithLengthNotEqualToOne_ThrowsFormatException(ByVal Value As String)
+    On Error Resume Next
+    
+    NewChars Value
+    
+    AssertFormatException Err
 End Sub
 

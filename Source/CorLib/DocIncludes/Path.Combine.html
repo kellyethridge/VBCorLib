@@ -1,0 +1,63 @@
+@remarks <i>Path1</i> should be an absolute path (for example, "d:\archives" or "\\archives\public"). If <i>Path2</i> or a string in <i>Paths</i> is also an absolute path, the combine operation discards all previously combined paths and resets to that absolute path.
+<p>Zero-length strings are omitted from the combined path.</p>
+<p>If <i>Path1</i> is not a drive reference (that is, "C:" or "D:") and does not end with a valid separator character as defined in <a href="Path.Get.DirectorySeparatorChar.html">DirectorySeparatorChar</a>, <a href="Path.Get.AltDirectorySeparatorChar.html">AltDirectorySeparatorChar</a>, or <a href="Path.Get.VolumeSeparatorChar.html">VolumeSeparatorChar</a>, <a href="Path.Get.DirectorySeparatorChar.html">DirectorySeparatorChar</a> is appended to <i>Path1</i> before concatenation.</p>
+<p>If <i>Path2</i> does not include a root (for example, if <i>Path2</i> does not start with a separator character or a drive specification), the result is a concatenation of the two paths, with an intervening separator character. If <i>Path2</i> includes a root, <i>Path2</i> is returned.</p>
+<p>The parameters are not parsed if they have white space. Therefore, if <i>Path2</i> includes white space (for example, " c:\ "), the <b>Combine</b> method appends <i>Path2</i> to <i>Path1</i> instead of returning only <i>Path2</i>.</p>
+<p>Not all invalid characters for directory and file names are interpreted as unacceptable by the <b>Combine</b> method, because you can use these characters for search wildcard characters. For example, while <code>Path.Combine("c:\", "*.txt")</code> might be invalid if you were to create a file from it, it is valid as a search string. It is therefore successfully interpreted by the <b>Combine</b> method.</p>
+@exceptions
+<table style="width: auto">
+	<tr>
+		<th>Exception</th><th>Condition</th>
+	</tr>
+	<tr>
+		<td><a href="ArgumentException.html">ArgumentException</a></td>
+		<td><i>Path1</i>, <i>Path2</i>, or a string element in <i>Paths</i> contains one or more of the invalid characters defined in <a href="Path.GetInvalidPathChars.html">GetInvalidPathChars</a>.</td>
+	</tr>
+</table>
+@examples The following code example demonstrates using the <b>Combine</b> method.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Const</span> Path1 <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span> = <span style="color: #a31515">&quot;c:\Temp&quot;</span>
+    <span style="color: #0000ff">Const</span> Path2 <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span> = <span style="color: #a31515">&quot;SubDir\File.txt&quot;</span>
+    <span style="color: #0000ff">Const</span> Path3 <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span> = <span style="color: #a31515">&quot;c:\Temp.txt&quot;</span>
+    <span style="color: #0000ff">Const</span> Path4 <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span> = <span style="color: #a31515">&quot;c:^*&amp;)(_=#&#39;\^&amp;#2.*(.txt&quot;</span>
+    <span style="color: #0000ff">Const</span> Path5 <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span> = <span style="color: #a31515">&quot;&quot;</span>
+    <span style="color: #0000ff">Const</span> Path6 <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span> = vbNullString
+    
+    CombinePaths Path1, Path2
+    CombinePaths Path1, Path3
+    CombinePaths Path3, Path2
+    CombinePaths Path4, Path2
+    CombinePaths Path5, Path2
+    CombinePaths Path6, Path2
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> CombinePaths(<span style="color: #0000ff">ByVal</span> P1 <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>, <span style="color: #0000ff">ByVal</span> P2 <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>)
+    <span style="color: #0000ff">Dim</span> Combination <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+    
+    Combination = Path.Combine(P1, P2)
+    
+    Debug.Print CorString.Format(<span style="color: #a31515">&quot;When you combine &#39;{0}&#39; and &#39;{1}&#39;, the result is: {2}&#39;{3}&#39;&quot;</span>, P1, P2, vbCrLf, Combination)
+    Debug.Print
+    <span style="color: #0000ff">Exit</span> <span style="color: #0000ff">Sub</span>
+End <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; </span>This example code produces the following output.
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    When you combine &#39;c:\Temp&#39; and &#39;SubDir\File.txt&#39;, the result is:</span>
+<span style="color: #008000">&#39;    &#39;c:\Temp\SubDir\File.txt&#39;</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    When you combine &#39;c:\Temp&#39; and &#39;c:\Temp.txt&#39;, the result is:</span>
+<span style="color: #008000">&#39;    &#39;c:\Temp.txt&#39;</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    When you combine &#39;c:\Temp.txt&#39; and &#39;SubDir\File.txt&#39;, the result is:</span>
+<span style="color: #008000">&#39;    &#39;c:\Temp.txt\SubDir\File.txt&#39;</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    When you combine &#39;c:^*&amp;)(_=#&#39;\^&amp;#2.*(.txt&#39; and &#39;SubDir\File.txt&#39;, the result is:</span>
+<span style="color: #008000">&#39;    &#39;c:^*&amp;)(_=#&#39;\^&amp;#2.*(.txt\SubDir\File.txt&#39;</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    When you combine &#39;&#39; and &#39;SubDir\File.txt&#39;, the result is:</span>
+<span style="color: #008000">&#39;    &#39;SubDir\File.txt&#39;</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    When you combine &#39;&#39; and &#39;SubDir\File.txt&#39;, the result is:</span>
+<span style="color: #008000">&#39;    &#39;SubDir\File.txt&#39;</span>
+</pre></div>
