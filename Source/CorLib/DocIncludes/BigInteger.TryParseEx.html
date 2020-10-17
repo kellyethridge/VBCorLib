@@ -1,0 +1,162 @@
+@remarks The <b>TryParseEx(String, NumberStyles, IFormatProvider, BigInteger)</b> method is like the <a href="BigIntegerStatic.ParseEx.html">ParseEx(String, NumberStyles, IFormatProvider)</a> method, except that it does not throw an exception if the conversion fails. This method eliminates the need to use exception handling to test for a <a href="FormatException.html">FormatException</a> if value is invalid and cannot be parsed successfully.
+<p>The <i>Style</i> parameter defines the style elements (such as white space or a positive or negative sign) that are allowed in the <i>Value</i> parameter for the parse operation to succeed. It must be a combination of bit flags from the <a href="NumberFormatInfo.NumberStyles.html">NumberStyles</a> enumeration. Depending on the value of <i>Style</i>, the <i>Value</i> parameter may include the following elements:</p>
+<p>[<i>ws</i>][<i>$</i>][<i>sign</i>][<i>digits,</i>]<i>digits</i>[<i>.fractional_digits</i>][E[<i>sign</i>]<i>exponential_digits</i>][<i>ws</i>]</p>
+<p>If the <i>Style</i> parameter includes <a href="NumberFormatInfoStatic.NumberStyles.html">AllowHexSpecifier</a>, the <i>Value</i> parameter may include the following elements:</p>
+<p>[<i>ws</i>]<i>hexdigits</i>[<i>ws</i>]</p>
+<p>Elements in square brackets ([ and ]) are optional. The following table describes each element.</p>
+<table style="width: auto">
+	<tr>
+		<th>Element</th>
+		<th>Description</th>
+	</tr>
+	<tr>
+		<td><i>ws</i></td>
+		<td>Optional white space. White space can appear at the start of <i>Value</i> if style includes the <a href="NumberFormatInfoStatic.NumberStyles.html">NumberStyles.AllowLeadingWhite</a> flag, or at the end of <i>Value</i> if style includes the <a href="NumberFormatInfoStatic.NumberStyles.html">NumberStyles.AllowTrailingWhite</a> flag.</td>
+	</tr>
+	<tr>
+		<td><i>$</i></td>
+		<td>A culture-specific currency symbol. Its position in the string is defined by the <a href="NumberFormatInfo.Get.CurrencyPositivePattern.html">CurrencyPositivePattern</a> property of the <a href="NumberFormatInfo.html">NumberFormatInfo</a> object returned by the <a href="IFormatProvider.GetFormat.html">GetFormat</a> method of the <i>Provider</i> parameter. The currency symbol can appear in <i>Value</i> if <i>Style</i> includes the <a href="NumberFormatInfoStatic.NumberStyles.html">NumberStyles.AllowCurrencySymbol</a> flag.</td>
+	</tr>
+	<tr>
+		<td><i>sign</i></td>
+		<td>An optional sign. The sign can appear at the start of <i>Value</i> if <i>Style</i> includes the <a href="NumberFormatInfoStatic.NumberStyles.html">NumberStyles.AllowLeadingSign</a> flag, and it can appear at the end of <i>Value</i> if <i>Style</i> includes the <a href="NumberFormatInfoStatic.NumberStyles.html">NumberStyles.AllowTrailingSign</a> flag. Parentheses can be used in <i>Value</i> to indicate a negative value if <i>Style</i> includes the <a href="NumberFormatInfoStatic.NumberStyles.html">NumberStyles.AllowParentheses</a> flag.</td>
+	</tr>
+	<tr>
+		<td><i>digits</i></td>
+		<td>A sequence of digits from 0 through 9.</td>
+	</tr>
+	<tr>
+		<td><i>,</i></td>
+		<td>A culture-specific group separator. The group separator of the culture specified by <i>Provider</i> can appear in <i>Value</i> if <i>Style</i> includes the <a href="NumberFormatInfoStatic.NumberStyles.html">NumberStyles.AllowThousands</a> flag.</td>
+	</tr>
+	<tr>
+		<td><i>.</i></td>
+		<td>A culture-specific decimal point symbol. The decimal point symbol of the culture specified by <i>Provider</i> can appear in <i>Value</i> if <i>Style</i> includes the <a href="NumberFormatInfoStatic.NumberStyles.html">NumberStyles.AllowDecimalPoint</a> flag.</td>
+	</tr>
+	<tr>
+		<td><i>fractional_digits</i></td>
+		<td>One or more occurrences of the digit 0. Fractional digits can appear in <i>Value</i> only if <i>style</i> includes the <a href="NumberFormatInfoStatic.NumberStyles.html">NumberStyles.AllowDecimalPoint</a> flag.</td>
+	</tr>
+	<tr>
+		<td>E</td>
+		<td>The "e" or "E" character, which indicates that the value is represented in exponential (scientific) notation. The <i>Value</i> parameter can represent a number in exponential notation if <i>Style</i> includes the <a href="NumberFormatInfoStatic.NumberStyles.html">NumberStyles.AllowExponent</a> flag.</td>
+	</tr>
+	<tr>
+		<td><i>exponential_digits</i></td>
+		<td>A sequence of digits from 0 through 9. The <i>Value</i> parameter can represent a number in exponential notation if <i>Style</i> includes the <a href="NumberFormatInfoStatic.NumberStyles.html">NumberStyles.AllowExponent</a> flag.</td>
+	</tr>
+	<tr>
+		<td><i>hexdigits</i></td>
+		<td>A sequence of hexadecimal digits from 0 through f, or 0 through F.</td>
+	</tr>
+</table>
+<p>A string with decimal digits only (which corresponds to the <a href="NumberFormatInfoStatic.NumberStyles.html">NumberStyles.None</a> flag) always parses successfully. Most of the remaining <a href="NumberFormatInfoStatic.NumberStyles.html">NumberStyles</a> members control elements that may be present, but are not required to be present, in this input string. The following table indicates how individual <a href="NumberFormatInfoStatic.NumberStyles.html">NumberStyles</a> members affect the elements that may be present in value.</p>
+<table style="width: auto">
+	<tr>
+		<th>Non-composite NumberStyles values</th>
+		<th>Elements permitted in value in addition to digits</th>
+	</tr>
+	<tr>
+		<td><a href="NumberFormatInfoStatic.NumberStyles.html">None</a></td>
+		<td>Decimal digits only.</td>
+	</tr>
+	<tr>
+		<td><a href="NumberFormatInfoStatic.NumberStyles.html">AllowDecimalPoint</a></td>
+		<td>The decimal point (<i>.</i>) and <i>fractional_digits</i> elements. However, <i>fractional_digits</i> must consist of only one or more 0 digits, or the method returns <b>False</b>.</td>
+	</tr>
+	<tr>
+		<td><a href="NumberFormatInfoStatic.NumberStyles.html">AllowExponent</a></td>
+		<td>The "e" or "E" character, which indicates exponential notation, along with  <i>exponential_digits</i>. If <i>Value</i> represents a number in exponential notation, it cannot have a non-zero, fractional component.</td>
+	</tr>
+	<tr>
+		<td><a href="NumberFormatInfoStatic.NumberStyles.html">AllowLeadingWhite</a></td>
+		<td>The <i>ws</i> element at the start of <i>Value</i>.</td>
+	</tr>
+	<tr>
+		<td><a href="NumberFormatInfoStatic.NumberStyles.html">AllowTrailingWhite</a></td>
+		<td>The <i>ws</i> element at the end of <i>Value</i>.</td>
+	</tr>
+	<tr>
+		<td><a href="NumberFormatInfoStatic.NumberStyles.html">AllowLeadingSign</a></td>
+		<td>The <i>sign</i> element before <i>digits</i>.</td>
+	</tr>
+	<tr>
+		<td><a href="NumberFormatInfoStatic.NumberStyles.html">AllowTrailingSign</a></td>
+		<td>The <i>sign</i> element after <i>digits</i>.</td>
+	</tr>
+	<tr>
+		<td><a href="NumberFormatInfoStatic.NumberStyles.html">AllowPerentheses</a></td>
+		<td>The <i>sign</i> element in the form of parentheses enclosing the numeric value.</td>
+	</tr>
+	<tr>
+		<td><a href="NumberFormatInfoStatic.NumberStyles.html">AllowThousands</a></td>
+		<td>The group separator (<i>,</i>) element.</td>
+	</tr>
+	<tr>
+		<td><a href="NumberFormatInfoStatic.NumberStyles.html">AllowCurrencySymbol</a></td>
+		<td>The currency (<i>$</i>) element.</td>
+	</tr>
+	<tr>
+		<td><a href="NumberFormatInfoStatic.NumberStyles.html">Currency</a></td>
+		<td>All elements. However, <i>Value</i> cannot represent a hexadecimal number or a number in exponential notation.</td>
+	</tr>
+	<tr>
+		<td><a href="NumberFormatInfoStatic.NumberStyles.html">Float</a></td>
+		<td>The <i>ws</i> element at the start or end of <i>Value</i>, <i>sign</i> at the start of <i>Value</i>, and the decimal point (<i>.</i>) symbol. The <i>Value</i> parameter can also use exponential notation.</td>
+	</tr>
+	<tr>
+		<td><a href="NumberFormatInfoStatic.NumberStyles.html">Number</a></td>
+		<td>The <i>ws</i>, <i>sign</i>, group separator (<i>,</i>), and decimal point (<i>.</i>) elements.</td>
+	</tr>
+	<tr>
+		<td><a href="NumberFormatInfoStatic.NumberStyles.html">Any</a></td>
+		<td>All elements. However, <i>Value</i> cannot represent a hexadecimal number.</td>
+	</tr>
+</table>
+<p>If the <a href="NumberFormatInfoStatic.NumberStyles.html">NumberStyles.AllowHexSpecifier</a> flag is used,value must be a hexadecimal value. The only other flags that can be present in style are <a href="NumberFormatInfoStatic.NumberStyles.html">NumberStyles.AllowLeadingWhite</a> and <a href="NumberFormatInfoStatic.NumberStyles.html">NumberStyles.AllowTrailingWhite</a>. (The <a href="NumberFormatInfoStatic.NumberStyles.html">NumberStyles</a> enumeration has a composite style, <a href="NumberFormatInfoStatic.NumberStyles.html">HexNumber</a>, that includes both white-space flags.)</p>
+<table style="width: auto">
+	<tr>
+		<th>Note</th>
+	</tr>
+	<tr>
+		<td>If <i>Value</i> is the string representation of a hexadecimal number, it can be preceded by any decoration (such as 0x or &h) that differentiates it as a hexadecimal number.</td>
+	</tr>
+</table>
+<p>If <i>Value</i> is a hexadecimal string, the <b>TryParseEx(String, NumberStyles, IFormatProvider, BigInteger)</b> method interprets <i>Value</i> as a negative number stored by using two's complement representation if its first hexadecimal digit is greater than or equal to 0x8. In other words, the method interprets the highest-order bit of the first nibble in <i>Value</i> as the sign bit. To make sure that a hexadecimal string is correctly interpreted as a positive number, the first digit in <i>Value</i> must have a value of zero. For example, the method interprets <b>0x80</b> as a negative value, but it interprets either <i>0x080</i> or <i>0x0080</i> as a positive value. The following example illustrates the difference between hexadecimal strings that represent negative and positive values.</p>
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> HexStrings() <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+    <span style="color: #0000ff">Dim</span> HexString <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>
+    <span style="color: #0000ff">Dim</span> Number <span style="color: #0000ff">As</span> BigInteger
+    
+    HexStrings = NewStrings(<span style="color: #a31515">&quot;80&quot;</span>, <span style="color: #a31515">&quot;E293&quot;</span>, <span style="color: #a31515">&quot;F9A2FF&quot;</span>, <span style="color: #a31515">&quot;FFFFFFFF&quot;</span>, <span style="color: #a31515">&quot;080&quot;</span>, <span style="color: #a31515">&quot;0E293&quot;</span>, <span style="color: #a31515">&quot;0F9A2FF&quot;</span>, <span style="color: #a31515">&quot;0FFFFFFFF&quot;</span>, <span style="color: #a31515">&quot;0080&quot;</span>, <span style="color: #a31515">&quot;00E293&quot;</span>, <span style="color: #a31515">&quot;00F9A2FF&quot;</span>, <span style="color: #a31515">&quot;00FFFFFFFF&quot;</span>)
+    
+    <span style="color: #0000ff">For</span> <span style="color: #0000ff">Each</span> HexString <span style="color: #0000ff">In</span> HexStrings
+        <span style="color: #0000ff">Set</span> Number = BigInteger.Parse(<span style="color: #0000ff">CStr</span>(HexString), AllowHexSpecifier)
+        Console.WriteLine <span style="color: #a31515">&quot;Converted 0x{0} to {1}.&quot;</span>, HexString, Number
+    <span style="color: #0000ff">Next</span>
+    
+    Console.ReadKey
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #008000">&#39; This code produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    Converted 0x80 to -128.</span>
+<span style="color: #008000">&#39;    Converted 0xE293 to -7533.</span>
+<span style="color: #008000">&#39;    Converted 0xF9A2FF to -417025.</span>
+<span style="color: #008000">&#39;    Converted 0xFFFFFFFF to -1.</span>
+<span style="color: #008000">&#39;    Converted 0x080 to 128.</span>
+<span style="color: #008000">&#39;    Converted 0x0E293 to 58003.</span>
+<span style="color: #008000">&#39;    Converted 0x0F9A2FF to 16360191.</span>
+<span style="color: #008000">&#39;    Converted 0x0FFFFFFFF to 4294967295.</span>
+<span style="color: #008000">&#39;    Converted 0x0080 to 128.</span>
+<span style="color: #008000">&#39;    Converted 0x00E293 to 58003.</span>
+<span style="color: #008000">&#39;    Converted 0x00F9A2FF to 16360191.</span>
+<span style="color: #008000">&#39;    Converted 0x00FFFFFFFF to 4294967295.</span>
+</pre></div>
+<p>The <p>Provider</p> parameter is an <a href="IFormatProvider.html">IFormatProvider</a> implementation. Its <a href="IFormatProvider.GetFormat.html">GetFormat</a> method returns a <a href="NumberFormatInfo.html">NumberFormatInfo</a> object that provides culture-specific information about the format of <i>Value</i>. The <i>Provider</i> parameter can be any one of the following:</p>
+<ul>
+	<li>A <a href="CultureInfo.html">CultureInfo</a> object that represents the culture that supplies formatting information. Its <a href="CultureInfo.GetFormat.html">GetFormat</a> method returns the <a href="NumberFormatInfo.html">NumberFormatInfo</a> object that provides numeric formatting information for that culture.</li>
+	<li>A <a href="NumberFormatInfo.html">NumberFormatInfo</a> object that provides numeric formatting information. (Its implementation of <a href="NumberFormatInfo.GetFormat.html">GetFormat</a> just returns itself.)</li>
+	<li>A custom object that implements <a href="IFormatProvider.html">IFormatProvider</a>. Its <a href="IFormatProvider.GetFormat.html">GetFormat</a> method instantiates and returns the <a href="NumberFormatInfo.html">NumberFormatInfo</a> object that provides formatting information.</li>
+</ul>
+<p>If <i>Provider</i> is <b>Nothing</b>, the <a href="NumberFormatInfo.html">NumberFormatInfo</a> object for the current culture is used.</p>

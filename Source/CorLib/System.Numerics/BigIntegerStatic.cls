@@ -164,7 +164,11 @@ End Function
 ' @param Value The string representation of a number. The string is interpreted using the style specified by style.
 ' @param Style A bitwise combination of enumeration values that indicates the style elements that can be present in value. A typical value to specify is NumberStyles.Integer.
 ' @param Provider An object that supplies culture-specific formatting information about value. If Nothing is passed in the current CultureInfo will be used.
-' @param OutResult When this method returns, contains the <a href="BigInteger.html">BigInteger</a> equivalent to the number that is contained in value, or <a href="BigInteger.Get.Zero.html">BigInteger.Zero</a> if the conversion failed. The conversion fails if thevalue parameter is null or is not in a format that is compliant withstyle. This parameter is passed uninitialized.
+' @param OutResult When this method returns, contains the <a href="BigInteger.html">BigInteger</a> equivalent to the number that is contained in value, or
+' <a href="BigInteger.Get.Zero.html">BigInteger.Zero</a> if the conversion failed. The conversion fails if thevalue parameter is null or is not in a format
+' that is compliant withstyle. This parameter is passed uninitialized.
+' @return <b>True</b> if the value parameter was converted successfully; otherwise, <b>False</b>.
+' @see #TryParse
 Public Function TryParseEx(ByRef Value As String, ByVal Style As NumberStyles, ByVal Provider As IFormatProvider, ByRef OutResult As BigInteger) As Boolean
     Dim Result      As BigNumber
     Dim Info        As NumberFormatInfo

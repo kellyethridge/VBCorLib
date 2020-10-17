@@ -8,6 +8,7 @@ version Next
 	* Optimize BinaryWriter when writing strings and Integer arrays.
 	* Fixed #78 - BigInteger not correctly formatting with large exponent.
 	* Fixed #83 - BigInteger.Parse was not correctly parsing negative hex string values.
+	* Fixed #84 - BigInteger.ToString was not preserving leading characters necessary to maintain sign of the value.
 
 version 3.1
 	* Fixed CorArray.Clear not releasing reference types correctly for Variant().

@@ -1054,25 +1054,36 @@ Private Function FormatHexBigNumber(ByRef Number As BigNumber, ByRef Specifiers 
     If Output.Position < UBound(Output.Buffer) Then
         Dim Position As Long
         Dim LastChar As Long
+        Dim MaxIndex As Long
+        Dim Ch       As Integer
         
         Position = Output.Position + 1
         LastChar = Output.Buffer(Position)
+        MaxIndex = UBound(Output.Buffer)
         
-        Select Case LastChar
-            Case vbLowerFChar, vbUpperFChar, vbZeroChar
-                Do While Position < UBound(Output.Buffer) And Output.Buffer(Position) = LastChar
-                    Position = Position + 1
-                    CharCount = CharCount - 1
-                Loop
-                
-                If Output.Buffer(Position) >= vbEightChar And Number.Sign = 1 Then
-                    Position = Position - 1
-                    CharCount = CharCount + 1
-                    Output.Buffer(Position) = vbZeroChar
-                End If
-        
-                Output.Position = Position - 1
-        End Select
+        If Number.Sign Then
+            Select Case LastChar
+                Case vbLowerFChar, vbUpperFChar, vbZeroChar
+                    Do While Position <= MaxIndex
+                        Ch = Output.Buffer(Position)
+                        
+                        If Ch <> LastChar Then
+                            If (Number.Sign = 1 And Ch >= vbEightChar) Or _
+                               (Number.Sign = -1 And Ch < vbEightChar) Then
+                                Position = Position - 1
+                                CharCount = CharCount + 1
+                            End If
+                            
+                            Exit Do
+                        End If
+                                            
+                        Position = Position + 1
+                        CharCount = CharCount - 1
+                    Loop
+    
+                    Output.Position = Position - 1
+            End Select
+        End If
     End If
             
     Dim MinCharCount    As Long
