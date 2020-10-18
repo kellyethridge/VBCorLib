@@ -1,0 +1,72 @@
+@remarks The individual bytes in the array returned by this method appear in little-endian order. That is, the lower-order bytes of the value precede the higher-order bytes. The first byte of the array reflects the first eight bits of the <a href="BigInteger.html">BigInteger</a> value, the second byte reflects the next eight bits, and so on. For example, the value 1024, or 0x0400, is stored as the following array of two bytes:
+<table style="width: auto">
+	<tr>
+		<th>Element</th>
+		<th>Byte value</th>
+	</tr>
+	<tr>
+		<td>0</td>
+		<td>0x00</td>
+	</tr>
+	<tr>
+		<td>1</td>
+		<td>0x04</td>
+	</tr>
+</table>
+<p>Negative values are written to the array using two's complement representation in the most compact form possible. For example, -1 is represented as a single byte whose value is <b>0xFF</b> instead of as an array with multiple elements, such as <b>0xFF, 0xFF</b> or <b>0xFF, 0xFF, 0xFF, 0xFF</b>.</p>
+<p>Because two's complement representation always interprets the highest-order bit of the last byte in the array (the byte at position UBound(Array)) as the sign bit, the method returns a byte array with an extra element whose value is zero to disambiguate positive values that could otherwise be interpreted as having their sign bits set. For example, the value 120 or <b>0x78</b> is represented as a single-byte array: <b>0x78</b>. However, 128, or <b>0x80</b>, is represented as a two-byte array: <b>0x80, 0x00</b>.</p>
+<p>You can round-trip a <a href="BigInteger.html">BigInteger</a> value by storing it to a byte array and then restoring it using the <a href="Constructors.NewBigInteger.html">NewBigInteger(Byte())</a> constructor.</p>
+<table style="width: auto">
+	<tr>
+		<th>Caution</th>
+	</tr>
+	<tr>
+		<td> If your code modifies the value of individual bytes in the array returned by this method before it restores the value, you must make sure that you do not unintentionally change the sign bit. For example, if your modifications increase a positive value so that the highest-order bit in the last element of the byte array becomes set, you can add a new byte whose value is zero to the end of the array.</td>
+</table>
+@examples The following example illustrates how some <a href="BigInteger.html">BigInteger</a> values are represented in byte arrays.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> Numbers <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>
+    <span style="color: #0000ff">Dim</span> Item    <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>
+    <span style="color: #0000ff">Dim</span> BigInt  <span style="color: #0000ff">As</span> BigInteger
+    <span style="color: #0000ff">Dim</span> Bytes() <span style="color: #0000ff">As</span> <span style="color: #2b91af">Byte</span>
+    <span style="color: #0000ff">Dim</span> b       <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>
+    
+    Numbers = Array(BigInteger.MinusOne, BigInteger.One, BigInteger.Zero, _
+                  CBigInt(120), CBigInt(128), CBigInt(255), CBigInt(1024), _
+                  CBigInt(Int64.MinValue), CBigInt(Int64.MaxValue), _
+                  BigInteger.Parse(<span style="color: #a31515">&quot;90123123981293054321&quot;</span>))
+
+    <span style="color: #0000ff">For</span> <span style="color: #0000ff">Each</span> Item <span style="color: #0000ff">In</span> Numbers
+        <span style="color: #0000ff">Set</span> BigInt = Item
+        
+        Bytes = BigInt.ToByteArray
+        Console.WriteValue <span style="color: #a31515">&quot;{0} ({1}) -&gt; &quot;</span>, BigInt, BigInt.ToString(GetSpecifier(Bytes))
+        Console.WriteValue <span style="color: #a31515">&quot;{0} bytes: &quot;</span>, CorArray.Length(Bytes)
+        
+        <span style="color: #0000ff">For</span> <span style="color: #0000ff">Each</span> b <span style="color: #0000ff">In</span> Bytes
+            Console.WriteValue <span style="color: #a31515">&quot;{0:X2} &quot;</span>, b
+        <span style="color: #0000ff">Next</span>
+        
+        Console.WriteLine
+    <span style="color: #0000ff">Next</span>
+    
+    Console.ReadKey
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Function</span> GetSpecifier(<span style="color: #0000ff">ByRef</span> Bytes() <span style="color: #0000ff">As</span> <span style="color: #2b91af">Byte</span>) <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+    GetSpecifier = <span style="color: #a31515">&quot;X&quot;</span> &amp; CorArray.Length(Bytes) * 2
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Function</span>
+
+<span style="color: #008000">&#39; The example code produces the following output.</span>
+<span style="color: #008000">&#39;</span>
+<span style="color: #008000">&#39;    -1 (FF) -&gt; 1 bytes: FF</span>
+<span style="color: #008000">&#39;    1 (01) -&gt; 1 bytes: 01</span>
+<span style="color: #008000">&#39;    0 (00) -&gt; 1 bytes: 00</span>
+<span style="color: #008000">&#39;    120 (78) -&gt; 1 bytes: 78</span>
+<span style="color: #008000">&#39;    128 (0080) -&gt; 2 bytes: 80 00</span>
+<span style="color: #008000">&#39;    255 (00FF) -&gt; 2 bytes: FF 00</span>
+<span style="color: #008000">&#39;    1024 (0400) -&gt; 2 bytes: 00 04</span>
+<span style="color: #008000">&#39;    -9223372036854775808 (8000000000000000) -&gt; 8 bytes: 00 00 00 00 00 00 00 80</span>
+<span style="color: #008000">&#39;    9223372036854775807 (7FFFFFFFFFFFFFFF) -&gt; 8 bytes: FF FF FF FF FF FF FF 7F</span>
+<span style="color: #008000">&#39;    90123123981293054321 (04E2B5A7C4A975E971) -&gt; 9 bytes: 71 E9 75 A9 C4 A7 B5 E2 04</span>
+</pre></div>

@@ -1019,31 +1019,42 @@ Private Function TryParseHex(ByRef s As String, ByVal HasPrefix As Boolean, ByVa
     
     j = 1
     For i = UpperIndex To MinIndex Step -1
-        Select Case Chars(i)
+        Ch = Chars(i)
+        
+        Select Case Ch
             Case vbZeroChar
                 Ch = 0
                 FoundDigits = True
             Case vbOneChar To vbNineChar
-                Ch = Chars(i) - vbZeroChar
+                Ch = Ch - vbZeroChar
                 n.Sign = 1
                 FoundDigits = True
             Case vbLowerAChar To vbLowerFChar
-                Ch = Chars(i) - vbLowerHexOffset
+                Ch = Ch - vbLowerHexOffset
                 n.Sign = 1
                 FoundDigits = True
             Case vbUpperAChar To vbUpperFChar
-                Ch = Chars(i) - vbUpperHexOffset
+                Ch = Ch - vbUpperHexOffset
                 n.Sign = 1
                 FoundDigits = True
             Case vbTabChar, vbLfChar, vbVtChar, vbFfChar, vbCrChar, vbSpaceChar
-                If ((Style And NumberStyles.AllowLeadingWhite) = 0) And FoundDigits Then
-                    GoTo Finally
+                If FoundDigits Then
+                    ' We already found digits, so this whitespace must be leading.
+                    ' We are walking backwards through the string, so the leading whitespace
+                    ' would be found after the digits. => "   1234"
+                    If (Style And NumberStyles.AllowLeadingWhite) = 0 Then
+                        GoTo Finally
+                    End If
+                Else
+                    ' We haven't found any digits, so this must be trailing whitespace.
+                    ' We are walking backwards through the string, so the trailing whitespace
+                    ' will be found before any digits. => "1234   "
+                    If (Style And NumberStyles.AllowTrailingWhite) = 0 Then
+                        GoTo Finally
+                    End If
                 End If
                 
-                If ((Style And NumberStyles.AllowTrailingWhite) = 0) And Not FoundDigits Then
-                    GoTo Finally
-                End If
-                
+                ' We allow the whitespace, so skip it and continue.
                 GoTo Continue
             Case Else
                 GoTo Finally
@@ -1079,18 +1090,21 @@ Continue:
     
     n.Precision = c
     
-    If n.Sign Then
+    ' Characters represent &H0 to &HF when parsing
+    ' so if the last character is &H8 or greater then
+    ' we ended with the high bit set, meaning this should
+    ' be a negative value.
+    If Ch >= &H8 Then
         Ch = n.Digits(n.Precision - 1)
-            
-        If (Ch And &H8000) = &H8000 Then
-            n.Sign = -1
-        ElseIf (Ch And &HF800) = &H800 Then
-            n.Sign = -1
+        n.Sign = -1
+
+        ' We want to fill in any leading zeros with &HF
+        ' to represent a two's compliment negative value.
+        If (Ch And &HF800) = &H800 Then
             n.Digits(n.Precision - 1) = Ch Or &HF000
         ElseIf (Ch And &HFF80) = &H80 Then
-            n.Sign = -1
-        ElseIf (Ch And &HFFF8) = &H8 Then
-            n.Sign = -1
+            n.Digits(n.Precision - 1) = Ch Or &HFF00
+        ElseIf (Ch And &HFFF8) And &H8 Then
             n.Digits(n.Precision - 1) = Ch Or &HFFF0
         End If
     End If

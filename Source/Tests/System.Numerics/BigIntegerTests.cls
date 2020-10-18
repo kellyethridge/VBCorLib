@@ -44,8 +44,13 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
         Case "NewBigInteger_WithByteArray_InitializesBigInteger"
             Test.Use NewBytes(), NewBytes(0), 0
             Test.Use NewBytes(&H80), NewBytes(&H80), -1
+            Test.Use NewBytes(&H0, &H80), NewBytes(&H0, &H80), -1
+            Test.Use NewBytes(&H0, &H0, &H80), NewBytes(&H0, &H0, &H80), -1
             Test.Use NewBytes(&HFF), NewBytes(&HFF), -1
             Test.Use NewBytes(&HFF, &HFF), NewBytes(&HFF), -1
+            Test.Use NewBytes(&H80, &H0), NewBytes(&H80, &H0), 1
+            Test.Use NewBytes(&H0, &H80, &H0), NewBytes(&H0, &H80, &H0), 1
+            Test.Use NewBytes(&H0, &H0, &H80, &H0), NewBytes(&H0, &H0, &H80, &H0), 1
             Test.Use NewBytes(&H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H4, &HF1, &H67, &HA8, &HA5, &H67, &H68), NewBytes(&H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H4, &HF1, &H67, &HA8, &HA5, &H67, &H68), 1
             
         Case "NewBigInteger_WithDouble_InitializesBigInteger"
@@ -1102,3 +1107,4 @@ Public Sub NewBigInteger_WithInt64_InitializesBigInteger(ByRef Value As Variant,
     Assert.That Actual.ToByteArray, Iz.EqualTo(ExpectedBytes), "#1"
     Assert.That Actual.Sign, Iz.EqualTo(ExpectedSign)
 End Sub
+
