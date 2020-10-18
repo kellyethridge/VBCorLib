@@ -110,12 +110,18 @@ End Sub
 
 Public Sub GetCommandLineArgs_WhenCalled_ReturnsArgs()
     Dim Actual() As String
-    
     Actual = Environment.GetCommandLineArgs
+    Dim Element As Variant
     
-    Assert.That CorArray.Length(Actual), Iz.EqualTo(2)
+    For Each Element In Actual
+        TestContext.Log.WriteLine CStr(Element)
+    Next Element
+
+    Assert.That CorArray.Length(Actual), Iz.InRange(1, 2)
     Assert.That Actual(0), Iz.StringEnding("vb6.exe").IgnoreCase
-    Assert.That Actual(1), Iz.StringEnding("corlib.solution.vbg").IgnoreCase.OrElse.StringEnding("corlib.tests.solution.vbg").IgnoreCase
+    If CorArray.Length(Actual) > 1 Then
+        Assert.That Actual(1), Iz.StringEnding("corlib.solution.vbg").IgnoreCase.OrElse.StringEnding("corlib.tests.solution.vbg").IgnoreCase
+    End If
 End Sub
 
 Public Sub GetFolderPath_WithWindows_ReturnsWindowsPath()
