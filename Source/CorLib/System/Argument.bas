@@ -26,6 +26,7 @@ Attribute VB_Name = "Argument"
 ''
 ' This modules contains functions used to help with method arguments.
 '
+'@Folder("CorLib.System")
 Option Explicit
 
 Public Type ListRange

@@ -40,6 +40,7 @@ Attribute VB_Exposed = True
 '
 ' @see IResourceDecoder
 '
+'@Folder("CorLib.System.Resources")
 Option Explicit
 Implements IResourceDecoder
 

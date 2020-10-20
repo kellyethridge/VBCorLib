@@ -47,6 +47,7 @@ Attribute VB_Exposed = True
 ' <li>Replacement with a string of your choice. If you call the <a href="Constructors.NewEncoderReplacementFallback.html">NewEncoderReplacementFallback(String)</a> constructor, you provide the replacement string.</li>
 ' </ul>
 ' <p>If you choose a fallback string to use with this class, make sure that the string is composed entirely of characters that can be encoded in the target encoding. Otherwise, a recursive fallback results, causing an <a href="ArgumentException.html">ArgumentException</a>.</p>
+'@Folder("CorLib.System.Text")
 Option Explicit
 Implements IObject
 Implements EncoderFallback

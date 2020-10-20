@@ -22,6 +22,7 @@ Attribute VB_Name = "Globalization"
 '
 ' Module: Globalization
 '
+'@Folder("CorLib.System")
 Option Explicit
 
 Private Const DaysPer100Years       As Long = DaysPer4Years * 25 - 1

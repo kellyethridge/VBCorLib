@@ -39,6 +39,7 @@ Attribute VB_Exposed = True
 ' The ICustomFormatter interface is used to allow user-defined classes to be
 ' the formatting service for values.
 '
+'@Folder("CorLib.System")
 Option Explicit
 
 ''

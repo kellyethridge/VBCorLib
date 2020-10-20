@@ -41,6 +41,7 @@ Attribute VB_Exposed = True
 ' @see DriveInfo
 ' @see Constructors
 '
+'@Folder("CorLib.System.IO")
 Option Explicit
 
 ''

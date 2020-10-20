@@ -34,6 +34,7 @@ Attribute VB_Exposed = False
 '
 ' Module: PathHelper
 '
+'@Folder("CorLib.System.IO")
 Option Explicit
 
 Private mFinalBuffer()  As Integer

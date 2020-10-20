@@ -41,6 +41,7 @@ Attribute VB_Exposed = True
 ' @remarks This provides access to the Windows CryptoAPI cryptography services.
 ' @see DES
 ' @include "..\DocIncludes\DESCryptoServiceProvider.html"
+'@Folder("CorLib.System.Security.Cryptography")
 Option Explicit
 Implements IObject
 Implements SymmetricAlgorithm

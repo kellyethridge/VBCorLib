@@ -22,6 +22,7 @@ Attribute VB_Name = "HashtableHelper"
 '
 ' Module: HashtableHelper
 '
+'@Folder("CorLib.System.Collections")
 Option Explicit
 
 Public Enum HashBucketState

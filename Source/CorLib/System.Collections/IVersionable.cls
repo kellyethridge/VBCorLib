@@ -38,6 +38,7 @@ Attribute VB_Exposed = True
 ''
 ' This interface is used to inspect classes that have changed, like a collection class.
 '
+'@Folder("CorLib.System.Collections")
 Option Explicit
 
 ''

@@ -38,6 +38,7 @@ Attribute VB_Exposed = True
 ''
 ' Contains parameter values that can be passed on to cryptography providers.
 '
+'@Folder("CorLib.System.Security.Cryptography")
 Option Explicit
 Implements IObject
 

@@ -22,6 +22,7 @@ Attribute VB_Name = "Interaction"
 '
 ' Module: CorInteraction
 '
+'@Folder("CorLib.Cor")
 Option Explicit
 
 Public Function IfObject(ByVal ObjA As Object, ByVal ObjB As Object) As Object

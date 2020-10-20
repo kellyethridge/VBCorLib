@@ -41,6 +41,7 @@ Attribute VB_Exposed = True
 ' @see TripleDESCryptoServiceProvider
 ' @see TripleDESStatic
 '
+'@Folder("CorLib.System.Security.Cryptography")
 Option Explicit
 
 

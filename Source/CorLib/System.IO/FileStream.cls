@@ -57,6 +57,7 @@ Attribute VB_Exposed = True
 ' @see Constructors
 ' @see Stream
 ' @include "..\DocIncludes\FileStream.html"
+'@Folder("CorLib.System.IO")
 Option Explicit
 Implements IObject
 Implements Stream

@@ -41,6 +41,7 @@ Attribute VB_Exposed = True
 ' @remarks The HashAlgorithmBase class uses callbacks to perform hashing functions.
 ' A callback object must implement this interface to be used.
 '
+'@Folder("CorLib.System.Security.Cryptography")
 Option Explicit
 
 ''

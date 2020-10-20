@@ -48,6 +48,7 @@ Attribute VB_Exposed = True
 ' directly with <a href="BigInteger.html">BigInteger</a> objects. The primary advantage of using the
 ' methods defined in this class is that a value of <b>Nothing</b> can be passed in and
 ' will be treated as a value of 0.</p>
+'@Folder("CorLib.System.Numerics")
 Option Explicit
 
 Private mZero       As BigInteger

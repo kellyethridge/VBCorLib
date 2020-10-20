@@ -50,6 +50,7 @@ Attribute VB_Exposed = True
 ' mappings of the same file with two views does not provide concurrency.</p>
 ' @see MemoryMappedFile
 ' @include "..\DocIncludes\MemoryMappedFile.html"
+'@Folder("CorLib.System.IO.MemoryMappedFiles")
 Option Explicit
 
 

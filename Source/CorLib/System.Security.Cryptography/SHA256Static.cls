@@ -38,6 +38,7 @@ Attribute VB_Exposed = True
 ''
 ' Provides methods associated with the SHA-256 class.
 '
+'@Folder("CorLib.System.Security.Cryptography")
 Option Explicit
 
 Private mK()    As Long

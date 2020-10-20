@@ -84,6 +84,7 @@ Attribute VB_Exposed = True
 ' End Sub
 ' </pre>
 '
+'@Folder("CorLib.System")
 Option Explicit
 Implements IObject
 

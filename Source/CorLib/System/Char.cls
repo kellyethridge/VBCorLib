@@ -48,6 +48,7 @@ Attribute VB_Exposed = True
 ' @see #Compare
 ' @see #ConvertToInt32
 ' @see #ConvertFromInt32
+'@Folder("CorLib.System")
 Option Explicit
 
 ''

@@ -35,6 +35,7 @@ Attribute VB_Exposed = False
 ' Module: CultureTable
 '
 
+'@Folder("CorLib.System.Globalization")
 Option Explicit
 
 '   vbcultures.nlp structure

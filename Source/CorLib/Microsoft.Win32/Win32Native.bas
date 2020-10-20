@@ -24,6 +24,7 @@ Attribute VB_Name = "Win32Native"
 '
 
 ' These are here because these are not supported on Win9x.
+'@Folder("CorLib.Microsoft.Win32")
 Option Explicit
 
 Public Const CSIDL_ADMINTOOLS               As Long = &H30

@@ -36,6 +36,7 @@ Attribute VB_Name = "CharAllocation"
 ' Which ever method is used, FreeChars must still be called using the original
 ' array returned to remove having multiple handles point to the same data.
 '
+'@Folder("CorLib.System")
 Option Explicit
 
 Private Const BufferCapacity As Long = 16

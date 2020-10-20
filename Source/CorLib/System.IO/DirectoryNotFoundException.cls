@@ -38,6 +38,7 @@ Attribute VB_Exposed = True
 ''
 ' An exception that is thrown when a specified directory was not found.
 '
+'@Folder("CorLib.System.IO")
 Option Explicit
 Implements IObject
 Implements Exception

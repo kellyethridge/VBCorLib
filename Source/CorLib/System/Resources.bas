@@ -22,6 +22,7 @@ Attribute VB_Name = "Resources"
 '
 ' Module: Resources
 '
+'@Folder("CorLib.System")
 Option Explicit
 
 Public Enum ResourceStringKey

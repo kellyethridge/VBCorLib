@@ -47,6 +47,7 @@ Attribute VB_Exposed = True
 ' @see StreamReader
 ' @see TextWriter
 ' @include "..\DocIncludes\StreamWriter.html"
+'@Folder("CorLib.System.IO")
 Option Explicit
 Implements IObject
 Implements TextWriter

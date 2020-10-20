@@ -42,6 +42,7 @@ Attribute VB_Exposed = True
 ' merging of the existing section key-value pairs and the new key-value pairs.
 ' Only the new key-value pairs will exist in the section once generated.
 '
+'@Folder("CorLib.System.IO")
 Option Explicit
 Implements IObject
 Implements IResourceWriter

@@ -44,6 +44,7 @@ Attribute VB_Exposed = True
 '
 ' @see Constructors
 ' @see BinaryReader
+'@Folder("CorLib.System.IO")
 Option Explicit
 Implements IObject
 

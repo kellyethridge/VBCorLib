@@ -38,6 +38,7 @@ Attribute VB_Exposed = True
 ''
 ' Provides a mechanism for retrieving an object to control formatting.
 '
+'@Folder("CorLib.System")
 Option Explicit
 
 ''

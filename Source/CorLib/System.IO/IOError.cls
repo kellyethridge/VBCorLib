@@ -34,6 +34,7 @@ Attribute VB_Exposed = False
 '
 ' Module: IOError
 '
+'@Folder("CorLib.System.IO")
 Option Explicit
 
 Friend Sub WinIOError(ByVal ErrorCode As Long, Optional ByRef Path As String)

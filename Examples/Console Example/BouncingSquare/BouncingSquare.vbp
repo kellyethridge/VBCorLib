@@ -1,6 +1,6 @@
 Type=Exe
-Reference=*\G{00020430-0000-0000-C000-000000000046}#2.0#0#..\..\..\..\..\..\..\..\Windows\SysWOW64\stdole2.tlb#OLE Automation
-Reference=*\G{E67787FD-71D6-4C37-837D-0300A1E31B5A}#3.1#0#..\..\..\Binaries\Compiled\vbcorlib3.dll#VB.EXT: CorLib 3.0
+Reference=*\G{00020430-0000-0000-C000-000000000046}#2.0#0#..\..\..\..\..\Windows\SysWOW64\stdole2.tlb#OLE Automation
+Reference=*\G{E67787FD-71D6-4C37-837D-0300A1E31B5A}#3.1#0#..\..\..\Binaries\VBCorLib3.dll#VB.EXT: CorLib 3.0
 Module=modMain; modMain.bas
 Startup="Sub Main"
 Command32=""
@@ -12,6 +12,7 @@ MinorVer=0
 RevisionVer=0
 AutoIncrementVer=0
 ServerSupportFiles=0
+VersionCompanyName="Bluejacket Software"
 CompilationType=0
 OptimizationType=0
 FavorPentiumPro(tm)=0
@@ -27,3 +28,6 @@ Unattended=0
 Retained=0
 ThreadPerObject=0
 MaxNumberOfThreads=1
+
+[Rubberduck]
+ProjectId=dfe80fb2-fc09-44e1-8918-bceef824f41a

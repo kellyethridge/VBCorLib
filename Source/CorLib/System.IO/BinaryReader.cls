@@ -48,6 +48,7 @@ Attribute VB_Exposed = True
 ' @see BinaryWriter
 ' @see Stream
 ' @include "..\DocIncludes\BinaryReader.html"
+'@Folder("CorLib.System.IO")
 Option Explicit
 Implements IObject
 

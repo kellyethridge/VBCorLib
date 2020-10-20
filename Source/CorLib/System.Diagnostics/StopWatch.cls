@@ -41,6 +41,7 @@ Attribute VB_Exposed = True
 '
 ' @see StopWatchStatic
 '
+'@Folder("CorLib.System.Diagnostics")
 Option Explicit
 Implements IObject
 

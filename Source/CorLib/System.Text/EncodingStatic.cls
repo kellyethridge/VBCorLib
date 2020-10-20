@@ -45,6 +45,7 @@ Attribute VB_Exposed = True
 ' @see UTF32Encoding
 ' @see UnicodeEncoding
 ' @include "..\DocIncludes\Encoding.html"
+'@Folder("CorLib.System.Text")
 Option Explicit
 
 Private mUTF32              As UTF32Encoding

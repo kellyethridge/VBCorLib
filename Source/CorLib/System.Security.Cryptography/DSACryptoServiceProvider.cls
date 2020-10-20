@@ -41,6 +41,7 @@ Attribute VB_Exposed = True
 ' @remarks This class is used to create signatures for data and hashes and provide
 ' verification of those signatures generated.
 '
+'@Folder("CorLib.System.Security.Cryptography")
 Option Explicit
 Implements IObject
 Implements AsymmetricAlgorithm

@@ -42,6 +42,7 @@ Attribute VB_Exposed = True
 ' use the methods in the class, use the <b>BitArray.<i>MethodName</i></b> syntax.
 ' @see BitArray
 ' @include "..\DocIncludes\BitArray.html"
+'@Folder("CorLib.System.Collections")
 Option Explicit
 
 ''

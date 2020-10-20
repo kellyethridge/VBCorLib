@@ -45,6 +45,7 @@ Attribute VB_Exposed = True
 ' <p>To create a new instance use the <a href="Constructors.NewEnumeratorBase.html">NewEnumeratorBase</a> method.</p>
 ' @see Constructors
 ' @include "..\DocIncludes\IEnumerable.html"
+'@Folder("CorLib.System.Collections")
 Option Explicit
 Implements ICloneable
 

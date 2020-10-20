@@ -39,6 +39,7 @@ Attribute VB_Exposed = True
 ' Provides static methods and properties for the <a href="TextReader.html">TextReader</a> class.
 '
 ' @see TextReader
+'@Folder("CorLib.System.IO")
 Option Explicit
 
 Private mNullReader As New NullTextReader

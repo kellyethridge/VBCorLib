@@ -41,6 +41,7 @@ Attribute VB_Exposed = True
 ' @remarks All of the key sizes are represented by indicating a minimum key size and a maximum key size,
 ' then using a step to fill in key sizes between the two.
 '
+'@Folder("CorLib.System.Security.Cryptography")
 Option Explicit
 Implements IObject
 

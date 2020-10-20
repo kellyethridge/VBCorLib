@@ -22,6 +22,7 @@ Attribute VB_Name = "Delegation"
 '
 ' Module: Delegation
 '
+'@Folder("CorLib.System")
 Option Explicit
 
 Private Const DelegationCode        As Currency = -368956918007638.6215@     ' delegator code from Matt Curland

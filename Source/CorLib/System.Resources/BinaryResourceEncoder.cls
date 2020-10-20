@@ -41,6 +41,7 @@ Attribute VB_Exposed = True
 ' @remarks Multiple resources can be encoded. Each encoded resource will be stored internally for later retrieval.
 ' @see ResourceWriter
 '
+'@Folder("CorLib.System.Resources")
 Option Explicit
 Implements IResourceEncoder
 

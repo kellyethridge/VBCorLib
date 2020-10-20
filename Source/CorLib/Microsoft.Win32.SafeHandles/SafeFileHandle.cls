@@ -38,6 +38,7 @@ Attribute VB_Exposed = True
 ''
 ' Represents a wrapper class for a file handle.
 '
+'@Folder("CorLib.Microsoft.Win32.SafeHandles")
 Option Explicit
 Implements IObject
 Implements SafeHandle

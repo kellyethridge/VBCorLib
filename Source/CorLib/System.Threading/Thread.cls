@@ -38,6 +38,7 @@ Attribute VB_Exposed = True
 ''
 ' Creates and controls a thread, sets its priority, and gets its status.
 '
+'@Folder("CorLib.System.Threading")
 Option Explicit
 
 Private mCurrentCulture As CultureInfo

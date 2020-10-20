@@ -44,6 +44,7 @@ Attribute VB_Exposed = True
 ' interface implementations.
 '
 ' @include "..\DocIncludes\ObjectBase.html"
+'@Folder("CorLib.System")
 Option Explicit
 
 

@@ -39,6 +39,7 @@ Attribute VB_Exposed = True
 ' Represents a first-in, first-out collection of values.
 '
 ' @include "..\DocIncludes\Queue.html"
+'@Folder("CorLib.System.Collections")
 Option Explicit
 Implements IObject
 Implements ICloneable

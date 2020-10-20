@@ -41,6 +41,7 @@ Attribute VB_Exposed = True
 ' @see Constructors
 ' @see VersionStatic
 '
+'@Folder("CorLib.System")
 Option Explicit
 Implements IObject
 Implements ICloneable

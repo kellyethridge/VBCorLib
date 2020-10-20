@@ -46,6 +46,7 @@ Attribute VB_Exposed = True
 ' @see IComparable
 ' @see IFormattable
 ' @include "..\DocIncludes\CorDateTime.html"
+'@Folder("CorLib.System")
 Option Explicit
 Implements IObject
 Implements IComparable

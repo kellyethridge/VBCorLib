@@ -34,6 +34,7 @@ Attribute VB_Exposed = False
 '
 ' Module: EqualityComparer
 '
+'@Folder("CorLib.System.Collections")
 Option Explicit
 Implements IEqualityComparer
 

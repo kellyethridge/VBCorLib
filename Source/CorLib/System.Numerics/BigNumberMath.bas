@@ -30,6 +30,7 @@ Attribute VB_Name = "BigNumberMath"
 ' "Remove Integer Overflow Checks" should be on. This will compile the optimized
 ' portions of routines.
 '
+'@Folder("CorLib.System.Numerics")
 Option Explicit
 
 ''

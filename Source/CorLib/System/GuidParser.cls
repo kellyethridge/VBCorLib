@@ -34,6 +34,7 @@ Attribute VB_Exposed = False
 '
 ' Module: GuidParser
 '
+'@Folder("CorLib.System")
 Option Explicit
 
 Private Const LengthOfEnclosed      As Long = 38

@@ -34,6 +34,7 @@ Attribute VB_Exposed = False
 '
 ' Module: VersionParser
 '
+'@Folder("CorLib.System")
 Option Explicit
 
 Private Const MajorComponent As Long = 0

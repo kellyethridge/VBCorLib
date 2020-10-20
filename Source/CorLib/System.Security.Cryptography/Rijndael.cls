@@ -40,6 +40,7 @@ Attribute VB_Exposed = True
 '
 ' @see RijndaelManaged.
 '
+'@Folder("CorLib.System.Security.Cryptography")
 Option Explicit
 
 ' Inherited from SymmetricAlgorithm

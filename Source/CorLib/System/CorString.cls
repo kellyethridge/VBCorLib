@@ -40,6 +40,7 @@ Attribute VB_Exposed = True
 '
 ' @remarks This class cannot be directly instantiated. The methods are accessed through the class name itself.
 ' @include "..\DocIncludes\CorString.html"
+'@Folder("CorLib.System")
 Option Explicit
 
 ''

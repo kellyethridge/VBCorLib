@@ -45,6 +45,7 @@ Attribute VB_Exposed = True
 ' @see Constructors
 ' @see Encoding
 '
+'@Folder("CorLib.System.Text")
 Option Explicit
 Implements IObject
 Implements Encoding

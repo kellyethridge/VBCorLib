@@ -39,6 +39,7 @@ Attribute VB_Exposed = True
 ' Provides functionality to format the value of an object into a string representation.
 '
 ' @remarks The <b>IFormattable</b> interface converts an object to its string representation based on a format string and a format provider.
+'@Folder("CorLib.System")
 Option Explicit
 
 ''

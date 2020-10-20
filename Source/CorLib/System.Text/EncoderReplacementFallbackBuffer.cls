@@ -38,6 +38,7 @@ Attribute VB_Exposed = True
 ''
 ' Represents a substitute input string that is used when the original input character cannot be encoded. This class cannot be inherited.
 '
+'@Folder("CorLib.System.Text")
 Option Explicit
 Implements IObject
 Implements EncoderFallbackBuffer

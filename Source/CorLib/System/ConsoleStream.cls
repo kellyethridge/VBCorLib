@@ -38,6 +38,7 @@ Attribute VB_Exposed = False
 ''
 ' This is a <b>Stream</b> wrapper around the console input and output methods.
 '
+'@Folder("CorLib.System")
 Option Explicit
 Implements IObject
 Implements Stream

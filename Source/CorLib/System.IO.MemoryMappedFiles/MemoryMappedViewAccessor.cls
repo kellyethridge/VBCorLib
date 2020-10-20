@@ -39,6 +39,7 @@ Attribute VB_Exposed = True
 ' Represents a randomly accessed view of a memory-mapped file.
 '
 ' @remarks Use the <a href="MemoryMappedFile.CreateViewAccessor.html">CreateViewAccessor</a> method of a <a href="MemoryMappedFile.html">MemoryMappedFile</a> object to get this view.
+'@Folder("CorLib.System.IO.MemoryMappedFiles")
 Option Explicit
 Implements IObject
 

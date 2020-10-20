@@ -40,6 +40,7 @@ Attribute VB_Exposed = True
 '
 ' @remarks To access these methods, use the <b>ResourceManager.*</b> syntax.
 '
+'@Folder("CorLib.System.Resources")
 Option Explicit
 
 ''

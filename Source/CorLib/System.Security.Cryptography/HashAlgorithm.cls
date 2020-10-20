@@ -53,6 +53,7 @@ Attribute VB_Exposed = True
 ' @see RIPEMD160Managed
 ' @see MD5CryptoServiceProvider
 '
+'@Folder("CorLib.System.Security.Cryptography")
 Option Explicit
 
 ''

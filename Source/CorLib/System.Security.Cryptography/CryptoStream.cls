@@ -46,6 +46,7 @@ Attribute VB_Exposed = True
 ' have to be another <b>CryptoStream</b> object. It can be any object implementing the <a href="Stream.html">Stream</a> interface.</p>
 '
 ' @see Constructors
+'@Folder("CorLib.System.Security.Cryptography")
 Option Explicit
 Implements IObject
 Implements Stream

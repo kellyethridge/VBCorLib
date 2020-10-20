@@ -38,6 +38,7 @@ Attribute VB_Exposed = True
 ''
 ' Provides a safe handle that represents a memory-mapped file for sequential access.
 '
+'@Folder("CorLib.Microsoft.Win32.SafeHandles")
 Option Explicit
 Implements IObject
 Implements SafeHandle

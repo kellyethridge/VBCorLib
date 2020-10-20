@@ -43,6 +43,7 @@ Attribute VB_Exposed = False
 ' comparisons of the array elements. This is the second fastest sorting
 ' provided by VBCorLib. And it allows for complete custom array element comparison.
 '
+'@Folder("CorLib.System")
 Option Explicit
 
 Private mComparer       As Func_T_T_Long

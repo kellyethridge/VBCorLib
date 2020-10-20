@@ -22,6 +22,7 @@ Attribute VB_Name = "ConsoleCallbacks"
 '
 ' Module: ConsoleCallbacks
 '
+'@Folder("CorLib.System")
 Option Explicit
 
 ''

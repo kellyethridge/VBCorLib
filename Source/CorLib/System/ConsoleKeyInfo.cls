@@ -45,6 +45,7 @@ Attribute VB_Exposed = True
 '
 ' @see Console
 '
+'@Folder("CorLib.System")
 Option Explicit
 Implements IObject
 

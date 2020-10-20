@@ -35,6 +35,7 @@ Attribute VB_Exposed = False
 ' Module: IListWrapper
 '
 
+'@Folder("CorLib.System.Collections")
 Option Explicit
 Implements IObject
 Implements ArrayList

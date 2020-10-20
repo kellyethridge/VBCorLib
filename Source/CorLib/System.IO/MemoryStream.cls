@@ -63,6 +63,7 @@ Attribute VB_Exposed = True
 ' @see Constructors
 ' @see Stream
 ' @include "..\DocIncludes\MemoryStream.html"
+'@Folder("CorLib.System.IO")
 Option Explicit
 Implements IObject
 Implements Stream

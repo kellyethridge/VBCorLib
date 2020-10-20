@@ -39,6 +39,7 @@ Attribute VB_Exposed = True
 ' Accesses the cryptography configuration information.
 '
 ' @include "..\DocIncludes\CryptoConfig.html"
+'@Folder("CorLib.System.Security.Cryptography")
 Option Explicit
 
 Private mDefaultAlgos   As Hashtable

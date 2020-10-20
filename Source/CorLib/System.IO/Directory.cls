@@ -41,6 +41,7 @@ Attribute VB_Exposed = True
 ' @remarks Use the <b>Directory</b> class for typical operations such as copying, moving, renaming, creating, and deleting directories.
 ' You can also use the <b>Directory</b> class to get and set DateTime information related to the creation, access, and writing of a directory.
 ' @include "..\DocIncludes\Directory.html"
+'@Folder("CorLib.System.IO")
 Option Explicit
 
 Private Const FILE_FLAG_BACKUP_SEMANTICS        As Long = &H2000000

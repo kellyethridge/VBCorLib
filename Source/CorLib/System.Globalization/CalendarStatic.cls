@@ -43,6 +43,7 @@ Attribute VB_Exposed = True
 ' Era = Calendar.CurrentEra
 ' </pre>
 '
+'@Folder("CorLib.System.Globalization")
 Option Explicit
 
 Private mCachedDateTime As New CorDateTime

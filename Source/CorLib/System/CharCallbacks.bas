@@ -26,6 +26,7 @@ Attribute VB_Name = "CharCallbacks"
 ''
 ' These are used for callbacks for such functions a CorString.AllChars().
 '
+'@Folder("CorLib.System")
 Option Explicit
 
 Public Function IsValidTagCallback(ByRef Char As Integer) As Boolean

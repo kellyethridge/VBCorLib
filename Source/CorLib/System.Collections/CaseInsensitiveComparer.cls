@@ -40,6 +40,7 @@ Attribute VB_Exposed = True
 '
 ' @see CaseInsensitiveComparerStatic
 ' @see Constructors
+'@Folder("CorLib.System.Collections")
 Option Explicit
 Implements IObject
 Implements IComparer

@@ -38,6 +38,7 @@ Attribute VB_Exposed = True
 ''
 ' A common interface to be implemented by random number generators.
 '
+'@Folder("CorLib.System.Security.Cryptography")
 Option Explicit
 
 

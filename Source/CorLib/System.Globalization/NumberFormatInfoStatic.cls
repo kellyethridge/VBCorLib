@@ -47,6 +47,7 @@ Attribute VB_Exposed = True
 '
 ' @see NumberFormatInfo
 '
+'@Folder("CorLib.System.Globalization")
 Option Explicit
 
 ''

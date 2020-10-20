@@ -51,6 +51,7 @@ Attribute VB_Exposed = False
 '
 ' Index is zero based.
 '
+'@Folder("CorLib.System.Resources")
 Option Explicit
 
 Private mStrings(15) As String

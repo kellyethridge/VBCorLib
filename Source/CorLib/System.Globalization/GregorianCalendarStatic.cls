@@ -40,6 +40,7 @@ Attribute VB_Exposed = True
 '
 ' @see GregorianCalendar
 '
+'@Folder("CorLib.System.Globalization")
 Option Explicit
 
 ''

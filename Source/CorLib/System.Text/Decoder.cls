@@ -44,6 +44,7 @@ Attribute VB_Exposed = True
 ' no knowledge of previous data. A Decoder is useful in situation where unknown streams of data may need
 ' to be processed in multiple chunks such as over a network.
 '
+'@Folder("CorLib.System.Text")
 Option Explicit
 
 

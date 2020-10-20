@@ -41,6 +41,7 @@ Attribute VB_Exposed = True
 ' @see DES
 ' @see DESCryptoServiceProvider
 '
+'@Folder("CorLib.System.Security.Cryptography")
 Option Explicit
 
 Private Const DESBlockSize  As Long = 64

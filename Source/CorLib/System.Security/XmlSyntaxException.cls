@@ -38,6 +38,7 @@ Attribute VB_Exposed = True
 ''
 ' Represents an exception caused by invalid XML syntax.
 '
+'@Folder("CorLib.System.Security")
 Option Explicit
 Implements IObject
 Implements Exception

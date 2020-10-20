@@ -40,6 +40,7 @@ Attribute VB_Exposed = False
 '
 ' @see Stream
 '
+'@Folder("CorLib.System.IO")
 Option Explicit
 Implements IObject
 Implements Stream

@@ -42,6 +42,7 @@ Attribute VB_Exposed = True
 '
 ' @see DESCryptoServiceProvider
 ' @see SymmetricAlgorithm
+'@Folder("CorLib.System.Security.Cryptography")
 Option Explicit
 
 ' Inherited from SymmetricAlgorithm

@@ -47,6 +47,7 @@ Attribute VB_Exposed = True
 ' Debug.Print Max(1, 2)
 ' </pre>
 '
+'@Folder("CorLib.System")
 Option Explicit
 
 Private Const corPI         As Double = 3.14159265358979

@@ -43,6 +43,7 @@ Attribute VB_Exposed = True
 ' @see TimeZone
 ' @see TimeZoneStatic
 '
+'@Folder("CorLib.System.Globalization")
 Option Explicit
 Implements IObject
 

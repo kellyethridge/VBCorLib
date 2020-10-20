@@ -43,6 +43,7 @@ Attribute VB_Exposed = True
 ' in a streaming mechanism. It is not intended to be used directly.</p>
 ' @see CryptoStream
 '
+'@Folder("CorLib.System.Security.Cryptography")
 Option Explicit
 Implements IObject
 Implements ICryptoTransform

@@ -34,6 +34,7 @@ Attribute VB_Exposed = True
 '
 ' Module: IconResourceEncoder
 '
+'@Folder("CorLib.System.Resources")
 Option Explicit
 Implements IResourceEncoder
 

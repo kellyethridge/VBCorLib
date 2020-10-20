@@ -44,6 +44,7 @@ Attribute VB_Exposed = True
 ' <p><a href="RijndaelManaged.html">RijndaelManaged</a>, <a href="DESCryptoServiceProvider.html">DESCryptoServiceProvider</a>,
 ' <a href="RC2CryptoServiceProvider.html">RC2CryptoServiceProvider</a>, and <a href="TripleDESCryptoServiceProvider.html">TripleDESCryptoServiceProvider</a> are implementations of symmetric algorithms.</p>
 ' @see SymmetricAlgorithmBase
+'@Folder("CorLib.System.Security.Cryptography")
 Option Explicit
 
 ''

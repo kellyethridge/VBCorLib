@@ -40,6 +40,7 @@ Attribute VB_Exposed = True
 '
 ' @see TripleDESStatic
 ' @include "..\DocIncludes\TripleDESCryptoServiceProvider.html"
+'@Folder("CorLib.System.Security.Cryptography")
 Option Explicit
 Implements IObject
 Implements SymmetricAlgorithm

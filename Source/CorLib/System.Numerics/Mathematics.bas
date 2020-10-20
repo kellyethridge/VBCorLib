@@ -22,6 +22,7 @@ Attribute VB_Name = "Mathematics"
 '
 ' Module: Mathematics
 '
+'@Folder("CorLib.System.Numerics")
 Option Explicit
 
 Public Const vbShift12Bits As Long = &H1000&

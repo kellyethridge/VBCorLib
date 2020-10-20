@@ -45,6 +45,7 @@ Attribute VB_Exposed = True
 ' @see HMACSHA512
 ' @see HMACRIPEMD160
 ' @see MACTripleDES
+'@Folder("CorLib.System.Security.Cryptography")
 Option Explicit
 
 

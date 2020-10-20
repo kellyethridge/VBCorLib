@@ -38,6 +38,7 @@ Attribute VB_Exposed = True
 ''
 ' Represents a TripleDES implementation of an HMAC algorithm.
 '
+'@Folder("CorLib.System.Security.Cryptography")
 Option Explicit
 Implements IObject
 Implements HashAlgorithm

@@ -44,6 +44,7 @@ Attribute VB_Exposed = True
 ' <b>ResourceName</b>, and <b>ResourceType</b> are combined to create a single
 ' unique identifier for a Windows resource.
 '
+'@Folder("CorLib.System.Resources")
 Option Explicit
 Implements IObject
 

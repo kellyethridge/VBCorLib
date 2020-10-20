@@ -9,3 +9,7 @@ Binaries
 /Install/*.exe
 /Source/CorLib/doc.zip
 /Source/Tests/frmSimplyVBUnitRunner.log
+*.dll
+*.exp
+*.Lib
+*.OBJ

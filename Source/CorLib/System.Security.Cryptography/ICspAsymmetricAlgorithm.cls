@@ -46,6 +46,7 @@ Attribute VB_Exposed = True
 ' @see RSACryptoServiceProvider
 ' @see DSACryptoServiceProvider
 '
+'@Folder("CorLib.System.Security.Cryptography")
 Option Explicit
 
 ''

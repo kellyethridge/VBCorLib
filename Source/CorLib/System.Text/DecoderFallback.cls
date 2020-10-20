@@ -41,6 +41,7 @@ Attribute VB_Exposed = True
 ' @see DecoderFallbackStatic
 ' @see DecoderExceptionFallback
 ' @see DecoderReplacementFallback
+'@Folder("CorLib.System.Text")
 Option Explicit
 
 ''

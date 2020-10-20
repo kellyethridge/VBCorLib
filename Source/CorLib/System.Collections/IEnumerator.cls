@@ -45,6 +45,7 @@ Attribute VB_Exposed = True
 ' by <i>For..Each</i>. The enumeration will then be delegated to the custom <b>IEnumerator</b> object.</p>
 ' @see IEnumerable
 ' @include "..\DocIncludes\IEnumerator.html"
+'@Folder("CorLib.System.Collections")
 Option Explicit
 
 ''

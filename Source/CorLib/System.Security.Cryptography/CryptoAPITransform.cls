@@ -45,6 +45,7 @@ Attribute VB_Exposed = True
 ' @see TripleDESCryptoServiceProvider
 ' @see RC2CryptoServiceProvider
 '
+'@Folder("CorLib.System.Security.Cryptography")
 Option Explicit
 Implements IObject
 Implements ICryptoTransform

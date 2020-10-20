@@ -34,6 +34,7 @@ Attribute VB_Exposed = False
 '
 ' Module: UTF7DecoderFallbackBuffer
 '
+'@Folder("CorLib.System.Text")
 Option Explicit
 Implements IObject
 Implements DecoderFallbackBuffer

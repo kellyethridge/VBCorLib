@@ -26,6 +26,7 @@ Attribute VB_Name = "ArrayHelpers"
 ''
 ' This helper class contains supporting code for the CorArray class.
 '
+'@Folder("CorLib.System")
 Option Explicit
 
 Public Type SortItems

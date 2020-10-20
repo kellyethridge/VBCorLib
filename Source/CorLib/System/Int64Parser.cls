@@ -35,6 +35,7 @@ Attribute VB_Exposed = False
 ' Module: Int64Parser
 '
 
+'@Folder("CorLib.System")
 Option Explicit
 
 Private mError As ParseError

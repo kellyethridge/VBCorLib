@@ -40,6 +40,7 @@ Attribute VB_Exposed = True
 '
 ' @see TimeZone
 '
+'@Folder("CorLib.System")
 Option Explicit
 
 Private mCurrentTimeZone As TimeZone

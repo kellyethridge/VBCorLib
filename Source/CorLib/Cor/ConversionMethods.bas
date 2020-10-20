@@ -22,6 +22,7 @@ Attribute VB_Name = "ConversionMethods"
 '
 ' Module: Conversion
 '
+'@Folder("CorLib.Cor")
 Option Explicit
 
 

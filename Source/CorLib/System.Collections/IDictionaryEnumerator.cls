@@ -38,6 +38,7 @@ Attribute VB_Exposed = True
 ''
 ' An interface used to enumerate a dictionary style collections (Hashtable.)
 '
+'@Folder("CorLib.System.Collections")
 Option Explicit
 
 Public Enum IDictionaryEnumType

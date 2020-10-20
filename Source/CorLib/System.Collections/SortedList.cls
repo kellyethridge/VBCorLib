@@ -47,6 +47,7 @@ Attribute VB_Exposed = True
 ' @see ICollection
 ' @see IEnumerable
 '
+'@Folder("CorLib.System.Collections")
 Option Explicit
 Implements IObject
 Implements IEnumerable

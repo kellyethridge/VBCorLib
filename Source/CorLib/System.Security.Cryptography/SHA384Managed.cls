@@ -42,6 +42,7 @@ Attribute VB_Exposed = True
 ' <p>Details can be found at http://csrc.nist.gov/CryptoToolkit/tkhash.html</p>
 ' @see HashAlgorithm
 '
+'@Folder("CorLib.System.Security.Cryptography")
 Option Explicit
 Implements IObject
 Implements HashAlgorithm

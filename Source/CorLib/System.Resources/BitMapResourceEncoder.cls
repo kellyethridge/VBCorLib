@@ -44,6 +44,7 @@ Attribute VB_Exposed = True
 ' stored with a <a href="ResourceKey.html">ResourceKey</a> for future retrieval.</p>
 ' @see ResourceWriter
 '
+'@Folder("CorLib.System.Resources")
 Option Explicit
 Implements IResourceEncoder
 

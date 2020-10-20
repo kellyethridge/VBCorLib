@@ -31,6 +31,7 @@ Attribute VB_Exposed = True
 '
 '    Module: WaitHandle
 '
+'@Folder("CorLib.System.Threading")
 Option Explicit
 
 

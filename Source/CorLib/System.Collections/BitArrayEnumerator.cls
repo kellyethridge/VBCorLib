@@ -39,6 +39,7 @@ Attribute VB_Exposed = False
 ' This class is used to enumerate the individual bits being
 ' managed by a BitArray object.
 '
+'@Folder("CorLib.System.Collections")
 Option Explicit
 Implements IObject
 Implements IEnumerator

@@ -41,6 +41,7 @@ Attribute VB_Exposed = True
 ' @see Constructors
 ' @see TextWriter
 '
+'@Folder("CorLib.System.IO")
 Option Explicit
 Implements IObject
 Implements TextWriter

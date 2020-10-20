@@ -49,6 +49,7 @@ Attribute VB_Exposed = True
 ' @see HMACSHA384
 ' @see HMACSHA512
 ' @see Constructors
+'@Folder("CorLib.System.Security.Cryptography")
 Option Explicit
 
 Private mHashAlgorithm  As HashAlgorithm

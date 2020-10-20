@@ -26,6 +26,7 @@ Attribute VB_Name = "Information"
 ''
 ' Functions used to retrieve information about variables.
 '
+'@Folder("CorLib.Cor")
 Option Explicit
 
 

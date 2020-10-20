@@ -43,6 +43,7 @@ Attribute VB_Exposed = True
 ' have been modified. This works by each party at boths ends sharing a secret key used to sign the sent message and
 ' to also authenticate the received message. If the key were compromised, then the authentication cannot be guaranteed.</p>
 '
+'@Folder("CorLib.System.Security.Cryptography")
 Option Explicit
 Implements IObject
 Implements HashAlgorithm

@@ -40,6 +40,7 @@ Attribute VB_Exposed = True
 '
 ' @see Calendar
 '
+'@Folder("CorLib.System.Globalization")
 Option Explicit
 Implements IObject
 Implements Calendar

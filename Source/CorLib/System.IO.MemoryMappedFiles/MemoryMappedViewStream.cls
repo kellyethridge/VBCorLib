@@ -37,6 +37,7 @@ Attribute VB_Exposed = True
 
 ''
 ' Represents a view of a memory-mapped file as a sequentially accessed stream.
+'@Folder("CorLib.System.IO.MemoryMappedFiles")
 Option Explicit
 Implements IObject
 Implements Stream

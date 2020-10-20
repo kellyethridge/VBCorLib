@@ -23,6 +23,7 @@ Attribute VB_Name = "WinResourceReaderHelper"
 ' Module: modWinResourceReader
 '
 
+'@Folder("CorLib.System.Resources")
 Option Explicit
 
 Public Function EnumResTypeProc(ByVal hModule As Long, ByVal lpszType As Long, ByRef Reader As WinResourceReader) As Long

@@ -35,6 +35,7 @@ Attribute VB_Exposed = False
 ' Module: ResourceEnumerator
 '
 
+'@Folder("CorLib.System.Resources")
 Option Explicit
 Implements IObject
 Implements IEnumerator

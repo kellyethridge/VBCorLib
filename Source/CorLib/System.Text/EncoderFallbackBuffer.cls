@@ -38,6 +38,7 @@ Attribute VB_Exposed = True
 ''
 ' Provides a buffer that allows a fallback handler to return an alternate string to an encoder when it cannot encode an input character.
 '
+'@Folder("CorLib.System.Text")
 Option Explicit
 
 ''

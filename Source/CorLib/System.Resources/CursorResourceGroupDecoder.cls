@@ -43,6 +43,7 @@ Attribute VB_Exposed = True
 ' @see ResourceReader
 ' @see WinResourceReader
 '
+'@Folder("CorLib.System.Resources")
 Option Explicit
 Implements IResourceDecoder
 

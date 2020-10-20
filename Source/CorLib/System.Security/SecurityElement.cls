@@ -42,6 +42,7 @@ Attribute VB_Exposed = True
 ' classes when dealing with the keys as xml parameters. It is not meant for serious xml text manipulation.
 ' @see SecurityElementStatic
 '
+'@Folder("CorLib.System.Security")
 Option Explicit
 Implements IObject
 

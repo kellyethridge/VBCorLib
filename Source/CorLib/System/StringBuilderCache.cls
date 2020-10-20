@@ -34,6 +34,7 @@ Attribute VB_Exposed = False
 '
 ' Module: StringBuilderCache
 '
+'@Folder("CorLib.System")
 Option Explicit
 
 Private mCache      As Stack

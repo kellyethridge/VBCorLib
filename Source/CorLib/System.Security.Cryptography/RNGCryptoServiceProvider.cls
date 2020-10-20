@@ -39,6 +39,7 @@ Attribute VB_Exposed = True
 ' Provides random number generation that is a bit more random than the regular Visual Basic method
 ' by using a Cryptographic Service Provider.
 '
+'@Folder("CorLib.System.Security.Cryptography")
 Option Explicit
 Implements IObject
 Implements RandomNumberGenerator

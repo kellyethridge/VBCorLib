@@ -39,6 +39,7 @@ Attribute VB_Exposed = True
 ' Provides an interface to allow a <b>ResourceReader</b> to decode
 ' resource types found within a .RES file.
 '
+'@Folder("CorLib.System.Resources")
 Option Explicit
 
 ''

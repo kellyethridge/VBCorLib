@@ -38,6 +38,7 @@ Attribute VB_Exposed = False
 ''
 ' A simple wrapper around the Crypto API functions.
 '
+'@Folder("CorLib.System.Security.Cryptography")
 Option Explicit
 Private Declare Function CryptEnumProvidersA Lib "advapi32.dll" (ByVal dwIndex As Long, ByVal pdwReserved As Long, ByVal dwFlags As Long, ByRef pdwProvType As Long, ByVal pszProvName As String, ByRef pcbProvName As Long) As Long
 

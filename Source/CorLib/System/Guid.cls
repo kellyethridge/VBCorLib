@@ -54,6 +54,7 @@ Attribute VB_Exposed = True
 ' @see GuidStatic
 ' @see Constructors
 ' @include "..\DocIncludes\Guid.html"
+'@Folder("CorLib.System")
 Option Explicit
 Implements IObject
 Implements IComparable

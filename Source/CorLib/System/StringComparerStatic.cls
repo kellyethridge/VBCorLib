@@ -40,6 +40,7 @@ Attribute VB_Exposed = True
 '
 ' @see StringComparer
 '
+'@Folder("CorLib.System")
 Option Explicit
 
 Private mOrdinal            As OrdinalStringComparer

@@ -40,6 +40,7 @@ Attribute VB_Exposed = True
 '
 ' @remarks Implement this interface for general cases where only an enumerator is needed.
 ' @include "..\DocIncludes\IEnumerable.html"
+'@Folder("CorLib.System.Collections")
 Option Explicit
 
 ''

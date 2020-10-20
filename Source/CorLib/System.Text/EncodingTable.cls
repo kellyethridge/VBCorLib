@@ -34,6 +34,7 @@ Attribute VB_Exposed = False
 '
 ' Module: EncodingTable
 '
+'@Folder("CorLib.System.Text")
 Option Explicit
 
 ' The binary data read from the BinaryReader is

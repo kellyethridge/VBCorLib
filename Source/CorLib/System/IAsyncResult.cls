@@ -34,6 +34,7 @@ Attribute VB_Exposed = True
 '
 ' Module: IAsyncResult
 '
+'@Folder("CorLib.System")
 Option Explicit
 
 Public Property Get AsyncState() As Variant: End Property

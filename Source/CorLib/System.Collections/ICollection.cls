@@ -49,6 +49,7 @@ Attribute VB_Exposed = True
 '
 ' @see IEnumerator
 '
+'@Folder("CorLib.System.Collections")
 Option Explicit
 
 ''

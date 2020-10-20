@@ -84,6 +84,7 @@ Attribute VB_Exposed = True
 ' @see Constructors
 ' @see IEnumerator
 '
+'@Folder("CorLib.System")
 Option Explicit
 Implements IObject
 Implements IEnumerator

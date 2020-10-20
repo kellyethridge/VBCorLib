@@ -43,6 +43,7 @@ Attribute VB_Exposed = True
 ' custom safe-handle implementation and handle the <b>ReleaseHandle</b> event to peform
 ' clean-up for the specific handle in implementations.</p>
 ' <p>An example of implementing and using <b>SafeHandle</b> is <a href="SafeFileHandle.html">SafeFileHandle</a>.</p>
+'@Folder("CorLib.Microsoft.Win32.SafeHandles")
 Option Explicit
 
 Private mHandle         As Long

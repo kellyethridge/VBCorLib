@@ -41,6 +41,7 @@ Attribute VB_Exposed = True
 ' @remarks Any array that is used in these methods are treated as byte arrays. No attention
 ' is paid to the type of the original array. They are manipulated as bytes.
 ' @include "..\DocIncludes\Buffer.html"
+'@Folder("CorLib.System")
 Option Explicit
 
 ''

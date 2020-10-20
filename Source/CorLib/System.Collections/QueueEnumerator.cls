@@ -34,6 +34,7 @@ Attribute VB_Exposed = False
 '
 ' Module: QueueEnumerator
 '
+'@Folder("CorLib.System.Collections")
 Option Explicit
 Implements IObject
 Implements IEnumerator

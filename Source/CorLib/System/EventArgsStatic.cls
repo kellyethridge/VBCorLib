@@ -34,6 +34,7 @@ Attribute VB_Exposed = True
 '
 ' Module: EventArgsStatic
 '
+'@Folder("CorLib.System")
 Option Explicit
 
 Private mEmptyArgs As New EventArgs

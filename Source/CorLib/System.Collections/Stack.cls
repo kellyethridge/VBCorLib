@@ -43,6 +43,7 @@ Attribute VB_Exposed = True
 ' @see IEnumerable
 ' @see ICloneable
 ' @include "..\DocIncludes\Stack.html"
+'@Folder("CorLib.System.Collections")
 Option Explicit
 Implements IObject
 Implements ICloneable

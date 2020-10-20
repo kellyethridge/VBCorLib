@@ -47,6 +47,7 @@ Attribute VB_Exposed = True
 '
 ' @see Constructors
 '
+'@Folder("CorLib.System.Security.Cryptography")
 Option Explicit
 
 Private mCore               As IHashAlgorithm

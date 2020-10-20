@@ -22,6 +22,7 @@ Attribute VB_Name = "EncodingHelper"
 '
 ' Module: EncodingHelper
 '
+'@Folder("CorLib.System.Text")
 Option Explicit
 
 Private Const Base64Characters As String = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"

@@ -45,6 +45,7 @@ Attribute VB_Exposed = True
 ' Debug.Print Environment.UserName
 ' </pre>
 '
+'@Folder("CorLib.System")
 Option Explicit
 Private Declare Function IsWow64Process Lib "kernel32.dll" (ByVal Handle As Long, ByRef IsWow64 As Long) As Long
 Private Declare Function GetCurrentProcess Lib "kernel32.dll" () As Long

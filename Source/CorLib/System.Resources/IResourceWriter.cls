@@ -41,6 +41,7 @@ Attribute VB_Exposed = True
 ' @remarks Implement this interface to allow multiple resource writer
 ' types to be shared for different resources.
 '
+'@Folder("CorLib.System.Resources")
 Option Explicit
 
 ''

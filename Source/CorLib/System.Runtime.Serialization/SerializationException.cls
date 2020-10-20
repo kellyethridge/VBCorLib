@@ -39,6 +39,7 @@ Attribute VB_Exposed = True
 ' This exception is thrown when an error occurs reading or writing a
 ' propertybag and a value cannot be serialized.
 '
+'@Folder("CorLib.System.Runtime.Serialization")
 Option Explicit
 Implements IObject
 Implements Exception

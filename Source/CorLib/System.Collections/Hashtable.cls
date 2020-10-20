@@ -45,6 +45,7 @@ Attribute VB_Exposed = True
 ' @see ICloneable
 ' @see CaseInsensitiveComparer
 ' @include "..\DocIncludes\Hashtable.html"
+'@Folder("CorLib.System.Collections")
 Option Explicit
 Implements IObject
 Implements IDictionary

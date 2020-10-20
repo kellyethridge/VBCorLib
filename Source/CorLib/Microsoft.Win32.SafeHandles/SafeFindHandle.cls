@@ -34,6 +34,7 @@ Attribute VB_Exposed = False
 '
 ' Module: SafeFindHandle
 '
+'@Folder("CorLib.Microsoft.Win32.SafeHandles")
 Option Explicit
 Implements SafeHandle
 

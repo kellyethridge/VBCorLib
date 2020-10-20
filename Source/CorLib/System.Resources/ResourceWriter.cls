@@ -38,6 +38,7 @@ Attribute VB_Exposed = True
 ''
 ' Writes encoded resources out to a .RES file.
 '
+'@Folder("CorLib.System.Resources")
 Option Explicit
 Implements IObject
 Implements IResourceWriter

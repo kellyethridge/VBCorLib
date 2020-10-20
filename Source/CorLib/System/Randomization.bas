@@ -22,6 +22,7 @@ Attribute VB_Name = "Randomization"
 '
 ' Module: Randomization
 '
+'@Folder("CorLib.System")
 Option Explicit
 
 Private mInited As Boolean

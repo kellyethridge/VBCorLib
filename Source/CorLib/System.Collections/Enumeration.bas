@@ -26,6 +26,7 @@ Attribute VB_Name = "Enumeration"
 ''
 ' This module is to support the For Each method for classes that implement IEnumerator
 '
+'@Folder("CorLib.System.Collections")
 Option Explicit
 
 Private Const E_NOINTERFACE             As Long = &H80004002

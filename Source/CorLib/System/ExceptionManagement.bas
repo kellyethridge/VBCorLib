@@ -26,6 +26,7 @@ Attribute VB_Name = "ExceptionManagement"
 ''
 ' Provides the mechanisms to Throw and Catch exceptions in the system.
 '
+'@Folder("CorLib.System")
 Option Explicit
 
 Private mException As Exception

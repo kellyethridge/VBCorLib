@@ -38,6 +38,7 @@ Attribute VB_Exposed = True
 ''
 ' An exception that represents an error occuring during some form of cryptographic operation.
 '
+'@Folder("CorLib.System.Security.Cryptography")
 Option Explicit
 Implements IObject
 Implements Exception

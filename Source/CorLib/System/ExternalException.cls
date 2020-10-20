@@ -35,6 +35,7 @@ Attribute VB_Exposed = True
 ' Module: ExternalException
 '
 
+'@Folder("CorLib.System")
 Option Explicit
 Implements IObject
 Implements Exception

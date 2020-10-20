@@ -34,6 +34,7 @@ Attribute VB_Exposed = True
 '
 ' Module: ThreadStatic
 '
+'@Folder("CorLib.System.Threading")
 Option Explicit
 
 Private mCurrentThread As New Thread

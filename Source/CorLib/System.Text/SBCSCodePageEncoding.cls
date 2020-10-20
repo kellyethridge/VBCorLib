@@ -38,6 +38,7 @@ Attribute VB_Exposed = False
 ''
 ' Encoding module used when representing single-byte encoding schemes.
 '
+'@Folder("CorLib.System.Text")
 Option Explicit
 Implements IObject
 Implements Encoding

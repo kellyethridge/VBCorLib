@@ -47,6 +47,7 @@ Attribute VB_Exposed = True
 '
 ' @see DateTimeFormatInfo
 '
+'@Folder("CorLib.System.Globalization")
 Option Explicit
 
 

@@ -23,6 +23,7 @@ Attribute VB_Name = "Int64Callbacks"
 ' Module: Int64Callbacks
 '
 
+'@Folder("CorLib.System")
 Option Explicit
 
 Public Function Int64Compare(ByRef x As Int64, ByRef y As Int64) As Long

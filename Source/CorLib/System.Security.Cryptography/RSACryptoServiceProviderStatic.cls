@@ -34,6 +34,7 @@ Attribute VB_Exposed = True
 '
 ' Module: RSACryptoServiceProviderStatic
 '
+'@Folder("CorLib.System.Security.Cryptography")
 Option Explicit
 
 Private mUseMachineKeyStore As Boolean

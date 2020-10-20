@@ -38,6 +38,7 @@ Attribute VB_Exposed = True
 ''
 ' Used as a means for asynchronous operations to notify when a procedure is finished.
 '
+'@Folder("CorLib.System")
 Option Explicit
 
 ''

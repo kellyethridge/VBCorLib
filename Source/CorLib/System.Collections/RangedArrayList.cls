@@ -39,6 +39,7 @@ Attribute VB_Exposed = False
 ' This class is used to represent a sub-array view of the parent ArrayList object.
 '
 
+'@Folder("CorLib.System.Collections")
 Option Explicit
 Implements IObject
 Implements ArrayList

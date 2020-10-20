@@ -44,6 +44,7 @@ Attribute VB_Exposed = True
 ' Set ReadOnlyList = ArrayList.ReadOnly(list)
 ' </pre>
 ' @see ArrayList
+'@Folder("CorLib.System.Collections")
 Option Explicit
 
 ''

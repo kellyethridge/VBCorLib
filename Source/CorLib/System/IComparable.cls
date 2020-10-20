@@ -60,6 +60,7 @@ Attribute VB_Exposed = True
 ' <p>All number types (such as <b>Long</b> and <b>Double</b>) are supported by the default <a href="Comparer.html">Comparer</a>, as are <b>String</b> and <b>Date</b>.
 ' Custom types should also provide their own implementation of <b>IComparable</b> to enable object instances to be ordered or sorted.</p>
 ' @include "..\DocIncludes\IComparable.html"
+'@Folder("CorLib.System")
 Option Explicit
 
 ''

@@ -38,6 +38,7 @@ Attribute VB_Exposed = True
 ''
 ' Provides static methods associated with the RC2 algorithm.
 '
+'@Folder("CorLib.System.Security.Cryptography")
 Option Explicit
 
 

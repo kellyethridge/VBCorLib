@@ -35,6 +35,7 @@ Attribute VB_Exposed = False
 ' Module: DefaultDecoder
 '
 
+'@Folder("CorLib.System.Text")
 Option Explicit
 Implements IObject
 Implements Decoder

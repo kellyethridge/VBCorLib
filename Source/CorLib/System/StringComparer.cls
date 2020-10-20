@@ -43,6 +43,7 @@ Attribute VB_Exposed = True
 '
 ' @see StringComparerStatic
 '
+'@Folder("CorLib.System")
 Option Explicit
 
 ''

@@ -48,6 +48,7 @@ Attribute VB_Exposed = True
 ' @see Registry
 ' @see PublicFunctions
 '
+'@Folder("CorLib.Microsoft.Win32")
 Option Explicit
 
 

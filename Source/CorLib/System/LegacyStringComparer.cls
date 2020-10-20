@@ -34,6 +34,7 @@ Attribute VB_Exposed = False
 '
 ' Module: LegacyStringComparer
 '
+'@Folder("CorLib.System")
 Option Explicit
 Implements IObject
 Implements StringComparer

@@ -38,6 +38,7 @@ Attribute VB_Exposed = True
 ''
 ' Provides an interface for encoding unicode characters into bytes.
 '
+'@Folder("CorLib.System.Text")
 Option Explicit
 
 

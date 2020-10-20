@@ -45,6 +45,7 @@ Attribute VB_Exposed = True
 ' this base class manages, then the developer needs to implement those
 ' additional features directly into the derived class.</p>
 '
+'@Folder("CorLib.System")
 Option Explicit
 
 Private Const PropMessage           As String = "Message"

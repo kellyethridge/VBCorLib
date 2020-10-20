@@ -44,6 +44,7 @@ Attribute VB_Exposed = True
 ' @see SHA1Static
 ' @see HashAlgorithm
 '
+'@Folder("CorLib.System.Security.Cryptography")
 Option Explicit
 Implements IObject
 Implements HashAlgorithm

@@ -44,6 +44,7 @@ Attribute VB_Exposed = True
 ' desired object to create. Using the <a href="StaticClasses.Get.Cor.html">Cor</a> accessor provides
 ' IntelliSense to the available constructors, making object creation easier.</p>
 ' @include "..\DocIncludes\Constructors.html"
+'@Folder("CorLib.System")
 Option Explicit
 
 ''

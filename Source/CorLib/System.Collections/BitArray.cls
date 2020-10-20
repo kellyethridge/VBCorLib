@@ -42,6 +42,7 @@ Attribute VB_Exposed = True
 ' @see Constructors
 ' @see BitArrayStatic
 ' @include "..\DocIncludes\BitArray.html"
+'@Folder("CorLib.System.Collections")
 Option Explicit
 Implements IObject
 Implements IEnumerable

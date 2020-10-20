@@ -39,6 +39,7 @@ Attribute VB_Exposed = True
 ' Converts base data types to an array of bytes, and an array of bytes to base data types.
 '
 ' @include "..\DocIncludes\BitConverter.html"
+'@Folder("CorLib.System")
 Option Explicit
 
 

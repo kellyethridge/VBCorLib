@@ -64,6 +64,7 @@ Attribute VB_Exposed = True
 '
 ' @see ConsoleKeyInfo
 '
+'@Folder("CorLib.System")
 Option Explicit
 Private Declare Function AllocConsole Lib "kernel32.dll" () As Long
 Private Declare Function FreeConsole Lib "kernel32.dll" () As Long

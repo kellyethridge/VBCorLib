@@ -47,6 +47,7 @@ Attribute VB_Exposed = True
 ' @see Constructors
 ' @see ArrayListStatic
 ' @include "../DocIncludes/ArrayList.html"
+'@Folder("CorLib.System.Collections")
 Option Explicit
 Implements IObject
 Implements ICollection

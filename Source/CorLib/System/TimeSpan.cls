@@ -48,6 +48,7 @@ Attribute VB_Exposed = True
 ' @see TimeSpanStatic
 ' @see CorDateTime
 '
+'@Folder("CorLib.System")
 Option Explicit
 Implements IObject
 Implements IComparable

@@ -40,6 +40,7 @@ Attribute VB_Exposed = True
 '
 ' @see TimeSpan
 '
+'@Folder("CorLib.System")
 Option Explicit
 
 Private mParser     As New TimeSpanParser

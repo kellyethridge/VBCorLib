@@ -22,6 +22,7 @@ Attribute VB_Name = "Startup"
 '
 ' Module: modMain
 '
+'@Folder("CorLib.System")
 Option Explicit
 
 Private mInIDE        As Boolean

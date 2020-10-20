@@ -82,6 +82,7 @@ Attribute VB_Exposed = True
 ' @see Registry
 ' @see RegistryKeyStatic
 '
+'@Folder("CorLib.Microsoft.Win32")
 Option Explicit
 Implements IObject
 

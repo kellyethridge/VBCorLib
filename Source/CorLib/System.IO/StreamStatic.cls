@@ -41,6 +41,7 @@ Attribute VB_Exposed = True
 ' @see Stream
 ' @see PublicFunctions
 '
+'@Folder("CorLib.System.IO")
 Option Explicit
 
 Private mNullStream As New NullStream

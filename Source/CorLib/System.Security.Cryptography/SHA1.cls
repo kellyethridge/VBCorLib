@@ -41,6 +41,7 @@ Attribute VB_Exposed = True
 ' @see SHA1CryptoServiceProvider
 ' @see SHA1Managed
 '
+'@Folder("CorLib.System.Security.Cryptography")
 Option Explicit
 
 ''

@@ -40,6 +40,7 @@ Attribute VB_Exposed = True
 '
 ' @see EncoderExceptionFallback
 ' @see EncoderReplacementFallback
+'@Folder("CorLib.System.Text")
 Option Explicit
 
 Private mReplacementFallback    As New EncoderReplacementFallback

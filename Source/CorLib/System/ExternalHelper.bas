@@ -27,6 +27,7 @@ Attribute VB_Name = "ExternalHelper"
 ' Creates an object that provides ASM code for special functions.
 '
 '
+'@Folder("CorLib.System")
 Option Explicit
 
 Private Const OutOfMemoryError      As Long = 7

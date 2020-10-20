@@ -29,6 +29,7 @@ Attribute VB_Name = "CharMethods"
 ' The public facing Char class forwards calls to this module for clients of this library.
 '
 ' These methods do no validation. It is assumed the caller validated the arguments.
+'@Folder("CorLib.System")
 Option Explicit
 
 Public Const UnicodePlane1Start As Long = &H10000

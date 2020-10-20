@@ -71,6 +71,7 @@ Attribute VB_Exposed = True
 '
 ' @see Constructors
 '
+'@Folder("CorLib.System.Threading")
 Option Explicit
 Implements IObject
 

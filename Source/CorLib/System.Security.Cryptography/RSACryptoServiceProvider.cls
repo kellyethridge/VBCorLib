@@ -38,6 +38,7 @@ Attribute VB_Exposed = True
 ''
 ' Provides RSA encryption services using the Windows Crypto API methods.
 '
+'@Folder("CorLib.System.Security.Cryptography")
 Option Explicit
 Implements IObject
 Implements AsymmetricAlgorithm

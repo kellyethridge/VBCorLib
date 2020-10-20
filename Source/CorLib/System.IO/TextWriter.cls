@@ -43,6 +43,7 @@ Attribute VB_Exposed = True
 ' @see StreamWriter
 ' @see StringWriter
 '
+'@Folder("CorLib.System.IO")
 Option Explicit
 
 ''

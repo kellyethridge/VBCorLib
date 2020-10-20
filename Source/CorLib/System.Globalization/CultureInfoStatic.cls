@@ -44,6 +44,7 @@ Attribute VB_Exposed = True
 ' Cultures = CultureInfo.GetCultures(AllCultures)
 ' </pre>
 ' @see CultureInfo
+'@Folder("CorLib.System.Globalization")
 Option Explicit
 
 ''

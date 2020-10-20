@@ -34,6 +34,7 @@ Attribute VB_Exposed = False
 '
 ' Module: DefaultEncoder
 '
+'@Folder("CorLib.System.Text")
 Option Explicit
 Implements IObject
 Implements Encoder

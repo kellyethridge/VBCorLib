@@ -41,6 +41,7 @@ Attribute VB_Exposed = True
 ' @see JapaneseCalendarStatic
 ' @see Calendar
 '
+'@Folder("CorLib.System.Globalization")
 Option Explicit
 Implements IObject
 Implements Calendar

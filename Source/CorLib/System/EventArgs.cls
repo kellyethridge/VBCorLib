@@ -42,6 +42,7 @@ Attribute VB_Exposed = True
 ' class that implements from the <b>EventArgs</b> class and provide the properties to store the necessary data. The name of your custom
 ' event data class should end with <b>EventArgs</b>.
 ' <p>To pass an object that does not contain any data, use the <a href="EventArgsStatic.Get.EmptyArgs.html">EmptyArgs</a> field.</p>
+'@Folder("CorLib.System")
 Option Explicit
 Implements IObject
 

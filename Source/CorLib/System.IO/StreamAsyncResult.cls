@@ -34,6 +34,7 @@ Attribute VB_Exposed = False
 '
 ' Module: StreamAsyncResult
 '
+'@Folder("CorLib.System.IO")
 Option Explicit
 Implements IObject
 Implements IAsyncResult

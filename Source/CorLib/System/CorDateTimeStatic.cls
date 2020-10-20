@@ -50,6 +50,7 @@ Attribute VB_Exposed = True
 ' This will create a new instance of <a href="CorDateTime.html">CorDateTime</a> with the supplied date value.
 ' @see CorDateTime
 '
+'@Folder("CorLib.System")
 Option Explicit
 
 Private Const MinMilliseconds As Currency = 0

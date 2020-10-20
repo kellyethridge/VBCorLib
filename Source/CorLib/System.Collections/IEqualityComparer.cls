@@ -44,6 +44,7 @@ Attribute VB_Exposed = True
 ' Hashtable collection type accepts this interface.</p>
 ' <p>This interface supports only equality comparisons. Customization of comparisons for sorting and ordering is provided by the <a href="IComparer.html">IComparer</a> interface.</p>
 ' <p>A default implementation can be accessed using <a href="EqualityComparerStatic.Get.Default.html">EqualityComparer.Default</a>.</p>
+'@Folder("CorLib.System.Collections")
 Option Explicit
 
 ''

@@ -48,6 +48,7 @@ Attribute VB_Exposed = True
 ' @see HMACSHA384
 ' @see HMACSHA512
 ' @see HMACRIPEMD160
+'@Folder("CorLib.System.Security.Cryptography")
 Option Explicit
 
 

@@ -38,6 +38,7 @@ Attribute VB_Exposed = False
 ''
 ' Provides some helper routines.
 '
+'@Folder("CorLib.System.Security.Cryptography")
 Option Explicit
 
 Private mRNG As New RNGCryptoServiceProvider

@@ -38,6 +38,7 @@ Attribute VB_Exposed = False
 ''
 ' Wraps an ArrayList object in a read-only wrapper.
 
+'@Folder("CorLib.System.Collections")
 Option Explicit
 Implements IObject
 Implements ArrayList

@@ -40,6 +40,7 @@ Attribute VB_Exposed = True
 '
 ' @see ResourceWriter
 '
+'@Folder("CorLib.System.Resources")
 Option Explicit
 Implements IResourceEncoder
 Private Const RES_CURSOR As Long = 2

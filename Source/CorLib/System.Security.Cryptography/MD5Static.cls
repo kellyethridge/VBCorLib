@@ -40,6 +40,7 @@ Attribute VB_Exposed = True
 '
 ' @see MD5
 ' @see MD5CryptoServiceProvider
+'@Folder("CorLib.System.Security.Cryptography")
 Option Explicit
 
 ''

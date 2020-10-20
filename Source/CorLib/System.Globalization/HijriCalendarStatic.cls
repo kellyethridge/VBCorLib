@@ -46,6 +46,7 @@ Attribute VB_Exposed = True
 '
 ' @see HijriCalendar
 '
+'@Folder("CorLib.System.Globalization")
 Option Explicit
 
 Private mMinDateTime As CorDateTime

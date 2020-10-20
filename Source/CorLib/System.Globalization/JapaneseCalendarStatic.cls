@@ -40,6 +40,7 @@ Attribute VB_Exposed = True
 '
 ' @see JapaneseCalendar
 '
+'@Folder("CorLib.System.Globalization")
 Option Explicit
 
 Private mMinSupportedDateTime As CorDateTime

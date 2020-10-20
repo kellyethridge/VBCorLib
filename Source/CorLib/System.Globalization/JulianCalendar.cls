@@ -41,6 +41,7 @@ Attribute VB_Exposed = True
 ' @see JulianCalendarStatic
 ' @see Calendar
 '
+'@Folder("CorLib.System.Globalization")
 Option Explicit
 Implements IObject
 Implements Calendar

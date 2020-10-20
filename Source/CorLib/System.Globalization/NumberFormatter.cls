@@ -34,6 +34,7 @@ Attribute VB_Exposed = False
 '
 ' Module: NumberFormatter
 '
+'@Folder("CorLib.System.Globalization")
 Option Explicit
 Private Const UnknownPrecision          As Long = -1
 Private Const DefaultIntegerPrecision   As Long = 10

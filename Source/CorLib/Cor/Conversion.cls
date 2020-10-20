@@ -38,6 +38,7 @@ Attribute VB_Exposed = True
 ''
 ' Provides methods to convert to specified data-types.
 '
+'@Folder("CorLib.Cor")
 Option Explicit
 
 ''

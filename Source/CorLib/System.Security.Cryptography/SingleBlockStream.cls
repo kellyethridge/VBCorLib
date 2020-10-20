@@ -38,6 +38,7 @@ Attribute VB_Exposed = False
 ''
 ' This provides a small stream buffer that buffers only the last block of a write process.
 '
+'@Folder("CorLib.System.Security.Cryptography")
 Option Explicit
 Implements Stream
 

@@ -39,6 +39,7 @@ Attribute VB_Exposed = True
 ' Performs operations on String instances that contain file or directory path information.
 '
 ' @include "..\DocIncludes\Path.html"
+'@Folder("CorLib.System.IO")
 Option Explicit
 
 Private mInvalidPathChars()     As Integer

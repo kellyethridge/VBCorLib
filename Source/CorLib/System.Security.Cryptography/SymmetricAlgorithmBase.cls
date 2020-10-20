@@ -43,6 +43,7 @@ Attribute VB_Exposed = True
 ' can quickly provide a new implementation that is consistent with the existing
 ' implementations without the need to manage lower level details.
 ' @see SymmetricAlgorithm
+'@Folder("CorLib.System.Security.Cryptography")
 Option Explicit
 
 ''

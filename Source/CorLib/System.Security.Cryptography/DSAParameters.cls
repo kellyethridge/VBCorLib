@@ -38,6 +38,7 @@ Attribute VB_Exposed = True
 ''
 ' Represents the DSA key parameters.
 '
+'@Folder("CorLib.System.Security.Cryptography")
 Option Explicit
 Implements IObject
 

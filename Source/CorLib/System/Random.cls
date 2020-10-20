@@ -40,6 +40,7 @@ Attribute VB_Exposed = True
 '
 ' @see Constructors
 '
+'@Folder("CorLib.System")
 Option Explicit
 Implements IObject
 

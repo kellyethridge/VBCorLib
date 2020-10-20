@@ -38,6 +38,7 @@ Attribute VB_Exposed = False
 ''
 ' This a specific Decoder used by UnicodeEncoding.
 '
+'@Folder("CorLib.System.Text")
 Option Explicit
 Implements IObject
 Implements Decoder

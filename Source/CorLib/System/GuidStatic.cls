@@ -50,6 +50,7 @@ Attribute VB_Exposed = True
 ' </table>
 ' @see Guid
 ' @include "..\DocIncludes\Guid.html"
+'@Folder("CorLib.System")
 Option Explicit
 
 Private mParser         As New GuidParser

@@ -38,6 +38,7 @@ Attribute VB_Exposed = True
 ''
 ' The exception that is thrown when trying to access a drive or share that is not available.
 '
+'@Folder("CorLib.System.IO")
 Option Explicit
 Implements IObject
 Implements Exception

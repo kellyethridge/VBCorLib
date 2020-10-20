@@ -41,6 +41,7 @@ Attribute VB_Exposed = True
 ' @remarks To learn more about RSAParameters, please visit this Shawnfa blog entry:
 ' http://blogs.msdn.com/shawnfa/archive/2005/11/17/493972.aspx
 '
+'@Folder("CorLib.System.Security.Cryptography")
 Option Explicit
 Implements IObject
 

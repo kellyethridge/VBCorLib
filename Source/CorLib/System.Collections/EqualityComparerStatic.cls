@@ -38,6 +38,7 @@ Attribute VB_Exposed = True
 ''
 ' Provides static methods to support <a href="IEqualityComparer.html">IEqualityComparer</a> interface.
 '
+'@Folder("CorLib.System.Collections")
 Option Explicit
 
 Private mDefault As New EqualityComparer

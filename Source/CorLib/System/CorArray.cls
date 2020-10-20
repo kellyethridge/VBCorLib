@@ -42,6 +42,7 @@ Attribute VB_Exposed = True
 ' provides several methods to help manage arrays through the course of an applications lifetime.
 ' @see PublicFunctions
 ' @include "..\DocIncludes\CorArray.html"
+'@Folder("CorLib.System")
 Option Explicit
 
 

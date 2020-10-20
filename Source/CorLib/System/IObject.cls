@@ -39,6 +39,7 @@ Attribute VB_Exposed = True
 ' This is the base interface to allow objects to be utilized throughout most of VBCorLib.
 '
 ' @include "..\DocIncludes\IObject.html"
+'@Folder("CorLib.System")
 Option Explicit
 
 ''

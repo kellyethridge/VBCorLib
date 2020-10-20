@@ -38,6 +38,7 @@ Attribute VB_Exposed = True
 ' @remarks Implement this interface to allow multiple resource reader types
 ' to be shared to read different resources.
 '
+'@Folder("CorLib.System.Resources")
 Option Explicit
 
 ''

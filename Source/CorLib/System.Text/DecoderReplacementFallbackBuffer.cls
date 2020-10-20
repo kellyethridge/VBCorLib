@@ -38,6 +38,7 @@ Attribute VB_Exposed = True
 ''
 ' Represents a substitute output string that is emitted when the original input byte sequence cannot be decoded. This class cannot be inherited.
 '
+'@Folder("CorLib.System.Text")
 Option Explicit
 Implements IObject
 Implements DecoderFallbackBuffer

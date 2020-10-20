@@ -38,6 +38,7 @@ Attribute VB_Exposed = True
 ''
 ' Throws <a href="EncoderFallbackException.html">EncoderFallbackException</a> when an input character cannot be converted to an encoded output byte sequence.
 '
+'@Folder("CorLib.System.Text")
 Option Explicit
 Implements IObject
 Implements EncoderFallbackBuffer

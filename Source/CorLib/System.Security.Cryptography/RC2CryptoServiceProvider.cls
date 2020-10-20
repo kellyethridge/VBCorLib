@@ -41,6 +41,7 @@ Attribute VB_Exposed = True
 ' @remarks This class uses the Windows CryptoAPI services.
 ' @see RC2
 ' @include "..\DocIncludes\RC2CryptoServiceProvider.html"
+'@Folder("CorLib.System.Security.Cryptography")
 Option Explicit
 Implements IObject
 Implements SymmetricAlgorithm

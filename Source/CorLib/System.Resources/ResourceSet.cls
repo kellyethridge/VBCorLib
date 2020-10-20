@@ -46,6 +46,7 @@ Attribute VB_Exposed = True
 ' @see ResourceManager
 ' @see Win32Resource
 '
+'@Folder("CorLib.System.Resources")
 Option Explicit
 Implements IObject
 Implements IEnumerable

@@ -38,6 +38,7 @@ Attribute VB_Exposed = True
 ''
 ' Provides methods specific to the SHA-1 class.
 '
+'@Folder("CorLib.System.Security.Cryptography")
 Option Explicit
 
 ''

@@ -48,6 +48,7 @@ Attribute VB_Exposed = True
 ' @see CaseInsensitiveComparer
 ' @see ThreadStatic
 ' @include "..\DocIncludes\Comparer.html"
+'@Folder("CorLib.System.Collections")
 Option Explicit
 Implements IObject
 Implements IComparer

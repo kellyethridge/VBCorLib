@@ -38,6 +38,7 @@ Attribute VB_Exposed = True
 ''
 ' The exception that is thrown when a decoder fallback operation fails.
 '
+'@Folder("CorLib.System.Text")
 Option Explicit
 Implements IObject
 Implements Exception

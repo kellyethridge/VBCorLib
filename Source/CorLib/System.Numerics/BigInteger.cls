@@ -44,6 +44,7 @@ Attribute VB_Exposed = True
 ' <b>Byte</b>s because of the speed increase with working with multiple bytes simultaneously.
 ' However, <b>Integer</b>s are never exposed outside of the class, only byte arrays.
 '
+'@Folder("CorLib.System.Numerics")
 Option Explicit
 Implements IObject
 Implements IComparable

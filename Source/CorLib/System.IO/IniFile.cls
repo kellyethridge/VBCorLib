@@ -59,6 +59,7 @@ Attribute VB_Exposed = True
 '
 ' @see IniResourceWriter
 '
+'@Folder("CorLib.System.IO")
 Option Explicit
 Implements IObject
 

@@ -40,6 +40,7 @@ Attribute VB_Exposed = True
 '
 ' @see SecurityElement
 '
+'@Folder("CorLib.System.Security")
 Option Explicit
 
 Private Const vbLeftCheveron    As Long = 60

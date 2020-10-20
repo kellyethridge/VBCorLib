@@ -43,6 +43,7 @@ Attribute VB_Exposed = True
 ' @see ICloneable
 ' @see IFormatProvider
 '
+'@Folder("CorLib.System.Globalization")
 Option Explicit
 Implements IObject
 Implements ICloneable

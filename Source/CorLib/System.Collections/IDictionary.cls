@@ -42,6 +42,7 @@ Attribute VB_Exposed = True
 ' Lists that maintain a key-value pair should implement this interface to allow
 ' cross-compatibility usage amongst all key-value pair lists.
 '
+'@Folder("CorLib.System.Collections")
 Option Explicit
 
 ''

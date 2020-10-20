@@ -38,6 +38,7 @@ Attribute VB_Exposed = True
 ''
 ' Provides MD5 hashing services through the CryptoAPI interface.
 '
+'@Folder("CorLib.System.Security.Cryptography")
 Option Explicit
 Implements IObject
 Implements HashAlgorithm

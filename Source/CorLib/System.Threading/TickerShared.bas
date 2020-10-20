@@ -26,6 +26,7 @@ Attribute VB_Name = "TickerShared"
 ''
 ' Ticker class helper methods.
 '
+'@Folder("CorLib.System.Threading")
 Option Explicit
 
 Private Const WM_TIMER As Long = &H113

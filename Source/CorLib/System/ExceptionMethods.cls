@@ -47,6 +47,7 @@ Attribute VB_Exposed = True
 '
 ' @see Exception
 '
+'@Folder("CorLib.System")
 Option Explicit
 
 ''

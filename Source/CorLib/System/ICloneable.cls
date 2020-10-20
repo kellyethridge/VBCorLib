@@ -38,6 +38,7 @@ Attribute VB_Exposed = True
 ''
 ' Supports cloning, which creates a new instance of a class with the same value as an existing instance.
 '
+'@Folder("CorLib.System")
 Option Explicit
 
 ''

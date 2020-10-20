@@ -34,6 +34,7 @@ Attribute VB_Exposed = True
 '
 ' Module: EncoderExceptionFallback
 '
+'@Folder("CorLib.System.Text")
 Option Explicit
 Implements IObject
 Implements EncoderFallback

@@ -38,6 +38,7 @@ Attribute VB_Exposed = True
 ''
 ' Provides a failure-handling mechanism, called a fallback, for an encoded input byte sequence that cannot be converted to an input character. The fallback throws an exception instead of decoding the input byte sequence.
 '
+'@Folder("CorLib.System.Text")
 Option Explicit
 Implements IObject
 Implements DecoderFallback

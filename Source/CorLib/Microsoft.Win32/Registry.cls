@@ -48,6 +48,7 @@ Attribute VB_Exposed = True
 ' @see RegistryKey
 ' @see RegistryKeyStatic
 '
+'@Folder("CorLib.Microsoft.Win32")
 Option Explicit
 
 Private mClassesRoot        As RegistryKey

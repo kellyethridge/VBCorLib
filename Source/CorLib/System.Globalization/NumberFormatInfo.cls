@@ -50,6 +50,7 @@ Attribute VB_Exposed = True
 ' @see IFormatProvider
 ' @see ICloneable
 ' @include "..\DocIncludes\NumberFormatInfo.html"
+'@Folder("CorLib.System.Globalization")
 Option Explicit
 Implements IObject
 Implements IFormatProvider

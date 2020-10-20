@@ -34,6 +34,7 @@ Attribute VB_Exposed = False
 '
 ' Module: TimeSpanFormatter
 '
+'@Folder("CorLib.System")
 Option Explicit
 Private Const MaxDayWidth       As Long = 8
 Private Const MaxHourWidth      As Long = 2

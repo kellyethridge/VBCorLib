@@ -40,6 +40,7 @@ Attribute VB_Exposed = True
 '
 ' @see JulianCalendar
 '
+'@Folder("CorLib.System.Globalization")
 Option Explicit
 
 ''

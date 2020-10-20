@@ -40,6 +40,7 @@ Attribute VB_Exposed = True
 '
 ' @see SHA384Managed
 '
+'@Folder("CorLib.System.Security.Cryptography")
 Option Explicit
 
 ''

@@ -40,6 +40,7 @@ Attribute VB_Exposed = True
 '
 ' @see Version
 '
+'@Folder("CorLib.System")
 Option Explicit
 
 Private mParser As New VersionParser

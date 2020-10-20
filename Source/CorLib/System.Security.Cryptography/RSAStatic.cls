@@ -38,6 +38,7 @@ Attribute VB_Exposed = True
 ''
 ' Represents methods associated with the RSA class.
 '
+'@Folder("CorLib.System.Security.Cryptography")
 Option Explicit
 
 Public Enum KeyNumber

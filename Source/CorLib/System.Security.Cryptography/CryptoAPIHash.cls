@@ -38,6 +38,7 @@ Attribute VB_Exposed = True
 ''
 ' Wraps the CryptoAPI hash functions to be used in the HashAlgorithmBase callback methods.
 '
+'@Folder("CorLib.System.Security.Cryptography")
 Option Explicit
 Implements IHashAlgorithm
 

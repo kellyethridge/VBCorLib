@@ -56,6 +56,7 @@ Attribute VB_Exposed = True
 ' This example simply refers to the <a href="StaticClasses.Get.Environment.html">Environment Property Get</a> in this
 ' class, then directly calls a method on the returned object from the <a href="StaticClasses.Get.Environment.html">Environment Property Get</a>.
 ' In this case it returns a reference to the <a href="Environment.html">Environment</a> class.
+'@Folder("CorLib.System")
 Option Explicit
 
 ''

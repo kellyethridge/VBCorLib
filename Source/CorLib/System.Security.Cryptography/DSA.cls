@@ -40,6 +40,7 @@ Attribute VB_Exposed = True
 '
 ' @see DSACryptoServiceProvider
 '
+'@Folder("CorLib.System.Security.Cryptography")
 Option Explicit
 
 

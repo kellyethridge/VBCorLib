@@ -43,6 +43,7 @@ Attribute VB_Exposed = True
 ' have been encoded, each resource will be requested one at a time. The same
 ' resource should never be returned more than once.
 '
+'@Folder("CorLib.System.Resources")
 Option Explicit
 
 ''

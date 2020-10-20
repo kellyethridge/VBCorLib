@@ -38,6 +38,7 @@ Attribute VB_Exposed = True
 ''
 ' Contains information about a specific encoding.
 '
+'@Folder("CorLib.System.Text")
 Option Explicit
 Implements IObject
 

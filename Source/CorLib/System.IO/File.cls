@@ -39,6 +39,7 @@ Attribute VB_Exposed = True
 ' Provides static methods for the creation, copying, deletion, moving, and opening of files, and aids in the creation of <a href="FileStream.html">FileStream</a> objects.
 '
 ' @include "..\DocIncludes\File.html"
+'@Folder("CorLib.System.IO")
 Option Explicit
 
 Private mDirectorySeparators() As Integer

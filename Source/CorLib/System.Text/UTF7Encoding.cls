@@ -45,6 +45,7 @@ Attribute VB_Exposed = True
 ' @see UTF32Encoding
 ' @see UnicodeEncoding
 ' @include "..\DocIncludes\UTF7Encoding.html"
+'@Folder("CorLib.System.Text")
 Option Explicit
 Implements IObject
 Implements Encoding

@@ -38,6 +38,7 @@ Attribute VB_Exposed = True
 ''
 ' Provides default implementations of the IObject interface.
 '
+'@Folder("CorLib.System")
 Option Explicit
 Private mDateAsDateTime As CorDateTime
 Private mCharBuffer As SafeArray1d

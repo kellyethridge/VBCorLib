@@ -53,6 +53,7 @@ Attribute VB_Exposed = True
 ' @see ArgumentException
 ' @see SystemException
 '
+'@Folder("CorLib.System")
 Option Explicit
 Implements IObject
 Implements Exception

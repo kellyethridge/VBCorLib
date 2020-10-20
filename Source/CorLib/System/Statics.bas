@@ -28,6 +28,7 @@ Attribute VB_Name = "Statics"
 ' explicitly instanciate an object. They are shared by the entire application
 ' and exposed to client applications through the StaticClasses class.
 '
+'@Folder("CorLib.System")
 Option Explicit
 
 Public Type NullVersionable

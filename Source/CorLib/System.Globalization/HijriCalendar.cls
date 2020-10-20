@@ -43,6 +43,7 @@ Attribute VB_Exposed = True
 ' @see HijriCalendarStatic
 ' @see Calendar
 '
+'@Folder("CorLib.System.Globalization")
 Option Explicit
 Implements IObject
 Implements Calendar

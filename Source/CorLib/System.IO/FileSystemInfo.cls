@@ -40,6 +40,7 @@ Attribute VB_Exposed = True
 ' objects using the same code. This allows for similar properties and methods
 ' to be used on both files and directories with a single routine.
 '
+'@Folder("CorLib.System.IO")
 Option Explicit
 
 ''

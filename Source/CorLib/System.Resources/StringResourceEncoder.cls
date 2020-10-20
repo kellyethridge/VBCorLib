@@ -42,6 +42,7 @@ Attribute VB_Exposed = True
 ' 16 strings per table. Each table is uniquely identified based on
 ' the range of string ID's.
 '
+'@Folder("CorLib.System.Resources")
 Option Explicit
 Implements IResourceEncoder
 

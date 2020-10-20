@@ -40,6 +40,7 @@ Attribute VB_Exposed = True
 '
 ' @remarks Details about the hash algorithm can be found here: http://homes.esat.kuleuven.be/~bosselae/ripemd160.html
 '
+'@Folder("CorLib.System.Security.Cryptography")
 Option Explicit
 Implements IObject
 Implements HashAlgorithm

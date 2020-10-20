@@ -38,6 +38,7 @@ Attribute VB_Exposed = True
 ''
 ' The exception that is thrown when an encoder fallback operation fails. This class cannot be inherited.
 '
+'@Folder("CorLib.System.Text")
 Option Explicit
 Implements IObject
 Implements Exception

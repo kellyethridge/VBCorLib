@@ -40,6 +40,7 @@ Attribute VB_Exposed = True
 '
 ' @remarks To access the methods of this class, call the method using the <b>Convert.<i>Method</i></b> syntax.
 ' @include "..\DocIncludes\Convert.html"
+'@Folder("CorLib.System")
 Option Explicit
 
 ''

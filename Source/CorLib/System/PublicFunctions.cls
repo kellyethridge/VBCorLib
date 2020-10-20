@@ -38,6 +38,7 @@ Attribute VB_Exposed = True
 ''
 ' Provides some helper functions.
 '
+'@Folder("CorLib.System")
 Option Explicit
 
 Private mTextOut As New StringBuilder

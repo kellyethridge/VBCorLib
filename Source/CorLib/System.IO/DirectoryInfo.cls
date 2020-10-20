@@ -43,6 +43,7 @@ Attribute VB_Exposed = True
 '
 ' @see Constructors
 '
+'@Folder("CorLib.System.IO")
 Option Explicit
 Implements IObject
 Implements FileSystemInfo

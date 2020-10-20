@@ -47,6 +47,7 @@ Attribute VB_Exposed = True
 ' @see Comparer
 ' @see Constructors
 '
+'@Folder("CorLib.System.Collections")
 Option Explicit
 
 Private mDefault            As Comparer

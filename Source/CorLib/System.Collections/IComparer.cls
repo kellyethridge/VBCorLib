@@ -43,6 +43,7 @@ Attribute VB_Exposed = True
 ' <p>The default implementation of this interface is the <a href="Comparer.html">Comparer</a> class.</p>
 ' @see Comparer
 ' @include "..\DocIncludes\IComparer.html"
+'@Folder("CorLib.System.Collections")
 Option Explicit
 
 ''

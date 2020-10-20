@@ -34,6 +34,7 @@ Attribute VB_Exposed = False
 '
 ' Module: ErrorStatic
 '
+'@Folder("CorLib.System")
 Option Explicit
 
 Friend Sub Argument(ByVal Key As ResourceStringKey, Optional ByRef ParamName As String)

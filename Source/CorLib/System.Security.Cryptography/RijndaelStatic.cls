@@ -38,6 +38,7 @@ Attribute VB_Exposed = True
 ''
 ' Provides static methods associated with the Rijndael class.
 '
+'@Folder("CorLib.System.Security.Cryptography")
 Option Explicit
 
 Private mTe0()      As Long

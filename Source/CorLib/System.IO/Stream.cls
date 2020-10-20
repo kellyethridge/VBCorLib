@@ -45,6 +45,7 @@ Attribute VB_Exposed = True
 ' @see FileStream
 ' @see MemoryStream
 ' @see CryptoStream
+'@Folder("CorLib.System.IO")
 Option Explicit
 
 Private Const FILE_BEGIN    As Long = 0

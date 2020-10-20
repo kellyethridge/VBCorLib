@@ -35,6 +35,7 @@ Attribute VB_Exposed = False
 ' Module: TimeSpanParser
 '
 
+'@Folder("CorLib.System")
 Option Explicit
 Private Const MillisecondsPerSecond       As Long = 1000
 Private Const SecondsPerMinute            As Long = 60

@@ -39,6 +39,7 @@ Attribute VB_Exposed = False
 ' This Encoding is used to encode/decode unicode characters that can be represented
 ' with either one or two bytes.
 '
+'@Folder("CorLib.System.Text")
 Option Explicit
 Implements IObject
 Implements Encoding

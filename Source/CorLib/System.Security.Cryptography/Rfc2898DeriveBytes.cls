@@ -40,6 +40,7 @@ Attribute VB_Exposed = True
 '
 ' @see Constructors
 ' @include "..\DocIncludes\Rfc2898DeriveBytes.html"
+'@Folder("CorLib.System.Security.Cryptography")
 Option Explicit
 Implements IObject
 

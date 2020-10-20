@@ -40,6 +40,7 @@ Attribute VB_Exposed = True
 '
 ' @see ThaiBuddhistCalendar
 '
+'@Folder("CorLib.System.Globalization")
 Option Explicit
 
 ''

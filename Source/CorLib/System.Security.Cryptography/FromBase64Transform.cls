@@ -41,6 +41,7 @@ Attribute VB_Exposed = True
 ' @remarks This class is used primarily in conjunction with the <a href="CryptoStream.html">CryptoStream</a> class and shouldn't
 ' be used to process large amounts of data manually. For that use the <a href="Convert.FromBase64String.html">Convert.FromBase64String</a> method.
 '
+'@Folder("CorLib.System.Security.Cryptography")
 Option Explicit
 Implements IObject
 Implements ICryptoTransform

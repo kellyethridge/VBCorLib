@@ -42,6 +42,7 @@ Attribute VB_Exposed = True
 ' @see Constructors
 ' @see Conversion
 ' @include "..\DocIncludes\Int64Static.html"
+'@Folder("CorLib.System")
 Option Explicit
 
 Private mMaxDecimalValue As Variant

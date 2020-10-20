@@ -38,6 +38,7 @@ Attribute VB_Exposed = True
 ''
 ' Represents a standard interface implemented by all RC2 crypto service providers.
 '
+'@Folder("CorLib.System.Security.Cryptography")
 Option Explicit
 
 

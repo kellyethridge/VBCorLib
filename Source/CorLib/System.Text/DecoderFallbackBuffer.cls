@@ -44,6 +44,7 @@ Attribute VB_Exposed = True
 '   <li>A decoder fallback, which is represented by a class that implements the <a href="DecoderFallback.html">DecoderFallback</a> interface.</li>
 '   <li>A decoder fallback buffer, which is represented by a type that implements the <b>DecoderFallbackBuffer</b> interface that can return a string to the conversion operation.</li>
 ' </ul></p>
+'@Folder("CorLib.System.Text")
 Option Explicit
 
 ''

@@ -34,6 +34,7 @@ Attribute VB_Exposed = True
 '
 ' Module: DecoderFallbackStatic
 '
+'@Folder("CorLib.System.Text")
 Option Explicit
 
 Private mReplacementFallback    As New DecoderReplacementFallback

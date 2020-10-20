@@ -22,6 +22,7 @@ Attribute VB_Name = "Validation"
 '
 ' Module: Validation
 '
+'@Folder("CorLib.System")
 Option Explicit
 
 Public Sub ValidateArrayRange(ByRef Arr As Variant, ByRef Index As Variant, ByRef Count As Variant, _

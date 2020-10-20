@@ -40,6 +40,7 @@ Attribute VB_Exposed = True
 '
 ' @see StopWatch
 '
+'@Folder("CorLib.System.Diagnostics")
 Option Explicit
 
 Private mIsHighResolution   As Boolean

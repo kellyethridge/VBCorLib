@@ -40,6 +40,7 @@ Attribute VB_Exposed = True
 '
 ' @remarks To create an instance of <b>CspKeyContainerInfo</b> use the <a href="Constructors.NewCspKeyContainerInfo.html">NewCspKeyContainerInfo</a> constructor.
 ' @see Constructors
+'@Folder("CorLib.System.Security.Cryptography")
 Option Explicit
 Implements IObject
 

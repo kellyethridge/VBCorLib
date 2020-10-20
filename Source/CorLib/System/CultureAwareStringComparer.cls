@@ -35,6 +35,7 @@ Attribute VB_Exposed = False
 ' Module: CultureAwareStringComparer
 '
 
+'@Folder("CorLib.System")
 Option Explicit
 Implements IObject
 Implements StringComparer

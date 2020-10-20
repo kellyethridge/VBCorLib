@@ -41,6 +41,7 @@ Attribute VB_Exposed = True
 ' @see TextReaderStatic
 ' @see StreamReader
 ' @see StringReader
+'@Folder("CorLib.System.IO")
 Option Explicit
 
 ''

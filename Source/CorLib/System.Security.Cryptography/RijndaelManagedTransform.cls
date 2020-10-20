@@ -42,6 +42,7 @@ Attribute VB_Exposed = True
 ' <p>Use the RijndaelManaged class to create an instance of this class.</p>
 ' @see RijndaelManaged
 '
+'@Folder("CorLib.System.Security.Cryptography")
 Option Explicit
 Implements IObject
 Implements ICryptoTransform
