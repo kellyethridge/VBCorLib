@@ -30,6 +30,11 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "1e10", NewBytes(&H0, &HE4, &HB, &H54, &H2), 1
             Test.Use "1e+10", NewBytes(&H0, &HE4, &HB, &H54, &H2), 1
             
+        Case "Parse_WithExponentAndDecimal_ReturnsBigInteger"
+            Test.Use "1.0e5", "100000"
+            Test.Use "1.4e5", "140000"
+            Test.Use "123456789.00", "123456789"
+            
         Case "Parse_WithInvalidValue_ThrowsFormatException"
             Test.Use "-1"
             Test.Use " 1"
@@ -59,6 +64,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "1e+"
             Test.Use "1e-"
             Test.Use "1e10e"
+            Test.Use "1.4e5"
             
     End Select
 End Sub
@@ -69,6 +75,14 @@ Public Sub Parse_WithValidValue_ReturnsBigInteger(ByVal s As String, ByRef Expec
     Set Actual = BigInteger.Parse(s, NumberStyles.AllowExponent)
     
     AssertNumber Actual, ExpectedBytes, ExpectedSign
+End Sub
+
+Public Sub Parse_WithExponentAndDecimal_ReturnsBigInteger(ByVal s As String, ByVal Expected As String)
+    Dim Actual As BigInteger
+    
+    Set Actual = BigInteger.Parse(s, NumberStyles.AllowExponent Or NumberStyles.AllowDecimalPoint)
+    
+    Assert.That Actual.ToString, Iz.EqualTo(Expected)
 End Sub
 
 Public Sub Parse_WithInvalidValue_ThrowsFormatException(ByVal s As String)

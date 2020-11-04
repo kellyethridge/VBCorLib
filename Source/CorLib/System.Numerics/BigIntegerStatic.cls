@@ -788,6 +788,8 @@ Private Function TryParseDecimal(ByRef s As String, ByVal Style As NumberStyles,
     Dim FoundExponent       As Boolean
     Dim Exponent            As Long
     Dim DecimalPlaces       As Long
+    Dim AsShiftedSpace      As Boolean
+    Dim HasExponent         As Boolean
     
     NegativeSign = AscW(Info.NegativeSign)
     PositiveSign = AscW(Info.PositiveSign)
@@ -796,14 +798,15 @@ Private Function TryParseDecimal(ByRef s As String, ByVal Style As NumberStyles,
     CurrencyPoint = AscW(Info.CurrencyDecimalSeparator)
     Thousands = AscW(Info.NumberGroupSeparator)
     CurrencyThousands = AscW(Info.CurrencyGroupSeparator)
+    AsShiftedSpace = Thousands = &HA0
     Chars = AllocChars(s)
     MaxIndex = UBound(Chars)
     n.Sign = 1
     ReDim n.Digits(0 To Len(s) \ 4)
     
     Do While Index <= MaxIndex
-        Ch = Chars(Index)
-        
+        Ch = Chars(Index) And &HFFFF&
+                    
         Select Case Ch
             Case vbZeroChar To vbNineChar
                 If (FoundCurrency = FoundAfter) Or (FoundSign = FoundAfter) Or InWhitespace Then
@@ -814,8 +817,8 @@ Private Function TryParseDecimal(ByRef s As String, ByVal Style As NumberStyles,
                     SingleInPlaceMultiply n, 10
                     SingleInPlaceAdd n, Ch - vbZeroChar
                 Else
-                    If Style And NumberStyles.AllowExponent Then
-                        ' we are allowing a possible exponent value to be parsed,
+                    If (Style And NumberStyles.AllowExponent) And HasExponent Then
+                        ' We are allowing a possible exponent value to be parsed,
                         ' so if we have encountered a decimal point, we need to
                         ' continue parsing digits and also count how many
                         ' decimal places we have gone.
@@ -853,7 +856,7 @@ Private Function TryParseDecimal(ByRef s As String, ByVal Style As NumberStyles,
                 If Ch = NegativeSign Then
                     n.Sign = -1
                 End If
-            Case vbTabChar, vbLfChar, vbVtChar, vbFfChar, vbCrChar, vbSpaceChar
+            Case vbTabChar, vbLfChar, vbVtChar, vbFfChar, vbCrChar ', vbSpaceChar
                 If Not FoundDigit Then
                     If ((Style And NumberStyles.AllowLeadingWhite) = 0) Or NeedsClosingParen Then
                         GoTo Finally
@@ -862,6 +865,37 @@ Private Function TryParseDecimal(ByRef s As String, ByVal Style As NumberStyles,
                     InWhitespace = FoundSign
                 Else
                     InWhitespace = True
+                End If
+            Case vbSpaceChar
+                ' We could potentially treat a space as a shifted-space (&hA0) if the culture
+                ' group separator is a shifted-space. Otherwise treat a space like whitespace.
+                
+                ' We would only treat a space as shifted if we've already found digits
+                ' that could then have a group separator. Otherwise, we have a space before
+                ' any digits and need to check leading whitespace allowance.
+                If Not FoundDigit Then
+                    If ((Style And NumberStyles.AllowLeadingWhite) = 0) Or NeedsClosingParen Then
+                        GoTo Finally
+                    End If
+                
+                    InWhitespace = FoundSign
+                Else
+                    ' We have found digits, so now we want to treat a space as shifted if the
+                    ' group separator is a shifted space.
+                    If Thousands = &HA0 Then
+                        ' Treat as finding a group separator.
+                        If ((Style And NumberStyles.AllowThousands) = 0) Or (Not FoundDigit) Then
+                            GoTo Finally
+                        End If
+                        
+                        If FoundCurrency Then
+                            If Ch = Thousands Then
+                                GoTo Finally
+                            End If
+                        End If
+                    Else
+                        InWhitespace = True
+                    End If
                 End If
             Case vbOpenParenChar
                 If ((Style And NumberStyles.AllowParentheses) = 0) Or (FoundSign <> NotFound) Then
@@ -892,6 +926,23 @@ Private Function TryParseDecimal(ByRef s As String, ByVal Style As NumberStyles,
                     If Ch = DecimalPoint Then
                         GoTo Finally
                     End If
+                End If
+                
+                If Style And NumberStyles.AllowExponent Then
+                    ' We want to check to see if we will even encounter
+                    ' an exponent so as we parse we can determine how to
+                    ' handle a decimal point. So quickly check for an "E" or "e",
+                    ' otherwise we may have to fail when finding digits after
+                    ' a decimal point.
+                    Dim i As Long
+                    
+                    For i = Index + 1 To MaxIndex
+                        Select Case Chars(i)
+                            Case vbLowerEChar, vbUpperEChar
+                                HasExponent = True
+                                Exit For
+                        End Select
+                    Next
                 End If
                 
                 FoundDecimal = True

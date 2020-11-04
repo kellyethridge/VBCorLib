@@ -579,6 +579,17 @@ Public Sub Parse_WithInvalidValueForNumberStylesAllowParentheses_ThrowsFormatExc
     AssertFormatException Err
 End Sub
 
+Public Sub Parse_WithFrenchCulture_ParsesWithSpaceAsGroupSeparator()
+    Dim Provider As CultureInfo
+    Dim Actual As BigInteger
+    
+    Set Provider = NewCultureInfo("fr-FR")
+    
+    Set Actual = BigInteger.Parse("9 031 425 666 123 546,00", NumberStyles.AllowDecimalPoint Or NumberStyles.AllowThousands, Provider)
+    
+    Assert.That Actual.ToString, Iz.EqualTo("9031425666123546")
+End Sub
+
 Public Sub ToString_WithNoFormatting_ReturnsDefault(ByVal Value As Long, ByVal Expected As String)
     Dim Number As BigInteger
     Dim Actual As String

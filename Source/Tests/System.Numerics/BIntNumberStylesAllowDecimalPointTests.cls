@@ -31,6 +31,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "0.0", NewBytes(0), 0
             Test.Use "1.", NewBytes(1), 1
             Test.Use ".0", NewBytes(0), 0
+            Test.Use "9031425666123546.00", NewBytes(&H1A, &H7, &HA5, &HA6, &H8, &H16, &H20), 1
             
         Case "Parse_WithInvalidValue_ThrowsFormatException"
             Test.Use "-1"
@@ -53,6 +54,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "1++"
             Test.Use "--1"
             Test.Use "1--"
+            Test.Use "1.4"
             
     End Select
 End Sub
@@ -72,4 +74,5 @@ Public Sub Parse_WithInvalidValue_ThrowsFormatException(ByVal s As String)
     
     AssertFormatException Err
 End Sub
+
 
