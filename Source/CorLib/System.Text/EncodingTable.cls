@@ -61,7 +61,7 @@ End Type
 Private mEncodingData()     As DataItem
 Private mIndexByCodePage    As Hashtable
 Private mCodePageByName     As Hashtable
-Private mCodePageItems()        As CodePageItem
+Private mCodePageItems()    As CodePageItem
 
 
 Friend Property Get BodyName(ByVal cp As Long) As String

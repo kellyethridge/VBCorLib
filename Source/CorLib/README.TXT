@@ -9,6 +9,7 @@ version Next
 	* Fixed #78 - BigInteger not correctly formatting with large exponent.
 	* Fixed #83 - BigInteger.Parse was not correctly parsing negative hex string values.
 	* Fixed #84 - BigInteger.ToString was not preserving leading characters necessary to maintain sign of the value.
+	* Removed dependency of CompareStringOrdinal API to remain compatible with Windows XP. This closes #93.
 
 version 3.1
 	* Fixed CorArray.Clear not releasing reference types correctly for Variant().

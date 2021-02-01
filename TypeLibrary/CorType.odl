@@ -1,8 +1,8 @@
 [
-    helpstring("VB.EXT: CorLib Type Library 3.0"),
-    uuid(1F852AFD-5C0A-46d0-8AA1-4319E8EF72C0),
+    helpstring("VB.EXT: CorLib Type Library 3.2"),
+    uuid(97EBCEAB-2671-4384-B175-9B29DE78069C),
     lcid(0x00000000),
-    version(3.0)
+    version(3.2)
 ]
 library CorType {
     importlib("stdole2.tlb");
@@ -1080,7 +1080,6 @@ library CorType {
     	[entry("GlobalUnlock")] long GlobalUnlock([in] long hMem);
     	[entry("VirtualQuery")] DWORD VirtualQuery([in] LPCVOID lpAddress, [in] MEMORY_BASIC_INFORMATION* lpBuffer, [in] DWORD dwLength);
     	[entry("CompareStringW"), usesgetlasterror] long CompareString([in] long LCID, [in] long dwCmpFlags, [in] long lpString1, [in] long cchCount1, [in] long lpString2, [in] long cchCount2);
-    	[entry("CompareStringOrdinal"), usesgetlasterror] long CompareStringOrdinal([in] long lpString1, [in] long cchCount1, [in] long lpString2, [in] long cchCount2, [in] BOOL bIgnoreCase);
     }
 
     [dllname("oleaut32.dll"), helpstring("Access to API functions within the Oleaut32.dll system file.")]
@@ -1331,7 +1330,7 @@ library CorType {
 
         [entry("SendMessageTimeoutA"), usesgetlasterror] long  SendMessageTimeout([in] long hWnd, [in] long Msg, [in] long wParam, [in] long lParam, [in] long fuFlags, [in] long uTimeout, [in] long * lpdwResult);
         [entry("GetKeyState")] short GetKeyState([in] long nVirtKey);
-        [entry("CharLowerA")] long  CharLower([in] long Char);
+        // [entry("CharLowerA")] long  CharLower([in] long Char);
         [entry("SetTimer"), usesgetlasterror] long  SetTimer([in] long hwnd, [in] long nIDEvent, [in] long uElapse, [in] long lpTimerFunc);
         [entry("KillTimer"), usesgetlasterror] long  KillTimer([in] long hwnd, [in] long nIDEvent);
         [entry("CreateIconFromResource"), usesgetlasterror] long  CreateIconFromResource([in] byte * PresBits, [in] long dwResSize, [in] long fIcon, [in] long dwVer);
@@ -1340,6 +1339,7 @@ library CorType {
         [entry("GetUserObjectInformationW"), usesgetlasterror] long GetUserObjectInformationW([in] long hObj, [in] long nIndex, [in] LPVOID pvInfo, [in] long nLength, [in] long * lpnLengthNeeded);
         [entry("GetSystemMenu")] long GetSystemMenu([in] long hWnd, [in] BOOL bRevert);
         [entry("RemoveMenu"), usesgetlasterror] long RemoveMenu([in] long hMenu, [in] long nPosition, [in] long wFlags);
+        [entry("CharUpperBuffW")] long CharUpperBuffW([in] void * lpsz, [in] DWORD cchLength);
     }
 
     [dllname("shfolder.dll"), helpstring("Access to API functions in the Shfolder.dll system file.")]
