@@ -402,6 +402,10 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "A", "Az", -1
             Test.Use "az", "A", 1
             Test.Use "Az", "a", -1
+            Test.Use Space$(15), Space$(15), 0
+            Test.Use Space$(16), Space$(15), 1
+            Test.Use Space$(15), Space$(16), -1
+            Test.Use Space$(15) & "a", Space$(15) & "b", -1
             
     End Select
 End Sub
