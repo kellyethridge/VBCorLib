@@ -6,8 +6,8 @@
 ; Do not use the same AppId value in installers for other applications.
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
 AppId={{CBB90C23-2F68-4770-8469-85F0B78FFF25}
-AppName=VBCorLib 3.1.0
-AppVerName=VBCorLib 3.1.0
+AppName=VBCorLib 3.2.0
+AppVerName=VBCorLib 3.2.0
 AppPublisher=Kelly Ethridge
 AppPublisherURL=https://github.com/kellyethridge/VBCorLib
 AppSupportURL=https://github.com/kellyethridge/VBCorLib
@@ -16,7 +16,7 @@ DefaultDirName={pf}\VBCorLib3
 DefaultGroupName=VBCorLib
 AllowNoIcons=yes
 OutputDir=.
-OutputBaseFilename=VBCorLib-3.1.0
+OutputBaseFilename=VBCorLib-3.2.0
 Compression=lzma
 SolidCompression=yes
 
