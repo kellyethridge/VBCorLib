@@ -166,10 +166,15 @@ End Function
 ' @see #ReadChars
 ' @see #PeekChar
 ' @include "..\DocIncludes\BinaryReader.ReadChar.html"
-Public Function ReadChar() As Long
-    ReadChar = Read
+Public Function ReadChar() As Integer
+    Dim Result As Long
+    
+    Result = Read
+    
     If ReadChar = NoChars Then _
         Throw New EndOfStreamException
+        
+    ReadChar = Char.ConvertFromInt32(Result)
 End Function
 
 ''

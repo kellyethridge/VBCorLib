@@ -6,6 +6,7 @@ version 4.0
 	* Closed #64 - ExceptionBase.ToString should return type String.
 	* Closed #61 - CorString.CompareOrdinalEx parameter Length should be declared as Long.
 	* Closed #60 - CorString.CompareCulturalEx parameter Length should be declared as Long.
+	* Closed #27 - Changed BinaryReader.ReadChar return type to Integer.
 
 version 3.2
 	* Optimize StringBuilder.AppendChar for Release build.

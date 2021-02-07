@@ -247,10 +247,20 @@ Public Sub ReadChar_WhenCalled_ReturnsChar()
     Dim Reader As BinaryReader
     Set Reader = MakeReader(NewBytes(&HE2, &H80, &HB0))
     
-    Dim Actual As Long
+    Dim Actual As Integer
     Actual = Reader.ReadChar
     
     Assert.That Actual, Iz.EqualTo(&H2030)
+End Sub
+
+Public Sub ReadChar_WhenReadingCharacterWithHighBit_ReturnsConvertedCorrectly()
+    Dim Reader As BinaryReader
+    Set Reader = MakeReader(NewBytes(&HEA, &H80, &H80))
+    
+    Dim Actual As Integer
+    Actual = Reader.ReadChar
+    
+    Assert.That Actual, Iz.EqualTo(&HA000)
 End Sub
 
 Public Sub ReadChar_WhenReadingASurrogateFromAPair_ThrowsArgumentException()
