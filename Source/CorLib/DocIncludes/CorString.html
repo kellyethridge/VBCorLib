@@ -1,11 +1,11 @@
 @examples The following example shows how to call various methods on the <b>CorString</b> class.
 <!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid lightgrey;border-width:.2em .1em .2em .1em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
-    <span style="color: #0000ff">Const</span> Sentance <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span> = <span style="color: #a31515">&quot;This string consists of a single short sentence.&quot;</span>
+    <span style="color: #0000ff">Const</span> Sentence <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span> = <span style="color: #a31515">&quot;This string consists of a single short sentence.&quot;</span>
     
     <span style="color: #0000ff">Dim</span> Words() <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
     <span style="color: #0000ff">Dim</span> Word <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>
     
-    Words = CorString.Split(Sentance, <span style="color: #a31515">&quot; &quot;</span>)
+    Words = CorString.Split(Sentence, <span style="color: #a31515">&quot; &quot;</span>)
     
     <span style="color: #0000ff">For</span> <span style="color: #0000ff">Each</span> Word <span style="color: #0000ff">In</span> Words
         Debug.Print CorString.Format(<span style="color: #a31515">&quot;&#39;{0}&#39;&quot;</span>, Word)

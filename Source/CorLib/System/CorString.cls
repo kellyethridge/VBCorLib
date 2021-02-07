@@ -1000,7 +1000,7 @@ End Function
 '        <td>Greater than zero</td><td><i>StrA</i> is greater than <i>StrB</i>.</td>
 '    </tr>
 ' </table>
-Public Function Compare(ByRef StrA As String, ByRef StrB As String, Optional ByVal ComparisonType As StringComparison = StringComparison.Ordinal) As Long
+Public Function Compare(ByRef StrA As String, ByRef StrB As String, Optional ByVal ComparisonType As StringComparison = StringComparison.CurrentCulture) As Long
     Select Case ComparisonType
         Case StringComparison.BinaryCompare
             Compare = StrComp(StrA, StrB, vbBinaryCompare)
@@ -1013,7 +1013,7 @@ End Function
 
 ' there are places where strings will be held in variants and we don't want to
 ' have to convert them to a string variable causing additional string allocations.
-Friend Function CompareV(ByRef StrA As Variant, ByRef StrB As Variant, Optional ByVal ComparisonType As StringComparison = StringComparison.Ordinal) As Long
+Friend Function CompareV(ByRef StrA As Variant, ByRef StrB As Variant, Optional ByVal ComparisonType As StringComparison = StringComparison.CurrentCulture) As Long
     Select Case ComparisonType
         Case StringComparison.BinaryCompare
             CompareV = StrComp(StrA, StrB, vbBinaryCompare)
@@ -1076,7 +1076,7 @@ End Function
 '        <td><a href="NotSupportedException.html">NotSupportedException</a></td><td><a href="CorString.StringComparison.html">StringComparison</a> is not supported.</td>
 '    </tr>
 ' </table>
-Public Function CompareEx(ByRef StrA As String, ByVal IndexA As Long, ByRef StrB As String, ByVal IndexB As Long, ByVal Length As Long, Optional ByVal ComparisonType As StringComparison = StringComparison.Ordinal) As Long
+Public Function CompareEx(ByRef StrA As String, ByVal IndexA As Long, ByRef StrB As String, ByVal IndexB As Long, ByVal Length As Long, Optional ByVal ComparisonType As StringComparison = StringComparison.CurrentCulture) As Long
     Dim PtrA As Long
     Dim PtrB As Long
     Dim LengthA As Long
@@ -1863,14 +1863,16 @@ Friend Function CompareStringOrdinalIgnoreCase(ByVal PtrA As Long, ByVal LengthA
         ' to convert to upper case to avoid looking
         ' up in the table. Most characters will probably be ASCII.
         Select Case ChA
-            Case 97 To 122, 224 To 246, 248, 249 To 254
+            Case Is < 97
+            Case Is <= 122, 224 To 246, 248, 249 To 254
                 ChA = ChA - 32
             Case Is > 254
                 ChA = mLowerUpper(ChA) And &HFFFF&
         End Select
         
         Select Case ChB
-            Case 97 To 122, 224 To 246, 248, 249 To 254
+            Case Is < 97
+            Case Is <= 122, 224 To 246, 248, 249 To 254
                 ChB = ChB - 32
             Case Is > 254
                 ChB = mLowerUpper(ChB) And &HFFFF&

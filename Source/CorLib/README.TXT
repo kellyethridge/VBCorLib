@@ -1,6 +1,9 @@
 ** VBCorLib **
 
-version Next
+version 4.0
+	* Closed #79 - Updated CorString.Compare and CorString.CompareEx default comparison to StringComparison.CurrentCulture.
+
+version 3.2
 	* Optimize StringBuilder.AppendChar for Release build.
 	* Validate Char parameter in StringBuilder.AppendChar. Must be within -32768 to 65535 or OverflowException is thrown.
 	* Optimize BinaryWriter.WriteChar method. Changed using mEncoding.GetBytes method to mEncoding.GetBytesEx to re-use Byte array instead of re-creating it each call.
