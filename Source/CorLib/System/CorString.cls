@@ -1150,7 +1150,7 @@ End Function
 '        <td>Greater than zero</td><td><i>StrA</i> is greater than <i>StrB</i>.</td>
 '    </tr>
 ' </table>
-Public Function CompareCulturalEx(ByRef StrA As String, ByVal IndexA As Long, ByRef StrB As String, ByVal IndexB As Long, ByVal Length, ByVal Culture As CultureInfo, ByVal Options As CompareOptions) As Long
+Public Function CompareCulturalEx(ByRef StrA As String, ByVal IndexA As Long, ByRef StrB As String, ByVal IndexB As Long, ByVal Length As Long, ByVal Culture As CultureInfo, ByVal Options As CompareOptions) As Long
     Dim PtrA As Long
     Dim PtrB As Long
     Dim LengthA As Long
@@ -1235,7 +1235,7 @@ End Function
 '        </td>
 '   </tr>
 ' </table>
-Public Function CompareOrdinalEx(ByRef StrA As String, ByVal IndexA As Long, ByRef StrB As String, ByVal IndexB As Long, ByVal Length) As Long
+Public Function CompareOrdinalEx(ByRef StrA As String, ByVal IndexA As Long, ByRef StrB As String, ByVal IndexB As Long, ByVal Length As Long) As Long
     CompareOrdinalEx = CompareEx(StrA, IndexA, StrB, IndexB, Length, StringComparison.Ordinal)
 End Function
 

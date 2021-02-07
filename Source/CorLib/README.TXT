@@ -4,6 +4,8 @@ version 4.0
 	* Closed #79 - Updated CorString.Compare and CorString.CompareEx default comparison to StringComparison.CurrentCulture.
 	* Closed #65 - SHA1CryptoServiceProvider.SHA1_ComputeHash method should be private.
 	* Closed #64 - ExceptionBase.ToString should return type String.
+	* Closed #61 - CorString.CompareOrdinalEx parameter Length should be declared as Long.
+	* Closed #60 - CorString.CompareCulturalEx parameter Length should be declared as Long.
 
 version 3.2
 	* Optimize StringBuilder.AppendChar for Release build.
