@@ -2,6 +2,7 @@
 
 version 4.0
 	* Closed #79 - Updated CorString.Compare and CorString.CompareEx default comparison to StringComparison.CurrentCulture.
+	* Closed #65 - SHA1CryptoServiceProvider.SHA1_ComputeHash method should be private.
 
 version 3.2
 	* Optimize StringBuilder.AppendChar for Release build.
