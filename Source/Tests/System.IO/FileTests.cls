@@ -72,7 +72,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
         Case "WriteAllLines_WithLines_WritesToFile"
             Test.Use NewStrings()
             Test.Use NewStrings("a", "1", "2", "b")
-            Test.Use NewArrayList(Source:=Array("1", "2", "3", "a", "b", "c"))
+            Test.Use NewArrayList(Array("1", "2", "3", "a", "b", "c"))
             Test.Use NewCollection("1", "2")
             
     End Select
@@ -428,6 +428,31 @@ Public Sub AppendAllText_WithExistingFile_AppendToEndOfFile()
     Dim Actual As String
     Actual = File.ReadAllText(mBuilder.TempFileName)
     Assert.That Actual, Iz.EqualTo("abcdef")
+End Sub
+
+Public Sub AppendAllLines_WithNonExistingFile_CreatesNewFile()
+    Dim Lines As Variant
+    
+    Lines = Array("Line2", "Line3")
+    
+    File.AppendAllLines mBuilder.TempFileName, Lines
+    
+    Dim Actual() As String
+    Actual = File.ReadAllLines(mBuilder.TempFileName)
+    Assert.That Actual, Iz.EqualTo(Array("Line2", "Line3"))
+End Sub
+
+Public Sub AppendAllLines_WithExistingFile_AppendsToFile()
+    Dim Lines As Variant
+    
+    Lines = Array("Line2", "Line3")
+    mBuilder.CreateFile Data:="Line1" & vbCrLf
+    
+    File.AppendAllLines mBuilder.TempFileName, Lines
+    
+    Dim Actual() As String
+    Actual = File.ReadAllLines(mBuilder.TempFileName)
+    Assert.That Actual, Iz.EqualTo(Array("Line1", "Line2", "Line3"))
 End Sub
 
 Public Sub OpenFile_WithModeAppendAndDefaultAccess_ReturnsFileStreamWithWriteAccessOnly()

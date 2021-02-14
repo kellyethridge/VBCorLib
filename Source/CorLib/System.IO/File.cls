@@ -69,6 +69,36 @@ Public Sub AppendAllText(ByRef Path As String, ByRef Contents As String, Optiona
 End Sub
 
 ''
+' Appends lines to a file by using a specified encoding, and then closes the file.
+'
+' @param Path The file to append the lines to.
+' @param Contents The lines to append to the file.
+' @param Encoding The character encoding to use.
+' @remarks If the target file does not exist, it is created.
+' @exceptions
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th><th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ArgumentException.html">ArgumentException</a></td>
+'        <td><i>Path</i> is a zero-length string, contains only white space, or contains one more invalid characters defined by the <a href="Path.GetInvalidPathChars.html">GetInvalidPathChars</a> method.</td>
+'   </tr>
+'    <tr>
+'        <td><a href="IOException.html">IOException</a></td><td>An I/O error occurred while opening the file.</td>
+'    </tr>
+' </table>
+Public Sub AppendAllLines(ByRef Path As String, ByRef Contents As Variant, Optional ByVal Encoding As Encoding)
+    Dim Line As Variant
+    
+    With Cor.NewStreamWriter(Path, True, Encoding)
+        For Each Line In Contents
+            .WriteLine Line
+        Next
+    End With
+End Sub
+
+''
 ' Copies an existing file to a new file. Overwriting a file of the same name is allowed.
 '
 ' @param SourceFileName The file to copy.
@@ -539,9 +569,9 @@ End Sub
 ' exists, it will be overwritten.
 '
 Public Sub WriteAllLines(ByRef Path As String, ByRef Contents As Variant, Optional ByVal Encoding As Encoding)
+    Dim Line As Variant
+    
     With Cor.NewStreamWriter(Path, Encoding:=Encoding)
-        Dim Line As Variant
-        
         For Each Line In Contents
             .WriteLine Line
         Next

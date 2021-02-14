@@ -12,6 +12,7 @@ version 4.0
 	* Fixed #46 - Allow CorString.Split to have optional delimiter that would default to splitting on whitespaces.
 	* Added NewBigIntegers contstructor. This closes #81.
 	* Fixed #43 - Removed the Comparer parameter from the NewArrayList constructor method.
+	* Added AppendAllLines to File class. This closes #44.
 
 version 3.2
 	* Optimize StringBuilder.AppendChar for Release build.
