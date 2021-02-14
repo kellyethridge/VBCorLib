@@ -376,6 +376,7 @@ Class=OrdinalStringComparer; System\OrdinalStringComparer.cls
 Class=LegacyStringComparer; System\LegacyStringComparer.cls
 Class=Conversion; Cor\Conversion.cls
 ResFile32="CorLib.RES"
+Class=FileLineEnumerator; System.IO\FileLineEnumerator.cls
 Startup="Sub Main"
 HelpFile=""
 Title="CorLib"

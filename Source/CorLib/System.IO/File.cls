@@ -91,6 +91,9 @@ End Sub
 Public Sub AppendAllLines(ByRef Path As String, ByRef Contents As Variant, Optional ByVal Encoding As Encoding)
     Dim Line As Variant
     
+    If Not IsEnumerable(Contents) Then _
+        Error.Argument Argument_NotEnumerable
+    
     With Cor.NewStreamWriter(Path, True, Encoding)
         For Each Line In Contents
             .WriteLine Line
@@ -528,6 +531,27 @@ Public Function ReadAllLines(ByRef Path As String, Optional ByVal Encoding As En
 End Function
 
 ''
+' Read the lines of a file that has a specified encoding.
+'
+' @param Path The file to read.
+' @param Encoding The encoding that is applied to the contents of the file.
+' @return All the lines of the file, or the lines that are the result of a query.
+' @remarks The <b>ReadLines</b> and <a href="File.ReadAllLines.html">ReadAllLines</a> methods differ as follows: When you use <b>ReadLines</b>,
+' you can start enumerating the collection of strings before the whole collection is returned. When you use <a href="File.ReadAllLines.html">ReadAllLines</a>,
+' you must wait for the whole array of strings be returned before you can access the array. Therefore, when you are working with very large files, <b>ReadLines</b> can be more efficient.
+' <p>You can use the <b>ReadLines</b> method to do the following:</p>
+' <ul>
+'   <li>Write the returned collection of lines to a file with the <a href="File.WriteAllLines.html">File.WriteAllLines</a> method, or append them to an existing file with the <a href="File.AppendAllLines.html">File.AppendAllLines<a/> method.</li>
+'   <li>Create an immediately populated instance of a collection that takes an <a href="IEnumerable.html">IEnumerable</a> collection of strings for its constructor, such as <a href="ArrayList.html">ArrayList</a> or a <a href="Queue.html">Queue</a>.</li>
+' </ul>
+Public Function ReadLines(ByRef Path As String, Optional ByVal Encoding As Encoding) As IEnumerable
+    Dim En As New FileLineEnumerator
+    
+    En.Init Path, Encoding
+    Set ReadLines = En
+End Function
+
+''
 ' Opens a files, writes out all contents to the file, then closes the file.
 '
 ' @param Path The path and filename of the file to write to.
@@ -570,6 +594,9 @@ End Sub
 '
 Public Sub WriteAllLines(ByRef Path As String, ByRef Contents As Variant, Optional ByVal Encoding As Encoding)
     Dim Line As Variant
+    
+    If Not IsEnumerable(Contents) Then _
+        Error.Argument Argument_NotEnumerable
     
     With Cor.NewStreamWriter(Path, Encoding:=Encoding)
         For Each Line In Contents

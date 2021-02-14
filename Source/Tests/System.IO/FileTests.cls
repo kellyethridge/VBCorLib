@@ -258,6 +258,38 @@ Public Sub ReadAllLines_WithLinesContainingDifferentLineSeparators_ReturnsArrayO
     Assert.That Actual, Iz.EqualTo(Array("1", "2", "3"))
 End Sub
 
+Public Sub ReadLines_WithEmptyFile_ReturnsNoContent()
+    Dim FileName As String
+    Dim Line As Variant
+    Dim HasLines As Boolean
+    
+    FileName = mBuilder.CreateFile()
+    
+    For Each Line In File.ReadLines(FileName)
+        HasLines = True
+        Exit For
+    Next
+    
+    Assert.That HasLines, Iz.False
+End Sub
+
+Public Sub ReadLines_WithFileContainingLines_EnumeratesLines()
+    Dim FileName As String
+    Dim Line As Variant
+    Dim Lines As Variant
+    Dim Actual As New Collection
+    
+    FileName = mBuilder.TempFileName
+    Lines = Array("L1", "L2", "L3")
+    File.WriteAllLines FileName, Lines
+    
+    For Each Line In File.ReadLines(FileName)
+        Actual.Add Line
+    Next
+    
+    Assert.That Actual, Iz.EqualTo(Lines)
+End Sub
+
 Public Sub ReadAllBytes_WithEmptyFile_ReturnsEmptyArray()
     Dim FileName As String
     FileName = mBuilder.CreateFile()

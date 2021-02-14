@@ -43,6 +43,7 @@ Attribute VB_Exposed = True
 ' <p>To lower the capacity to save memory, use the <a href="ArrayList.TrimToSize.html">TrimToSize</a> method, or set <a href="ArrayList.Let.Capacity.html">Capacity</a> directly.</p>
 ' <p>The default capacity is 16.</p>
 ' <p>Elements in this collection can be accessed using an integer index. Indexes in this collection are zero-based.</p>
+' <p>A new <b>ArrayList</b> can be initialized with elements using the <a href="Constructors.NewArrayList.html">NewArrayList</a> constructor methods.</p>
 '
 ' @see Constructors
 ' @see ArrayListStatic

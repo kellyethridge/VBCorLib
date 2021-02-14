@@ -13,6 +13,7 @@ version 4.0
 	* Added NewBigIntegers contstructor. This closes #81.
 	* Fixed #43 - Removed the Comparer parameter from the NewArrayList constructor method.
 	* Added AppendAllLines to File class. This closes #44.
+	* Added ReadLines to File class. This closes #94.
 
 version 3.2
 	* Optimize StringBuilder.AppendChar for Release build.

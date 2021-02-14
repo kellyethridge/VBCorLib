@@ -115,6 +115,20 @@ Public Function IsInteger(ByRef Value As Variant) As Boolean
     End Select
 End Function
 
+Public Function IsEnumerable(ByRef Value As Variant) As Boolean
+    If IsArray(Value) Then
+        IsEnumerable = True
+    ElseIf IsObject(Value) Then
+        If Not Value Is Nothing Then
+            If TypeOf Value Is Collection Then
+                IsEnumerable = True
+            ElseIf TypeOf Value Is IEnumerable Then
+                IsEnumerable = True
+            End If
+        End If
+    End If
+End Function
+
 ' This method returns the VbVarType of a variable like the VarType
 ' method. However, this will not cause an object's default property
 ' to be invoked like VarType does. This method will also return

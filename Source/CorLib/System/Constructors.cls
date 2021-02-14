@@ -234,7 +234,7 @@ End Function
 ' As elements are added to an <a href="ArrayList.html">ArrayList</a>, the capacity is automatically increased as required by reallocating the internal array.</p>
 ' <p>The elements are copied onto the <a href="ArrayList.html">ArrayList</a> in the same order they are read by the For..Each statement.</p>
 ' <p>This constructor is an O(<i>n</i>) operation, where <i>n</i> is the number of elements in <i>Source</i>.</p>
-'' @see ArrayList
+' @see ArrayList
 ' @see IComparer
 Public Function NewArrayList(ByRef Source As Variant) As ArrayList
     Set NewArrayList = New ArrayList
