@@ -55,6 +55,7 @@ Private mSingleChar(0)  As Integer
 Private mCharBytes(5)   As Byte
 Private mLargeBuffer()  As Byte
 Private mMaxChars       As Long
+Private mLeaveOpen      As Boolean
 
 
 ''
@@ -72,13 +73,20 @@ End Property
 ' Closes the writer, flushing any data.
 '
 Public Sub CloseWriter()
-    mOutStream.CloseStream
+    If Not mOutStream Is Nothing Then
+        If Not mLeaveOpen Then
+            mOutStream.CloseStream
+        End If
+        
+        Set mOutStream = Nothing
+    End If
 End Sub
 
 ''
 ' Tells the underlying stream to store its data to its repository.
 '
 Public Sub Flush()
+    VerifyIsOpen
     mOutStream.Flush
 End Sub
 
@@ -90,6 +98,7 @@ End Sub
 ' @return The final position in the stream.
 '
 Public Function SeekPosition(ByVal Offset As Currency, ByVal Origin As SeekOrigin) As Currency
+    VerifyIsOpen
     SeekPosition = mOutStream.SeekPosition(Offset, Origin)
 End Function
 
@@ -148,6 +157,8 @@ End Function
 ' bytes 15: sign (&h80 is negative)<br>
 '
 Public Sub WriteValue(ByRef Value As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant)
+    VerifyIsOpen
+    
     If IsArray(Value) Then
         ValidateArrayRange Value, Index, Count, NameOfValue
         WriteArray Value, Index, Count
@@ -164,6 +175,8 @@ End Sub
 '
 Public Sub WriteChar(ByRef Value As Variant)
     Dim BytesRead As Long
+    
+    VerifyIsOpen
     
     Select Case VarType(Value)
         Case vbString
@@ -220,13 +233,14 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByVal Output As Stream, ByVal Encoding As Encoding)
+Friend Sub Init(ByVal Output As Stream, ByVal Encoding As Encoding, ByVal LeaveOpen As Boolean)
     If Output Is Nothing Then _
         Error.ArgumentNull "Output", ArgumentNull_Stream
     If Not Output.CanWrite Then _
         Error.Argument Argument_StreamNotWritable
     
     Set mOutStream = Output
+    mLeaveOpen = LeaveOpen
     
     If Encoding Is Nothing Then
         Set mEncoding = Cor.NewUTF8Encoding(False, True)
@@ -242,6 +256,12 @@ End Sub
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Sub VerifyIsOpen()
+    If mOutStream Is Nothing Then
+        Error.ObjectDisposed ObjectDisposed_FileNotOpen
+    End If
+End Sub
+
 Private Sub WriteStringLength(ByVal Length As Long)
     Dim LengthRemaining As Long
     

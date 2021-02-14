@@ -319,3 +319,16 @@ Public Sub SeekPosition_WhenCalled_ReturnsNewPosition()
     
     Assert.That Actual, Iz.EqualTo(6)
 End Sub
+
+Public Sub NewBinaryWriter_WithLeaveOpenTrue_DoesNotCloseUnderlyingStream()
+    Dim ms As New MemoryStream
+    Dim Writer As BinaryWriter
+    
+    Set Writer = Cor.NewBinaryWriter(ms, LeaveOpen:=True)
+    Writer.WriteValue CByte(1)
+    Writer.CloseWriter
+    
+    ms.WriteByte 2
+    
+    Assert.That ms.Position, Iz.EqualTo(2)
+End Sub

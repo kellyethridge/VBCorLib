@@ -733,6 +733,7 @@ End Function
 '
 ' @param Stream The supplied stream.
 ' @param Encoding The character encoding.
+' @param LeaveOpen <b>True</b> to leave the stream open after the <a href="BinaryWriter.html">BinaryWriter</a> object is disposed; otherwise, <b>False</b>.
 ' @return The new <a href="BinaryWriter.html">BinaryWriter</a> object.
 ' @remarks If <i>Encoding</i> is not supplied, then an encoding of <a href="Constructors.NewUTF8Encoding.html">Cor.NewUTF8Encoding(False, True)</a> is used.
 ' <table style="width: auto">
@@ -746,9 +747,9 @@ End Function
 '        <td><a href="ArgumentNullException.html">ArgumentNullException</a></td><td><i>Stream</i> is <b>Nothing</b>.</td>
 '    </tr>
 ' </table>
-Public Function NewBinaryWriter(ByVal Stream As Stream, Optional ByVal Encoding As Encoding) As BinaryWriter
+Public Function NewBinaryWriter(ByVal Stream As Stream, Optional ByVal Encoding As Encoding, Optional ByVal LeaveOpen As Boolean) As BinaryWriter
     Set NewBinaryWriter = New BinaryWriter
-    NewBinaryWriter.Init Stream, Encoding
+    NewBinaryWriter.Init Stream, Encoding, LeaveOpen
 End Function
 
 ''
