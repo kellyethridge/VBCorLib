@@ -46,6 +46,9 @@ Attribute VB_Exposed = True
 ' @include "..\DocIncludes\Constructors.html"
 Option Explicit
 
+Private mBigIntegerGuid As VBGUID
+
+
 ''
 ' Creates a <i>For..Each</i> compatible wrapper around an <a href="IEnumerator.html">IEnumerator</a> interface.
 '
@@ -220,38 +223,22 @@ Public Function NewInvalidOperationException(ByRef Message As String, Optional B
 End Function
 
 ''
-' Creates a new <a href="ArrayList.html">ArrayList</a> object with the specified settings.
+' Initializes a new instance of the <a href="ArrayList.html">ArrayList</a> class that contains elements copied from the specified source
+' and that has the same initial capacity is at least the number of elements copied.
 '
-' @param Comparer A comparer to be used for searching and sorting items in the list.
-' @param Source A collection to initialize the list with. <a href="ArrayList.Get.Count.html">Count</a> will reflect the number of items added.
-' @return A new <a href="ArrayList.html">ArrayList</a> object.
-' @remarks Sometimes the comparison of two items in the list cannot be accomplished
-' by the default comparer that <a href="ArrayList.html">ArrayList</a> uses. Cases like this may be when using
-' different datatypes, UDT's, or objects that do not implement <a href="IComparable.html">IComparable</a>. In
-' cases such as these, a custom comparer object may be supplied during the construction
-' of an <a href="ArrayList.html">ArrayList</a>. This comparer will be used as the default comparer for methods
-' that require comparing items.
-' <p>An <a href="ArrayList.html">ArrayList</a> can be initialized with a default set of items. This is the same
-' as creating a new <a href="ArrayList.html">ArrayList</a> and using <a href="ArrayList.AddRange.html">AddRange</a> to add the items.</p>
-' <p><a href="ArrayList.html">ArrayList</a> accepts a VBA.Collection, <a href="ICollection.html">ICollection</a>, and an array as a list of
-' items to initialize the new <a href="ArrayList.html">ArrayList</a> to.</p>
-'
-' <h4>Example</h4>
-' <pre>
-' Dim MyItems(10) As Long
-'
-' Set list = NewArrayList(New MyComparer, MyItems)
-' </pre>
-' This will create a new <a href="ArrayList.html">ArrayList</a> that uses MyComparer as the default comparer
-' for the items. The <a href="ArrayList.html">ArrayList</a> is also initialized with an array of <b>Longs</b>. The
-' fully initialized <a href="ArrayList.html">ArrayList</a> will have a count of 11 items, each item being
-' a <b>Long</b> datatype with the value of 0.
-'
-' @see ArrayList
+' @param Source The collection or array whose elements are copied to the new list.
+' @return A new <a href="ArrayList.html">ArrayList</a> object containing the collection of values.
+' @remarks The <a href="ArrayList.html">ArrayList</a> constructor accepts a <b>VBA.Collection</b>, <a href="ICollection.html">ICollection</a>, or an array as a list of
+' items to initialize the new <a href="ArrayList.html">ArrayList</a> with.
+' <p>The capacity of an <a href="ArrayList.html">ArrayList</a> is the number of elements that the <a href="ArrayList.html">ArrayList</a> can hold.
+' As elements are added to an <a href="ArrayList.html">ArrayList</a>, the capacity is automatically increased as required by reallocating the internal array.</p>
+' <p>The elements are copied onto the <a href="ArrayList.html">ArrayList</a> in the same order they are read by the For..Each statement.</p>
+' <p>This constructor is an O(<i>n</i>) operation, where <i>n</i> is the number of elements in <i>Source</i>.</p>
+'' @see ArrayList
 ' @see IComparer
-Public Function NewArrayList(Optional ByVal Comparer As IComparer, Optional ByRef Source As Variant) As ArrayList
+Public Function NewArrayList(ByRef Source As Variant) As ArrayList
     Set NewArrayList = New ArrayList
-    NewArrayList.Init Comparer, Source
+    NewArrayList.Init Source
 End Function
 
 ''
@@ -1327,6 +1314,26 @@ Public Function NewIntegers(ParamArray Values() As Variant) As Integer()
 End Function
 
 ''
+' Initializes a <a href="BigInteger.html">BigInteger</a> array with elements copied from <i>Values</i>.
+'
+' @param Values The values to create the array from.
+' @remarks The values need to be convertable to a <a href="BigInteger.html">BigInteger</a> or an exception will occur.
+' <p>The array is zero-based.</p>
+' <p>If no values are passed in then an empty array is returned, not a null array.</p>
+Public Function NewBigIntegers(ParamArray Values() As Variant) As BigInteger()
+    Dim Result() As BigInteger
+    Dim i As Long
+    
+    SAPtr(Result) = SafeArrayCreateVectorEx(vbObject, 0, UBound(Values) + 1, VarPtr(mBigIntegerGuid))
+    
+    For i = 0 To UBound(Values)
+        Set Result(i) = CBigInt(Values(i))
+    Next
+    
+    NewBigIntegers = Result
+End Function
+
+''
 ' Initializes an <b>Integer</b> array representing Unicode characters with elements copied from <i>Values</i>.
 '
 ' @param Values A series of characters or their Unicode code points.
@@ -1371,7 +1378,11 @@ Public Function NewStrings(ParamArray Values() As Variant) As String()
     SAPtr(Result) = SafeArrayCreateVector(vbString, 0, UBound(Values) + 1)
     
     For i = 0 To UBound(Values)
-        Result(i) = Values(i)
+        If VarType(Values(i)) = vbString Then
+            Result(i) = Values(i)
+        Else
+            Result(i) = Object.ToString(Values(i))
+        End If
     Next
     
     NewStrings = Result
@@ -2182,3 +2193,19 @@ Friend Function NewCallbackSorter(ByVal Callback As Long) As CallbackSorter
     Set NewCallbackSorter = New CallbackSorter
     NewCallbackSorter.Init Callback
 End Function
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Constructors
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Sub Class_Initialize()
+    InitBigIntegerGuid
+End Sub
+
+Private Sub InitBigIntegerGuid()
+' CopyMemory ByVal VarPtr(srcSA.SA) - IIDOffset, ByVal srcpSA - IIDOffset, LenB(srcSA.SA) + IIDOffset
+    Dim Arr() As BigInteger
+    
+    ReDim Arr(0)
+    CopyMemory mBigIntegerGuid, ByVal SAPtr(Arr) - vbSizeOfGuid, vbSizeOfGuid
+End Sub

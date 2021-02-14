@@ -209,7 +209,7 @@ End Function
 '
 ' @return An <a href="IDictionaryEnumerator.html">IDictionaryEnumerator</a> for the <a href="Hashtable.html">Hashtable</a>.
 ' @remarks The elements enumerated are <a href="DictionaryEntry.html">DictionaryEntry</a> objects each containing a key/value pair.
-Public Function GetEnumerator() As Object
+Public Function GetEnumerator() As IDictionaryEnumerator
     Dim Ret As New HashtableEnumerator
     Ret.Init Me, mBuckets, EnumEntries
     Set GetEnumerator = Ret

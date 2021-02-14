@@ -60,7 +60,6 @@ Private Const PropCapacity          As String = "Capacity"
 Private Const PropItemPrefix        As String = "Item"
 Private Const PropSubType           As String = "SubType"
 Private Const PropDefaultComparer   As String = "DefaultComparer"
-Private Const PropComparer          As String = "Comparer"
 
 Private Const SubtypeNormal     As Long = 0
 Private Const SubtypeEmpty      As Long = 1
@@ -71,7 +70,6 @@ Private mItems()    As Variant
 Private mCount      As Long
 Private mCapacity   As Long
 Private mVersion    As Long
-Private mComparer   As IComparer
 
 
 ''
@@ -185,10 +183,6 @@ Public Function BinarySearchEx(ByVal Index As Long, ByVal Count As Long, ByRef V
         Exit Function
     End If
     
-    If Comparer Is Nothing Then
-        Set Comparer = mComparer
-    End If
-    
     BinarySearchEx = CorArray.BinarySearchEx(mItems, Index, Count, Value, Comparer)
 End Function
 
@@ -274,7 +268,7 @@ End Sub
 ' pointers to the same objects as the original list has.
 Public Function Clone() As ArrayList
     Set Clone = New ArrayList
-    Clone.InitClone mItems, mCount, mComparer
+    Clone.InitClone mItems, mCount
 End Function
 
 ''
@@ -674,10 +668,6 @@ Public Sub Sort(Optional ByRef Index As Variant, Optional ByRef Count As Variant
     If Range.Index + Range.Count > mCount Then _
         Error.Argument Argument_InvalidOffLen
 
-    If Comparer Is Nothing Then
-        Set Comparer = mComparer
-    End If
-    
     CorArray.SortEx mItems, Range.Index, Range.Count, Comparer
     mVersion = mVersion + 1
 End Sub
@@ -722,18 +712,14 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub InitClone(ByRef Arr() As Variant, ByVal Count As Long, ByVal Comparer As IComparer)
+Friend Sub InitClone(ByRef Arr() As Variant, ByVal Count As Long)
     mItems = Arr
     mCount = Count
     mCapacity = UBound(Arr) + 1
-    Set mComparer = Comparer
 End Sub
 
-Friend Sub Init(ByVal Comparer As IComparer, ByRef Source As Variant)
-    Set mComparer = Comparer
-    If Not IsMissing(Source) Then
-        AddRange Source
-    End If
+Friend Sub Init(ByRef Source As Variant)
+    AddRange Source
 End Sub
 
 Private Sub Class_InitProperties()
@@ -800,8 +786,9 @@ End Sub
 
 Private Sub WriteArray(ByVal Index As Long, ByRef Source As Variant, ByVal Insert As Boolean)
     Dim SizeOfArray As Long
-    SizeOfArray = UBound(Source) - LBound(Source) + 1
     
+    SizeOfArray = Len1D(Source)
+    EnsureCapacity SizeOfArray
     WriteCollection Index, SizeOfArray, Source, Insert
 End Sub
 
@@ -855,12 +842,6 @@ Private Sub Class_ReadProperties(PropBag As PropertyBag)
                     Set mItems(i) = Nothing
             End Select
         Next i
-        
-        If .ReadProperty(PropDefaultComparer, False) Then
-            Set mComparer = Comparer.Default
-        Else
-            Set mComparer = .ReadProperty(PropComparer, Nothing)
-        End If
     End With
     Exit Sub
     
@@ -897,11 +878,6 @@ Private Sub Class_WriteProperties(PropBag As PropertyBag)
         
         .WriteProperty PropCount, mCount
         .WriteProperty PropCapacity, mCapacity
-        If mComparer Is Comparer.Default Then
-            .WriteProperty PropDefaultComparer, True
-        Else
-            .WriteProperty PropComparer, mComparer, Nothing
-        End If
     End With
     Exit Sub
     

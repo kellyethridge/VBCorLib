@@ -27,6 +27,10 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
     Set Objects(0) = New Int32
     Set Objects(1) = New Int32
     Set Objects(2) = New Int32
+    Dim BigInts(0 To 2) As BigInteger
+    Set BigInts(0) = BigInteger.One
+    Set BigInts(1) = BigInteger.Ten
+    Set BigInts(2) = BigInteger.MinusOne
     
     Select Case Test.MethodName
         Case "Copy_WithValues_CopiesWithConversion"
@@ -70,6 +74,9 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             
             Test.Use Objects, Array(Nothing, Nothing, Nothing), Objects
             
+            Test.Use BigInts, Array(Nothing, Nothing, Nothing), BigInts
+            Test.Use NewBigIntegers(1, 2, 3), NewBigIntegers(0, 0, 0), NewBigIntegers(1, 2, 3)
+            
         Case "CopyEx_WithValues_CopiesWithConversion"
             Test.Use NewLongs(1, 2, 3), NewLongs(0, 0, 0), NewLongs(0, 1, 2)
             Test.Use NewStrings("1", "2", "3"), NewStrings("", "", ""), NewStrings("", "1", "2")
@@ -98,7 +105,7 @@ End Sub
 Public Sub Copy_WithValues_CopiesWithConversion(ByRef Source As Variant, ByRef Destination As Variant, ByRef Expected As Variant)
     CorArray.Copy Source, Destination, 3
     
-    Assert.That Destination, Iz.EqualTo(Expected).Strict
+    Assert.That Destination, Iz.EqualTo(Expected).Strict.Using(New CorObjectComparer)
 End Sub
 
 Public Sub Copy_WithIncompatibleTypes_ThrowsArrayTypeMismatchException(ByRef Source As Variant, ByRef Destination As Variant)

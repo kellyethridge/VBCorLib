@@ -27,6 +27,16 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
         Case "NewChars_WithStringWithLengthNotEqualToOne_ThrowsFormatException"
             Test.Use ""
             Test.Use "aa"
+        
+        Case "NewStrings_WithValue_ReturnsStringArray"
+            Test.Use "1", Array("1")
+            Test.Use 2, Array("2")
+            Test.Use CInt64(64), Array("64")
+            
+        Case "NewBigIntegers_WithValues_ReturnsBigIntegerArray"
+            Test.Use 1, BigInteger.One
+            Test.Use "1", BigInteger.One
+            Test.Use Int64.MaxValue, NewBigInteger(Int64.MaxValue)
             
     End Select
 End Sub
@@ -61,5 +71,24 @@ Public Sub NewChars_WithStringWithLengthNotEqualToOne_ThrowsFormatException(ByVa
     NewChars Value
     
     AssertFormatException Err
+End Sub
+
+Public Sub NewStrings_WithValue_ReturnsStringArray(ByRef Value As Variant, ByRef Expected As Variant)
+    Dim Actual() As String
+    
+    Actual = NewStrings(Value)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub NewBigIntegers_WithValues_ReturnsBigIntegerArray(ByRef Value As Variant, ByRef ExpectedElement As Variant)
+    Dim Actual() As BigInteger
+    Dim Expected() As BigInteger
+    
+    Actual = NewBigIntegers(Value)
+    
+    ReDim Expected(0)
+    Set Expected(0) = CBigInt(ExpectedElement)
+    Assert.That Actual, Iz.EqualTo(Expected).Using(New CorObjectComparer)
 End Sub
 

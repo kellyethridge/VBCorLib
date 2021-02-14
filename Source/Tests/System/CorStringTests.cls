@@ -318,6 +318,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "a,b,c", ",", NewStrings("a", "b", "c")
             Test.Use "a b c", "", NewStrings("a", "b", "c")
             Test.Use "abcde", NewStrings("d", "b"), NewStrings("a", "c", "e")
+            Test.Use ",a,", ",", NewStrings("", "a", "")
             
         Case "Split_WithRemoveEmptyEntries_ReturnsFilledStringsOnly"
             Test.Use "abbc", NewStrings("b"), NewStrings("a", "c")
@@ -1193,6 +1194,14 @@ Public Sub Split_WithCharSeparators_ReturnsExpected(ByVal StringToSplit As Strin
     Actual = CorString.Split(StringToSplit, Separators)
     
     Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub Split_WithMissingDelimiter_SplitsOnWhitespaces()
+    Dim Actual() As String
+    
+    Actual = CorString.Split("a b c")
+    
+    Assert.That Actual, Iz.EqualTo(Array("a", "b", "c"))
 End Sub
 
 Public Sub CharAt_WhenCalled_ReturnsExpected()

@@ -672,7 +672,7 @@ End Function
 ' that contains the <i>s</i> parameter. If the <i>Separator</i> parameter is <b>null</b> or contains no elements, white-space characters are assumed to be the delimiters.
 ' White-space characters are defined by the Unicode standard and return <b>True</b> if they are passed to the <a href="Char.IsWhiteSpace.html">Char.IsWhiteSpace</a> method.</p>
 ' <p>If the <i>Count</i> parameter is zero, or the <i>Options</i> parameter is <a href="CorString.StringSplitOptions.html">RemoveEmptyEntries</a> and the length of the <i>s</i> parameter is zero, an empty array is returned.</p>
-Public Function Split(ByRef s As String, ByRef Separator As Variant, Optional ByVal Count As Long = &H7FFFFFFF, Optional ByVal Options As StringSplitOptions = StringSplitOptions.None) As String()
+Public Function Split(ByRef s As String, Optional ByRef Separator As Variant, Optional ByVal Count As Long = &H7FFFFFFF, Optional ByVal Options As StringSplitOptions = StringSplitOptions.None) As String()
     If Count < 0 Then _
         Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_NeedNonNegNum
     
@@ -688,7 +688,9 @@ Public Function Split(ByRef s As String, ByRef Separator As Variant, Optional By
         ReDim SeparatorIndexes(0 To MaxIndexes)
         ReDim SeparatorLengths(0 To MaxIndexes)
         
-        If VarType(Separator) = vbString Then
+        If IsMissing(Separator) Then
+            MatchCount = FindWhitespaceSeparatorIndexes(s, SeparatorIndexes, SeparatorLengths)
+        ElseIf VarType(Separator) = vbString Then
             If Len(Separator) = 0 Then
                 MatchCount = FindWhitespaceSeparatorIndexes(s, SeparatorIndexes, SeparatorLengths)
             Else
