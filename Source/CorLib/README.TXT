@@ -1,5 +1,24 @@
 ** VBCorLib **
 
+version 4.0
+	* Closed #79 - Updated CorString.Compare and CorString.CompareEx default comparison to StringComparison.CurrentCulture.
+	* Closed #65 - SHA1CryptoServiceProvider.SHA1_ComputeHash method should be private.
+	* Closed #64 - ExceptionBase.ToString should return type String.
+	* Closed #61 - CorString.CompareOrdinalEx parameter Length should be declared as Long.
+	* Closed #60 - CorString.CompareCulturalEx parameter Length should be declared as Long.
+	* Closed #27 - Changed BinaryReader.ReadChar return type to Integer.
+
+version 3.2
+	* Optimize StringBuilder.AppendChar for Release build.
+	* Validate Char parameter in StringBuilder.AppendChar. Must be within -32768 to 65535 or OverflowException is thrown.
+	* Optimize BinaryWriter.WriteChar method. Changed using mEncoding.GetBytes method to mEncoding.GetBytesEx to re-use Byte array instead of re-creating it each call.
+	* Optimize BinaryReader.ReadChars by reading up to 128 bytes at a time instead of a single byte at a time.
+	* Optimize BinaryWriter when writing strings and Integer arrays.
+	* Fixed #78 - BigInteger not correctly formatting with large exponent.
+	* Fixed #83 - BigInteger.Parse was not correctly parsing negative hex string values.
+	* Fixed #84 - BigInteger.ToString was not preserving leading characters necessary to maintain sign of the value.
+	* Removed dependency of CompareStringOrdinal API to remain compatible with Windows XP. This closes #93.
+
 version 3.1
 	* Fixed CorArray.Clear not releasing reference types correctly for Variant().
 	* Fixed BigInteger default output formatting was falling back to exponent when is should never.

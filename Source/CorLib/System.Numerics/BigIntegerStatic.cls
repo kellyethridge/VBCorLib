@@ -164,7 +164,11 @@ End Function
 ' @param Value The string representation of a number. The string is interpreted using the style specified by style.
 ' @param Style A bitwise combination of enumeration values that indicates the style elements that can be present in value. A typical value to specify is NumberStyles.Integer.
 ' @param Provider An object that supplies culture-specific formatting information about value. If Nothing is passed in the current CultureInfo will be used.
-' @param OutResult When this method returns, contains the <a href="BigInteger.html">BigInteger</a> equivalent to the number that is contained in value, or <a href="BigInteger.Get.Zero.html">BigInteger.Zero</a> if the conversion failed. The conversion fails if thevalue parameter is null or is not in a format that is compliant withstyle. This parameter is passed uninitialized.
+' @param OutResult When this method returns, contains the <a href="BigInteger.html">BigInteger</a> equivalent to the number that is contained in value, or
+' <a href="BigInteger.Get.Zero.html">BigInteger.Zero</a> if the conversion failed. The conversion fails if thevalue parameter is null or is not in a format
+' that is compliant withstyle. This parameter is passed uninitialized.
+' @return <b>True</b> if the value parameter was converted successfully; otherwise, <b>False</b>.
+' @see #TryParse
 Public Function TryParseEx(ByRef Value As String, ByVal Style As NumberStyles, ByVal Provider As IFormatProvider, ByRef OutResult As BigInteger) As Boolean
     Dim Result      As BigNumber
     Dim Info        As NumberFormatInfo
@@ -784,6 +788,8 @@ Private Function TryParseDecimal(ByRef s As String, ByVal Style As NumberStyles,
     Dim FoundExponent       As Boolean
     Dim Exponent            As Long
     Dim DecimalPlaces       As Long
+    Dim AsShiftedSpace      As Boolean
+    Dim HasExponent         As Boolean
     
     NegativeSign = AscW(Info.NegativeSign)
     PositiveSign = AscW(Info.PositiveSign)
@@ -792,14 +798,15 @@ Private Function TryParseDecimal(ByRef s As String, ByVal Style As NumberStyles,
     CurrencyPoint = AscW(Info.CurrencyDecimalSeparator)
     Thousands = AscW(Info.NumberGroupSeparator)
     CurrencyThousands = AscW(Info.CurrencyGroupSeparator)
+    AsShiftedSpace = Thousands = &HA0
     Chars = AllocChars(s)
     MaxIndex = UBound(Chars)
     n.Sign = 1
     ReDim n.Digits(0 To Len(s) \ 4)
     
     Do While Index <= MaxIndex
-        Ch = Chars(Index)
-        
+        Ch = Chars(Index) And &HFFFF&
+                    
         Select Case Ch
             Case vbZeroChar To vbNineChar
                 If (FoundCurrency = FoundAfter) Or (FoundSign = FoundAfter) Or InWhitespace Then
@@ -810,8 +817,8 @@ Private Function TryParseDecimal(ByRef s As String, ByVal Style As NumberStyles,
                     SingleInPlaceMultiply n, 10
                     SingleInPlaceAdd n, Ch - vbZeroChar
                 Else
-                    If Style And NumberStyles.AllowExponent Then
-                        ' we are allowing a possible exponent value to be parsed,
+                    If (Style And NumberStyles.AllowExponent) And HasExponent Then
+                        ' We are allowing a possible exponent value to be parsed,
                         ' so if we have encountered a decimal point, we need to
                         ' continue parsing digits and also count how many
                         ' decimal places we have gone.
@@ -849,7 +856,7 @@ Private Function TryParseDecimal(ByRef s As String, ByVal Style As NumberStyles,
                 If Ch = NegativeSign Then
                     n.Sign = -1
                 End If
-            Case vbTabChar, vbLfChar, vbVtChar, vbFfChar, vbCrChar, vbSpaceChar
+            Case vbTabChar, vbLfChar, vbVtChar, vbFfChar, vbCrChar ', vbSpaceChar
                 If Not FoundDigit Then
                     If ((Style And NumberStyles.AllowLeadingWhite) = 0) Or NeedsClosingParen Then
                         GoTo Finally
@@ -858,6 +865,37 @@ Private Function TryParseDecimal(ByRef s As String, ByVal Style As NumberStyles,
                     InWhitespace = FoundSign
                 Else
                     InWhitespace = True
+                End If
+            Case vbSpaceChar
+                ' We could potentially treat a space as a shifted-space (&hA0) if the culture
+                ' group separator is a shifted-space. Otherwise treat a space like whitespace.
+                
+                ' We would only treat a space as shifted if we've already found digits
+                ' that could then have a group separator. Otherwise, we have a space before
+                ' any digits and need to check leading whitespace allowance.
+                If Not FoundDigit Then
+                    If ((Style And NumberStyles.AllowLeadingWhite) = 0) Or NeedsClosingParen Then
+                        GoTo Finally
+                    End If
+                
+                    InWhitespace = FoundSign
+                Else
+                    ' We have found digits, so now we want to treat a space as shifted if the
+                    ' group separator is a shifted space.
+                    If Thousands = &HA0 Then
+                        ' Treat as finding a group separator.
+                        If ((Style And NumberStyles.AllowThousands) = 0) Or (Not FoundDigit) Then
+                            GoTo Finally
+                        End If
+                        
+                        If FoundCurrency Then
+                            If Ch = Thousands Then
+                                GoTo Finally
+                            End If
+                        End If
+                    Else
+                        InWhitespace = True
+                    End If
                 End If
             Case vbOpenParenChar
                 If ((Style And NumberStyles.AllowParentheses) = 0) Or (FoundSign <> NotFound) Then
@@ -888,6 +926,23 @@ Private Function TryParseDecimal(ByRef s As String, ByVal Style As NumberStyles,
                     If Ch = DecimalPoint Then
                         GoTo Finally
                     End If
+                End If
+                
+                If Style And NumberStyles.AllowExponent Then
+                    ' We want to check to see if we will even encounter
+                    ' an exponent so as we parse we can determine how to
+                    ' handle a decimal point. So quickly check for an "E" or "e",
+                    ' otherwise we may have to fail when finding digits after
+                    ' a decimal point.
+                    Dim i As Long
+                    
+                    For i = Index + 1 To MaxIndex
+                        Select Case Chars(i)
+                            Case vbLowerEChar, vbUpperEChar
+                                HasExponent = True
+                                Exit For
+                        End Select
+                    Next
                 End If
                 
                 FoundDecimal = True
@@ -1019,31 +1074,42 @@ Private Function TryParseHex(ByRef s As String, ByVal HasPrefix As Boolean, ByVa
     
     j = 1
     For i = UpperIndex To MinIndex Step -1
-        Select Case Chars(i)
+        Ch = Chars(i)
+        
+        Select Case Ch
             Case vbZeroChar
                 Ch = 0
                 FoundDigits = True
             Case vbOneChar To vbNineChar
-                Ch = Chars(i) - vbZeroChar
+                Ch = Ch - vbZeroChar
                 n.Sign = 1
                 FoundDigits = True
             Case vbLowerAChar To vbLowerFChar
-                Ch = Chars(i) - vbLowerHexOffset
+                Ch = Ch - vbLowerHexOffset
                 n.Sign = 1
                 FoundDigits = True
             Case vbUpperAChar To vbUpperFChar
-                Ch = Chars(i) - vbUpperHexOffset
+                Ch = Ch - vbUpperHexOffset
                 n.Sign = 1
                 FoundDigits = True
             Case vbTabChar, vbLfChar, vbVtChar, vbFfChar, vbCrChar, vbSpaceChar
-                If ((Style And NumberStyles.AllowLeadingWhite) = 0) And FoundDigits Then
-                    GoTo Finally
+                If FoundDigits Then
+                    ' We already found digits, so this whitespace must be leading.
+                    ' We are walking backwards through the string, so the leading whitespace
+                    ' would be found after the digits. => "   1234"
+                    If (Style And NumberStyles.AllowLeadingWhite) = 0 Then
+                        GoTo Finally
+                    End If
+                Else
+                    ' We haven't found any digits, so this must be trailing whitespace.
+                    ' We are walking backwards through the string, so the trailing whitespace
+                    ' will be found before any digits. => "1234   "
+                    If (Style And NumberStyles.AllowTrailingWhite) = 0 Then
+                        GoTo Finally
+                    End If
                 End If
                 
-                If ((Style And NumberStyles.AllowTrailingWhite) = 0) And Not FoundDigits Then
-                    GoTo Finally
-                End If
-                
+                ' We allow the whitespace, so skip it and continue.
                 GoTo Continue
             Case Else
                 GoTo Finally
@@ -1079,18 +1145,21 @@ Continue:
     
     n.Precision = c
     
-    If n.Sign Then
+    ' Characters represent &H0 to &HF when parsing
+    ' so if the last character is &H8 or greater then
+    ' we ended with the high bit set, meaning this should
+    ' be a negative value.
+    If Ch >= &H8 Then
         Ch = n.Digits(n.Precision - 1)
-            
-        If (Ch And &H8000) = &H8000 Then
-            n.Sign = -1
-        ElseIf (Ch And &HF800) = &H800 Then
-            n.Sign = -1
+        n.Sign = -1
+
+        ' We want to fill in any leading zeros with &HF
+        ' to represent a two's compliment negative value.
+        If (Ch And &HF800) = &H800 Then
             n.Digits(n.Precision - 1) = Ch Or &HF000
         ElseIf (Ch And &HFF80) = &H80 Then
-            n.Sign = -1
-        ElseIf (Ch And &HFFF8) = &H8 Then
-            n.Sign = -1
+            n.Digits(n.Precision - 1) = Ch Or &HFF00
+        ElseIf (Ch And &HFFF8) And &H8 Then
             n.Digits(n.Precision - 1) = Ch Or &HFFF0
         End If
     End If

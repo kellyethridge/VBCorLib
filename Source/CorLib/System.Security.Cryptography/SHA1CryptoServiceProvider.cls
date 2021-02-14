@@ -340,7 +340,7 @@ Private Sub SHA1_Clear()
     Clear
 End Sub
 
-Function SHA1_ComputeHash(Source As Variant, Optional Index As Variant, Optional Count As Variant) As Byte()
+Private Function SHA1_ComputeHash(Source As Variant, Optional Index As Variant, Optional Count As Variant) As Byte()
     SHA1_ComputeHash = ComputeHash(Source, Index, Count)
 End Function
 

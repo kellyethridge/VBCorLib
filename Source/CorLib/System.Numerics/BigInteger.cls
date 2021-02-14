@@ -130,11 +130,10 @@ Public Property Get Precision() As Long
 End Property
 
 ''
-' Returns a byte array representing the number.
+' Converts a <a href="BigInteger.html">BigInteger</a> value to a byte array.
 '
-' @return A byte array the same length as <a href="BigInteger.Get.Precision.html">Precision</a> that represents the number.
-' @remarks To represent a byte array for a negative value, the highest bit must be set.
-' To ensure this, a pair of bytes with the value of &HFF may be part of the return value.
+' @return The value of the current <a href="BigInteger.html">BigInteger</a> object converted to an array of bytes.
+' @include "..\DocIncludes\BigInteger.ToByteArray.html"
 Public Function ToByteArray() As Byte()
     Dim Result()    As Byte
     Dim MaxIndex    As Long

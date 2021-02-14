@@ -193,7 +193,7 @@ End Function
 '    </tr>
 ' </table>
 ' For example, if you create <a href="Version.html">Version</a> object using the constructor <code>Version(1,3,5)</code>, <code>ToString(2)</code> returns "1.3" and <code>ToString(4)</code> throws an exception.
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
 '       <th>Exception</th>

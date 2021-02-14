@@ -400,7 +400,7 @@ Public Sub SortStringsWithComparer(ByRef Keys As Variant, ByVal Left As Long, By
     ElseIf Comparer Is StringComparer.Ordinal Then
         SortStrings Keys, Left, Right, AddressOf QuickSortCompareStringOrdinal, 0, BOOL.BOOL_FALSE
     ElseIf Comparer Is StringComparer.OrdinalIgnoreCase Then
-        SortStrings Keys, Left, Right, AddressOf QuickSortCompareStringOrdinal, 0, BOOL.BOOL_TRUE
+        SortStrings Keys, Left, Right, AddressOf QuickSortCompareStringOrdinalIC, 0, BOOL.BOOL_TRUE
     ElseIf Comparer Is StringComparer.InvariantCulture Then
         SortStrings Keys, Left, Right, AddressOf QuickSortCompareString, CultureInfo.InvariantCulture.LCID, CompareOptions.None
     ElseIf Comparer Is StringComparer.InvariantCultureIgnoreCase Then
@@ -526,11 +526,11 @@ Private Sub QuickSortCompareStringOrdinal(ByRef Context As StringSortContext, By
         LenX = Len(Context.Keys(m))
         
         Do
-            Do While CompareStringOrdinal(Context.KeyPtrs(i), Len(Context.Keys(i)), PtrX, LenX, Context.ComparisonType) = CSTR_LESS_THAN
+            Do While CorString.CompareStringOrdinal(Context.KeyPtrs(i), Len(Context.Keys(i)), PtrX, LenX) < 0
                 i = i + 1
             Loop
             
-            Do While CompareStringOrdinal(Context.KeyPtrs(j), Len(Context.Keys(j)), PtrX, LenX, Context.ComparisonType) = CSTR_GREATER_THAN
+            Do While CorString.CompareStringOrdinal(Context.KeyPtrs(j), Len(Context.Keys(j)), PtrX, LenX) > 0
                 j = j - 1
             Loop
             
@@ -571,7 +571,83 @@ Private Sub InsertionSortCompareStringOrdinal(ByRef Context As StringSortContext
         j = i - 1
         
         Do While j >= Left
-            If CompareStringOrdinal(Context.KeyPtrs(j), Len(Context.Keys(j)), PtrX, LenX, Context.ComparisonType) <> CSTR_GREATER_THAN Then
+            If CorString.CompareStringOrdinal(Context.KeyPtrs(j), Len(Context.KeyPtrs(j)), PtrX, LenX) <= 0 Then
+                Exit Do
+            End If
+            
+            Context.KeyPtrs(j + 1) = Context.KeyPtrs(j)
+            j = j - 1
+        Loop
+        
+        Context.KeyPtrs(j + 1) = PtrX
+        i = i + 1
+    Loop
+End Sub
+
+Private Sub QuickSortCompareStringOrdinalIC(ByRef Context As StringSortContext, ByVal Left As Long, ByVal Right As Long)
+    Dim i As Long, j As Long, t As Long, m As Long
+    Dim PtrX As Long
+    Dim LenX As Long
+    
+    If Not mHasSortItems Then
+        If Right - Left < 15 Then
+            InsertionSortCompareStringOrdinalIC Context, Left, Right
+            Exit Sub
+        End If
+    End If
+    
+    Do While Left < Right
+        i = Left: j = Right: m = (i + j) \ 2
+        PtrX = Context.KeyPtrs(m)
+        LenX = Len(Context.Keys(m))
+        
+        Do
+            Do While CorString.CompareStringOrdinalIgnoreCase(Context.KeyPtrs(i), Len(Context.Keys(i)), PtrX, LenX) < 0
+                i = i + 1
+            Loop
+            
+            Do While CorString.CompareStringOrdinalIgnoreCase(Context.KeyPtrs(j), Len(Context.Keys(j)), PtrX, LenX) > 0
+                j = j - 1
+            Loop
+            
+            If i > j Then Exit Do
+            
+            If i < j Then
+                t = Context.KeyPtrs(i)
+                Context.KeyPtrs(i) = Context.KeyPtrs(j)
+                Context.KeyPtrs(j) = t
+                
+                If mHasSortItems Then SwapSortItems mSortItems, i, j
+            End If
+            
+            i = i + 1: j = j - 1
+        Loop While i <= j
+        
+        If j - Left <= Right - i Then
+            If Left < j Then QuickSortCompareStringOrdinalIC Context, Left, j
+            Left = i
+        Else
+            If i < Right Then QuickSortCompareStringOrdinalIC Context, i, Right
+            Right = j
+        End If
+    Loop
+End Sub
+
+Private Sub InsertionSortCompareStringOrdinalIC(ByRef Context As StringSortContext, ByVal Left As Long, ByVal Right As Long)
+    Dim i As Long
+    Dim j As Long
+    Dim PtrX As Long
+    Dim LenX As Long
+    
+    i = Left
+    
+    Do While i <= Right
+        PtrX = Context.KeyPtrs(i)
+        LenX = Len(Context.Keys(i))
+        j = i - 1
+        
+        Do While j >= Left
+            If CorString.CompareStringOrdinalIgnoreCase(Context.KeyPtrs(j), Len(Context.KeyPtrs(j)), PtrX, LenX) <= 0 Then
                 Exit Do
             End If
             

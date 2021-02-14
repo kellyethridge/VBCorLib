@@ -36,7 +36,7 @@ Attribute VB_Exposed = True
 '
 
 ''
-' Provides severs static functions to help in creating <a href="TimeSpan.html">TimeSpan</a> objects.
+' Provides several static functions to help in creating <a href="TimeSpan.html">TimeSpan</a> objects.
 '
 ' @see TimeSpan
 '

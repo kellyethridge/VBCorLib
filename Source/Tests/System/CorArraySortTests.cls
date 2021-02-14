@@ -35,7 +35,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use NewDates(#5/1/2001#, #4/1/2001#, #6/1/2001#, #3/1/2001#)
             Test.Use NewVariants(7, 8, 9, 6, 5, 4, 1, 3, 2)
             Test.Use NewInt64s(7, 8, 9, 6, 5, 4, 1, 3, 2)
-            
+
         Case "Sort_WithCallback_SortsItems"
             Test.Use NewBytes(7, 8, 9, 6, 5, 4, 1, 3, 2), AddressOf CompareBytes
             Test.Use NewIntegers(7, 8, 9, 6, 5, 4, 1, 3, 2), AddressOf CompareIntegers
@@ -46,7 +46,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use NewStrings("c", "d", "a", "B", "A"), AddressOf CompareStrings
             Test.Use NewDates(#5/1/2001#, #4/1/2001#, #6/1/2001#, #3/1/2001#), AddressOf CompareDates
             Test.Use NewVariants(7, 8, 9, 6, 5, 4, 1, 3, 2), AddressOf CompareVariants
-            
+
         Case "Sort_WithStringsAndComparer_SortsExpected"
             Test.Use Nothing, NewStrings("a", "a", "A", "A", "à", "à", "À", "À", "B", "B", "c", "c", "d", "d", "ê", "ê", "Ê", "Ê", "Ø", "Ø")
             Test.Use CorLib.Comparer.Default, NewStrings("a", "a", "A", "A", "à", "à", "À", "À", "B", "B", "c", "c", "d", "d", "ê", "ê", "Ê", "Ê", "Ø", "Ø")
@@ -60,14 +60,14 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use StringComparer.InvariantCultureIgnoreCase
             Test.Use StringComparer.TextCompare
             Test.Use New AscendingComparer
-            
+
         Case "SortKey_WithItemsAndStringComparison_SortsItems"
             Test.Use StringComparer.Ordinal
             Test.Use StringComparer.InvariantCulture
             Test.Use StringComparer.BinaryCompare
             Test.Use StringComparer.CurrentCulture
             Test.Use New AscendingComparer
-            
+
     End Select
 End Sub
 

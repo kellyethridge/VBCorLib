@@ -89,20 +89,27 @@ End Function
 ' @remarks <p>The <b>AppendChar(Char)</b> method modifies the existing instance of this class; it does not return a new class instance.</p>
 ' <p>The <i>Char</i> argument accepts a <b>Long</b> datatype, however, it converts the value to an <b>Integer</b> by taking only the lower 16 bits.</p>
 Public Function AppendChar(ByVal Char As Long, Optional ByVal Count As Long = 1) As StringBuilder
-    Dim LocalChar As Integer
-    
     If Count < 0 Then _
         Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_NeedNonNegNum
-    
-    LocalChar = AsWord(Char)
+    If Char < MinCharValue Or Char > MaxCharValue Then _
+        Error.Overflow Overflow_Char
+        
     EnsureCapacity mLength + Count
     
     ' appending 1 character at a time happens 99%
     ' of the time, so optimize for it.
     If Count = 1 Then
-        mString(mLength) = LocalChar
+#If Release Then
+        mString(mLength) = Char And &HFFFF&
+#Else
+        mString(mLength) = AsWord(Char)
+#End If
     Else
-        Fill mLength, LocalChar, Count
+#If Release Then
+        Fill mLength, Char And &HFFFF&, Count
+#Else
+        Fill mLength, AsWord(Char), Count
+#End If
     End If
     
     mLength = mLength + Count

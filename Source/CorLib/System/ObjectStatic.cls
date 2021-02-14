@@ -116,7 +116,7 @@ Public Function Equals(ByRef ObjA As Variant, ByRef ObjB As Variant) As Boolean
     Select Case VarType(ObjA)
         Case vbString
             If VarType(ObjB) = vbString Then
-                Equals = CorString.EqualsV(ObjA, ObjB, StringComparison.Ordinal)
+                Equals = CorString.EqualsV(ObjA, ObjB)
             End If
         Case vbDate
             Equals = Statics.CorDateTime.Equals(ObjA, ObjB)

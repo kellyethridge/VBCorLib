@@ -365,6 +365,9 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "aBc", "abc", StringComparison.OrdinalIgnoreCase, 0
             Test.Use "abc", "aBc", StringComparison.OrdinalIgnoreCase, 0
             Test.Use "", vbNullString, StringComparison.Ordinal, 0
+            Test.Use "A", "[", StringComparison.OrdinalIgnoreCase, -1
+            Test.Use "a", "[", StringComparison.OrdinalIgnoreCase, -1
+            Test.Use "aa", "A[", StringComparison.OrdinalIgnoreCase, -1
             
         Case "CompareEx_WhenCalled_ComparesSubstrings"
             Test.Use 0, 0, 5, StringComparison.Ordinal, 0
@@ -389,6 +392,20 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use 5, 5, 10, CompareOptions.OrdinalOption, 1
             Test.Use 5, 5, 9, CompareOptions.OrdinalOption, 1
             Test.Use 5, 5, 9, CompareOptions.OrdinalIgnoreCaseOption, 0
+            
+        Case "CompareOrdinal_WithValues_ReturnsExpected"
+            Test.Use "", "", 0
+            Test.Use "a", "", 1
+            Test.Use "a", "a", 0
+            Test.Use "A", "A", 0
+            Test.Use "a", "az", -1
+            Test.Use "A", "Az", -1
+            Test.Use "az", "A", 1
+            Test.Use "Az", "a", -1
+            Test.Use Space$(15), Space$(15), 0
+            Test.Use Space$(16), Space$(15), 1
+            Test.Use Space$(15), Space$(16), -1
+            Test.Use Space$(15) & "a", Space$(15) & "b", -1
             
     End Select
 End Sub
@@ -431,6 +448,43 @@ Public Sub CompareCulturalEx_WithValues_ReturnsExpected(ByVal IndexA As Long, By
     Actual = CorString.CompareCulturalEx("abcdeABCDEabcde", IndexA, "abcdeABCDEabcD", IndexB, Length, NewCultureInfo("en-US"), Options)
     
     Assert.That Sgn(Actual), Iz.EqualTo(Expected)
+End Sub
+
+Public Sub CompareOrdinal_WithValues_ReturnsExpected(ByVal s1 As String, ByVal s2 As String, ByVal ExpectedSign As Long)
+    Dim Actual As Long
+
+    Actual = CorString.CompareOrdinal(s1, s2)
+
+    Assert.That Sgn(Actual), Iz.EqualTo(ExpectedSign)
+End Sub
+
+Public Sub CompareOrdinalIgnoreCase_WithEqualLowerUpper_ReturnsZero()
+    Dim CharReader  As StreamReader
+    Dim Line        As String
+    Dim s1          As String
+    Dim s2          As String
+    Dim Chars()     As String
+    Dim Actual      As Long
+    Dim FileName    As String
+    
+    FileName = Path.Combine(App.Path, "LowerUpper.txt")
+    Set CharReader = NewStreamReader(FileName)
+    
+    Do
+        Line = CharReader.ReadLine
+        
+        If CorString.IsNull(Line) Then
+            Exit Do
+        End If
+        
+        Chars = Split(Line, "=")
+        
+        s1 = ChrW$(CLng(Chars(0)))
+        s2 = ChrW$(CLng(Chars(1)))
+        
+        Actual = CorString.Compare(s1, s2, OrdinalIgnoreCase)
+        Assert.That Actual, Iz.EqualTo(0), Chars(0) & " should equal " & Chars(1)
+    Loop
 End Sub
 
 Public Sub IsNullOrWhitespace_WithValues_ReturnsExpected(ByVal s As String, ByVal Expected As Boolean)

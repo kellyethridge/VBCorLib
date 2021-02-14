@@ -179,7 +179,7 @@ Private Function ReadHexChar(ByRef Chars() As Integer, ByVal Index As Long) As L
         Count = Count + 1
     Loop
     
-    mTextOut.AppendChar AsWord(Result)
+    mTextOut.AppendChar Result
     ReadHexChar = Index
 End Function
 

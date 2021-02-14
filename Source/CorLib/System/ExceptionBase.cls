@@ -308,7 +308,7 @@ End Function
 ' VBCorLib.SystemException: An Error has occurred.
 ' <p>A listing of all inner exceptions will be included in the return value.</p>
 '
-Public Function ToString(Optional ByRef FormattedMessage As String)
+Public Function ToString(Optional ByRef FormattedMessage As String) As String
     If Len(mTypeName) > 0 Then
         ToString = mTypeName & ": "
     End If

@@ -135,7 +135,7 @@ End Property
 ' @param Value The last year of a 100-year range.
 ' @remarks <p>This property allows a 2-digit year to be properly translated to a 4-digit year. For example, if this property is set to 1429, the 100-year range is from 1330 to 1429. Therefore, a 2-digit value of 30 is interpreted as 1330, while a 2-digit value of 29 is interpreted as 1429.</p>
 ' <p>The application should set this value to 99 to indicate that 2-digit years are to be taken literally. For example, if this property is set to 99, the 100-year range is from 0 (not a valid value for most calendars) to 99. Therefore, a 2-digit value of 30 is interpreted as 30.</p>
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
 '       <th>Exception</th>
@@ -459,7 +459,7 @@ End Function
 ' @return Boolean indication if the month is a leap month.
 ' @remarks <p>Unlike the Gregorian calendar, the Julian calendar defines a leap year as a year that is evenly divisible by four with no exceptions. Therefore, the calendar is inaccurate by one day every 128 years. For example, the year 1999 was not a leap year, but the year 2000 was. A common year has 365 days and a leap year has 366 days.</p>
 ' <p>A leap month is an entire month that occurs only in a leap year. The Julian calendar does not have any leap months.</p>
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
 '       <th>Exception</th>
@@ -494,7 +494,7 @@ End Function
 ' @return Boolean indication if the day is a leap day.
 ' @remarks <p>Unlike the Gregorian calendar, the Julian calendar defines a leap year as a year that is evenly divisible by four with no exceptions. Therefore, the calendar is inaccurate by one day every 128 years. For example, the year 1999 was not a leap year, but the year 2000 was. A common year has 365 days and a leap year has 366 days.</p>
 ' <p>A leap day is a day that occurs only in a leap year. In the Julian calendar, the 29th day of February is the only leap day.</p>
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
 '       <th>Exception</th>

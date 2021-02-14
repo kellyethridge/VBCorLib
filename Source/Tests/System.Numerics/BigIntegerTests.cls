@@ -44,8 +44,13 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
         Case "NewBigInteger_WithByteArray_InitializesBigInteger"
             Test.Use NewBytes(), NewBytes(0), 0
             Test.Use NewBytes(&H80), NewBytes(&H80), -1
+            Test.Use NewBytes(&H0, &H80), NewBytes(&H0, &H80), -1
+            Test.Use NewBytes(&H0, &H0, &H80), NewBytes(&H0, &H0, &H80), -1
             Test.Use NewBytes(&HFF), NewBytes(&HFF), -1
             Test.Use NewBytes(&HFF, &HFF), NewBytes(&HFF), -1
+            Test.Use NewBytes(&H80, &H0), NewBytes(&H80, &H0), 1
+            Test.Use NewBytes(&H0, &H80, &H0), NewBytes(&H0, &H80, &H0), 1
+            Test.Use NewBytes(&H0, &H0, &H80, &H0), NewBytes(&H0, &H0, &H80, &H0), 1
             Test.Use NewBytes(&H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H4, &HF1, &H67, &HA8, &HA5, &H67, &H68), NewBytes(&H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H4, &HF1, &H67, &HA8, &HA5, &H67, &H68), 1
             
         Case "NewBigInteger_WithDouble_InitializesBigInteger"
@@ -253,6 +258,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use &HA, "x", "0a"
             Test.Use &HFFF80000, "x", "80000"
             Test.Use &HFFF80000, "x8", "fff80000"
+            Test.Use "&hF14237FFAAC086455192", "x", "f14237ffaac086455192"
             
         Case "Compare_WithWithValues_ReturnsExpected"
             Test.Use(CBigInt(0), CBigInt(0)).Expect Iz.EqualTo(0)
@@ -573,6 +579,17 @@ Public Sub Parse_WithInvalidValueForNumberStylesAllowParentheses_ThrowsFormatExc
     AssertFormatException Err
 End Sub
 
+Public Sub Parse_WithFrenchCulture_ParsesWithSpaceAsGroupSeparator()
+    Dim Provider As CultureInfo
+    Dim Actual As BigInteger
+    
+    Set Provider = NewCultureInfo("fr-FR")
+    
+    Set Actual = BigInteger.Parse("9 031 425 666 123 546,00", NumberStyles.AllowDecimalPoint Or NumberStyles.AllowThousands, Provider)
+    
+    Assert.That Actual.ToString, Iz.EqualTo("9031425666123546")
+End Sub
+
 Public Sub ToString_WithNoFormatting_ReturnsDefault(ByVal Value As Long, ByVal Expected As String)
     Dim Number As BigInteger
     Dim Actual As String
@@ -592,6 +609,17 @@ Public Sub ToString_WithFormatting_ReturnsFormattedNumber(ByVal Value As Variant
     Actual = Number.ToString(Format)
     
     Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub ToString_WithLargeExponent_ReturnsFormattedNumber()
+    Dim Number As BigInteger
+    Dim Actual As String
+    
+    Set Number = BigInteger.Pow(CBigInt(Int64.MaxValue), 53) ' "1.377703e+1005"
+
+    Actual = Number.ToString("e")
+    
+    Assert.That Actual, Iz.EqualTo("1.377703e+1005")
 End Sub
 
 Public Function Compare_WithWithValues_ReturnsExpected(ByVal x As BigInteger, ByVal y As BigInteger) As Long
@@ -1091,3 +1119,4 @@ Public Sub NewBigInteger_WithInt64_InitializesBigInteger(ByRef Value As Variant,
     Assert.That Actual.ToByteArray, Iz.EqualTo(ExpectedBytes), "#1"
     Assert.That Actual.Sign, Iz.EqualTo(ExpectedSign)
 End Sub
+

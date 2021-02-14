@@ -40,7 +40,7 @@ Implements StringComparer
 Implements IComparer
 Implements IEqualityComparer
 
-Private mComparisonType     As StringComparison
+Private mComparisonType     As VbCompareMethod
 Private mDefaultComparer    As Comparer
 
 
@@ -48,7 +48,7 @@ Private mDefaultComparer    As Comparer
 '   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByVal IgnoreCase As Boolean)
-    mComparisonType = IIfLong(IgnoreCase, StringComparison.TextCompare, StringComparison.BinaryCompare)
+    mComparisonType = IIfLong(IgnoreCase, vbTextCompare, vbBinaryCompare)
     Set mDefaultComparer = Comparer.Default
 End Sub
 
@@ -59,7 +59,7 @@ End Sub
 Private Function StringComparer_Compare(x As Variant, y As Variant) As Long
     If VarType(x) = vbString Then
         If VarType(y) = vbString Then
-            StringComparer_Compare = CorString.CompareV(x, y, mComparisonType)
+            StringComparer_Compare = StrComp(x, y, mComparisonType)
             Exit Function
         End If
     End If
@@ -70,7 +70,7 @@ End Function
 Private Function StringComparer_Equals(x As Variant, y As Variant) As Boolean
     If VarType(x) = vbString Then
         If VarType(y) = vbString Then
-            StringComparer_Equals = CorString.EqualsV(x, y, mComparisonType)
+            StringComparer_Equals = StrComp(x, y, mComparisonType) = 0
             Exit Function
         End If
     End If
@@ -80,7 +80,7 @@ End Function
 
 Private Function StringComparer_GetHashCode(Obj As Variant) As Long
     If VarType(Obj) = vbString Then
-        If mComparisonType = StringComparison.TextCompare Then
+        If mComparisonType = vbTextCompare Then
             StringComparer_GetHashCode = Object.GetHashCode(UCase$(Obj))
             Exit Function
         End If

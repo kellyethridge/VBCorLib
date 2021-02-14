@@ -395,7 +395,7 @@ End Function
 '
 ' @param ByteCount The number of bytes to be decoded.
 ' @return The maximum number of characters that can be decoded from the specified number of bytes.
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
 '       <th>Exception</th>
@@ -535,7 +535,7 @@ End Function
 ' @param Index The index of the first byte to be decoded.
 ' @param Count The number of bytes to be used in the decoding.
 ' @return A string containing the decoded set of bytes.
-' <h4>Exceptions</h4>
+' @exceptions
 ' <table style="width: auto">
 '   <tr>
 '       <th>Exception</th>

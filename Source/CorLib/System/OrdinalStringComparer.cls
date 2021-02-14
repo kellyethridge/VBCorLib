@@ -40,7 +40,7 @@ Implements StringComparer
 Implements IComparer
 Implements IEqualityComparer
 
-Private mComparisonType     As StringComparison
+Private mIgnoreCase         As Boolean
 Private mDefaultComparer    As Comparer
 
 
@@ -48,7 +48,7 @@ Private mDefaultComparer    As Comparer
 '   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByVal IgnoreCase As Boolean)
-    mComparisonType = IIfLong(IgnoreCase, StringComparison.OrdinalIgnoreCase, StringComparison.Ordinal)
+    mIgnoreCase = IgnoreCase
     Set mDefaultComparer = Comparer.Default
 End Sub
 
@@ -59,7 +59,12 @@ End Sub
 Private Function StringComparer_Compare(x As Variant, y As Variant) As Long
     If VarType(x) = vbString Then
         If VarType(y) = vbString Then
-            StringComparer_Compare = CorString.CompareV(x, y, mComparisonType)
+            If mIgnoreCase Then
+                StringComparer_Compare = CorString.CompareV(x, y, StringComparison.OrdinalIgnoreCase)
+            Else
+                StringComparer_Compare = CorString.CompareOrdinalV(x, y)
+            End If
+            
             Exit Function
         End If
     End If
@@ -70,7 +75,12 @@ End Function
 Private Function StringComparer_Equals(x As Variant, y As Variant) As Boolean
     If VarType(x) = vbString Then
         If VarType(y) = vbString Then
-            StringComparer_Equals = CorString.EqualsV(x, y, mComparisonType)
+            If mIgnoreCase Then
+                StringComparer_Equals = CorString.CompareV(x, y, StringComparison.OrdinalIgnoreCase) = 0
+            Else
+                StringComparer_Equals = CorString.EqualsV(x, y)
+            End If
+            
             Exit Function
         End If
     End If
@@ -80,7 +90,7 @@ End Function
 
 Private Function StringComparer_GetHashCode(Obj As Variant) As Long
     If VarType(Obj) = vbString Then
-        If mComparisonType = StringComparison.OrdinalIgnoreCase Then
+        If mIgnoreCase Then
             StringComparer_GetHashCode = Object.GetHashCode(UCase$(Obj))
             Exit Function
         End If
