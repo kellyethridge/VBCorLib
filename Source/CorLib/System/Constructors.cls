@@ -1848,7 +1848,7 @@ End Function
 ' @param ZeroIsInvalid <b>True</b> if a handle of the value zero is considered an invalid handle; <b>False</b> otherwise.
 ' @return A new instance of the <a href="SafeHandle.html">SafeHandle</a> class.
 ' @remarks The <a href="SafeHandle.html">SafeHandle</a> class is used as base class through composition for managing specific handles.
-Public Function NewSafeHandle(ByVal PreexistingHandle As Long, ByVal OwnsHandle As Boolean, Optional ByVal ZeroIsInvalid = False) As SafeHandle
+Public Function NewSafeHandle(ByVal PreexistingHandle As Long, ByVal OwnsHandle As Boolean, Optional ByVal ZeroIsInvalid As Boolean = False) As SafeHandle
     Set NewSafeHandle = New SafeHandle
     NewSafeHandle.Init PreexistingHandle, OwnsHandle, ZeroIsInvalid
 End Function

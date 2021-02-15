@@ -15,6 +15,7 @@ version 4.0
 	* Added AppendAllLines to File class. This closes #44.
 	* Added ReadLines to File class. This closes #94.
 	* Added LeaveOpen parameter in BinaryWriter constructor. This closes #28.
+	* Fixed #59 - Changed NewSafeHandle parameter ZeroIsInvalid to explicit boolean type.
 
 version 3.2
 	* Optimize StringBuilder.AppendChar for Release build.
