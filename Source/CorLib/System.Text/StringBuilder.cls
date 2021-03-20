@@ -53,6 +53,7 @@ Private Const DefaultFillChar   As Integer = vbSpaceChar
 Private Const DefaultCapacity   As Long = 128
 
 Private mString()   As Integer
+Private mStringPtr  As Long
 Private mCapacity   As Long
 Private mLength     As Long
 Private mFillChar   As Integer
@@ -194,7 +195,19 @@ End Function
 ' @param s The string value to be appended.
 ' @remarks This method appends the entire string to the end of the <a href="StringBuilder.html">StringBuilder</a>. There is no instance returned.
 Public Sub AppendString(ByRef s As String)
-    AppendCore StrPtr(s), 0, Len(s)
+'    AppendCore StrPtr(s), 0, Len(s)
+    Dim Length As Long
+    
+    Length = Len(s)
+    
+    If Length Then
+        If mLength + Length > mCapacity Then
+            EnsureCapacity mLength + Length
+        End If
+        
+        CopyMemory ByVal mStringPtr + mLength * vbSizeOfChar, ByVal StrPtr(s), Length * vbSizeOfChar
+        mLength = mLength + Length
+    End If
 End Sub
 
 ''
@@ -246,9 +259,11 @@ Public Property Let Capacity(ByVal Value As Long)
     If Value <> mCapacity Then
         If Value > 0 Then
             ReDim Preserve mString(0 To Value - 1)
+            mStringPtr = VarPtr(mString(0))
         Else
             Erase mString
             SAPtr(mString) = SafeArrayCreateVector(vbString, 0, 0)
+            mStringPtr = vbNullPtr
         End If
         
         mCapacity = Value
@@ -800,6 +815,7 @@ Private Sub Class_Initialize()
     mFillChar = DefaultFillChar
     mCapacity = DefaultCapacity
     ReDim mString(0 To DefaultCapacity - 1)
+    mStringPtr = VarPtr(mString(0))
 End Sub
 
 
@@ -884,8 +900,12 @@ Private Sub AppendCore(ByVal CharPtr As Long, ByVal StartIndex As Long, ByVal Ch
     
     If CharCount > 0 Then
         NewLength = mLength + CharCount
-        EnsureCapacity NewLength
-        CopyMemory mString(mLength), ByVal CharPtr + StartIndex * vbSizeOfChar, CharCount * vbSizeOfChar
+        
+        If NewLength > mCapacity Then
+            EnsureCapacity NewLength
+        End If
+        
+        CopyMemory ByVal mStringPtr + mLength * vbSizeOfChar, ByVal CharPtr + StartIndex * vbSizeOfChar, CharCount * vbSizeOfChar
         mLength = NewLength
     End If
 End Sub
