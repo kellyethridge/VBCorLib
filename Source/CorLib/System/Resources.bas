@@ -246,6 +246,7 @@ Public Enum ResourceStringKey
     IO_FileExists_Name = 411
     IO_SourceDestMustBeDifferent = 412
     IO_SourceDestMustHaveSameRoot = 413
+    IO_EOF_ReadBeyondEOF = 414
     
     Cryptography_HashNotYetFinalized = 500
     Cryptography_CSP_CFBSizeNotSupported = 501

@@ -72,6 +72,10 @@ Friend Sub IO(ByVal Key As ResourceStringKey)
     Throw Cor.NewIOException(Environment.GetResourceString(Key))
 End Sub
 
+Friend Sub EndOfStream(ByVal Key As ResourceStringKey)
+    Throw Cor.NewEndOfStreamException(Environment.GetResourceString(Key))
+End Sub
+
 Friend Sub Win32Error(ByVal ErrorCode As Long)
     Dim Message As String
     Message = GetMessage(ErrorCode)

@@ -171,8 +171,8 @@ Public Function ReadChar() As Integer
     
     Result = Read
     
-    If ReadChar = NoChars Then _
-        Throw New EndOfStreamException
+    If Result = NoChars Then _
+        Error.EndOfStream IO_EOF_ReadBeyondEOF
         
     ReadChar = Char.ConvertFromInt32(Result)
 End Function

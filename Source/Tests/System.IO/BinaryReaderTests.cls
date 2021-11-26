@@ -492,6 +492,18 @@ Public Sub ReadChar_WithClosedReader_ThrowsObjectDisposedException()
     AssertObjectDisposedException Err
 End Sub
 
+Public Sub ReadChar_WithNoMoreCharacters_ThrowsEndOfStreamException()
+    Dim Reader As BinaryReader
+    Set Reader = MakeReader(NewBytes(65))
+    
+    Reader.ReadChar
+    
+    On Error Resume Next
+    Reader.ReadChar
+    
+    AssertEndOfStreamException Err
+End Sub
+
 Private Function MakeReader(ByRef Data() As Byte) As BinaryReader
     Dim Source As New MemoryStream
     Source.WriteBlock Data, 0, UBound(Data) + 1
