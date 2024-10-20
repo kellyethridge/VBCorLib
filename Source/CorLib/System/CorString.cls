@@ -114,7 +114,6 @@ Public Enum StringSplitOptions
 End Enum
 
 Private mCharCheckerDelegate    As Delegate
-Private mCharChecker            As Func_T_Boolean
 Private mLowerUpper()           As Integer
 Private mString1()              As Integer
 Private mString1SA              As SafeArray1d
@@ -132,8 +131,8 @@ Private mString2LngSA           As SafeArray1d
 ' @param s The string to be tested for null.
 ' @return <b>True</b> if the string pointer is null, <b>False</b> otherwise.
 ' @include "..\DocIncludes\CorString.IsNull.html"
-Public Function IsNull(ByRef s As String) As Boolean
-    IsNull = (StrPtr(s) = vbNullPtr)
+Public Function IsNull(ByRef S As String) As Boolean
+    IsNull = (StrPtr(S) = vbNullPtr)
 End Function
 
 ''
@@ -142,17 +141,17 @@ End Function
 ' @param s The string to be tested for white-space.
 ' @return <b>True</b> if the string has a length of zero or contains only white-space, <b>False</b> otherwise.
 ' @include "..\DocIncludes\CorString.IsNullOrWhiteSpace.html"
-Public Function IsNullOrWhiteSpace(ByRef s As String) As Boolean
+Public Function IsNullOrWhiteSpace(ByRef S As String) As Boolean
     Dim Chars() As Integer
-    Dim i As Long
+    Dim I As Long
     
-    If LenB(s) = 0 Then
+    If LenB(S) = 0 Then
         IsNullOrWhiteSpace = True
     Else
-        Chars = AllocChars(s)
+        Chars = AllocChars(S)
         
-        For i = 0 To Len(s) - 1
-            If Not IsWhiteSpace(Chars(i)) Then
+        For I = 0 To Len(S) - 1
+            If Not IsWhiteSpace(Chars(I)) Then
                 GoTo Finally
             End If
         Next
@@ -245,22 +244,22 @@ End Function
 ' <p>If <i>Length</i> is zero, the returned array is empty and has a zero length. If <i>s</i> is an empty string (""),
 ' the returned array is empty and has a zero length.</p>
 ' @include "..\DocIncludes\CorString.ToCharArray.html"
-Public Function ToCharArray(ByRef s As String, Optional ByRef StartIndex As Variant, Optional ByRef Length As Variant) As Integer()
+Public Function ToCharArray(ByRef S As String, Optional ByRef StartIndex As Variant, Optional ByRef Length As Variant) As Integer()
     Dim Range   As ListRange
     Dim Chars() As Integer
     
-    Range = MakeDefaultRange(StartIndex, 0, Length, Len(s), NameOfStartIndex, NameOfLength)
+    Range = MakeDefaultRange(StartIndex, 0, Length, Len(S), NameOfStartIndex, NameOfLength)
     
     If Range.Index < 0 Then _
         Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_NeedNonNegNum
     If Range.Count < 0 Then _
         Error.ArgumentOutOfRange "Length", ArgumentOutOfRange_NeedNonNegNum
-    If Range.Index + Range.Count > Len(s) Then _
+    If Range.Index + Range.Count > Len(S) Then _
         Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_IndexCount
     
     If Range.Count > 0 Then
         ReDim Chars(0 To Range.Count - 1)
-        CopyMemory Chars(0), ByVal StrPtr(s) + Range.Index * vbSizeOfChar, Range.Count * vbSizeOfChar
+        CopyMemory Chars(0), ByVal StrPtr(S) + Range.Index * vbSizeOfChar, Range.Count * vbSizeOfChar
     Else
         Chars = Cor.NewIntegers()
     End If
@@ -278,13 +277,13 @@ End Function
 ' a length of <i>TotalWidth</i>. However, if <i>TotalWidth</i> is less than the length of <i>s</i>, the method returns <i>s</i>.
 ' If <i>TotalWidth</i> is equal to the length of <i>s</i>, the method returns a new string that is identical to <i>s</i>.
 ' @include "..\DocIncludes\CorString.PadLeft.html"
-Public Function PadLeft(ByRef s As String, ByVal TotalWidth As Long, Optional ByRef PaddingChar As Variant = 32) As String
+Public Function PadLeft(ByRef S As String, ByVal TotalWidth As Long, Optional ByRef PaddingChar As Variant = 32) As String
     Dim Length As Long
-    Length = Len(s)
+    Length = Len(S)
     If TotalWidth > Length Then
-        PadLeft = String$(TotalWidth - Length, PaddingChar) & s
+        PadLeft = String$(TotalWidth - Length, PaddingChar) & S
     Else
-        PadLeft = s
+        PadLeft = S
     End If
 End Function
 
@@ -298,13 +297,13 @@ End Function
 ' a length of <i>TotalWidth</i>. However, if <i>TotalWidth</i> is less than the length of <i>s</i>, the method returns <i>s</i>.
 ' If <i>TotalWidth</i> is equal to the length of <i>s</i>, the method returns a new string that is identical to <i>s</i>.
 ' @include "..\DocIncludes\CorString.PadRight.html"
-Public Function PadRight(ByRef s As String, ByVal TotalWidth As Long, Optional ByRef PaddingChar As Variant = 32) As String
+Public Function PadRight(ByRef S As String, ByVal TotalWidth As Long, Optional ByRef PaddingChar As Variant = 32) As String
     Dim Length As Long
-    Length = Len(s)
+    Length = Len(S)
     If TotalWidth > Length Then
-        PadRight = s & String$(TotalWidth - Length, PaddingChar)
+        PadRight = S & String$(TotalWidth - Length, PaddingChar)
     Else
-        PadRight = s
+        PadRight = S
     End If
 End Function
 
@@ -318,8 +317,8 @@ End Function
 ' @see #TrimEnd
 ' @see #ToCharArray
 ' @include "..\DocIncludes\CorString.TrimStart.html"
-Public Function TrimStart(ByRef s As String, Optional ByRef TrimChars As Variant) As String
-    TrimStart = TrimCore(s, TrimChars, True, False)
+Public Function TrimStart(ByRef S As String, Optional ByRef TrimChars As Variant) As String
+    TrimStart = TrimCore(S, TrimChars, True, False)
 End Function
 
 ''
@@ -332,8 +331,8 @@ End Function
 ' @see #TrimStart
 ' @see #ToCharArray
 ' @include "..\DocIncludes\CorString.TrimEnd.html"
-Public Function TrimEnd(ByRef s As String, Optional ByRef TrimChars As Variant) As String
-    TrimEnd = TrimCore(s, TrimChars, False, True)
+Public Function TrimEnd(ByRef S As String, Optional ByRef TrimChars As Variant) As String
+    TrimEnd = TrimCore(S, TrimChars, False, True)
 End Function
 
 ''
@@ -346,8 +345,8 @@ End Function
 ' @see #TrimEnd
 ' @see #ToCharArray
 ' @include "..\DocIncludes\CorString.Trim.html"
-Public Function Trim(ByRef s As String, Optional ByRef TrimChars As Variant) As String
-    Trim = TrimCore(s, TrimChars, True, True)
+Public Function Trim(ByRef S As String, Optional ByRef TrimChars As Variant) As String
+    Trim = TrimCore(S, TrimChars, True, True)
 End Function
 
 ''
@@ -425,22 +424,22 @@ End Sub
 ' @return A new string with the substring deleted.
 ' @see #Insert
 ' @include "..\DocIncludes\CorString.Remove.html"
-Public Function Remove(ByRef s As String, ByVal StartIndex As Long, Optional ByRef Count As Variant) As String
+Public Function Remove(ByRef S As String, ByVal StartIndex As Long, Optional ByRef Count As Variant) As String
     Dim CharCount       As Long
     Dim RemovalCount    As Long
     Dim SPtr As Long
     
-    CharCount = Len(s)
+    CharCount = Len(S)
     RemovalCount = CLngOrDefault(Count, CharCount - StartIndex)
     
     If StartIndex < 0 Then _
         Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_NeedNonNegNum
     If RemovalCount < 0 Then _
         Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_NeedNonNegNum
-    If StartIndex + RemovalCount > Len(s) Then _
+    If StartIndex + RemovalCount > Len(S) Then _
         Error.ArgumentOutOfRange "", Argument_InvalidOffLen
     
-    SPtr = StrPtr(s)
+    SPtr = StrPtr(S)
     Remove = SysAllocStringLen(SPtr, CharCount - RemovalCount)
     CopyMemory ByVal StrPtr(Remove) + StartIndex * vbSizeOfChar, ByVal SPtr + (StartIndex + RemovalCount) * vbSizeOfChar, (CharCount - (StartIndex + RemovalCount)) * vbSizeOfChar
 End Function
@@ -456,22 +455,22 @@ End Function
 ' @return The zero-based index position of the first occurrence in <i>s</i> where any character in <i>AnyOf</i> was found; -1 if no character in <i>AnyOf</i> was found.
 ' @see #LastIndexOfAny
 ' @include "..\DocIncludes\CorString.IndexOfAny.html"
-Public Function IndexOfAny(ByRef s As String, ByRef OfAny As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As Long
+Public Function IndexOfAny(ByRef S As String, ByRef OfAny As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As Long
     Dim Range As ListRange
     
-    Range = MakeDefaultStepRange(StartIndex, 0, Count, Len(s), NameOfStartIndex)
+    Range = MakeDefaultStepRange(StartIndex, 0, Count, Len(S), NameOfStartIndex)
     
     If Range.Index < 0 Then _
         Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_NeedNonNegNum
-    If Range.Index > Len(s) Then _
+    If Range.Index > Len(S) Then _
         Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_Index
     If Range.Count < 0 Then _
         Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_NeedNonNegNum
-    If Range.Index + Range.Count > Len(s) Then _
+    If Range.Index + Range.Count > Len(S) Then _
         Error.ArgumentOutOfRange "", ArgumentOutOfRange_Count
     
-    If Len(s) > 0 Then
-        IndexOfAny = IndexOfAnyCore(s, OfAny, Range.Index, Range.Index + Range.Count - 1, 1)
+    If Len(S) > 0 Then
+        IndexOfAny = IndexOfAnyCore(S, OfAny, Range.Index, Range.Index + Range.Count - 1, 1)
     Else
         IndexOfAny = -1
     End If
@@ -488,11 +487,11 @@ End Function
 ' @return The index position of the last occurrence in <i>s</i> where any character in <i>AnyOf</i> was found; -1 if no character in <i>AnyOf</i> was found or if <i>s</i> is empty.
 ' @see #IndexOfAny
 ' @include "..\DocIncludes\CorString.LastIndexOfAny.html"
-Public Function LastIndexOfAny(ByRef s As String, ByRef OfAny As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As Long
+Public Function LastIndexOfAny(ByRef S As String, ByRef OfAny As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As Long
     Dim Range As ListRange
     
-    If Len(s) > 0 Then
-        Range = MakeStringRange(s, StartIndex, Count)
+    If Len(S) > 0 Then
+        Range = MakeStringRange(S, StartIndex, Count)
         
         If Range.Index < 0 Then _
             Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_NeedNonNegNum
@@ -501,7 +500,7 @@ Public Function LastIndexOfAny(ByRef s As String, ByRef OfAny As Variant, Option
         If Range.Index - Range.Count + 1 < 0 Then _
             Error.ArgumentOutOfRange "", ArgumentOutOfRange_Count
         
-        LastIndexOfAny = IndexOfAnyCore(s, OfAny, Range.Index, Range.Index - Range.Count + 1, -1)
+        LastIndexOfAny = IndexOfAnyCore(S, OfAny, Range.Index, Range.Index - Range.Count + 1, -1)
     Else
         LastIndexOfAny = -1
     End If
@@ -516,23 +515,23 @@ End Function
 ' @return A new string that is equivalent to this instance, but with <i>Value</i> inserted at position <i>StartIndex</i>.
 ' @see #Remove
 ' @include "..\DocIncludes\CorString.Insert.html"
-Public Function Insert(ByRef s As String, ByVal StartIndex As Long, ByRef Value As String) As String
+Public Function Insert(ByRef S As String, ByVal StartIndex As Long, ByRef Value As String) As String
     Dim ValueLength As Long
     Dim SourcePtr As Long
     Dim TargetPtr As Long
        
-    If StartIndex < 0 Or StartIndex > Len(s) Then _
+    If StartIndex < 0 Or StartIndex > Len(S) Then _
         Error.ArgumentOutOfRange "StartIndex"
     
     ValueLength = Len(Value)
     
     If ValueLength = 0 Then
-        Insert = s
+        Insert = S
         Exit Function
     End If
     
-    SourcePtr = StrPtr(s)
-    Insert = SysAllocStringLen(ByVal 0&, ValueLength + Len(s))
+    SourcePtr = StrPtr(S)
+    Insert = SysAllocStringLen(ByVal 0&, ValueLength + Len(S))
     TargetPtr = StrPtr(Insert)
     ValueLength = ValueLength * vbSizeOfChar
     StartIndex = StartIndex * vbSizeOfChar
@@ -559,13 +558,13 @@ End Function
 '        <td><a href="ArgumentException.html">ArgumentException</a></td><td><i>ComparisonType</i> is not a <a href="CorString.StringComparison.html">StringComparison</a> value.</td>
 '   </tr>
 ' </table>
-Public Function StartsWith(ByRef s As String, ByRef Value As String, Optional ByVal ComparisonType As StringComparison = StringComparison.Ordinal) As Boolean
+Public Function StartsWith(ByRef S As String, ByRef Value As String, Optional ByVal ComparisonType As StringComparison = StringComparison.Ordinal) As Boolean
     Dim LenValue As Long
     
     LenValue = Len(Value)
     
-    If LenValue <= Len(s) Then
-        StartsWith = CompareHelper(StrPtr(s), LenValue, StrPtr(Value), LenValue, ComparisonType) = 0
+    If LenValue <= Len(S) Then
+        StartsWith = CompareHelper(StrPtr(S), LenValue, StrPtr(Value), LenValue, ComparisonType) = 0
     End If
 End Function
 
@@ -577,7 +576,7 @@ End Function
 ' @param IgnoreCase <b>True</b> to ignore case during comparison; otherwise <b>False</b>.
 ' @param Culture Cultural information that determines how <i>s</i> and <i>Value</i> are compared. If <i>Culture</i> is <b>Nothing</b>, the current culture is used.
 ' @return <b>True</b> if the <i>s</i> parameter begins with <i>Value</i>; otherwise <b>False</b>.
-Public Function StartsWithEx(ByRef s As String, ByRef Value As String, ByVal IgnoreCase As Boolean, ByVal Culture As CultureInfo) As Boolean
+Public Function StartsWithEx(ByRef S As String, ByRef Value As String, ByVal IgnoreCase As Boolean, ByVal Culture As CultureInfo) As Boolean
     Dim LenValue As Long
     
     If Culture Is Nothing Then
@@ -586,8 +585,8 @@ Public Function StartsWithEx(ByRef s As String, ByRef Value As String, ByVal Ign
     
     LenValue = Len(Value)
     
-    If LenValue <= Len(s) Then
-        StartsWithEx = CompareCulturalHelper(StrPtr(s), LenValue, StrPtr(Value), LenValue, Culture, IIfLong(IgnoreCase, CompareOptions.IgnoreCase, CompareOptions.None)) = 0
+    If LenValue <= Len(S) Then
+        StartsWithEx = CompareCulturalHelper(StrPtr(S), LenValue, StrPtr(Value), LenValue, Culture, IIfLong(IgnoreCase, CompareOptions.IgnoreCase, CompareOptions.None)) = 0
     End If
 End Function
 
@@ -608,15 +607,15 @@ End Function
 '        <td><a href="ArgumentException.html">ArgumentException</a></td><td><i>ComparisonType</i> is not a <a href="CorString.StringComparison.html">StringComparison</a> value.</td>
 '   </tr>
 ' </table>
-Public Function EndsWith(ByRef s As String, ByRef Value As String, Optional ByVal ComparisonType As StringComparison = StringComparison.Ordinal) As Boolean
+Public Function EndsWith(ByRef S As String, ByRef Value As String, Optional ByVal ComparisonType As StringComparison = StringComparison.Ordinal) As Boolean
     Dim StartIndex  As Long
     Dim LenValue    As Long
     
     LenValue = Len(Value)
     
-    If LenValue <= Len(s) Then
-        StartIndex = (Len(s) - LenValue) * vbSizeOfChar
-        EndsWith = CompareHelper(StrPtr(s) + StartIndex, LenValue, StrPtr(Value), LenValue, ComparisonType) = 0
+    If LenValue <= Len(S) Then
+        StartIndex = (Len(S) - LenValue) * vbSizeOfChar
+        EndsWith = CompareHelper(StrPtr(S) + StartIndex, LenValue, StrPtr(Value), LenValue, ComparisonType) = 0
     End If
 End Function
 
@@ -628,7 +627,7 @@ End Function
 ' @param IgnoreCase <b>True</b> to ignore case during comparison; otherwise <b>False</b>.
 ' @param Culture Cultural information that determines how <i>s</i> and <i>Value</i> are compared. If <i>Culture</i> is <b>Nothing</b>, the current culture is used.
 ' @return <b>True</b> if the <i>Value</i> parameter matches the end of <i>s</i>; otherwise <b>False</b>.
-Public Function EndsWithEx(ByRef s As String, ByRef Value As String, ByVal IgnoreCase As Boolean, ByVal Culture As CultureInfo) As Boolean
+Public Function EndsWithEx(ByRef S As String, ByRef Value As String, ByVal IgnoreCase As Boolean, ByVal Culture As CultureInfo) As Boolean
     Dim StartIndex  As Long
     Dim LenValue    As Long
     Dim Options     As CompareOptions
@@ -640,9 +639,9 @@ Public Function EndsWithEx(ByRef s As String, ByRef Value As String, ByVal Ignor
     LenValue = Len(Value)
     Options = IIfLong(IgnoreCase, CompareOptions.IgnoreCase, CompareOptions.None)
     
-    If LenValue <= Len(s) Then
-        StartIndex = (Len(s) - LenValue) * vbSizeOfChar
-        EndsWithEx = CompareCulturalHelper(StrPtr(s) + StartIndex, LenValue, StrPtr(Value), LenValue, Culture, Options) = 0
+    If LenValue <= Len(S) Then
+        StartIndex = (Len(S) - LenValue) * vbSizeOfChar
+        EndsWithEx = CompareCulturalHelper(StrPtr(S) + StartIndex, LenValue, StrPtr(Value), LenValue, Culture, Options) = 0
     End If
 End Function
 
@@ -672,11 +671,11 @@ End Function
 ' that contains the <i>s</i> parameter. If the <i>Separator</i> parameter is <b>null</b> or contains no elements, white-space characters are assumed to be the delimiters.
 ' White-space characters are defined by the Unicode standard and return <b>True</b> if they are passed to the <a href="Char.IsWhiteSpace.html">Char.IsWhiteSpace</a> method.</p>
 ' <p>If the <i>Count</i> parameter is zero, or the <i>Options</i> parameter is <a href="CorString.StringSplitOptions.html">RemoveEmptyEntries</a> and the length of the <i>s</i> parameter is zero, an empty array is returned.</p>
-Public Function Split(ByRef s As String, Optional ByRef Separator As Variant, Optional ByVal Count As Long = &H7FFFFFFF, Optional ByVal Options As StringSplitOptions = StringSplitOptions.None) As String()
+Public Function Split(ByRef S As String, Optional ByRef Separator As Variant, Optional ByVal Count As Long = &H7FFFFFFF, Optional ByVal Options As StringSplitOptions = StringSplitOptions.None) As String()
     If Count < 0 Then _
         Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_NeedNonNegNum
     
-    If Count = 0 Or (Len(s) = 0 And Options = StringSplitOptions.RemoveEmptyEntries) Then
+    If Count = 0 Or (Len(S) = 0 And Options = StringSplitOptions.RemoveEmptyEntries) Then
         Split = Cor.NewStrings()
     Else
         Dim SeparatorIndexes()  As Long
@@ -684,40 +683,40 @@ Public Function Split(ByRef s As String, Optional ByRef Separator As Variant, Op
         Dim MatchCount          As Long
         Dim MaxIndexes          As Long
         
-        MaxIndexes = Len(s) \ 2 + 1
+        MaxIndexes = Len(S) \ 2 + 1
         ReDim SeparatorIndexes(0 To MaxIndexes)
         ReDim SeparatorLengths(0 To MaxIndexes)
         
         If IsMissing(Separator) Then
-            MatchCount = FindWhitespaceSeparatorIndexes(s, SeparatorIndexes, SeparatorLengths)
+            MatchCount = FindWhitespaceSeparatorIndexes(S, SeparatorIndexes, SeparatorLengths)
         ElseIf VarType(Separator) = vbString Then
             If Len(Separator) = 0 Then
-                MatchCount = FindWhitespaceSeparatorIndexes(s, SeparatorIndexes, SeparatorLengths)
+                MatchCount = FindWhitespaceSeparatorIndexes(S, SeparatorIndexes, SeparatorLengths)
             Else
-                MatchCount = FindSeparatorIndexes(s, Separator, SeparatorIndexes, SeparatorLengths)
+                MatchCount = FindSeparatorIndexes(S, Separator, SeparatorIndexes, SeparatorLengths)
             End If
         ElseIf CorArray.IsNullOrEmpty(Separator) Then
-            MatchCount = FindWhitespaceSeparatorIndexes(s, SeparatorIndexes, SeparatorLengths)
+            MatchCount = FindWhitespaceSeparatorIndexes(S, SeparatorIndexes, SeparatorLengths)
         Else
-            MatchCount = FindSeparatorIndexes(s, Separator, SeparatorIndexes, SeparatorLengths)
+            MatchCount = FindSeparatorIndexes(S, Separator, SeparatorIndexes, SeparatorLengths)
         End If
         
         If MatchCount > 0 Then
             Select Case Options
                 Case StringSplitOptions.None
-                    Split = SplitWithEmpties(s, MatchCount, SeparatorIndexes, SeparatorLengths, Count)
+                    Split = SplitWithEmpties(S, MatchCount, SeparatorIndexes, SeparatorLengths, Count)
                 Case StringSplitOptions.RemoveEmptyEntries
-                    Split = SplitWithoutEmpties(s, MatchCount, SeparatorIndexes, SeparatorLengths, Count)
+                    Split = SplitWithoutEmpties(S, MatchCount, SeparatorIndexes, SeparatorLengths, Count)
                 Case Else
                     Error.Argument ArgumentOutOfRange_Enum
             End Select
         Else
-            Split = Cor.NewStrings(s)
+            Split = Cor.NewStrings(S)
         End If
     End If
 End Function
 
-Private Function FindSeparatorIndexes(ByRef s As String, ByRef Separator As Variant, ByRef SeparatorIndexes() As Long, ByRef SeparatorLengths() As Long) As Long
+Private Function FindSeparatorIndexes(ByRef S As String, ByRef Separator As Variant, ByRef SeparatorIndexes() As Long, ByRef SeparatorLengths() As Long) As Long
     Dim StringSeparator()   As String
     Dim CharSeparator()     As Integer
     
@@ -725,18 +724,18 @@ Private Function FindSeparatorIndexes(ByRef s As String, ByRef Separator As Vari
     
     Select Case VarType(Separator)
         Case vbString
-            FindSeparatorIndexes = FindStringSeparatorIndexes(s, Separator, SeparatorIndexes, SeparatorLengths)
+            FindSeparatorIndexes = FindStringSeparatorIndexes(S, Separator, SeparatorIndexes, SeparatorLengths)
         Case vbStringArray
             SAPtr(StringSeparator) = SAPtrV(Separator)
             
             If Len1D(Separator) = 1 Then
-                FindSeparatorIndexes = FindStringSeparatorIndexes(s, StringSeparator(LBound(StringSeparator)), SeparatorIndexes, SeparatorLengths)
+                FindSeparatorIndexes = FindStringSeparatorIndexes(S, StringSeparator(LBound(StringSeparator)), SeparatorIndexes, SeparatorLengths)
             Else
-                FindSeparatorIndexes = FindStringSeparatorsIndexes(s, StringSeparator, SeparatorIndexes, SeparatorLengths)
+                FindSeparatorIndexes = FindStringSeparatorsIndexes(S, StringSeparator, SeparatorIndexes, SeparatorLengths)
             End If
         Case vbIntegerArray
             SAPtr(CharSeparator) = SAPtrV(Separator)
-            FindSeparatorIndexes = FindCharSeparatorsIndexes(s, CharSeparator, SeparatorIndexes, SeparatorLengths)
+            FindSeparatorIndexes = FindCharSeparatorsIndexes(S, CharSeparator, SeparatorIndexes, SeparatorLengths)
         Case Else
             Error.Argument Argument_CharArrayRequired, "Separator"
     End Select
@@ -749,7 +748,7 @@ Catch:
     ThrowOrErr Err
 End Function
 
-Private Function FindStringSeparatorIndexes(ByRef s As String, ByRef Separator As Variant, ByRef SeparatorIndexes() As Long, ByRef SeparatorLengths() As Long) As Long
+Private Function FindStringSeparatorIndexes(ByRef S As String, ByRef Separator As Variant, ByRef SeparatorIndexes() As Long, ByRef SeparatorLengths() As Long) As Long
     Dim MatchCount As Long
     Dim SepLength  As Long
     Dim MatchIndex As Long
@@ -757,7 +756,7 @@ Private Function FindStringSeparatorIndexes(ByRef s As String, ByRef Separator A
     SepLength = Len(Separator)
         
     Do
-        MatchIndex = InStr(MatchIndex + 1, s, Separator) - 1
+        MatchIndex = InStr(MatchIndex + 1, S, Separator) - 1
         
         If MatchIndex >= 0 Then
             SeparatorIndexes(MatchCount) = MatchIndex
@@ -772,7 +771,7 @@ Private Function FindStringSeparatorIndexes(ByRef s As String, ByRef Separator A
     FindStringSeparatorIndexes = MatchCount
 End Function
 
-Private Function FindStringSeparatorsIndexes(ByRef s As String, ByRef Separator() As String, ByRef SeparatorIndexes() As Long, ByRef SeparatorLengths() As Long) As Long
+Private Function FindStringSeparatorsIndexes(ByRef S As String, ByRef Separator() As String, ByRef SeparatorIndexes() As Long, ByRef SeparatorLengths() As Long) As Long
     Dim CharIndex   As Long
     Dim SLength     As Long
     Dim SeparatorUB As Long
@@ -783,20 +782,20 @@ Private Function FindStringSeparatorsIndexes(ByRef s As String, ByRef Separator(
         
     SeparatorUB = UBound(Separator)
     SeparatorLB = LBound(Separator)
-    SLength = Len(s)
+    SLength = Len(S)
     
     Do While CharIndex < SLength
-        Dim i As Long
+        Dim I As Long
         
-        For i = SeparatorLB To SeparatorUB
-            Sep = Separator(i)
+        For I = SeparatorLB To SeparatorUB
+            Sep = Separator(I)
             SepLength = Len(Sep)
             
             If SepLength > SLength - CharIndex Then
                 Exit For
             End If
             
-            If CompareEx(s, CharIndex, Sep, 0, SepLength, StringComparison.Ordinal) = 0 Then
+            If CompareEx(S, CharIndex, Sep, 0, SepLength, StringComparison.Ordinal) = 0 Then
                 SeparatorIndexes(MatchCount) = CharIndex
                 SeparatorLengths(MatchCount) = SepLength
                 MatchCount = MatchCount + 1
@@ -811,7 +810,7 @@ Private Function FindStringSeparatorsIndexes(ByRef s As String, ByRef Separator(
     FindStringSeparatorsIndexes = MatchCount
 End Function
 
-Private Function FindCharSeparatorsIndexes(ByRef s As String, ByRef Separator() As Integer, ByRef SeparatorIndexes() As Long, ByRef SeparatorLengths() As Long) As Long
+Private Function FindCharSeparatorsIndexes(ByRef S As String, ByRef Separator() As Integer, ByRef SeparatorIndexes() As Long, ByRef SeparatorLengths() As Long) As Long
     Dim Chars()     As Integer
     Dim CharIndex   As Long
     Dim SLength     As Long
@@ -821,16 +820,16 @@ Private Function FindCharSeparatorsIndexes(ByRef s As String, ByRef Separator() 
     
     SeparatorUB = UBound(Separator)
     SeparatorLB = LBound(Separator)
-    SLength = Len(s)
-    Chars = AllocChars(s)
+    SLength = Len(S)
+    Chars = AllocChars(S)
     
     On Error GoTo Catch
     
     Do While CharIndex < SLength
-        Dim i As Long
+        Dim I As Long
         
-        For i = SeparatorLB To SeparatorUB
-            If Chars(CharIndex) = Separator(i) Then
+        For I = SeparatorLB To SeparatorUB
+            If Chars(CharIndex) = Separator(I) Then
                 SeparatorIndexes(MatchCount) = CharIndex
                 SeparatorLengths(MatchCount) = 1
                 MatchCount = MatchCount + 1
@@ -850,14 +849,14 @@ Catch:
     ThrowOrErr Err
 End Function
 
-Private Function FindWhitespaceSeparatorIndexes(ByRef s As String, ByRef SeparatorIndexes() As Long, ByRef SeparatorLengths() As Long) As Long
+Private Function FindWhitespaceSeparatorIndexes(ByRef S As String, ByRef SeparatorIndexes() As Long, ByRef SeparatorLengths() As Long) As Long
     Dim Chars()     As Integer
     Dim CharIndex   As Long
     Dim SLength     As Long
     Dim MatchCount  As Long
     
-    SLength = Len(s)
-    Chars = AllocChars(s)
+    SLength = Len(S)
+    Chars = AllocChars(S)
     
     On Error GoTo Catch
     
@@ -880,7 +879,7 @@ Catch:
     ThrowOrErr Err
 End Function
 
-Private Function SplitWithEmpties(ByRef s As String, ByVal MatchCount As Long, ByRef SeparatorIndexes() As Long, ByRef SeparatorLengths() As Long, ByVal Count As Long) As String()
+Private Function SplitWithEmpties(ByRef S As String, ByVal MatchCount As Long, ByRef SeparatorIndexes() As Long, ByRef SeparatorLengths() As Long, ByVal Count As Long) As String()
     Dim Result()            As String
     Dim MaxSubstrings       As Long
     Dim SubstringStartIndex As Long
@@ -888,63 +887,63 @@ Private Function SplitWithEmpties(ByRef s As String, ByVal MatchCount As Long, B
     MaxSubstrings = IIf(MatchCount + 1 < Count, MatchCount, Count - 1)
     ReDim Result(0 To MaxSubstrings)
     
-    Dim i As Long
-    For i = 0 To MaxSubstrings - 1
-        Result(i) = Mid$(s, SubstringStartIndex + 1, SeparatorIndexes(i) - SubstringStartIndex)
-        SubstringStartIndex = SeparatorIndexes(i) + SeparatorLengths(i)
+    Dim I As Long
+    For I = 0 To MaxSubstrings - 1
+        Result(I) = Mid$(S, SubstringStartIndex + 1, SeparatorIndexes(I) - SubstringStartIndex)
+        SubstringStartIndex = SeparatorIndexes(I) + SeparatorLengths(I)
     Next
     
-    If SubstringStartIndex < Len(s) Then
-        Result(MaxSubstrings) = Mid$(s, SubstringStartIndex + 1, Len(s) - SubstringStartIndex)
+    If SubstringStartIndex < Len(S) Then
+        Result(MaxSubstrings) = Mid$(S, SubstringStartIndex + 1, Len(S) - SubstringStartIndex)
     End If
 
     SplitWithEmpties = Result
 End Function
 
-Private Function SplitWithoutEmpties(ByRef s As String, ByVal MatchCount As Long, ByRef SeparatorIndexes() As Long, ByRef SeparatorLengths() As Long, ByVal Count As Long) As String()
+Private Function SplitWithoutEmpties(ByRef S As String, ByVal MatchCount As Long, ByRef SeparatorIndexes() As Long, ByRef SeparatorLengths() As Long, ByVal Count As Long) As String()
     Dim MaxSubstrings As Long
     
-    MaxSubstrings = CountSubstrings(s, MatchCount, SeparatorIndexes, SeparatorLengths)
+    MaxSubstrings = CountSubstrings(S, MatchCount, SeparatorIndexes, SeparatorLengths)
     MaxSubstrings = IIf(MaxSubstrings < Count, MaxSubstrings, Count)
-    SplitWithoutEmpties = CreateSubstrings(s, MatchCount, MaxSubstrings, SeparatorIndexes, SeparatorLengths)
+    SplitWithoutEmpties = CreateSubstrings(S, MatchCount, MaxSubstrings, SeparatorIndexes, SeparatorLengths)
 End Function
 
-Private Function CountSubstrings(ByRef s As String, ByVal MatchCount As Long, ByRef SeparatorIndexes() As Long, ByRef SeparatorLengths() As Long) As Long
+Private Function CountSubstrings(ByRef S As String, ByVal MatchCount As Long, ByRef SeparatorIndexes() As Long, ByRef SeparatorLengths() As Long) As Long
     Dim SubstringStartIndex As Long
     
-    Dim i As Long
-    For i = 0 To MatchCount - 1
-        If SeparatorIndexes(i) - SubstringStartIndex > 0 Then
+    Dim I As Long
+    For I = 0 To MatchCount - 1
+        If SeparatorIndexes(I) - SubstringStartIndex > 0 Then
             CountSubstrings = CountSubstrings + 1
         End If
         
-        SubstringStartIndex = SeparatorIndexes(i) + SeparatorLengths(i)
+        SubstringStartIndex = SeparatorIndexes(I) + SeparatorLengths(I)
     Next
     
-    If SubstringStartIndex < Len(s) And (Len(s) - SubstringStartIndex) > 0 Then
+    If SubstringStartIndex < Len(S) And (Len(S) - SubstringStartIndex) > 0 Then
         CountSubstrings = CountSubstrings + 1
     End If
 End Function
 
-Private Function CreateSubstrings(ByRef s As String, ByVal MatchCount As Long, ByVal MaxSubstrings As Long, ByRef SeparatorIndexes() As Long, ByRef SeparatorLengths() As Long) As String()
+Private Function CreateSubstrings(ByRef S As String, ByVal MatchCount As Long, ByVal MaxSubstrings As Long, ByRef SeparatorIndexes() As Long, ByRef SeparatorLengths() As Long) As String()
     Dim Result()            As String
     Dim SubstringStartIndex As Long
     Dim ResultIndex         As Long
     
     ReDim Result(0 To MaxSubstrings - 1)
     
-    Dim i As Long
-    For i = 0 To MatchCount - 1
-        If SeparatorIndexes(i) - SubstringStartIndex > 0 Then
-            Result(ResultIndex) = Mid$(s, SubstringStartIndex + 1, SeparatorIndexes(i) - SubstringStartIndex)
+    Dim I As Long
+    For I = 0 To MatchCount - 1
+        If SeparatorIndexes(I) - SubstringStartIndex > 0 Then
+            Result(ResultIndex) = Mid$(S, SubstringStartIndex + 1, SeparatorIndexes(I) - SubstringStartIndex)
             ResultIndex = ResultIndex + 1
         End If
         
-        SubstringStartIndex = SeparatorIndexes(i) + SeparatorLengths(i)
+        SubstringStartIndex = SeparatorIndexes(I) + SeparatorLengths(I)
     Next
     
-    If SubstringStartIndex < Len(s) And (Len(s) - SubstringStartIndex) > 0 Then
-        Result(MaxSubstrings - 1) = Mid$(s, SubstringStartIndex + 1, Len(s) - SubstringStartIndex)
+    If SubstringStartIndex < Len(S) And (Len(S) - SubstringStartIndex) > 0 Then
+        Result(MaxSubstrings - 1) = Mid$(S, SubstringStartIndex + 1, Len(S) - SubstringStartIndex)
     End If
 
     CreateSubstrings = Result
@@ -1263,29 +1262,29 @@ End Function
 '       </td>
 '   </tr>
 ' </table>
-Public Function CharAt(ByRef s As String, ByVal Index As Long) As Integer
+Public Function CharAt(ByRef S As String, ByVal Index As Long) As Integer
     If Index < 0 Then _
         Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_NeedNonNegNum
-    If Index >= Len(s) Then _
+    If Index >= Len(S) Then _
         Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_Index
     
-    CharAt = MemWord(StrPtr(s) + Index * vbSizeOfChar)
+    CharAt = MemWord(StrPtr(S) + Index * vbSizeOfChar)
 End Function
 
-Friend Function LastChar(ByRef s As String) As Integer
+Friend Function LastChar(ByRef S As String) As Integer
     Dim Length As Long
     Dim LastCharIndex As Long
     
-    Length = Len(s)
+    Length = Len(S)
     
     If Length > 0 Then
         LastCharIndex = Length - 1
-        LastChar = MemWord(StrPtr(s) + LastCharIndex * vbSizeOfChar)
+        LastChar = MemWord(StrPtr(S) + LastCharIndex * vbSizeOfChar)
     End If
 End Function
 
-Friend Function AllChars(ByRef s As String, ByVal Predicate As Long) As Boolean
-    AllChars = CheckChars(s, False, Predicate)
+Friend Function AllChars(ByRef S As String, ByVal Predicate As Long) As Boolean
+    AllChars = CheckChars(S, False, Predicate)
 End Function
 
 
@@ -1293,24 +1292,13 @@ End Function
 '   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_Initialize()
-    Set mCharChecker = InitDelegate(mCharCheckerDelegate)
     InitCompareStructures
     LoadLowerUpperLookupTable
 End Sub
 
-Private Sub Class_Terminate()
-    ' Normally we could let light-weight delegate object release
-    ' on their own, but, this class will be kept alive for the
-    ' duration of the application, so when the delegation object
-    ' is finally released, the Delegation module may have already
-    ' be deallocated, removing the Release function the delegate
-    ' object would have called. Since the delegation object is
-    ' owned by this class, no memory needs deallocating, so we
-    ' can just unhook the object pointer instead and let the
-    ' normal class tear-down take care of the allocated delegate.
-    ObjectPtr(mCharChecker) = vbNullPtr
-    DisposeCompareStructures
-End Sub
+'Private Sub Class_Terminate()
+'    DisposeCompareStructures
+'End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -1324,8 +1312,6 @@ Private Sub InitCompareStructures()
     End With
     
     mString2SA = mString1SA
-    SAPtr(mString1) = VarPtr(mString1SA)
-    SAPtr(mString2) = VarPtr(mString2SA)
     
     With mString1LngSA
         .cbElements = 4
@@ -1334,13 +1320,29 @@ Private Sub InitCompareStructures()
     End With
     
     mString2LngSA = mString1LngSA
+End Sub
+
+Private Sub HookupStringProxies(ByVal PtrA As Long, ByVal PtrB As Long)
+    mString1SA.PVData = PtrA
+    mString2SA.PVData = PtrB
+    mString1LngSA.PVData = PtrA
+    mString2LngSA.PVData = PtrB
+    SAPtr(mString1) = VarPtr(mString1SA)
+    SAPtr(mString2) = VarPtr(mString2SA)
     SAPtr(mString1Lng) = VarPtr(mString1LngSA)
     SAPtr(mString2Lng) = VarPtr(mString2LngSA)
 End Sub
 
+Private Sub UnhookStringProxies()
+    SAPtr(mString1) = vbNullPtr
+    SAPtr(mString2) = vbNullPtr
+    SAPtr(mString1Lng) = vbNullPtr
+    SAPtr(mString2Lng) = vbNullPtr
+End Sub
+
 Private Sub LoadLowerUpperLookupTable()
     Dim Data()  As Byte
-    Dim i       As Long
+    Dim I       As Long
     Dim LowCh   As Long
     
     Data = LoadResData(101, "LOWERUPPERLOOKUP")
@@ -1348,8 +1350,8 @@ Private Sub LoadLowerUpperLookupTable()
     
     ' Fill in table with one-to-one lookup
     ' for when we just fallback outside ASCII values.
-    For i = 0 To 65535
-        mLowerUpper(i) = AsWord(i)
+    For I = 0 To 65535
+        mLowerUpper(I) = AsWord(I)
     Next
     
     ' Replace one-to-one values with lower-to-upper
@@ -1357,26 +1359,19 @@ Private Sub LoadLowerUpperLookupTable()
     ' Table structure:
     ' lower case: 16bits
     ' upper case: 16bits
-    For i = 0 To UBound(Data) Step 4
-        LowCh = AsWord(Data(i)) And &HFFFF&
-        mLowerUpper(LowCh) = AsWord(Data(i + 2))
+    For I = 0 To UBound(Data) Step 4
+        LowCh = AsWord(Data(I)) And &HFFFF&
+        mLowerUpper(LowCh) = AsWord(Data(I + 2))
     Next
 End Sub
 
-Private Sub DisposeCompareStructures()
-    SAPtr(mString1) = vbNullPtr
-    SAPtr(mString2) = vbNullPtr
-    SAPtr(mString1Lng) = vbNullPtr
-    SAPtr(mString2Lng) = vbNullPtr
-End Sub
-
-Private Function MakeStringRange(ByRef s As String, ByRef StartIndex As Variant, ByRef Count As Variant) As ListRange
+Private Function MakeStringRange(ByRef S As String, ByRef StartIndex As Variant, ByRef Count As Variant) As ListRange
     If IsMissing(StartIndex) Then
         If Not IsMissing(Count) Then _
             Error.Argument Argument_ParamRequired, "StartIndex"
             
-        MakeStringRange.Index = Len(s) - 1
-        MakeStringRange.Count = Len(s)
+        MakeStringRange.Index = Len(S) - 1
+        MakeStringRange.Count = Len(S)
     Else
         MakeStringRange.Index = StartIndex
         MakeStringRange.Count = CLngOrDefault(Count, MakeStringRange.Index + 1)
@@ -1393,7 +1388,7 @@ Private Function FormatCore(ByRef Provider As IFormatProvider, ByRef Format As S
     FormatCore = StringBuilderCache.GetStringAndRelease(Output)
 End Function
 
-Private Function IndexOfAnyCore(ByRef s As String, ByRef OfAny As Variant, ByVal StartIndex As Long, ByVal EndIndex As Long, ByVal Step As Long) As Long
+Private Function IndexOfAnyCore(ByRef S As String, ByRef OfAny As Variant, ByVal StartIndex As Long, ByVal EndIndex As Long, ByVal Step As Long) As Long
     Dim OfAnyChars()    As Integer
     Dim Chars()         As Integer
     Dim OfAnyLB         As Long
@@ -1405,19 +1400,19 @@ Private Function IndexOfAnyCore(ByRef s As String, ByRef OfAny As Variant, ByVal
     If SAPtr(OfAnyChars) = vbNullPtr Then _
         Error.ArgumentNull "OfAny", ArgumentNull_Array
         
-    Chars = AllocChars(s)
+    Chars = AllocChars(S)
     OfAnyLB = LBound(OfAnyChars)
     OfAnyUB = UBound(OfAnyChars)
     
-    Dim i   As Long
+    Dim I   As Long
     Dim j   As Long
     Dim Ch  As Integer
-    For i = StartIndex To EndIndex Step Step
-        Ch = Chars(i)
+    For I = StartIndex To EndIndex Step Step
+        Ch = Chars(I)
         
         For j = OfAnyLB To OfAnyUB
             If Ch = OfAnyChars(j) Then
-                IndexOfAnyCore = i
+                IndexOfAnyCore = I
                 GoTo CleanExit
             End If
         Next
@@ -1436,24 +1431,24 @@ CleanExit:
     FreeChars Chars
 End Function
 
-Private Function TrimCore(ByRef s As String, ByRef TrimChars As Variant, ByVal TrimHead As Boolean, ByVal TrimTail As Boolean) As String
+Private Function TrimCore(ByRef S As String, ByRef TrimChars As Variant, ByVal TrimHead As Boolean, ByVal TrimTail As Boolean) As String
     Select Case VarType(TrimChars)
         Case vbString, vbIntegerArray
             Dim Chars() As Integer
             Chars = AsChars(TrimChars)
-            TrimCore = TrimGeneral(s, Chars, TrimHead, TrimTail)
+            TrimCore = TrimGeneral(S, Chars, TrimHead, TrimTail)
             FreeChars Chars
             
         Case vbMissing
-            TrimCore = TrimWhiteSpace(s, TrimHead, TrimTail)
+            TrimCore = TrimWhiteSpace(S, TrimHead, TrimTail)
             
         Case Else
             Error.Argument Argument_CharArrayRequired, "TrimChars"
     End Select
 End Function
 
-Private Function TrimGeneral(ByRef s As String, ByRef TrimChars() As Integer, ByVal TrimHead As Boolean, ByVal TrimTail As Boolean) As String
-    Dim i           As Long
+Private Function TrimGeneral(ByRef S As String, ByRef TrimChars() As Integer, ByVal TrimHead As Boolean, ByVal TrimTail As Boolean) As String
+    Dim I           As Long
     Dim TrimCharsLB As Long
     Dim TrimCharsUB As Long
     Dim Ch          As Integer
@@ -1462,18 +1457,18 @@ Private Function TrimGeneral(ByRef s As String, ByRef TrimChars() As Integer, By
     Dim EndIndex    As Long
     Dim Chars()     As Integer
     
-    Chars = AllocChars(s)
+    Chars = AllocChars(S)
     TrimCharsLB = LBound(TrimChars)
     TrimCharsUB = UBound(TrimChars)
-    Length = Len(s)
+    Length = Len(S)
     
     If TrimHead Then
         Do While StartIndex < Length
             Ch = Chars(StartIndex)
-            For i = TrimCharsLB To TrimCharsUB
-                If Ch = TrimChars(i) Then Exit For
-            Next i
-            If i > TrimCharsUB Then Exit Do
+            For I = TrimCharsLB To TrimCharsUB
+                If Ch = TrimChars(I) Then Exit For
+            Next I
+            If I > TrimCharsUB Then Exit Do
             StartIndex = StartIndex + 1
         Loop
         
@@ -1486,10 +1481,10 @@ Private Function TrimGeneral(ByRef s As String, ByRef TrimChars() As Integer, By
     If TrimTail Then
         Do While EndIndex >= StartIndex
             Ch = Chars(EndIndex)
-            For i = TrimCharsLB To TrimCharsUB
-                If Ch = TrimChars(i) Then Exit For
-            Next i
-            If i > TrimCharsUB Then Exit Do
+            For I = TrimCharsLB To TrimCharsUB
+                If Ch = TrimChars(I) Then Exit For
+            Next I
+            If I > TrimCharsUB Then Exit Do
             EndIndex = EndIndex - 1
         Loop
         
@@ -1498,60 +1493,60 @@ Private Function TrimGeneral(ByRef s As String, ByRef TrimChars() As Integer, By
         End If
     End If
         
-    TrimGeneral = Mid$(s, StartIndex + 1, EndIndex - StartIndex + 1)
+    TrimGeneral = Mid$(S, StartIndex + 1, EndIndex - StartIndex + 1)
     
 Finally:
     FreeChars Chars
 End Function
 
-Private Function TrimWhiteSpace(ByRef s As String, ByVal TrimHead As Boolean, ByVal TrimTail As Boolean) As String
+Private Function TrimWhiteSpace(ByRef S As String, ByVal TrimHead As Boolean, ByVal TrimTail As Boolean) As String
     Dim StartIndex  As Long
     Dim EndIndex    As Long
-    Dim i           As Long
+    Dim I           As Long
     Dim Chars()     As Integer
     
-    Chars = AllocChars(s)
+    Chars = AllocChars(S)
     If TrimHead Then
-        For i = 0 To UBound(Chars)
-            If Not IsWhiteSpace(Chars(i)) Then
-                StartIndex = i
+        For I = 0 To UBound(Chars)
+            If Not IsWhiteSpace(Chars(I)) Then
+                StartIndex = I
                 Exit For
             End If
         Next
         
-        If i > UBound(Chars) Then
+        If I > UBound(Chars) Then
             GoTo Finally
         End If
     End If
     
-    EndIndex = Len(s) - 1
+    EndIndex = Len(S) - 1
     If TrimTail Then
-        For i = UBound(Chars) To StartIndex Step -1
-            If Not IsWhiteSpace(Chars(i)) Then
-                EndIndex = i
+        For I = UBound(Chars) To StartIndex Step -1
+            If Not IsWhiteSpace(Chars(I)) Then
+                EndIndex = I
                 Exit For
             End If
         Next
         
-        If i < 0 Then
+        If I < 0 Then
             GoTo Finally
         End If
     End If
         
-    TrimWhiteSpace = Mid$(s, StartIndex + 1, EndIndex - StartIndex + 1)
+    TrimWhiteSpace = Mid$(S, StartIndex + 1, EndIndex - StartIndex + 1)
     
 Finally:
     FreeChars Chars
 End Function
 
-Private Function CharCount(ByRef s As String, ByVal Char As Integer) As Long
-    If LenB(s) > 0 Then
+Private Function CharCount(ByRef S As String, ByVal Char As Integer) As Long
+    If LenB(S) > 0 Then
         Dim Chars() As Integer
-        Chars = AllocChars(s)
+        Chars = AllocChars(S)
 
-        Dim i As Long
-        For i = 0 To UBound(Chars)
-            If Chars(i) = Char Then
+        Dim I As Long
+        For I = 0 To UBound(Chars)
+            If Chars(I) = Char Then
                 CharCount = CharCount + 1
             End If
         Next
@@ -1580,13 +1575,13 @@ End Function
 Private Function JoinVariants(ByRef Separator As String, ByRef Value As Variant, ByRef Range As ListRange) As String
     Dim SubStrings() As String
     Dim Variants() As Variant
-    Dim i As Long
+    Dim I As Long
     
     ReDim SubStrings(0 To Range.Count - 1)
     SAPtr(Variants) = SAPtrV(Value)
     
-    For i = 0 To Range.Count - 1
-        SubStrings(i) = Object.ToString(Variants(Range.Index + i))
+    For I = 0 To Range.Count - 1
+        SubStrings(I) = Object.ToString(Variants(Range.Index + I))
     Next
     
     SAPtr(Variants) = vbNullPtr
@@ -1597,9 +1592,9 @@ Private Function JoinArray(ByRef Separator As String, ByRef Value As Variant, By
     Dim Strings() As String
     ReDim Strings(0 To Range.Count - 1)
     
-    Dim i As Long
-    For i = 0 To Range.Count - 1
-        Strings(i) = Object.ToString(Value(Range.Index + i))
+    Dim I As Long
+    For I = 0 To Range.Count - 1
+        Strings(I) = Object.ToString(Value(Range.Index + I))
     Next
     
     JoinArray = VBA.Join(Strings, Separator)
@@ -1634,16 +1629,17 @@ NonEnumerable:
     Error.Argument Argument_NotEnumerable, "Value"
 End Function
 
-Private Function CheckChars(ByRef s As String, ByVal SuccessfulState As Boolean, ByVal Predicate As Long) As Boolean
+Private Function CheckChars(ByRef S As String, ByVal SuccessfulState As Boolean, ByVal Predicate As Long) As Boolean
+    Dim Checker As Func_T_Boolean
     Dim Chars() As Integer
-    Dim i       As Long
+    Dim I       As Long
 
-    mCharCheckerDelegate.pfn = Predicate
-    Chars = AllocChars(s)
+    Set Checker = InitDelegate(mCharCheckerDelegate, Predicate)
+    Chars = AllocChars(S)
     CheckChars = Not SuccessfulState
     
-    For i = 0 To UBound(Chars)
-        If mCharChecker.Invoke(Chars(i)) = SuccessfulState Then
+    For I = 0 To UBound(Chars)
+        If Checker.Invoke(Chars(I)) = SuccessfulState Then
             CheckChars = SuccessfulState
             Exit For
         End If
@@ -1789,12 +1785,13 @@ End Function
 
 ' This method is exposed to allow for quicker array sorting.
 Friend Function CompareStringOrdinal(ByVal PtrA As Long, ByVal LengthA As Long, ByVal PtrB As Long, ByVal LengthB As Long) As Long
-    Dim i       As Long
+    Dim I       As Long
     Dim Length  As Long
     Dim Result  As Long
     
-    mString1SA.PVData = PtrA
-    mString2SA.PVData = PtrB
+    HookupStringProxies PtrA, PtrB
+'    mString1SA.PVData = PtrA
+'    mString2SA.PVData = PtrB
     
     If LengthA <= LengthB Then
         Length = LengthA
@@ -1805,38 +1802,37 @@ Friend Function CompareStringOrdinal(ByVal PtrA As Long, ByVal LengthA As Long, 
     ' We're guessing most strings will be 10 or less characters.
     ' Unroll 10 character comparisons without looping.
     Do While Length > 10
-        Result = (mString1(i) And &HFFFF&) - (mString2(i) And &HFFFF&): If Result Then GoTo Finally
-        Result = (mString1(i + 1) And &HFFFF&) - (mString2(i + 1) And &HFFFF&): If Result Then GoTo Finally
-        Result = (mString1(i + 2) And &HFFFF&) - (mString2(i + 2) And &HFFFF&): If Result Then GoTo Finally
-        Result = (mString1(i + 3) And &HFFFF&) - (mString2(i + 3) And &HFFFF&): If Result Then GoTo Finally
-        Result = (mString1(i + 4) And &HFFFF&) - (mString2(i + 4) And &HFFFF&): If Result Then GoTo Finally
-        Result = (mString1(i + 5) And &HFFFF&) - (mString2(i + 5) And &HFFFF&): If Result Then GoTo Finally
-        Result = (mString1(i + 6) And &HFFFF&) - (mString2(i + 6) And &HFFFF&): If Result Then GoTo Finally
-        Result = (mString1(i + 7) And &HFFFF&) - (mString2(i + 7) And &HFFFF&): If Result Then GoTo Finally
-        Result = (mString1(i + 8) And &HFFFF&) - (mString2(i + 8) And &HFFFF&): If Result Then GoTo Finally
-        Result = (mString1(i + 9) And &HFFFF&) - (mString2(i + 9) And &HFFFF&): If Result Then GoTo Finally
+        Result = (mString1(I) And &HFFFF&) - (mString2(I) And &HFFFF&): If Result Then GoTo Finally
+        Result = (mString1(I + 1) And &HFFFF&) - (mString2(I + 1) And &HFFFF&): If Result Then GoTo Finally
+        Result = (mString1(I + 2) And &HFFFF&) - (mString2(I + 2) And &HFFFF&): If Result Then GoTo Finally
+        Result = (mString1(I + 3) And &HFFFF&) - (mString2(I + 3) And &HFFFF&): If Result Then GoTo Finally
+        Result = (mString1(I + 4) And &HFFFF&) - (mString2(I + 4) And &HFFFF&): If Result Then GoTo Finally
+        Result = (mString1(I + 5) And &HFFFF&) - (mString2(I + 5) And &HFFFF&): If Result Then GoTo Finally
+        Result = (mString1(I + 6) And &HFFFF&) - (mString2(I + 6) And &HFFFF&): If Result Then GoTo Finally
+        Result = (mString1(I + 7) And &HFFFF&) - (mString2(I + 7) And &HFFFF&): If Result Then GoTo Finally
+        Result = (mString1(I + 8) And &HFFFF&) - (mString2(I + 8) And &HFFFF&): If Result Then GoTo Finally
+        Result = (mString1(I + 9) And &HFFFF&) - (mString2(I + 9) And &HFFFF&): If Result Then GoTo Finally
         
-        i = i + 10
+        I = I + 10
         Length = Length - 10
     Loop
     
     ' Compare the remaining characters one at a time.
     Do While Length > 0
-        Result = (mString1(i) And &HFFFF&) - (mString2(i) And &HFFFF&)
+        Result = (mString1(I) And &HFFFF&) - (mString2(I) And &HFFFF&)
         
         If Result Then
             GoTo Finally
         End If
         
-        i = i + 1
+        I = I + 1
         Length = Length - 1
     Loop
     
     Result = LengthA - LengthB
         
 Finally:
-    mString1SA.PVData = vbNullPtr
-    mString2SA.PVData = vbNullPtr
+    UnhookStringProxies
     CompareStringOrdinal = Result
 End Function
 
@@ -1845,11 +1841,10 @@ Friend Function CompareStringOrdinalIgnoreCase(ByVal PtrA As Long, ByVal LengthA
     Dim ChA As Long
     Dim ChB As Long
     Dim Max As Long
-    Dim i   As Long
+    Dim I   As Long
     Dim Result As Long
     
-    mString1SA.PVData = PtrA
-    mString2SA.PVData = PtrB
+    HookupStringProxies PtrA, PtrB
     
     If LengthA <= LengthB Then
         Max = LengthA - 1
@@ -1857,9 +1852,9 @@ Friend Function CompareStringOrdinalIgnoreCase(ByVal PtrA As Long, ByVal LengthA
         Max = LengthB - 1
     End If
 
-    For i = 0 To Max
-        ChA = mString1(i) And &HFFFF&
-        ChB = mString2(i) And &HFFFF&
+    For I = 0 To Max
+        ChA = mString1(I) And &HFFFF&
+        ChB = mString2(I) And &HFFFF&
         
         ' We do quick range checks in the ASCII range
         ' to convert to upper case to avoid looking
@@ -1890,8 +1885,7 @@ Friend Function CompareStringOrdinalIgnoreCase(ByVal PtrA As Long, ByVal LengthA
     Result = LengthA - LengthB
     
 Finally:
-    mString1SA.PVData = vbNullPtr
-    mString2SA.PVData = vbNullPtr
+    UnhookStringProxies
     CompareStringOrdinalIgnoreCase = Result
 End Function
 
@@ -1902,8 +1896,7 @@ Private Function EqualsOrdinal(ByVal PtrA As Long, ByVal PtrB As Long, ByVal Len
     Dim ChB As Long
     Dim Index As Long
     
-    mString1LngSA.PVData = PtrA
-    mString2LngSA.PVData = PtrB
+    HookupStringProxies PtrA, PtrB
     
     ' We check 32 bits at a time since we are only looking for equality.
     ' The loop is unrolled compare 10 characters without looping. We are
@@ -1933,7 +1926,6 @@ Private Function EqualsOrdinal(ByVal PtrA As Long, ByVal PtrB As Long, ByVal Len
     EqualsOrdinal = Length <= 0
     
 Finally:
-    mString1LngSA.PVData = vbNullPtr
-    mString2LngSA.PVData = vbNullPtr
+    UnhookStringProxies
 End Function
 

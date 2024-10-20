@@ -585,7 +585,7 @@ Public Sub Parse_WithFrenchCulture_ParsesWithSpaceAsGroupSeparator()
     
     Set Provider = NewCultureInfo("fr-FR")
     
-    Set Actual = BigInteger.Parse("9 031 425 666 123 546,00", NumberStyles.AllowDecimalPoint Or NumberStyles.AllowThousands, Provider)
+    Set Actual = BigInteger.Parse(t("9\x202f031\x202f425\x202f666\x202f123\x202f546,00"), NumberStyles.AllowDecimalPoint Or NumberStyles.AllowThousands, Provider)
     
     Assert.That Actual.ToString, Iz.EqualTo("9031425666123546")
 End Sub

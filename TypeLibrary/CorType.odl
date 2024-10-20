@@ -1,8 +1,8 @@
 [
-    helpstring("VB.EXT: CorLib Type Library 3.2"),
-    uuid(97EBCEAB-2671-4384-B175-9B29DE78069C),
+    helpstring("VB.EXT: CorLib Type Library 4.0"),
+    uuid(1705040f-4494-4ab3-8a97-a9f84820636d),
     lcid(0x00000000),
-    version(3.2)
+    version(4.0)
 ]
 library CorType {
     importlib("stdole2.tlb");

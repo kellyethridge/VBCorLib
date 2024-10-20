@@ -17,6 +17,8 @@ version 4.0
 	* Added LeaveOpen parameter in BinaryWriter constructor. This closes #28.
 	* Fixed #59 - Changed NewSafeHandle parameter ZeroIsInvalid to explicit boolean type.
 	* Fixed #104 - Was not correctly checking for EOF when calling BinaryReader.ReadChar method.
+	* Fixed #111 - Was not correctly releasing resources when parsing numbers, causing crashes to register after application closed.
+	* Fixed #103,#108 - Was not correctly releasing resources when manipulating strings, causing crashes to register after application closed.
 
 version 3.2
 	* Optimize StringBuilder.AppendChar for Release build.
